@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: anonpress-db
+    environment:
+      POSTGRES_USER: anonpress
+      POSTGRES_PASSWORD: anonpress_dev_password
+      POSTGRES_DB: anonpress
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U anonpress"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: .
+    container_name: anonpress-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: 4000
+      NODE_ENV: production
+      DATABASE_URL: postgresql://anonpress:anonpress_dev_password@postgres:5432/anonpress
+      PINATA_API_KEY: ${PINATA_API_KEY}
+      PINATA_SECRET_KEY: ${PINATA_SECRET_KEY}
+      PINATA_JWT: ${PINATA_JWT}
+      IPFS_GATEWAY_URL: ${IPFS_GATEWAY_URL:-https://gateway.pinata.cloud/ipfs}
+      TOR_PROXY_HOST: ${TOR_PROXY_HOST:-localhost}
+      TOR_PROXY_PORT: ${TOR_PROXY_PORT:-9050}
+      TOR_CONTROL_PORT: ${TOR_CONTROL_PORT:-9051}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "4000:4000"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

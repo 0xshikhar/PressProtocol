@@ -1,0 +1,103 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: anonpress-postgres
+    environment:
+      POSTGRES_USER: anonpress
+      POSTGRES_PASSWORD: anonpress_dev
+      POSTGRES_DB: anonpress
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U anonpress"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - anonpress
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: anonpress-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: 4000
+      NODE_ENV: development
+      DATABASE_URL: postgresql://anonpress:anonpress_dev@postgres:5432/anonpress
+      PINATA_API_KEY: ${PINATA_API_KEY}
+      PINATA_SECRET_KEY: ${PINATA_SECRET_KEY}
+      PINATA_JWT: ${PINATA_JWT}
+      IPFS_GATEWAY_URL: https://gateway.pinata.cloud/ipfs
+      TOR_PROXY_HOST: localhost
+      TOR_PROXY_PORT: 9050
+      TOR_CONTROL_PORT: 9051
+      CORS_ORIGIN: http://localhost:3000
+      JWT_SECRET: ${JWT_SECRET:-dev_jwt_secret_at_least_32_characters_long}
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - anonpress
+    restart: unless-stopped
+
+  # WordPress with MySQL
+  wordpress-db:
+    image: mysql:8.0
+    container_name: anonpress-wordpress-db
+    environment:
+      MYSQL_ROOT_PASSWORD: wordpress_root
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    volumes:
+      - wordpress_db:/var/lib/mysql
+    networks:
+      - anonpress
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  wordpress:
+    image: wordpress:latest
+    container_name: anonpress-wordpress
+    depends_on:
+      wordpress-db:
+        condition: service_healthy
+      backend:
+        condition: service_started
+    environment:
+      WORDPRESS_DB_HOST: wordpress-db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    ports:
+      - "8080:80"
+    volumes:
+      - wordpress_data:/var/www/html
+      - ./wordpress-plugin:/var/www/html/wp-content/plugins/anonpress
+    networks:
+      - anonpress
+    restart: unless-stopped
+
+networks:
+  anonpress:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  wordpress_db:
+  wordpress_data:
