@@ -23,8 +23,8 @@ const Navbar = () => {
 			<div className="max-w-7xl mx-auto flex items-center justify-between">
 				{/* Logo */}
 				<Link href="/" className="flex items-center">
-					<div className="text-[28px] md:text-[32px] text-white font-serif">
-						MyLogo
+					<div className="text-[28px] md:text-[32px] text-white font-bold">
+						AnonPress
 					</div>
 				</Link>
 
@@ -56,20 +56,21 @@ const Navbar = () => {
 				<div className="hidden md:flex items-center">
 					<div
 						className="text-[#c8cacd] hover:text-white cursor-pointer px-4 font-bold"
-						onClick={() => router.push("/explore")}
+						onClick={() => router.push("/#discover")}
 					>
-						Explore
+						Discover
 					</div>
 					<div
-						className="font-bold flex items-center text-[#8a939b] text-xl px-4 hover:text-white cursor-pointer"
-						onClick={() => router.push("/nft")}
+						className="text-[#c8cacd] hover:text-white cursor-pointer px-4 font-bold"
+						onClick={() => router.push("/publish")}
 					>
-						<CgProfile className="mr-2" /> NFTProfile
+						Publish
 					</div>
-					<div className="text-[#c8cacd] hover:text-white text-xl cursor-pointer px-4 font-bold flex items-center"
-						onClick={() => router.push("/token")}
+					<div
+						className="text-[#c8cacd] hover:text-white cursor-pointer px-4 font-bold"
+						onClick={() => router.push("/dashboard")}
 					>
-						<MdOutlineAccountBalanceWallet className="mr-2" /> Token
+						Dashboard
 					</div>
 					<div className="px-4">
 						<AuthButton />
@@ -124,23 +125,29 @@ const Navbar = () => {
 					<div
 						className="text-[#c8cacd] hover:text-white cursor-pointer font-bold py-2"
 						onClick={() => {
-							router.push("/explore");
+							router.push("/#discover");
 							setIsMenuOpen(false);
 						}}
 					>
-						Explore
+						Discover
 					</div>
 					<div
-						className="text-[#c8cacd] hover:text-white cursor-pointer font-bold py-2 flex items-center"
+						className="text-[#c8cacd] hover:text-white cursor-pointer font-bold py-2"
 						onClick={() => {
-							router.push("/nft");
+							router.push("/publish");
 							setIsMenuOpen(false);
 						}}
 					>
-						<CgProfile className="mr-2" /> Profile
+						Publish
 					</div>
-					<div className="text-[#c8cacd] hover:text-white cursor-pointer font-bold py-2 flex items-center">
-						<MdOutlineAccountBalanceWallet className="mr-2" /> Wallet
+					<div
+						className="text-[#c8cacd] hover:text-white cursor-pointer font-bold py-2"
+						onClick={() => {
+							router.push("/dashboard");
+							setIsMenuOpen(false);
+						}}
+					>
+						Dashboard
 					</div>
 					<div className="py-2">
 						<AuthButton />

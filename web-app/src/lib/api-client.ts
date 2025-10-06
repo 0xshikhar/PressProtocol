@@ -33,6 +33,9 @@ export interface ResolveContentResponse {
   };
   recommended: "ipfs" | "tor" | "gateway";
   publisher: {
+    walletAddress: string;
+    username?: string;
+    avatar?: string;
     pubkey: string;
     signature: string;
   };
