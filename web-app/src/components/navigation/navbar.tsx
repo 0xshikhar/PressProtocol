@@ -1,161 +1,208 @@
 "use client"
-import Image from "next/image";
+
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
-import { AiOutlineSearch, AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
-import { CgProfile } from "react-icons/cg";
-import { MdOutlineAccountBalanceWallet } from "react-icons/md";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
+import { Search, Menu, X, Bell, BookMarked, TrendingUp, FileText, Home, BarChart3, Settings, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AuthButton } from "@/components/AuthButton";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 const Navbar = () => {
-	const router = useRouter();
-	const [searchQuery, setSearchQuery] = useState("");
-	const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-	const toggleMenu = () => {
-		setIsMenuOpen(!isMenuOpen);
-	};
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/explore?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+      setIsSearchOpen(false);
+    }
+  };
 
-	return (
-		<nav className="bg-black w-full px-4 py-3 sticky top-0 z-50">
-			<div className="max-w-7xl mx-auto flex items-center justify-between">
-				{/* Logo */}
-				<Link href="/" className="flex items-center">
-					<div className="text-[28px] md:text-[32px] text-white font-bold">
-						AnonPress
-					</div>
-				</Link>
+  const navLinks = [
+    { href: "/", label: "Home", icon: Home },
+    { href: "/explore", label: "Explore", icon: Search },
+    { href: "/trending", label: "Trending", icon: TrendingUp },
+    { href: "/publish", label: "Publish", icon: FileText },
+    { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
+  ];
 
-				{/* Desktop Search Bar - hidden on mobile */}
-				<div className="hidden md:flex flex-1 mx-4 max-w-[520px] items-center bg-[#363840] rounded-lg hover:bg-[#4c505c]">
-					<div className="text-[#8a939b] mx-3 font-bold text-lg">
-						<AiOutlineSearch />
-					</div>
-					<input
-						className="h-10 w-full border-0 bg-transparent outline-0 ring-0 px-2 pl-0 text-[#e6e8eb] placeholder:text-[#8a939b]"
-						type="text"
-						value={searchQuery}
-						onChange={(e) => setSearchQuery(e.target.value)}
-						placeholder="Enter Text"
-					/>
-					<button
-						onClick={() => {
-							if (searchQuery.trim()) {
-								router.push(`/searching/${searchQuery}`);
-							}
-						}}
-						className="text-white px-4 py-2"
-					>
-						Search
-					</button>
-				</div>
+  return (
+    <nav className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-lg supports-[backdrop-filter]:bg-white/60">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+        {/* Logo */}
+        <Link href="/" className="flex items-center space-x-2">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent">
+            <FileText className="h-5 w-5 text-white" />
+          </div>
+          <span className="text-xl font-bold text-gradient">AnonPress</span>
+        </Link>
 
-				{/* Desktop Menu Items - hidden on mobile */}
-				<div className="hidden md:flex items-center">
-					<div
-						className="text-[#c8cacd] hover:text-white cursor-pointer px-4 font-bold"
-						onClick={() => router.push("/#discover")}
-					>
-						Discover
-					</div>
-					<div
-						className="text-[#c8cacd] hover:text-white cursor-pointer px-4 font-bold"
-						onClick={() => router.push("/publish")}
-					>
-						Publish
-					</div>
-					<div
-						className="text-[#c8cacd] hover:text-white cursor-pointer px-4 font-bold"
-						onClick={() => router.push("/dashboard")}
-					>
-						Dashboard
-					</div>
-					<div className="px-4">
-						<AuthButton />
-					</div>
-				</div>
+        {/* Desktop Navigation */}
+        <div className="hidden items-center space-x-1 md:flex">
+          {navLinks.map((link) => {
+            const Icon = link.icon;
+            const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
+            
+            return (
+              <Link key={link.href} href={link.href}>
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "gap-2 font-medium transition-all",
+                    isActive
+                      ? "bg-primary/10 text-primary hover:bg-primary/20"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Icon className="h-4 w-4" />
+                  {link.label}
+                </Button>
+              </Link>
+            );
+          })}
+        </div>
 
-				{/* Mobile Menu Button - visible only on mobile */}
-				<div className="md:hidden flex items-center">
-					<button
-						onClick={toggleMenu}
-						className="text-white text-2xl focus:outline-none"
-					>
-						{isMenuOpen ? <AiOutlineClose /> : <AiOutlineMenu />}
-					</button>
-				</div>
-			</div>
+        {/* Desktop Actions */}
+        <div className="hidden items-center space-x-3 md:flex">
+          {/* Search */}
+          <div className="relative">
+            <form onSubmit={handleSearch} className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search content..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-64 pl-9 pr-4"
+              />
+            </form>
+          </div>
 
-			{/* Mobile Menu - hidden on desktop */}
-			<div
-				className={cn(
-					"md:hidden absolute left-0 right-0 bg-black transition-all duration-300 ease-in-out overflow-hidden",
-					isMenuOpen ? "max-h-[500px] py-4" : "max-h-0"
-				)}
-			>
-				{/* Mobile Search Bar */}
-				<div className="flex mx-4 my-3 items-center bg-[#363840] rounded-lg">
-					<div className="text-[#8a939b] mx-3 font-bold text-lg">
-						<AiOutlineSearch />
-					</div>
-					<input
-						className="h-10 w-full border-0 bg-transparent outline-0 ring-0 px-2 pl-0 text-[#e6e8eb] placeholder:text-[#8a939b]"
-						type="text"
-						value={searchQuery}
-						onChange={(e) => setSearchQuery(e.target.value)}
-						placeholder="Enter Text"
-					/>
-					<button
-						onClick={() => {
-							if (searchQuery.trim()) {
-								router.push(`/searching/${searchQuery}`);
-								setIsMenuOpen(false);
-							}
-						}}
-						className="text-white px-4 py-2"
-					>
-						Search
-					</button>
-				</div>
+          {/* Bookmarks */}
+          <Button variant="ghost" size="icon" onClick={() => router.push("/bookmarks")}>
+            <BookMarked className="h-5 w-5" />
+          </Button>
 
-				{/* Mobile Menu Items */}
-				<div className="flex flex-col px-4 space-y-4 pb-4">
-					<div
-						className="text-[#c8cacd] hover:text-white cursor-pointer font-bold py-2"
-						onClick={() => {
-							router.push("/#discover");
-							setIsMenuOpen(false);
-						}}
-					>
-						Discover
-					</div>
-					<div
-						className="text-[#c8cacd] hover:text-white cursor-pointer font-bold py-2"
-						onClick={() => {
-							router.push("/publish");
-							setIsMenuOpen(false);
-						}}
-					>
-						Publish
-					</div>
-					<div
-						className="text-[#c8cacd] hover:text-white cursor-pointer font-bold py-2"
-						onClick={() => {
-							router.push("/dashboard");
-							setIsMenuOpen(false);
-						}}
-					>
-						Dashboard
-					</div>
-					<div className="py-2">
-						<AuthButton />
-					</div>
-				</div>
-			</div>
-		</nav>
-	);
+          {/* Notifications */}
+          <Button variant="ghost" size="icon" className="relative">
+            <Bell className="h-5 w-5" />
+            <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-destructive" />
+          </Button>
+
+          {/* Auth */}
+          <AuthButton />
+        </div>
+
+        {/* Mobile Menu */}
+        <div className="flex items-center gap-2 md:hidden">
+          {/* Mobile Search */}
+          <Sheet open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Search className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="top" className="h-auto">
+              <SheetHeader>
+                <SheetTitle>Search Content</SheetTitle>
+              </SheetHeader>
+              <form onSubmit={handleSearch} className="mt-4">
+                <Input
+                  type="text"
+                  placeholder="Search content..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full"
+                  autoFocus
+                />
+              </form>
+            </SheetContent>
+          </Sheet>
+
+          {/* Mobile Navigation */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[280px]">
+              <SheetHeader className="mb-6">
+                <SheetTitle className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent">
+                    <FileText className="h-4 w-4 text-white" />
+                  </div>
+                  <span className="text-gradient">AnonPress</span>
+                </SheetTitle>
+              </SheetHeader>
+              
+              <div className="flex flex-col space-y-3">
+                {navLinks.map((link) => {
+                  const Icon = link.icon;
+                  const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
+                  
+                  return (
+                    <Link key={link.href} href={link.href}>
+                      <Button
+                        variant={isActive ? "secondary" : "ghost"}
+                        className={cn(
+                          "w-full justify-start gap-3",
+                          isActive && "bg-primary/10 text-primary hover:bg-primary/20"
+                        )}
+                      >
+                        <Icon className="h-4 w-4" />
+                        {link.label}
+                      </Button>
+                    </Link>
+                  );
+                })}
+                
+                <div className="my-4 border-t" />
+                
+                <Link href="/bookmarks">
+                  <Button variant="ghost" className="w-full justify-start gap-3">
+                    <BookMarked className="h-4 w-4" />
+                    Bookmarks
+                  </Button>
+                </Link>
+                
+                <Link href="/settings">
+                  <Button variant="ghost" className="w-full justify-start gap-3">
+                    <Settings className="h-4 w-4" />
+                    Settings
+                  </Button>
+                </Link>
+                
+                <Link href="/help">
+                  <Button variant="ghost" className="w-full justify-start gap-3">
+                    <HelpCircle className="h-4 w-4" />
+                    Help & Support
+                  </Button>
+                </Link>
+                
+                <div className="my-4 border-t" />
+                
+                <AuthButton />
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
+    </nav>
+  );
 };
 
 export default Navbar;

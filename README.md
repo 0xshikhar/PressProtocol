@@ -51,23 +51,18 @@ AnonPress enables true freedom of speech by distributing content across IPFS, To
 ### Prerequisites
 
 - Node.js 20+ or Bun
-- PostgreSQL 16+
-- Docker (optional)
+- Docker ( optional)
+- Prisma Postgres account ([Get free account](https://console.prisma.io))
 - Pinata API keys ([Get free account](https://pinata.cloud))
 
 ### 1. Clone & Setup Database
 
 ```bash
-# Create database
-createdb anonpress
-
-# Or use Docker
-docker run -d \
-  --name postgres \
-  -e POSTGRES_PASSWORD=anonpress \
-  -e POSTGRES_DB=anonpress \
-  -p 5432:5432 \
-  postgres:16-alpine
+# 1. Go to https://console.prisma.io
+# 2. Create a new project
+# 3. Select "Prisma Postgres" as your database
+# 4. Copy the DATABASE_URL connection string
+# 5. Keep it handy for the next step
 ```
 
 ### 2. Start Backend
@@ -80,7 +75,9 @@ npm install
 
 # Configure
 cp .env.example .env
-# Edit .env with your Pinata keys
+# Edit .env and add:
+# - Your Prisma Postgres DATABASE_URL
+# - Your Pinata API keys
 
 # Setup database
 npx prisma generate
@@ -124,7 +121,8 @@ Web app runs at `http://localhost:3000`
 - **IPFS** storage via Pinata
 - **Tor** onion service creation
 - **Ed25519** identity management
-- **PostgreSQL** + Prisma ORM
+- **Prisma Postgres** (fully managed cloud database)
+- **Prisma ORM** for type-safe queries
 - **RESTful API** with comprehensive error handling
 
 ### Web Application ([/web-app](./web-app))

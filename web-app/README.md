@@ -1,18 +1,19 @@
 # AnonPress Web App
 
-**Decentralized Censorship-Resistant Publishing Platform**
+**Decentralized Censorship-Resistant Publishing Platform - Frontend**
 
-AnonPress is a Next.js 14 web application that enables censorship-resistant content publishing distributed across IPFS, Tor, and gateway mirrors. Part of the RealFi - Internet Archive Europe Challenge hackathon project.
+AnonPress is a Next.js 14 web application (frontend only) that provides the user interface for censorship-resistant content publishing distributed across IPFS, Tor, and gateway mirrors. Part of the RealFi - Internet Archive Europe Challenge hackathon project.
+
+> **Note**: This is a **frontend-only** application. All database operations, IPFS uploads, and Tor services are handled by the separate `anonpress-backend` repository.
 
 ## Features
 
 - 🔐 **Web3 Authentication** - Privy integration for seamless wallet connection
 - ✍️ **Rich Text Editor** - Tiptap-based editor for content creation
-- 🌐 **Multi-Network Distribution** - Automatic publishing to IPFS, Tor, and gateway mirrors
-- 🔍 **Decentralized Discovery** - IPFS DHT-based content discovery feed
+- 🌐 **Multi-Network Distribution** - UI for IPFS, Tor, and gateway mirror status
+- 🔍 **Decentralized Discovery** - Content discovery feed
 - 📊 **Publisher Dashboard** - Manage and monitor your published content
 - 🎨 **Modern UI** - Built with shadcn/ui and Tailwind CSS
-- 🔒 **Cryptographic Verification** - Ed25519 signatures for content authenticity
 - 📱 **Responsive Design** - Mobile-friendly interface
 
 ## Tech Stack
@@ -20,19 +21,18 @@ AnonPress is a Next.js 14 web application that enables censorship-resistant cont
 - **Framework**: Next.js 14 (App Router)
 - **Package Manager**: Bun
 - **Authentication**: Privy (Web3 + Web2)
-- **Database**: Prisma + PostgreSQL
 - **Styling**: Tailwind CSS + shadcn/ui
 - **Editor**: Tiptap
 - **Icons**: Lucide React
 - **State Management**: React Hooks
 - **Type Safety**: TypeScript
+- **Backend**: API proxy to anonpress-backend
 
 ## Prerequisites
 
 - Node.js 18+ or Bun
-- PostgreSQL database
 - Privy App ID (sign up at [privy.io](https://privy.io))
-- Backend API running (see anonpress-backend repo)
+- **Backend API running** (see anonpress-backend repo) - **REQUIRED**
 
 ## Installation
 
@@ -50,29 +50,24 @@ AnonPress is a Next.js 14 web application that enables censorship-resistant cont
    Update the following variables:
    ```env
    NEXT_PUBLIC_APP_URL=http://localhost:3000
-   DATABASE_URL=postgresql://user:password@localhost:5432/anonpress
-   BACKEND_API_URL=http://localhost:4000
-   JWT_SECRET=your_jwt_secret
-   PINATA_API_KEY=your_pinata_api_key
-   PINATA_SECRET_KEY=your_pinata_secret_key
+   NEXT_PUBLIC_BACKEND_API_URL=http://localhost:4000
    ```
 
-3. **Generate Prisma client**:
-   ```bash
-   bun run build:prisma
-   ```
+3. **Configure Privy**:
+   - Create an account at [privy.io](https://privy.io)
+   - Create a new app
+   - Copy your App ID
+   - Add `http://localhost:3000` to allowed origins
+   - Add `NEXT_PUBLIC_PRIVY_APP_ID=your_app_id` to `.env`
 
-4. **Run database migrations**:
-   ```bash
-   npx prisma migrate dev
-   ```
-
-5. **Start the development server**:
+4. **Start the development server**:
    ```bash
    bun dev
    ```
 
    The app will be available at `http://localhost:3000`
+
+> **Important**: The backend API must be running at `http://localhost:4000` (or your configured URL) for the app to work properly.
 
 ## Project Structure
 
@@ -84,9 +79,9 @@ web-app/
 │   │   ├── publish/           # Publishing interface
 │   │   ├── read/[cid]/        # Content reader view
 │   │   ├── dashboard/         # Publisher dashboard
-│   │   └── api/               # API routes
-│   │       ├── content/       # Content management
-│   │       └── identity/      # Ed25519 identity management
+│   │   └── api/               # API proxy routes (forward to backend)
+│   │       ├── content/       # Content proxy routes
+│   │       └── identity/      # Identity proxy routes
 │   ├── components/
 │   │   ├── editor/            # Rich text editor components
 │   │   ├── discovery/         # Discovery feed components
@@ -94,10 +89,7 @@ web-app/
 │   │   └── ui/                # shadcn/ui components
 │   └── lib/
 │       ├── api-client.ts      # Backend API client
-│       ├── prisma.ts          # Prisma client
 │       └── utils.ts           # Utility functions
-├── prisma/
-│   └── schema.prisma          # Database schema
 └── package.json
 ```
 
@@ -112,7 +104,7 @@ web-app/
 ### Publish Page (`/publish`)
 - Rich text editor for content creation
 - Tag management
-- Automatic multi-network distribution
+- Publishing interface
 - Success view with mirror status
 
 ### Reader View (`/read/[cid]`)
@@ -126,36 +118,26 @@ web-app/
 - Mirror health monitoring
 - Quick actions (copy link, view content)
 
-## Database Schema
+## API Routes (Proxy Only)
 
-The application uses Prisma with PostgreSQL. Key models:
+All API routes in this app are **proxies** to the backend API. No database operations happen here.
 
-- **User**: User accounts with wallet addresses
-- **Identity**: Ed25519 keypairs for content signing
-- **Content**: Published articles with metadata
-- **Mirror**: Mirror URLs and availability status
+### Content Management (Proxy)
+- `POST /api/content` - Forward to backend for content publishing
+- `GET /api/content` - Forward to backend for content listing
+- `GET /api/content/[cid]` - Forward to backend for content retrieval
 
-## API Routes
-
-### Content Management
-- `POST /api/content` - Publish new content
-- `GET /api/content` - List content (with filtering)
-- `GET /api/content/[cid]` - Get specific content
-
-### Identity Management
-- `POST /api/identity` - Create new identity
-- `GET /api/identity` - List user identities
+### Identity Management (Proxy)
+- `POST /api/identity` - Forward to backend for identity creation
+- `GET /api/identity` - Forward to backend for identity listing
 
 ## Environment Variables
 
 | Variable | Description | Required |
 |----------|-------------|----------|
 | `NEXT_PUBLIC_APP_URL` | Application URL | Yes |
-| `DATABASE_URL` | PostgreSQL connection string | Yes |
-| `BACKEND_API_URL` | Backend API endpoint | Yes |
-| `JWT_SECRET` | Secret for JWT signing | Yes |
-| `PINATA_API_KEY` | Pinata API key for IPFS | No |
-| `PINATA_SECRET_KEY` | Pinata secret key | No |
+| `NEXT_PUBLIC_BACKEND_API_URL` | Backend API endpoint | Yes |
+| `NEXT_PUBLIC_PRIVY_APP_ID` | Privy App ID for auth | Yes |
 
 ## Development
 
@@ -200,15 +182,23 @@ bun run build
    bun start
    ```
 
-## Integration with Backend
+## Architecture
 
-This web app requires the AnonPress backend API to be running. The backend handles:
-- IPFS uploads via Pinata
-- Tor onion service creation
-- Content resolution and routing
-- IPFS DHT announcements
+This is a **frontend-only** Next.js application. It does NOT have:
+- ❌ Database (no Prisma, no PostgreSQL)
+- ❌ IPFS client
+- ❌ Tor integration
+- ❌ Content storage
 
-See the `anonpress-backend` repository for setup instructions.
+All backend operations are handled by the separate **anonpress-backend** repository:
+- ✅ Database (Prisma + PostgreSQL)
+- ✅ IPFS uploads via Pinata
+- ✅ Tor onion service creation
+- ✅ Content resolution and routing
+- ✅ IPFS DHT announcements
+- ✅ Ed25519 identity management
+
+The web app communicates with the backend via API proxy routes (`/api/*`).
 
 ## Contributing
 

@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Providers } from "@/app/providers"
 import Navbar from "@/components/navigation/navbar"
+import Footer from "@/components/navigation/footer"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -66,7 +67,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className="light">
       <head />
       <body
         className={cn(
@@ -74,19 +75,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
           inter.className
         )}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Providers>
-            <Navbar />
-            <main className="flex-1">
-              {children}
-            </main>
-          </Providers>
-        </ThemeProvider>
+        <Providers>
+          <Navbar />
+          <main className="flex-1">
+            {children}
+          </main>
+          <Footer />
+        </Providers>
       </body>
     </html>
   )

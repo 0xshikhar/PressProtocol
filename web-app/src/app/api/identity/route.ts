@@ -1,57 +1,30 @@
+// Proxy to backend API - web app is frontend only
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/getAuthUser";
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:4000";
 
 export async function POST(req: NextRequest) {
   try {
-    const authUser = await getAuthUser(req);
-    if (!authUser) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const body = await req.json();
-    const { publicKey } = body;
-
-    if (!publicKey) {
-      return NextResponse.json(
-        { error: "Public key is required" },
-        { status: 400 }
-      );
-    }
-
-    // Find or create user
-    let user = await prisma.user.findUnique({
-      where: { walletAddress: authUser.wallet.address },
-    });
-
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          walletAddress: authUser.wallet.address,
-        },
-      });
-    }
-
-    // Create identity
-    const identity = await prisma.identity.create({
-      data: {
-        userId: user.id,
-        publicKey,
+    
+    // Forward to backend API
+    const response = await fetch(`${BACKEND_URL}/api/identity`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(req.headers.get("Authorization") && {
+          Authorization: req.headers.get("Authorization")!,
+        }),
       },
+      body: JSON.stringify(body),
     });
 
-    return NextResponse.json({
-      success: true,
-      identity: {
-        id: identity.id,
-        publicKey: identity.publicKey,
-        createdAt: identity.createdAt,
-      },
-    });
+    const data = await response.json();
+    return NextResponse.json(data, { status: response.status });
   } catch (error) {
-    console.error("Error creating identity:", error);
+    console.error("Error proxying to backend:", error);
     return NextResponse.json(
-      { error: "Failed to create identity" },
+      { error: "Failed to communicate with backend" },
       { status: 500 }
     );
   }
@@ -59,37 +32,21 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
-    const authUser = await getAuthUser(req);
-    if (!authUser) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { walletAddress: authUser.wallet.address },
-      include: {
-        identities: {
-          orderBy: {
-            createdAt: "desc",
-          },
-        },
+    // Forward to backend API
+    const response = await fetch(`${BACKEND_URL}/api/identity`, {
+      headers: {
+        ...(req.headers.get("Authorization") && {
+          Authorization: req.headers.get("Authorization")!,
+        }),
       },
     });
 
-    if (!user) {
-      return NextResponse.json({ identities: [] });
-    }
-
-    return NextResponse.json({
-      identities: user.identities.map((i) => ({
-        id: i.id,
-        publicKey: i.publicKey,
-        createdAt: i.createdAt,
-      })),
-    });
+    const data = await response.json();
+    return NextResponse.json(data, { status: response.status });
   } catch (error) {
-    console.error("Error fetching identities:", error);
+    console.error("Error proxying to backend:", error);
     return NextResponse.json(
-      { error: "Failed to fetch identities" },
+      { error: "Failed to communicate with backend" },
       { status: 500 }
     );
   }
