@@ -20,6 +20,7 @@ model User {
 
   // Relations
   identities Identity[]
+  contents   Content[] // Optional relation - for authenticated publishing
 
   @@index([walletAddress])
 }
