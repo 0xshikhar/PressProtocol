@@ -12,6 +12,17 @@ export interface UploadContentResult {
   gatewayUrl: string;
 }
 
+export interface ContentData {
+  title: string;
+  content: string; // Full HTML content
+  tags: string[];
+  timestamp: string;
+  publisher?: {
+    pubkey: string;
+    signature: string;
+  };
+}
+
 export class StorageService {
   private pinataApiKey: string;
   private pinataSecretKey: string;
@@ -27,19 +38,24 @@ export class StorageService {
 
   /**
    * Upload content to IPFS via Pinata
+   * Content is stored as immutable JSON on IPFS - this is the source of truth
+   * Database only stores CID for discovery acceleration
    */
   async uploadContent(
     title: string,
     content: string,
-    tags: string[]
+    tags: string[],
+    publisher?: { pubkey: string; signature: string }
   ): Promise<UploadContentResult> {
     try {
-      // Create a JSON object with the content
-      const contentData = {
+      // Create a JSON object with the FULL content
+      // This is the SOURCE OF TRUTH - stored on IPFS
+      const contentData: ContentData = {
         title,
-        content,
+        content, // Full HTML content stored on IPFS
         tags,
         timestamp: new Date().toISOString(),
+        publisher,
       };
 
       // Pin JSON to IPFS
@@ -69,6 +85,10 @@ export class StorageService {
 
       const result: PinataUploadResult = await response.json();
 
+      console.log(`✅ Content uploaded to IPFS: ${result.IpfsHash}`);
+      console.log(`📦 Size: ${result.PinSize} bytes`);
+      console.log(`🔗 Gateway URL: ${this.gatewayUrl}/${result.IpfsHash}`);
+
       return {
         cid: result.IpfsHash,
         ipfsUrl: `ipfs://${result.IpfsHash}`,
@@ -77,6 +97,28 @@ export class StorageService {
     } catch (error) {
       console.error('Error uploading to IPFS:', error);
       throw new Error(`Failed to upload content to IPFS: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Fetch full content from IPFS - THIS is the source of truth
+   * Database is just a cache - always fetch from IPFS for authoritative content
+   */
+  async getContentFromIPFS(cid: string): Promise<ContentData> {
+    try {
+      const response = await fetch(`${this.gatewayUrl}/${cid}`);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch content from IPFS: ${response.status}`);
+      }
+
+      const contentData: ContentData = await response.json();
+      console.log(`✅ Fetched content from IPFS: ${cid}`);
+      
+      return contentData;
+    } catch (error) {
+      console.error('Error fetching from IPFS:', error);
+      throw new Error(`Failed to fetch content from IPFS: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 

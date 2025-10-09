@@ -13,14 +13,12 @@ model User {
   createdAt     DateTime  @default(now())
   lastLoginAt   DateTime? @updatedAt
 
-  // User profile information
-  username String? @unique
-  avatar   String? // IPFS hash or URL
-  bio      String?
-  NFTid    String?
+  // Minimal profile - no personal data
+  username String? @unique // Optional pseudonym
+  avatar   String? // IPFS hash only
+  NFTid    String? // Privy NFT ID for auth
 
   // Relations
-  contents   Content[]
   identities Identity[]
 
   @@index([walletAddress])
@@ -28,43 +26,48 @@ model User {
 
 model Identity {
   id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   publicKey String   @unique // Ed25519 public key
   createdAt DateTime @default(now())
-
-  // Relations
-  contents Content[]
+  
+  // Store IPNS name for persistent identity (optional)
+  ipnsName  String?  @unique // /ipns/k51... for permanent publisher identity
 
   @@index([userId])
   @@index([publicKey])
+  @@index([ipnsName])
 }
 
+// Content metadata cache - NOT source of truth
+// Source of truth: IPFS (immutable, decentralized)
+// This table: Acceleration layer for discovery and routing
 model Content {
   id        String   @id @default(cuid())
-  cid       String   @unique // IPFS CID
+  cid       String   @unique // IPFS CID - THE source of truth
+  
+  // Cached metadata for fast discovery (fetched from IPFS)
   title     String
-  content   String   @db.Text // HTML content
   tags      String[] // Array of tags
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Publisher info
-  userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  identityId String
-  identity   Identity @relation(fields: [identityId], references: [id], onDelete: Cascade)
-
-  // Cryptographic signature
+  // Publisher info - ANONYMOUS by default
+  publisherPubKey String // Ed25519 public key only
+  userId          String? // Optional - for authenticated users only
+  user            User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  // Cryptographic signature (also stored in IPFS manifest)
   signature String // Ed25519 signature of content
 
   // Relations
   mirrors Mirror[]
 
   @@index([cid])
+  @@index([publisherPubKey])
   @@index([userId])
-  @@index([identityId])
   @@index([createdAt])
+  @@index([tags])
 }
 
 model Mirror {

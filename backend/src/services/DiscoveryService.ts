@@ -1,4 +1,6 @@
 import { prisma } from '../lib/prisma.js';
+import { ipfsDHTService, type ContentManifest } from './IPFSDHTService.js';
+import { storageService } from './StorageService.js';
 
 export interface DiscoveryItem {
   cid: string;
@@ -15,30 +17,32 @@ export interface DiscoveryItem {
 /**
  * DiscoveryService handles content discovery and feed generation
  * 
- * Current implementation uses database queries
- * Future: Can integrate IPFS DHT for fully decentralized discovery
+ * Architecture: HYBRID with graceful degradation
+ * - Primary: Database cache (fast, reliable for demo)
+ * - Fallback: IPFS DHT (decentralized, censorship-resistant)
+ * 
+ * Database is ACCELERATION LAYER only - not source of truth
+ * Source of truth: IPFS (immutable content) + DHT (decentralized discovery)
  */
 export class DiscoveryService {
   /**
    * Get recent content for discovery feed
+   * Uses database cache for speed
    */
   async getRecentContent(
     limit: number = 20,
     offset: number = 0
   ): Promise<DiscoveryItem[]> {
+    console.log('📅 Fetching recent content from cache...');
     const content = await prisma.content.findMany({
       take: limit,
       skip: offset,
       orderBy: { createdAt: 'desc' },
       include: {
-        identity: {
-          include: {
-            user: {
-              select: {
-                walletAddress: true,
-                username: true,
-              },
-            },
+        user: {
+          select: {
+            walletAddress: true,
+            username: true,
           },
         },
       },
@@ -50,9 +54,9 @@ export class DiscoveryService {
       tags: item.tags,
       createdAt: item.createdAt,
       publisher: {
-        publicKey: item.identity.publicKey,
-        walletAddress: item.identity.user.walletAddress,
-        username: item.identity.user.username || undefined,
+        publicKey: item.publisherPubKey,
+        walletAddress: item.user?.walletAddress,
+        username: item.user?.username || undefined,
       },
     }));
   }
@@ -75,14 +79,10 @@ export class DiscoveryService {
       skip: offset,
       orderBy: { createdAt: 'desc' },
       include: {
-        identity: {
-          include: {
-            user: {
-              select: {
-                walletAddress: true,
-                username: true,
-              },
-            },
+        user: {
+          select: {
+            walletAddress: true,
+            username: true,
           },
         },
       },
@@ -94,9 +94,9 @@ export class DiscoveryService {
       tags: item.tags,
       createdAt: item.createdAt,
       publisher: {
-        publicKey: item.identity.publicKey,
-        walletAddress: item.identity.user.walletAddress,
-        username: item.identity.user.username || undefined,
+        publicKey: item.publisherPubKey,
+        walletAddress: item.user?.walletAddress,
+        username: item.user?.username || undefined,
       },
     }));
   }
@@ -120,14 +120,10 @@ export class DiscoveryService {
       skip: offset,
       orderBy: { createdAt: 'desc' },
       include: {
-        identity: {
-          include: {
-            user: {
-              select: {
-                walletAddress: true,
-                username: true,
-              },
-            },
+        user: {
+          select: {
+            walletAddress: true,
+            username: true,
           },
         },
       },
@@ -139,9 +135,9 @@ export class DiscoveryService {
       tags: item.tags,
       createdAt: item.createdAt,
       publisher: {
-        publicKey: item.identity.publicKey,
-        walletAddress: item.identity.user.walletAddress,
-        username: item.identity.user.username || undefined,
+        publicKey: item.publisherPubKey,
+        walletAddress: item.user?.walletAddress,
+        username: item.user?.username || undefined,
       },
     }));
   }
@@ -168,14 +164,10 @@ export class DiscoveryService {
       skip: offset,
       orderBy: { createdAt: 'desc' },
       include: {
-        identity: {
-          include: {
-            user: {
-              select: {
-                walletAddress: true,
-                username: true,
-              },
-            },
+        user: {
+          select: {
+            walletAddress: true,
+            username: true,
           },
         },
       },
@@ -187,9 +179,9 @@ export class DiscoveryService {
       tags: item.tags,
       createdAt: item.createdAt,
       publisher: {
-        publicKey: item.identity.publicKey,
-        walletAddress: item.identity.user.walletAddress,
-        username: item.identity.user.username || undefined,
+        publicKey: item.publisherPubKey,
+        walletAddress: item.user?.walletAddress,
+        username: item.user?.username || undefined,
       },
     }));
   }
@@ -220,12 +212,80 @@ export class DiscoveryService {
   }
 
   /**
-   * Announce content to network (placeholder for IPFS DHT integration)
+   * Announce content to IPFS DHT network
+   * Makes content discoverable without central server
    */
-  async announceContent(cid: string, tags: string[]): Promise<void> {
-    // TODO: Implement IPFS DHT announcement
-    // For now, content is discoverable via database
-    console.log(`Content announced: ${cid} with tags: ${tags.join(', ')}`);
+  async announceContent(
+    cid: string,
+    tags: string[],
+    manifest: ContentManifest
+  ): Promise<{ dhtAnnounced: boolean; manifestCid?: string }> {
+    try {
+      // Try to announce to DHT
+      if (ipfsDHTService.isAvailable()) {
+        const result = await ipfsDHTService.announceContent(manifest);
+        console.log(`✅ Content announced to DHT: ${cid}`);
+        console.log(`📜 Manifest CID: ${result.manifestCid}`);
+        console.log(`🏷️  Tags: ${tags.join(', ')}`);
+        
+        return {
+          dhtAnnounced: true,
+          manifestCid: result.manifestCid,
+        };
+      } else {
+        console.warn('⚠️  DHT not available - content cached in database only');
+        console.log(`📦 Content: ${cid} with tags: ${tags.join(', ')}`);
+        
+        return {
+          dhtAnnounced: false,
+        };
+      }
+    } catch (error) {
+      console.error('DHT announcement failed:', error);
+      console.log('🔄 Falling back to database-only discovery');
+      
+      return {
+        dhtAnnounced: false,
+      };
+    }
+  }
+
+  /**
+   * Discover content by tags - HYBRID approach
+   * Tries DHT first, falls back to database
+   */
+  async discoverByTagsHybrid(
+    tags: string[],
+    limit: number = 20,
+    offset: number = 0
+  ): Promise<DiscoveryItem[]> {
+    // Try DHT first if available
+    if (ipfsDHTService.isAvailable()) {
+      try {
+        console.log(`🔍 Trying DHT discovery for: ${tags.join(', ')}`);
+        const dhtResults = await ipfsDHTService.discoverByTags(tags, limit);
+        
+        if (dhtResults.length > 0) {
+          console.log(`✅ Found ${dhtResults.length} items via DHT`);
+          // Convert DHT results to DiscoveryItem format
+          return dhtResults.map(manifest => ({
+            cid: manifest.cid,
+            title: manifest.title,
+            tags: manifest.tags,
+            createdAt: new Date(manifest.timestamp),
+            publisher: {
+              publicKey: manifest.publisher.pubkey,
+            },
+          }));
+        }
+      } catch (error) {
+        console.warn('DHT query failed, falling back to database:', error);
+      }
+    }
+
+    // Fallback to database
+    console.log('📊 Using database cache for discovery');
+    return this.discoverByTags(tags, limit, offset);
   }
 }
 
