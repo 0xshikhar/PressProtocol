@@ -21,8 +21,6 @@ export interface OnionServiceResult {
  * - Create ephemeral hidden services
  * - Map to IPFS content via Tor
  * 
- * This is honest architecture - better to have working IPFS + roadmap
- * than fake Tor addresses that don't work.
  */
 export class TorService {
   private proxyHost: string;
