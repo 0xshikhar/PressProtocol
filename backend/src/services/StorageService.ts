@@ -83,7 +83,7 @@ export class StorageService {
         throw new Error(`Pinata upload failed: ${response.status} - ${errorText}`);
       }
 
-      const result: PinataUploadResult = await response.json();
+      const result = await response.json() as PinataUploadResult;
 
       console.log(`✅ Content uploaded to IPFS: ${result.IpfsHash}`);
       console.log(`📦 Size: ${result.PinSize} bytes`);
@@ -112,7 +112,7 @@ export class StorageService {
         throw new Error(`Failed to fetch content from IPFS: ${response.status}`);
       }
 
-      const contentData: ContentData = await response.json();
+      const contentData = await response.json() as ContentData;
       console.log(`✅ Fetched content from IPFS: ${cid}`);
       
       return contentData;
@@ -145,7 +145,7 @@ export class StorageService {
         throw new Error(`Pinata file upload failed: ${response.status} - ${errorText}`);
       }
 
-      const result: PinataUploadResult = await response.json();
+      const result = await response.json() as PinataUploadResult;
 
       return {
         cid: result.IpfsHash,
@@ -195,7 +195,7 @@ export class StorageService {
         return false;
       }
 
-      const result = await response.json();
+      const result = await response.json() as { count: number };
       return result.count > 0;
     } catch (error) {
       console.error('Error checking pin status:', error);

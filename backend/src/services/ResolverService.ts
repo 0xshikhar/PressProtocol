@@ -28,9 +28,7 @@ export class ResolverService {
     const content = await prisma.content.findUnique({
       where: { cid },
       include: {
-        identity: {
-          include: { user: true },
-        },
+        user: true,
         mirrors: true,
       },
     });
@@ -53,16 +51,20 @@ export class ResolverService {
     // Determine recommended mirror (fastest available)
     const recommended = this.getRecommendedMirror(mirrorHealth);
 
+    // Fetch actual content from IPFS (not stored in DB)
+    const { storageService } = await import('./StorageService.js');
+    const ipfsContent = await storageService.getContentFromIPFS(content.cid);
+
     return {
       cid: content.cid,
       title: content.title,
-      content: content.content,
+      content: ipfsContent.content,
       tags: content.tags,
       mirrors,
       recommended,
       publisher: {
-        publicKey: content.identity.publicKey,
-        walletAddress: content.identity.user.walletAddress,
+        publicKey: content.publisherPubKey,
+        walletAddress: content.user?.walletAddress,
       },
       signature: content.signature,
       createdAt: content.createdAt,
@@ -118,15 +120,11 @@ export class ResolverService {
         title: true,
         tags: true,
         createdAt: true,
-        identity: {
+        publisherPubKey: true,
+        user: {
           select: {
-            publicKey: true,
-            user: {
-              select: {
-                walletAddress: true,
-                username: true,
-              },
-            },
+            walletAddress: true,
+            username: true,
           },
         },
       },
