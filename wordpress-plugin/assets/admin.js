@@ -93,6 +93,38 @@ jQuery(document).ready(function($) {
         });
     });
     
+    // Test connection button handler
+    $(document).on('click', '#anonpress-test-connection', function(e) {
+        e.preventDefault();
+        
+        const $button = $(this);
+        const $status = $('#connection-status');
+        
+        $button.prop('disabled', true).text('Testing...');
+        $status.removeClass('success error').html('');
+        
+        $.ajax({
+            url: anonpressData.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'anonpress_test_connection',
+                nonce: anonpressData.nonce
+            },
+            success: function(response) {
+                if (response.success) {
+                    $status.addClass('notice notice-success').html('<p>✅ ' + response.data + '</p>');
+                } else {
+                    $status.addClass('notice notice-error').html('<p>❌ Error: ' + response.data + '</p>');
+                }
+                $button.prop('disabled', false).text('Test Connection');
+            },
+            error: function(xhr, status, error) {
+                $status.addClass('notice notice-error').html('<p>❌ Connection failed: ' + error + '</p>');
+                $button.prop('disabled', false).text('Test Connection');
+            }
+        });
+    });
+    
     // Copy link helper
     window.copyAnonPressLink = function(cid) {
         const link = 'anonpress://' + cid;
