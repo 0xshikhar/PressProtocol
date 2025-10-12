@@ -282,7 +282,7 @@ export default function ReadPage() {
           )}
           <div>
             <div className="text-sm font-medium text-muted-foreground">Public Key</div>
-            <div className="font-mono text-xs mt-1 break-all">{content.publisher.pubkey}</div>
+            <div className="font-mono text-xs mt-1 break-all">{content?.publisher?.pubkey}</div>
           </div>
           <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
             <Shield className="h-4 w-4" />
