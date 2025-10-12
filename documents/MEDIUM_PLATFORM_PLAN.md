@@ -92,7 +92,7 @@ model Topic {
 - [ ] Enhanced Tiptap editor (slash commands, better toolbar)
 - [ ] Image upload to IPFS
 - [ ] Drag-and-drop images
-- [ ] Drafts system (auto-save every 30s)
+- [ ] Drafts system (auto-save every 30s in localhost)
 - [ ] Preview mode
 - [ ] Embed support (YouTube, Twitter)
 - [ ] Code syntax highlighting

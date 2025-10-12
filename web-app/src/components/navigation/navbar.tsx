@@ -32,9 +32,8 @@ const Navbar = () => {
   };
 
   const navLinks = [
-    { href: "/", label: "Home", icon: Home },
     { href: "/explore", label: "Explore", icon: Search },
-    { href: "/trending", label: "Trending", icon: TrendingUp },
+    // { href: "/trending", label: "Trending", icon: TrendingUp },
     { href: "/publish", label: "Publish", icon: FileText },
     { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
   ];

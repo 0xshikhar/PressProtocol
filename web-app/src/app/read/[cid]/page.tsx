@@ -1,15 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ExternalLink, Download, Shield, Clock } from "lucide-react";
+import { ExternalLink, Download, Shield, Clock, BookOpen } from "lucide-react";
 import { apiClient, type ResolveContentResponse } from "@/lib/api-client";
 import { toast } from "sonner";
+import { calculateReadingTime } from "@/lib/reading-time";
+import { ReadingProgressBar } from "@/components/reader/ReadingProgressBar";
+import { TableOfContents } from "@/components/reader/TableOfContents";
 
 export default function ReadPage() {
   const params = useParams();
@@ -17,6 +20,9 @@ export default function ReadPage() {
   const [content, setContent] = useState<ResolveContentResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  
+  const readingStats = content ? calculateReadingTime(content.content) : null;
 
   useEffect(() => {
     if (cid) {
@@ -78,55 +84,97 @@ export default function ReadPage() {
   };
 
   return (
-    <div className="container mx-auto max-w-4xl py-12 space-y-6">
-      {/* Extension Install Banner */}
-      <Alert>
-        <Download className="h-4 w-4" />
-        <AlertDescription>
-          Install the AnonPress browser extension for automatic multi-network routing and better performance.
-          <Button variant="link" className="ml-2 h-auto p-0">
-            Install Extension
-          </Button>
-        </AlertDescription>
-      </Alert>
-
-      {/* Content Card */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <CardTitle className="text-3xl mb-2">{content.title}</CardTitle>
-              <CardDescription className="flex items-center gap-4 text-sm">
-                <span className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  {new Date(content.createdAt).toLocaleDateString()}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Shield className="h-3 w-3" />
-                  Verified Publisher
-                </span>
-              </CardDescription>
-            </div>
+    <>
+      {/* Reading Progress Bar */}
+      <ReadingProgressBar />
+      
+      {/* Table of Contents */}
+      <TableOfContents contentRef={contentRef} />
+      
+      <div className="min-h-screen bg-background">
+        {/* Extension Install Banner */}
+        <div className="border-b bg-muted/30">
+          <div className="container mx-auto max-w-4xl px-4 py-3">
+            <Alert className="border-0 bg-transparent">
+              <Download className="h-4 w-4" />
+              <AlertDescription className="text-sm">
+                Install the AnonPress browser extension for automatic multi-network routing.
+                <Button variant="link" className="ml-2 h-auto p-0 text-sm">
+                  Install Extension
+                </Button>
+              </AlertDescription>
+            </Alert>
           </div>
+        </div>
+
+        {/* Article Content - Medium Style */}
+        <article className="mx-auto max-w-[680px] px-6 py-12">
+          {/* Title */}
+          <h1 className="font-serif text-4xl sm:text-5xl font-bold leading-tight mb-6">
+            {content.title}
+          </h1>
+          
+          {/* Meta Information */}
+          <div className="flex items-center gap-4 mb-8 text-sm text-muted-foreground">
+            {readingStats && (
+              <span className="flex items-center gap-1">
+                <BookOpen className="h-4 w-4" />
+                {readingStats.formattedTime}
+              </span>
+            )}
+            <span>•</span>
+            <time>{new Date(content.createdAt).toLocaleDateString('en-US', { 
+              year: 'numeric', 
+              month: 'short', 
+              day: 'numeric' 
+            })}</time>
+            <span>•</span>
+            <span className="flex items-center gap-1">
+              <Shield className="h-3 w-3" />
+              Verified
+            </span>
+          </div>
+          
+          {/* Tags */}
           {content.tags && content.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-4">
+            <div className="flex flex-wrap gap-2 mb-10">
               {content.tags.map((tag) => (
-                <Badge key={tag} variant="secondary">
-                  {tag}
+                <Badge key={tag} variant="secondary" className="text-xs">
+                  #{tag}
                 </Badge>
               ))}
             </div>
           )}
-        </CardHeader>
-        <CardContent>
+
+          {/* Content - Medium Typography */}
           <div
-            className="prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none dark:prose-invert"
+            ref={contentRef}
+            className="article-content
+                       prose prose-lg max-w-none
+                       prose-headings:font-sans prose-headings:font-bold
+                       prose-h1:text-4xl prose-h1:mb-4 prose-h1:mt-12
+                       prose-h2:text-3xl prose-h2:mb-3 prose-h2:mt-10
+                       prose-h3:text-2xl prose-h3:mb-2 prose-h3:mt-8
+                       prose-p:text-[21px] prose-p:leading-[1.58] prose-p:mb-8
+                       prose-p:font-serif prose-p:text-foreground
+                       prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+                       prose-strong:font-semibold
+                       prose-blockquote:border-l-4 prose-blockquote:border-primary
+                       prose-blockquote:pl-6 prose-blockquote:italic
+                       prose-blockquote:text-muted-foreground
+                       prose-img:rounded-lg prose-img:my-8
+                       prose-code:bg-muted prose-code:px-2 prose-code:py-1
+                       prose-code:rounded prose-code:text-sm
+                       prose-pre:bg-muted prose-pre:border
+                       prose-li:text-[21px] prose-li:leading-[1.58]
+                       prose-li:font-serif prose-li:mb-2
+                       dark:prose-invert"
             dangerouslySetInnerHTML={{ __html: content.content }}
           />
-        </CardContent>
-      </Card>
+        </article>
 
-      {/* Mirror Status Card */}
+        {/* Mirror Status Card - Move inside container */}
+        <div className="container mx-auto max-w-4xl px-6 space-y-6 pb-12">
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Mirror Status</CardTitle>
@@ -259,6 +307,8 @@ export default function ReadPage() {
           </div>
         </CardContent>
       </Card>
-    </div>
+        </div>
+      </div>
+    </>
   );
 }

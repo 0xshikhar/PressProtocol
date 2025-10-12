@@ -195,7 +195,7 @@ export function DiscoveryFeed() {
               <CardContent>
                 <div className="text-sm text-muted-foreground">
                   <span className="font-mono text-xs">
-                    Publisher: {item.publisher.pubkey.slice(0, 16)}...
+                    Publisher: {item.publisher?.pubkey?.slice(0, 16)}...
                   </span>
                 </div>
               </CardContent>
