@@ -8,6 +8,7 @@ import { resolveRoutes } from './routes/resolve.js';
 import { discoveryRoutes } from './routes/discovery.js';
 import { identityRoutes } from './routes/identity.js';
 import { mirrorsRoutes } from './routes/mirrors.js';
+import { uploadRoutes } from './routes/upload.js';
 
 const fastify = Fastify({
   logger: {
@@ -86,6 +87,7 @@ await fastify.register(resolveRoutes);
 await fastify.register(discoveryRoutes);
 await fastify.register(identityRoutes);
 await fastify.register(mirrorsRoutes);
+await fastify.register(uploadRoutes);
 
 // Root route
 fastify.get('/', async (request, reply) => {
@@ -99,6 +101,8 @@ fastify.get('/', async (request, reply) => {
       discovery: '/api/discovery',
       identity: '/api/identity',
       mirrors: '/api/mirrors/:cid/health',
+      uploadImage: '/api/upload/image',
+      uploadJson: '/api/upload/json',
     },
     docs: 'https://github.com/anonpress/backend',
   });

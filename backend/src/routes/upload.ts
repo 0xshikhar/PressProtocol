@@ -1,20 +1,8 @@
 import { FastifyInstance } from 'fastify';
-import { PinataService } from '../services/PinataService';
-import multipart from '@fastify/multipart';
+import { StorageService } from '../services/StorageService.js';
 
 export async function uploadRoutes(fastify: FastifyInstance) {
-  // Register multipart support for file uploads
-  fastify.register(multipart, {
-    limits: {
-      fileSize: 5 * 1024 * 1024, // 5MB max
-      files: 1, // Only one file at a time
-    },
-  });
-
-  const pinataService = new PinataService(
-    process.env.PINATA_JWT || '',
-    process.env.IPFS_GATEWAY_URL || 'https://gateway.pinata.cloud/ipfs'
-  );
+  const storageService = new StorageService();
 
   /**
    * POST /api/upload/image
@@ -44,17 +32,11 @@ export async function uploadRoutes(fastify: FastifyInstance) {
       // Convert stream to buffer
       const buffer = await data.toBuffer();
 
-      // Upload to Pinata
-      const result = await pinataService.uploadFile(buffer, {
-        name: data.filename || 'image.jpg',
-        keyvalues: {
-          type: 'image',
-          uploadedAt: new Date().toISOString(),
-        },
-      });
+      // Upload to IPFS
+      const result = await storageService.uploadFile(buffer, data.filename || 'image.jpg');
 
-      const cid = result.IpfsHash;
-      const url = `${pinataService.gatewayUrl}/${cid}`;
+      const cid = result.cid;
+      const url = result.gatewayUrl;
 
       return reply.send({
         success: true,
@@ -90,15 +72,16 @@ export async function uploadRoutes(fastify: FastifyInstance) {
         });
       }
 
-      const result = await pinataService.uploadJSON(jsonData);
-      const cid = result.IpfsHash;
-      const url = `${pinataService.gatewayUrl}/${cid}`;
+      // Convert JSON to buffer and upload
+      const jsonString = JSON.stringify(jsonData);
+      const buffer = Buffer.from(jsonString, 'utf-8');
+      const result = await storageService.uploadFile(buffer, 'manifest.json');
 
       return reply.send({
         success: true,
         data: {
-          cid,
-          url,
+          cid: result.cid,
+          url: result.gatewayUrl,
         },
       });
     } catch (error) {

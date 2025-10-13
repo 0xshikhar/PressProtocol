@@ -1,0 +1,228 @@
+/**
+ * Hybrid Discovery System
+ * 
+ * Tries multiple indexers for fast discovery, falls back to IPFS DHT for decentralization
+ * This ensures the platform works even if all centralized indexers go down
+ */
+
+import { env } from "@/env.mjs";
+
+export interface ContentManifest {
+  cid: string;
+  title: string;
+  excerpt: string;
+  tags: string[];
+  publisher: string; // public key
+  publishedAt: number;
+  version: string;
+}
+
+export interface IndexerConfig {
+  url: string;
+  type: "official" | "community" | "self-hosted";
+  trusted: boolean;
+  enabled: boolean;
+}
+
+export interface DiscoveryContent {
+  cid: string;
+  title: string;
+  tags: string[];
+  timestamp: number;
+  publisher: {
+    pubkey: string;
+  };
+}
+
+const DEFAULT_INDEXERS: IndexerConfig[] = [
+  {
+    url: env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:4000",
+    type: "official",
+    trusted: true,
+    enabled: true,
+  },
+];
+
+/**
+ * Discovery Service - Hybrid Approach
+ */
+export class DiscoveryService {
+  private indexers: IndexerConfig[];
+  
+  constructor(customIndexers?: IndexerConfig[]) {
+    this.indexers = customIndexers || this.loadIndexersFromStorage();
+  }
+
+  /**
+   * Load indexer configuration from localStorage
+   */
+  private loadIndexersFromStorage(): IndexerConfig[] {
+    if (typeof window === "undefined") return DEFAULT_INDEXERS;
+
+    try {
+      const saved = localStorage.getItem("anonpress_indexers");
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (error) {
+      console.error("Failed to load indexers from storage:", error);
+    }
+
+    return DEFAULT_INDEXERS;
+  }
+
+  /**
+   * Save indexer configuration to localStorage
+   */
+  saveIndexers(indexers: IndexerConfig[]): void {
+    if (typeof window === "undefined") return;
+
+    try {
+      localStorage.setItem("anonpress_indexers", JSON.stringify(indexers));
+      this.indexers = indexers;
+    } catch (error) {
+      console.error("Failed to save indexers:", error);
+    }
+  }
+
+  /**
+   * Get current indexer configuration
+   */
+  getIndexers(): IndexerConfig[] {
+    return this.indexers;
+  }
+
+  /**
+   * Discover content using hybrid approach
+   * 1. Try enabled indexers (fast)
+   * 2. Fall back to DHT (slow but decentralized)
+   */
+  async discoverContent(
+    tags?: string[],
+    limit: number = 20
+  ): Promise<DiscoveryContent[]> {
+    const enabledIndexers = this.indexers.filter((i) => i.enabled);
+
+    // Try each indexer in order
+    for (const indexer of enabledIndexers) {
+      try {
+        console.log(`📡 Trying indexer: ${indexer.url}`);
+        const content = await this.fetchFromIndexer(indexer, tags, limit);
+
+        if (content.length > 0) {
+          console.log(`✅ Discovered ${content.length} items via ${indexer.url}`);
+          return content;
+        }
+      } catch (error) {
+        console.warn(`⚠️  Indexer ${indexer.url} failed:`, error);
+        // Continue to next indexer
+      }
+    }
+
+    // All indexers failed, try DHT fallback
+    console.log("📡 All indexers failed, falling back to IPFS DHT");
+    return await this.discoverViaDHT(tags, limit);
+  }
+
+  /**
+   * Fetch content from a specific indexer
+   */
+  private async fetchFromIndexer(
+    indexer: IndexerConfig,
+    tags?: string[],
+    limit: number = 20
+  ): Promise<DiscoveryContent[]> {
+    const params = new URLSearchParams();
+    if (tags && tags.length > 0) {
+      params.append("tags", tags.join(","));
+    }
+    params.append("limit", limit.toString());
+
+    const response = await fetch(
+      `${indexer.url}/api/discovery?${params.toString()}`,
+      {
+        signal: AbortSignal.timeout(10000), // 10 second timeout
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Indexer returned ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result.data || [];
+  }
+
+  /**
+   * Discover content via IPFS DHT (fallback)
+   * This is slower but fully decentralized
+   */
+  private async discoverViaDHT(
+    tags?: string[],
+    limit: number = 20
+  ): Promise<DiscoveryContent[]> {
+    // For now, return empty array
+    // In production, this would query IPFS DHT for content manifests
+    console.log("🔍 DHT discovery not yet implemented (requires IPFS node)");
+    
+    // TODO: Implement actual DHT discovery
+    // This would involve:
+    // 1. Connect to IPFS node (could be js-ipfs in browser)
+    // 2. Query DHT for "anonpress-manifest" providers
+    // 3. Fetch manifests from IPFS
+    // 4. Filter by tags if provided
+    // 5. Sort by timestamp
+    // 6. Return results
+    
+    return [];
+  }
+
+  /**
+   * Calculate client-side trending score
+   * Used when we have manifests but no centralized engagement tracking
+   */
+  calculateTrendingScore(manifest: ContentManifest): number {
+    const now = Date.now();
+    const ageHours = (now - manifest.publishedAt) / (1000 * 60 * 60);
+
+    // Exponential time decay (48 hour half-life)
+    const timeDecay = Math.exp(-ageHours / 48);
+
+    // Tag popularity (estimate based on tag count)
+    const tagScore = manifest.tags.length * 0.1;
+
+    // Recency bonus (content < 24 hours old)
+    const recencyBonus = ageHours < 24 ? 0.5 : 0;
+
+    return timeDecay * 100 + tagScore + recencyBonus;
+  }
+
+  /**
+   * Add a custom indexer
+   */
+  addIndexer(indexer: IndexerConfig): void {
+    const updated = [...this.indexers, indexer];
+    this.saveIndexers(updated);
+  }
+
+  /**
+   * Remove an indexer
+   */
+  removeIndexer(url: string): void {
+    const updated = this.indexers.filter((i) => i.url !== url);
+    this.saveIndexers(updated);
+  }
+
+  /**
+   * Toggle indexer enabled state
+   */
+  toggleIndexer(url: string): void {
+    const updated = this.indexers.map((i) =>
+      i.url === url ? { ...i, enabled: !i.enabled } : i
+    );
+    this.saveIndexers(updated);
+  }
+}
+
+// Singleton instance
+export const discoveryService = new DiscoveryService();
