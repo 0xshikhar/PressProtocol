@@ -212,34 +212,45 @@ export class DiscoveryService {
   }
 
   /**
-   * Announce content to IPFS DHT network
-   * Makes content discoverable without central server
+   * Announce content to IPFS DHT network (Phase 2B)
+   * Creates manifest and stores it on IPFS for decentralized discovery
    */
   async announceContent(
     cid: string,
+    title: string,
+    content: string,
     tags: string[],
-    manifest: ContentManifest
+    publisher: { pubkey: string; signature: string },
+    mirrors: { ipfs: string; tor?: string; gateway?: string }
   ): Promise<{ dhtAnnounced: boolean; manifestCid?: string }> {
     try {
-      // Try to announce to DHT
-      if (ipfsDHTService.isAvailable()) {
-        const result = await ipfsDHTService.announceContent(manifest);
-        console.log(`✅ Content announced to DHT: ${cid}`);
-        console.log(`📜 Manifest CID: ${result.manifestCid}`);
-        console.log(`🏷️  Tags: ${tags.join(', ')}`);
-        
-        return {
-          dhtAnnounced: true,
-          manifestCid: result.manifestCid,
-        };
-      } else {
-        console.warn('⚠️  DHT not available - content cached in database only');
-        console.log(`📦 Content: ${cid} with tags: ${tags.join(', ')}`);
-        
-        return {
-          dhtAnnounced: false,
-        };
+      // Initialize DHT service if not already done
+      if (!ipfsDHTService.isAvailable()) {
+        await ipfsDHTService.init();
       }
+
+      // Create manifest
+      const manifest = await ipfsDHTService.createManifest(
+        cid,
+        title,
+        content,
+        tags,
+        publisher,
+        mirrors
+      );
+
+      // Announce to DHT (uploads manifest to IPFS)
+      const result = await ipfsDHTService.announceContent(manifest);
+      
+      console.log(`✅ Content announced to DHT: ${cid}`);
+      console.log(`📜 Manifest CID: ${result.manifestCid}`);
+      console.log(`🏷️  Tags: ${tags.join(', ')}`);
+      console.log(`📊 Manifest: ${manifest.wordCount} words, ${manifest.readingTime} min read`);
+      
+      return {
+        dhtAnnounced: true,
+        manifestCid: result.manifestCid,
+      };
     } catch (error) {
       console.error('DHT announcement failed:', error);
       console.log('🔄 Falling back to database-only discovery');

@@ -127,24 +127,19 @@ export async function contentRoutes(fastify: FastifyInstance) {
         webGatewayUrl
       );
 
-      // 7. Announce to IPFS DHT for decentralized discovery
-      const manifest = {
-        cid: ipfsResult.cid,
-        title: body.title,
-        tags: body.tags,
-        timestamp: Date.now(),
-        publisher: { pubkey: publicKey, signature },
-        mirrors: {
+      // 7. Announce to IPFS DHT for decentralized discovery (Phase 2B)
+      // Creates manifest with excerpt, word count, reading time
+      const dhtResult = await discoveryService.announceContent(
+        ipfsResult.cid,
+        body.title,
+        body.content,
+        body.tags,
+        { pubkey: publicKey, signature },
+        {
           ipfs: ipfsResult.gatewayUrl,
           tor: onionResult.onionUrl,
           gateway: webGatewayUrl,
-        },
-      };
-
-      const dhtResult = await discoveryService.announceContent(
-        ipfsResult.cid,
-        body.tags,
-        manifest
+        }
       );
 
       // 8. Get mirrors for response

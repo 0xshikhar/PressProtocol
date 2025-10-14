@@ -8,13 +8,24 @@
 import { env } from "@/env.mjs";
 
 export interface ContentManifest {
-  cid: string;
+  version: string;
+  cid: string; // Content CID
+  manifestCid?: string; // Manifest CID
   title: string;
   excerpt: string;
   tags: string[];
-  publisher: string; // public key
-  publishedAt: number;
-  version: string;
+  timestamp: number;
+  publisher: {
+    pubkey: string;
+    signature: string;
+  };
+  mirrors: {
+    ipfs: string;
+    tor?: string;
+    gateway?: string;
+  };
+  wordCount?: number;
+  readingTime?: number; // minutes
 }
 
 export interface IndexerConfig {
@@ -183,7 +194,7 @@ export class DiscoveryService {
    */
   calculateTrendingScore(manifest: ContentManifest): number {
     const now = Date.now();
-    const ageHours = (now - manifest.publishedAt) / (1000 * 60 * 60);
+    const ageHours = (now - manifest.timestamp) / (1000 * 60 * 60);
 
     // Exponential time decay (48 hour half-life)
     const timeDecay = Math.exp(-ageHours / 48);
@@ -195,6 +206,45 @@ export class DiscoveryService {
     const recencyBonus = ageHours < 24 ? 0.5 : 0;
 
     return timeDecay * 100 + tagScore + recencyBonus;
+  }
+
+  /**
+   * Fetch manifest from IPFS
+   */
+  async fetchManifest(manifestCid: string): Promise<ContentManifest | null> {
+    try {
+      const response = await fetch(
+        `${DEFAULT_INDEXERS[0].url}/api/manifest/${manifestCid}`,
+        {
+          signal: AbortSignal.timeout(10000), // 10 second timeout
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch manifest: ${response.status}`);
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error(`Failed to fetch manifest ${manifestCid}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Convert manifest to DiscoveryContent format
+   */
+  manifestToDiscoveryContent(manifest: ContentManifest): DiscoveryContent {
+    return {
+      cid: manifest.cid,
+      title: manifest.title,
+      tags: manifest.tags,
+      timestamp: manifest.timestamp,
+      publisher: {
+        pubkey: manifest.publisher.pubkey,
+      },
+    };
   }
 
   /**

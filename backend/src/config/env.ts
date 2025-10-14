@@ -35,12 +35,6 @@ const parsed = envSchema.safeParse(process.env);
 
 if (!parsed.success) {
   console.error('❌ Invalid environment variables:', parsed.error.flatten().fieldErrors);
-  console.error('\n📋 Railway Setup Instructions:');
-  console.error('1. Go to your Railway dashboard');
-  console.error('2. Select your BACKEND SERVICE (not project settings)');
-  console.error('3. Click "Variables" tab');
-  console.error('4. Add each variable individually (not as a file)');
-  console.error('5. Click "Deploy" to restart with new variables\n');
   throw new Error('Invalid environment variables');
 }
 
