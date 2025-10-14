@@ -13,7 +13,7 @@ import { Loader2, Copy, Check, ExternalLink } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 
 export default function PublishPage() {
-  const { authenticated, login } = usePrivy();
+  const { authenticated, login, user } = usePrivy();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState<string[]>([]);
@@ -50,13 +50,13 @@ export default function PublishPage() {
 
     setIsPublishing(true);
     try {
-      // In a real implementation, this would call the backend API
-      // For now, we'll simulate the publishing process
+      const walletAddress = user?.wallet?.address;
+      
       const response = await apiClient.publishContent({
         title,
         content,
         tags,
-      });
+      }, walletAddress);
 
       setPublishedContent(response);
       toast.success("Content published successfully!");
@@ -164,7 +164,7 @@ export default function PublishPage() {
                       <span className="font-medium">IPFS</span>
                     </div>
                     <a
-                      href={publishedContent.mirrors.ipfs.url}
+                      href={publishedContent.mirrors.ipfs}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-blue-500 hover:underline flex items-center gap-1"
@@ -179,8 +179,8 @@ export default function PublishPage() {
                       <div className="h-2 w-2 rounded-full bg-green-500" />
                       <span className="font-medium">Tor</span>
                     </div>
-                    <span className="text-sm text-muted-foreground">
-                      {publishedContent.mirrors.tor.url}
+                    <span className="text-sm text-muted-foreground font-mono text-xs">
+                      {publishedContent.mirrors.tor}
                     </span>
                   </div>
                 )}
@@ -191,7 +191,7 @@ export default function PublishPage() {
                       <span className="font-medium">Gateway</span>
                     </div>
                     <a
-                      href={publishedContent.mirrors.gateway.url}
+                      href={publishedContent.mirrors.gateway}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-blue-500 hover:underline flex items-center gap-1"

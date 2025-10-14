@@ -51,11 +51,26 @@ AnonPress enables true freedom of speech by distributing content across IPFS, To
 ### Prerequisites
 
 - Node.js 20+ or Bun
-- Docker ( optional)
+- Docker (optional)
 - Prisma Postgres account ([Get free account](https://console.prisma.io))
 - Pinata API keys ([Get free account](https://pinata.cloud))
+- Privy account ([Get free account](https://privy.io))
 
-### 1. Clone & Setup Database
+### Fastest Start (Using Scripts)
+
+```bash
+# Terminal 1 - Backend
+./start-backend.sh
+
+# Terminal 2 - Frontend
+./start-frontend.sh
+
+# Open http://localhost:3000
+```
+
+### Manual Setup
+
+#### 1. Clone & Setup Database
 
 ```bash
 # 1. Go to https://console.prisma.io
@@ -65,7 +80,7 @@ AnonPress enables true freedom of speech by distributing content across IPFS, To
 # 5. Keep it handy for the next step
 ```
 
-### 2. Start Backend
+#### 2. Start Backend
 
 ```bash
 cd backend
@@ -89,7 +104,7 @@ npm run dev
 
 Backend runs at `http://localhost:4000`
 
-### 3. Start Web App
+#### 3. Start Web App
 
 ```bash
 cd web-app
@@ -97,13 +112,20 @@ cd web-app
 # Install dependencies
 bun install
 
+# Configure
+cp .env.example .env
+# Edit .env and add:
+# - Your Privy App ID
+# - Backend URL (http://localhost:4000)
+# - Database URL (same as backend)
+
 # Start
 bun dev
 ```
 
 Web app runs at `http://localhost:3000`
 
-### 4. Try It Out!
+#### 4. Try It Out!
 
 1. Open `http://localhost:3000`
 2. Click "Publish"
@@ -196,12 +218,20 @@ docker stop ipfs
 
 ## 📚 Documentation
 
-- **[IMPLEMENTATION_COMPLETE.md](./IMPLEMENTATION_COMPLETE.md)** - Complete implementation details
-- **[SETUP_GUIDE.md](./SETUP_GUIDE.md)** - Step-by-step setup instructions
+### Getting Started
+- **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)** - Complete setup and deployment guide
+- **[TESTING_GUIDE.md](./TESTING_GUIDE.md)** - Comprehensive testing procedures
+- **[UPDATE_SUMMARY.md](./UPDATE_SUMMARY.md)** - Latest changes and current status
+
+### Technical Details
 - **[backend/README.md](./backend/README.md)** - Backend API documentation
 - **[web-app/README.md](./web-app/README.md)** - Web app documentation
 - **[wordpress-plugin/README.md](./wordpress-plugin/README.md)** - WordPress plugin guide
 - **[browser-extension/README.md](./browser-extension/README.md)** - Extension development guide
+
+### Reference
+- **[DECENTRALIZATION_SUCCESS.md](./DECENTRALIZATION_SUCCESS.md)** - Architecture decisions
+- **[NEXT_STEPS.md](./NEXT_STEPS.md)** - Migration and next steps
 
 ## 🛠️ Development
 

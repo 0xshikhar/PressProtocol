@@ -9,18 +9,27 @@ export interface PublishContentRequest {
   media?: string[];
 }
 
+// Publish response - simple mirror URLs (from POST /api/content)
 export interface PublishContentResponse {
   shareUrl: string;
   cid: string;
   mirrors: {
-    ipfs: { url: string; available: boolean; latency?: number };
-    tor: { url: string; available: boolean; latency?: number };
-    gateway: { url: string; available: boolean; latency?: number };
+    ipfs?: string;
+    tor?: string;
+    gateway?: string;
   };
-  signature: string;
-  publicKey: string;
+  recommended: "ipfs" | "tor" | "gateway";
+  publisher: {
+    publicKey: string;
+    isAnonymous: boolean;
+  };
+  dht: {
+    announced: boolean;
+    manifestCid: string;
+  };
 }
 
+// Content retrieval response - full mirror objects with status (from GET /api/content/:cid)
 export interface ResolveContentResponse {
   cid: string;
   title: string;
@@ -61,22 +70,25 @@ export class ApiClient {
 
   async publishContent(
     data: PublishContentRequest,
-    authToken?: string
+    walletAddress?: string
   ): Promise<PublishContentResponse> {
     const response = await fetch(`${this.baseUrl}/api/content`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...(authToken && { Authorization: `Bearer ${authToken}` }),
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        ...data,
+        walletAddress,
+      }),
     });
 
     if (!response.ok) {
       throw new Error(`Failed to publish content: ${response.statusText}`);
     }
 
-    return response.json();
+    const result = await response.json();
+    return result.data;
   }
 
   async resolveContent(cid: string): Promise<ResolveContentResponse> {
@@ -86,7 +98,8 @@ export class ApiClient {
       throw new Error(`Failed to resolve content: ${response.statusText}`);
     }
 
-    return response.json();
+    const result = await response.json();
+    return result.data;
   }
 
   async getContent(cid: string): Promise<ResolveContentResponse> {
@@ -96,7 +109,8 @@ export class ApiClient {
       throw new Error(`Failed to get content: ${response.statusText}`);
     }
 
-    return response.json();
+    const result = await response.json();
+    return result.data;
   }
 
   async discoverContent(
@@ -117,7 +131,8 @@ export class ApiClient {
       throw new Error(`Failed to discover content: ${response.statusText}`);
     }
 
-    return response.json();
+    const result = await response.json();
+    return result.data || [];
   }
 
   async checkMirrorHealth(cid: string): Promise<{
@@ -131,7 +146,8 @@ export class ApiClient {
       throw new Error(`Failed to check mirror health: ${response.statusText}`);
     }
 
-    return response.json();
+    const result = await response.json();
+    return result.data;
   }
 
   async generateIdentity(
