@@ -25,7 +25,6 @@ export async function verifySignature(message: string, signature: string) {
 
 // Define the user type for the JWT payload
 export interface JwtPayload {
-    userId: string;
     address: string;
     iat?: number;
     exp?: number;

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateJwtToken } from '@/lib/auth';
 import { SiweMessage } from 'siwe';
-import { prisma } from '@/lib/prisma';
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,22 +35,9 @@ export async function POST(request: NextRequest) {
 
     console.log('Wallet Address:', walletAddress);
 
-    // Find or create user in database
-    const user = await prisma.user.upsert({
-      where: { walletAddress: walletAddress.toLowerCase() },
-      update: { lastLoginAt: new Date() },
-      create: {
-        walletAddress: walletAddress.toLowerCase(),
-        lastLoginAt: new Date(),
-      },
-    });
-
-    console.log('User:', user);
-
-    // Generate JWT token
+    // Generate JWT token (stateless auth - no database)
     const token = generateJwtToken({
-      userId: user.id,
-      address: user.walletAddress,
+      address: walletAddress.toLowerCase(),
     });
 
     console.log('Token:', token);
@@ -60,14 +46,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       token,
       user: {
-        id: user.id,
-        walletAddress: user.walletAddress,
-        username: user.username,
-        createdAt: user.createdAt,
-        lastLoginAt: user.lastLoginAt,
-        avatar: user.avatar,
-        bio: user.bio,
-        NFTid: user.NFTid
+        walletAddress: walletAddress.toLowerCase(),
       }
     });
   } catch (error) {

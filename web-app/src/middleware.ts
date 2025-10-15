@@ -42,11 +42,10 @@ export default async function middleware(request: NextRequest) {
         try {
             // Verify the token
             const decoded = await verifyJwtToken(token);
-            console.log(`Token verified for user: ${decoded.userId}`);
+            console.log(`Token verified for address: ${decoded.address}`);
 
             // Add user info to request headers to be accessible in route handlers
             const requestHeaders = new Headers(request.headers);
-            requestHeaders.set('x-user-id', decoded.userId);
             requestHeaders.set('x-user-address', decoded.address);
 
             // Return the request with modified headers
