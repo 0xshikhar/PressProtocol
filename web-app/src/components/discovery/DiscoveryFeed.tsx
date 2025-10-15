@@ -6,15 +6,17 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
-import { Clock, ExternalLink, Search } from "lucide-react";
-import { apiClient, type DiscoveryItem } from "@/lib/api-client";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Clock, ExternalLink, Search, Server } from "lucide-react";
+import { discoveryService, type DiscoveryContent } from "@/lib/discovery";
 import { toast } from "sonner";
 
 export function DiscoveryFeed() {
-  const [items, setItems] = useState<DiscoveryItem[]>([]);
+  const [items, setItems] = useState<DiscoveryContent[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTags, setSearchTags] = useState("");
   const [filteredTags, setFilteredTags] = useState<string[]>([]);
+  const [usingFallback, setUsingFallback] = useState(false);
 
   useEffect(() => {
     loadDiscoveryFeed();
@@ -24,14 +26,22 @@ export function DiscoveryFeed() {
   const loadDiscoveryFeed = async () => {
     try {
       setLoading(true);
-      const data = await apiClient.discoverContent(
+      setUsingFallback(false);
+      const data = await discoveryService.discoverContent(
         filteredTags.length > 0 ? filteredTags : undefined,
         20
       );
       setItems(data);
+      
+      // Check if we got results - if not, might be using DHT fallback
+      if (data.length === 0) {
+        setUsingFallback(true);
+      }
     } catch (error) {
       console.error("Error loading discovery feed:", error);
-      toast.error("Failed to load discovery feed");
+      setUsingFallback(true);
+      toast.error("All indexers failed - trying DHT fallback");
+      setItems([]);
     } finally {
       setLoading(false);
     }
@@ -88,6 +98,16 @@ export function DiscoveryFeed() {
 
   return (
     <div className="space-y-6">
+      {usingFallback && (
+        <Alert>
+          <Server className="h-4 w-4" />
+          <AlertDescription>
+            Using decentralized discovery (DHT fallback). This may be slower but ensures
+            censorship-resistance. Consider adding more indexers in settings for better performance.
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="flex gap-2">
         <Input
           placeholder="Search by tags (comma-separated)"
@@ -174,7 +194,7 @@ export function DiscoveryFeed() {
                 </div>
                 {item.tags && item.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-3">
-                    {item.tags.map((tag) => (
+                    {item.tags.map((tag: string) => (
                       <Badge
                         key={tag}
                         variant="outline"

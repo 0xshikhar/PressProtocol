@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react";
-import { Settings, User, Bell, Shield, Eye, Palette, Key, Database } from "lucide-react";
+import { Settings, User, Bell, Shield, Eye, Palette, Key, Database, Server } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { IndexerSettings } from "@/components/settings/IndexerSettings";
 
 export default function SettingsPage() {
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -38,10 +39,14 @@ export default function SettingsPage() {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5">
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6">
             <TabsTrigger value="profile" className="gap-2">
               <User className="h-4 w-4" />
               <span className="hidden sm:inline">Profile</span>
+            </TabsTrigger>
+            <TabsTrigger value="indexers" className="gap-2">
+              <Server className="h-4 w-4" />
+              <span className="hidden sm:inline">Indexers</span>
             </TabsTrigger>
             <TabsTrigger value="notifications" className="gap-2">
               <Bell className="h-4 w-4" />
@@ -115,6 +120,11 @@ export default function SettingsPage() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Indexers Tab */}
+          <TabsContent value="indexers" className="space-y-6">
+            <IndexerSettings />
           </TabsContent>
 
           {/* Notifications Tab */}
