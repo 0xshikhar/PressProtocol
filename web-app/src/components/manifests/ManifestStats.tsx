@@ -12,6 +12,12 @@ interface ManifestStats {
   manifestCount: number;
   tagCount: number;
   tags: string[];
+  heliaNode?: {
+    ready: boolean;
+    peerId?: string;
+    peers?: number;
+    addresses?: number;
+  };
 }
 
 export function ManifestStats() {
@@ -122,6 +128,58 @@ export function ManifestStats() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Helia Node Status (Phase 2C) */}
+      {stats.heliaNode && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Database className="h-5 w-5" />
+              Helia IPFS Node Status
+              {stats.heliaNode.ready ? (
+                <Badge variant="default" className="bg-green-500">Ready</Badge>
+              ) : (
+                <Badge variant="secondary">Offline</Badge>
+              )}
+            </CardTitle>
+            <CardDescription>
+              Peer-to-peer IPFS node for decentralized content storage
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {stats.heliaNode.ready ? (
+              <div className="space-y-3">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="p-4 bg-muted/30 rounded-lg">
+                    <div className="text-sm text-muted-foreground mb-1">Peer ID</div>
+                    <div className="text-xs font-mono break-all">
+                      {stats.heliaNode.peerId?.slice(0, 16)}...
+                    </div>
+                  </div>
+                  <div className="p-4 bg-muted/30 rounded-lg">
+                    <div className="text-sm text-muted-foreground mb-1">Connected Peers</div>
+                    <div className="text-2xl font-bold">{stats.heliaNode.peers || 0}</div>
+                  </div>
+                  <div className="p-4 bg-muted/30 rounded-lg">
+                    <div className="text-sm text-muted-foreground mb-1">Addresses</div>
+                    <div className="text-2xl font-bold">{stats.heliaNode.addresses || 0}</div>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  ✅ P2P operations enabled: Manifests can be uploaded directly to IPFS network
+                </p>
+              </div>
+            ) : (
+              <div className="text-sm text-muted-foreground">
+                <p>Helia node is not initialized. Using Pinata gateway fallback.</p>
+                <p className="mt-2 text-xs">
+                  To enable P2P operations, ensure required dependencies are installed and the node can start.
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Tag Cloud */}
       {stats.tags.length > 0 && (
