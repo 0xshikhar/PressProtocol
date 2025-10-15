@@ -188,7 +188,8 @@ Web app runs at `http://localhost:3000`
 ### 1. WordPress Publishing (Local Node)
 ```bash
 # Start WordPress with plugin
-docker-compose up -d wordpress
+cd backend
+docker-compose --profile wordpress up -d
 
 # Create post in WordPress
 # Click "Publish to AnonPress"

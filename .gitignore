@@ -1,1 +1,10 @@
 .vercel
+
+# Environment files (use backend/.env instead)
+.env
+.env.local
+.env.*.local
+
+# Docker files (use backend/docker-compose.yml instead)
+docker-compose.yml
+docker-compose.override.yml

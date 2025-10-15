@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { mirrorService } from '../services/MirrorService.js';
+import { torService } from '../services/TorService.js';
 import { prisma } from '../lib/prisma.js';
 
 export async function mirrorsRoutes(fastify: FastifyInstance) {
@@ -72,6 +73,38 @@ export async function mirrorsRoutes(fastify: FastifyInstance) {
       return reply.status(500).send({
         success: false,
         error: 'Failed to fetch fastest mirror',
+      });
+    }
+  });
+
+  /**
+   * GET /api/mirrors/onion-url - Get the Tor onion URL for WordPress
+   */
+  fastify.get('/api/mirrors/onion-url', async (request, reply) => {
+    try {
+      const onionUrl = await torService.getOnionUrl('anonpress-wordpress');
+      
+      if (!onionUrl) {
+        return reply.status(404).send({
+          success: false,
+          error: 'Onion service not available yet',
+          message: 'The onionize container is still generating the .onion address. Please wait a moment and try again.',
+        });
+      }
+
+      const isAvailable = await torService.checkOnionAvailability('anonpress-wordpress');
+
+      return reply.send({
+        success: true,
+        onionUrl,
+        available: isAvailable,
+        message: 'Access this URL using Tor Browser for anonymous access',
+      });
+    } catch (error) {
+      fastify.log.error(error);
+      return reply.status(500).send({
+        success: false,
+        error: 'Failed to get onion URL',
       });
     }
   });

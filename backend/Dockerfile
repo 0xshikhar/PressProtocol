@@ -2,19 +2,25 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Install wget for healthcheck
+RUN apk add --no-cache wget
+
 # Copy package files
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# Install dependencies
-RUN npm ci
+# Install dependencies with retry and timeout settings
+RUN npm config set fetch-retry-maxtimeout 120000 && \
+    npm config set fetch-retry-mintimeout 10000 && \
+    npm config set fetch-retries 5 && \
+    npm ci --prefer-offline --no-audit
 
 # Copy source
 COPY src ./src
 COPY prisma ./prisma
 
-# Generate Prisma client
-RUN npx prisma generate
+# Generate Prisma client with --no-engine for Accelerate
+RUN npx prisma generate --no-engine
 
 # Build
 RUN npm run build
@@ -24,11 +30,18 @@ FROM node:20-alpine
 
 WORKDIR /app
 
+# Install wget for healthcheck
+RUN apk add --no-cache wget
+
 # Copy package files
 COPY package*.json ./
 
-# Install production dependencies only
-RUN npm ci --omit=dev
+# Install production dependencies with retry settings (include prisma for generation)
+RUN npm config set fetch-retry-maxtimeout 120000 && \
+    npm config set fetch-retry-mintimeout 10000 && \
+    npm config set fetch-retries 5 && \
+    npm ci --omit=dev --prefer-offline --no-audit && \
+    npm install -g prisma@6.17.0
 
 # Copy built files and prisma
 COPY --from=builder /app/dist ./dist
@@ -38,9 +51,5 @@ COPY prisma ./prisma
 # Expose port
 EXPOSE 4000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:4000/health/live', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
-
-# Start
-CMD ["node", "dist/index.js"]
+# Start with Prisma generation at runtime to ensure fresh client
+CMD ["sh", "-c", "prisma generate --no-engine && node dist/index.js"]

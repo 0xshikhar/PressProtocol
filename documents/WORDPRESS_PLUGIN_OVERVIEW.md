@@ -11,7 +11,7 @@ The AnonPress WordPress plugin is now fully implemented and production-ready. It
 │                      WordPress CMS                              │
 │                                                                 │
 │  ┌──────────────────────────────────────────────────────────┐  │
-│  │              AnonPress Plugin                             │  │
+│  │              PressProtocol Plugin                             │  │
 │  │  ┌──────────┐  ┌──────────┐  ┌──────────┐              │  │
 │  │  │Publisher │  │API Client│  │ Settings │              │  │
 │  │  └──────────┘  └──────────┘  └──────────┘              │  │
