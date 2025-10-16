@@ -1,4 +1,4 @@
-# AnonPress Web App - TODO & Next Steps
+# PressProtocol Web App - TODO & Next Steps
 
 ## ✅ Completed Features
 
@@ -176,7 +176,7 @@ The web app is frontend-only. Backend needs to implement:
 
 ### Phase 4: WordPress Plugin
 - [ ] Create WordPress plugin
-- [ ] Add "Publish to AnonPress" button
+- [ ] Add "Publish to PressProtocol" button
 - [ ] Export posts to static HTML
 - [ ] Integrate with backend API
 - [ ] Show mirror status in WP admin

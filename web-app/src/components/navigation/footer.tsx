@@ -47,7 +47,7 @@ export default function Footer() {
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-400 group-hover:shadow-lg transition-all">
                 <FileText className="h-5 w-5 text-white" />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">AnonPress</span>
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">PressProtocol</span>
             </Link>
             <p className="mb-4 max-w-sm text-sm text-muted-foreground">
               Professional decentralized publishing platform. Publish censorship-resistant content across IPFS, Tor, and gateway mirrors.
@@ -146,7 +146,7 @@ export default function Footer() {
 
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} AnonPress. Built for censorship-resistant publishing.
+            © {new Date().getFullYear()} PressProtocol. Built for censorship-resistant publishing.
           </p>
           <div className="flex gap-4 text-sm text-muted-foreground">
             <Link href="/privacy" className="hover:text-primary transition-colors">

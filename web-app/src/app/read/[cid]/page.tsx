@@ -113,7 +113,7 @@ export default function ReadPage() {
             <Alert className="border-0 bg-transparent">
               <Download className="h-4 w-4" />
               <AlertDescription className="text-sm">
-                Install the AnonPress browser extension for automatic multi-network routing.
+                Install the PressProtocol browser extension for automatic multi-network routing.
                 <Button variant="link" className="ml-2 h-auto p-0 text-sm">
                   Install Extension
                 </Button>

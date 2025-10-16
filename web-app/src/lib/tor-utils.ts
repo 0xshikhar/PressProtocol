@@ -44,7 +44,7 @@ export function extractOnionAddress(onionUrl: string): string {
 export function shareOnionUrl(onionUrl: string, title: string): void {
   if (navigator.share) {
     navigator.share({
-      title: `${title} - AnonPress (Tor)`,
+      title: `${title} - PressProtocol (Tor)`,
       text: `Access this content securely via Tor Browser: ${onionUrl}`,
       url: onionUrl,
     }).catch(err => console.log('Share cancelled', err));

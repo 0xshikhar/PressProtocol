@@ -20,7 +20,7 @@ export default function HelpPage() {
     {
       icon: Book,
       title: "Getting Started",
-      description: "Learn the basics of AnonPress",
+      description: "Learn the basics of PressProtocol",
       articles: 12
     },
     {
@@ -38,15 +38,15 @@ export default function HelpPage() {
     {
       icon: Zap,
       title: "Advanced Features",
-      description: "Make the most of AnonPress",
+      description: "Make the most of PressProtocol",
       articles: 15
     }
   ];
 
   const faqs = [
     {
-      question: "What is AnonPress?",
-      answer: "AnonPress is a decentralized, censorship-resistant publishing platform that distributes your content across IPFS, Tor, and gateway mirrors. This ensures your content remains accessible even if one network goes down."
+      question: "What is PressProtocol?",
+      answer: "PressProtocol is a decentralized, censorship-resistant publishing platform that distributes your content across IPFS, Tor, and gateway mirrors. This ensures your content remains accessible even if one network goes down."
     },
     {
       question: "How does content distribution work?",
@@ -58,19 +58,19 @@ export default function HelpPage() {
     },
     {
       question: "Can I publish anonymously?",
-      answer: "Absolutely. AnonPress supports anonymous publishing. You can create content without revealing your identity, and your Ed25519 cryptographic signatures verify authenticity without exposing personal information."
+      answer: "Absolutely. PressProtocol supports anonymous publishing. You can create content without revealing your identity, and your Ed25519 cryptographic signatures verify authenticity without exposing personal information."
     },
     {
       question: "How do I verify content authenticity?",
-      answer: "All content on AnonPress is signed with Ed25519 cryptographic signatures. Readers can verify the signature to ensure the content hasn't been tampered with and comes from the claimed publisher."
+      answer: "All content on PressProtocol is signed with Ed25519 cryptographic signatures. Readers can verify the signature to ensure the content hasn't been tampered with and comes from the claimed publisher."
     },
     {
       question: "What are the costs involved?",
-      answer: "AnonPress is free to use. Publishing and distributing content across our networks is completely free. There are no subscription fees or hidden costs."
+      answer: "PressProtocol is free to use. Publishing and distributing content across our networks is completely free. There are no subscription fees or hidden costs."
     },
     {
       question: "How do I share my published content?",
-      answer: "After publishing, you'll receive a unique anonpress:// link. Share this link anywhere, and readers with the AnonPress browser extension can access your content through the fastest available mirror."
+      answer: "After publishing, you'll receive a unique anonpress:// link. Share this link anywhere, and readers with the PressProtocol browser extension can access your content through the fastest available mirror."
     },
     {
       question: "Can I edit or delete published content?",
@@ -104,7 +104,7 @@ export default function HelpPage() {
             </div>
             <h1 className="text-4xl font-bold mb-4">How can we help you?</h1>
             <p className="text-lg text-muted-foreground mb-8">
-              Find answers, learn about features, and get the most out of AnonPress
+              Find answers, learn about features, and get the most out of PressProtocol
             </p>
             
             {/* Search */}

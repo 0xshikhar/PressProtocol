@@ -239,7 +239,7 @@ export default function ProfilePage() {
           <CardContent className="space-y-4">
             <Alert>
               <AlertDescription>
-                <strong>Privacy First:</strong> AnonPress doesn&apos;t track you. All your data
+                <strong>Privacy First:</strong> PressProtocol doesn&apos;t track you. All your data
                 (bookmarks, preferences, history) is stored locally in your browser. No
                 server-side tracking, no analytics, no profiling.
               </AlertDescription>

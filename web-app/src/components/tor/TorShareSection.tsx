@@ -45,7 +45,7 @@ export function TorShareSection({ onionUrl, contentTitle, className }: TorShareS
     if (navigator.share) {
       navigator
         .share({
-          title: contentTitle ? `${contentTitle} - AnonPress (Tor)` : "AnonPress Content (Tor)",
+          title: contentTitle ? `${contentTitle} - PressProtocol (Tor)` : "PressProtocol Content (Tor)",
           text: "Access this content securely via Tor Browser",
           url: onionUrl,
         })

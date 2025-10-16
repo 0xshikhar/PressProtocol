@@ -3,7 +3,7 @@ import { SiteConfig } from "@/types"
 import { env } from "@/env.mjs"
 
 export const siteConfig: SiteConfig = {
-  name: "AnonPress",
+  name: "PressProtocol",
   author: "0xShikhar",
   description:
     "Professional decentralized censorship-resistant publishing platform. Publish content across IPFS, Tor, and gateway mirrors with cryptographic verification and intelligent routing.",

@@ -153,7 +153,7 @@ export default function Home() {
         <div className="mb-16 text-center">
           <Badge variant="outline" className="mb-4 border-blue-200">
             <Award className="mr-1 h-3 w-3" />
-            Why Choose AnonPress
+            Why Choose PressProtocol
           </Badge>
           <h2 className="text-4xl font-bold mb-4">Built for the Future of Publishing</h2>
           <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
@@ -189,7 +189,7 @@ export default function Home() {
               <GitBranch className="mr-1 h-3 w-3" />
               Simple Workflow
             </Badge>
-            <h2 className="text-4xl font-bold mb-4">How AnonPress Works</h2>
+            <h2 className="text-4xl font-bold mb-4">How PressProtocol Works</h2>
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
               Four simple steps to publish censorship-resistant content
             </p>
@@ -278,7 +278,7 @@ export default function Home() {
               </h2>
               
               <p className="mx-auto mb-8 max-w-2xl text-lg text-muted-foreground">
-                Join thousands of publishers using AnonPress to share censorship-resistant content. 
+                Join thousands of publishers using PressProtocol to share censorship-resistant content. 
                 Your voice deserves to be heard, and we ensure it can&apos;t be silenced.
               </p>
               

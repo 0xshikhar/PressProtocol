@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
 
 ```
 ┌─────────────────────────────────────────┐
-│        AnonPress Web App                │
+│        PressProtocol Web App                │
 │        (Frontend Only)                  │
 │                                         │
 │  - Next.js 14 (App Router)             │
@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
               ↓ HTTP Requests
               ↓
 ┌─────────────────────────────────────────┐
-│      AnonPress Backend API              │
+│      PressProtocol Backend API              │
 │      (Separate Repository)              │
 │                                         │
 │  - Fastify Server                      │

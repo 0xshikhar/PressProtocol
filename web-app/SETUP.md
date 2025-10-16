@@ -1,4 +1,4 @@
-# AnonPress Web App - Quick Setup Guide
+# PressProtocol Web App - Quick Setup Guide
 
 ## Prerequisites
 

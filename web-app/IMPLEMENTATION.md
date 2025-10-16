@@ -1,8 +1,8 @@
-# AnonPress Web App - Implementation Summary
+# PressProtocol Web App - Implementation Summary
 
 ## Overview
 
-The AnonPress web application has been successfully implemented according to the v2 specifications. This document provides a comprehensive overview of what has been built and how to use it.
+The PressProtocol web application has been successfully implemented according to the v2 specifications. This document provides a comprehensive overview of what has been built and how to use it.
 
 ## Completed Features
 
@@ -118,7 +118,7 @@ Features:
 **File**: `src/components/navigation/navbar.tsx`
 
 Updated with:
-- AnonPress branding
+- PressProtocol branding
 - Discover, Publish, Dashboard links
 - Mobile-responsive menu
 - Authentication button
@@ -160,7 +160,7 @@ User → Web App → Backend API → IPFS/Tor/Gateway
 
 1. User writes content in rich text editor
 2. User adds title and tags
-3. User clicks "Publish to AnonPress"
+3. User clicks "Publish to PressProtocol"
 4. Web app calls backend API
 5. Backend uploads to IPFS, creates Tor onion, gateway mirror
 6. Backend stores metadata in database
@@ -366,7 +366,7 @@ All required variables documented in `.env.example`
 
 ## Conclusion
 
-The AnonPress web application is fully implemented according to v2 specifications. The frontend is production-ready and waiting for backend integration. All core features are in place:
+The PressProtocol web application is fully implemented according to v2 specifications. The frontend is production-ready and waiting for backend integration. All core features are in place:
 
 ✅ Publishing interface with rich text editor
 ✅ Reader view with mirror status

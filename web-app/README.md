@@ -1,8 +1,8 @@
-# AnonPress Web App
+# PressProtocol Web App
 
 **Decentralized Censorship-Resistant Publishing Platform - Frontend**
 
-AnonPress is a Next.js 14 web application (frontend only) that provides the user interface for censorship-resistant content publishing distributed across IPFS, Tor, and gateway mirrors. Part of the RealFi - Internet Archive Europe Challenge hackathon project.
+PressProtocol is a Next.js 14 web application (frontend only) that provides the user interface for censorship-resistant content publishing distributed across IPFS, Tor, and gateway mirrors. Part of the RealFi - Internet Archive Europe Challenge hackathon project.
 
 > **Note**: This is a **frontend-only** application. All database operations, IPFS uploads, and Tor services are handled by the separate `anonpress-backend` repository.
 
@@ -224,4 +224,4 @@ MIT License - see LICENSE file for details
 
 ---
 
-**AnonPress** - Your voice can't be silenced.
+**PressProtocol** - Your voice can't be silenced.
