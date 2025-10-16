@@ -95,10 +95,12 @@ export async function contentRoutes(fastify: FastifyInstance) {
       );
 
       // 4. Create Tor onion service
+      console.log('🧅 [PUBLISH] Creating Tor onion service...');
       const onionResult = await torService.createOnionService(
         ipfsResult.cid,
         ipfsResult.gatewayUrl
       );
+      console.log('🧅 [PUBLISH] Tor onion result:', onionResult);
 
       // 5. Store metadata in database (CACHE LAYER ONLY)
       // Full content lives on IPFS - database just has CID + metadata
@@ -119,6 +121,12 @@ export async function contentRoutes(fastify: FastifyInstance) {
       // 6. Create mirrors
       const webGatewayUrl = `${env.CORS_ORIGIN}/read/${ipfsResult.cid}`;
       
+      console.log('🪞 [PUBLISH] Creating mirrors with:', {
+        ipfs: ipfsResult.gatewayUrl,
+        tor: onionResult.onionUrl,
+        gateway: webGatewayUrl,
+      });
+      
       await mirrorService.createMirrors(
         content.id,
         ipfsResult.cid,
@@ -126,6 +134,8 @@ export async function contentRoutes(fastify: FastifyInstance) {
         onionResult.onionUrl,
         webGatewayUrl
       );
+      
+      console.log('✅ [PUBLISH] Mirrors created successfully');
 
       // 7. Announce to IPFS DHT for decentralized discovery (Phase 2B)
       // Creates manifest with excerpt, word count, reading time
@@ -238,6 +248,27 @@ export async function contentRoutes(fastify: FastifyInstance) {
           fromCache = true;
         }
 
+        // Transform mirrors array to object structure for frontend
+        const mirrorsObj: any = {
+          ipfs: null,
+          tor: null,
+          gateway: null,
+        };
+        
+        cachedContent.mirrors.forEach((m) => {
+          mirrorsObj[m.type] = {
+            url: m.url,
+            available: m.available,
+            latency: m.latency,
+          };
+        });
+
+        console.log('📡 [READ] Returning content with mirrors:', {
+          cid: cachedContent.cid,
+          title: cachedContent.title,
+          mirrors: mirrorsObj,
+        });
+
         return reply.send({
           success: true,
           data: {
@@ -250,15 +281,13 @@ export async function contentRoutes(fastify: FastifyInstance) {
               publicKey: cachedContent.publisherPubKey,
               walletAddress: cachedContent.user?.walletAddress,
               username: cachedContent.user?.username,
+              pubkey: cachedContent.publisherPubKey,
+              signature: cachedContent.signature,
               isAnonymous: !cachedContent.userId,
             },
             signature: cachedContent.signature,
-            mirrors: cachedContent.mirrors.map((m) => ({
-              type: m.type,
-              url: m.url,
-              available: m.available,
-              latency: m.latency,
-            })),
+            mirrors: mirrorsObj,
+            recommended: 'ipfs', // Default recommendation
             source: fromCache ? 'cache' : 'ipfs',
           },
         });
@@ -301,6 +330,163 @@ export async function contentRoutes(fastify: FastifyInstance) {
       return reply.status(500).send({
         success: false,
         error: 'Failed to fetch content',
+      });
+    }
+  });
+
+  /**
+   * GET /ipfs/:cid - Serve IPFS content through backend (for Tor onion access)
+   * This allows .onion URLs like http://abc.onion/ipfs/QmXYZ to work
+   */
+  fastify.get('/ipfs/:cid', async (request, reply) => {
+    try {
+      const { cid } = request.params as { cid: string };
+      
+      console.log(`🔍 [TOR-IPFS] Fetching content for Tor access: ${cid}`);
+
+      // Try database cache first
+      const cachedContent = await prisma.content.findUnique({
+        where: { cid },
+        include: {
+          user: true,
+          mirrors: true,
+        },
+      });
+
+      if (!cachedContent) {
+        console.log(`⚠️  [TOR-IPFS] Content not found in cache: ${cid}`);
+        return reply.status(404).send({
+          success: false,
+          error: 'Content not found',
+        });
+      }
+
+      // Fetch FULL content from IPFS
+      let fullContent;
+      try {
+        fullContent = await storageService.getContentFromIPFS(cid);
+        console.log(`✅ [TOR-IPFS] Content fetched from IPFS: ${cachedContent.title}`);
+      } catch (ipfsError) {
+        console.error(`❌ [TOR-IPFS] IPFS fetch failed:`, ipfsError);
+        return reply.status(500).send({
+          success: false,
+          error: 'Failed to fetch content from IPFS',
+        });
+      }
+
+      // Return HTML page (for browser viewing)
+      const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${cachedContent.title} - AnonPress (Tor)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            padding: 3rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .tor-badge {
+            display: inline-block;
+            background: #7e4798;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            margin-bottom: 2rem;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        .meta {
+            color: #666;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #eee;
+        }
+        .tags {
+            margin-bottom: 2rem;
+        }
+        .tag {
+            display: inline-block;
+            background: #e0e0e0;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .content {
+            font-size: 1.125rem;
+            line-height: 1.8;
+        }
+        .content p { margin-bottom: 1.5rem; }
+        .content h2 { margin: 2rem 0 1rem; font-size: 1.875rem; }
+        .content h3 { margin: 1.5rem 0 0.75rem; font-size: 1.5rem; }
+        .footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 2px solid #eee;
+            text-align: center;
+            color: #666;
+            font-size: 0.875rem;
+        }
+        .cid {
+            font-family: monospace;
+            background: #f0f0f0;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <span class="tor-badge">🧅 Accessed via Tor</span>
+        <h1>${cachedContent.title}</h1>
+        <div class="meta">
+            <div><strong>Published:</strong> ${new Date(cachedContent.createdAt).toLocaleDateString()}</div>
+            <div><strong>Publisher:</strong> <span class="cid">${cachedContent.publisherPubKey.slice(0, 16)}...</span></div>
+            <div><strong>CID:</strong> <span class="cid">${cid}</span></div>
+        </div>
+        ${cachedContent.tags.length > 0 ? `
+        <div class="tags">
+            ${cachedContent.tags.map(tag => `<span class="tag">#${tag}</span>`).join('')}
+        </div>
+        ` : ''}
+        <div class="content">
+            ${fullContent.content}
+        </div>
+        <div class="footer">
+            <p>🔐 This content is censorship-resistant and accessible via Tor</p>
+            <p>Powered by <strong>AnonPress</strong> - Decentralized Publishing Platform</p>
+        </div>
+    </div>
+</body>
+</html>
+      `;
+
+      reply.type('text/html').send(html);
+    } catch (error) {
+      fastify.log.error(error);
+      return reply.status(500).send({
+        success: false,
+        error: 'Failed to serve content',
       });
     }
   });

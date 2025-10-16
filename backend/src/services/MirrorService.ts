@@ -97,6 +97,8 @@ export class MirrorService {
     onionUrl: string,
     webGatewayUrl: string
   ) {
+    console.log('🪞 [MIRROR] Creating mirrors for content:', contentId);
+    
     const mirrors = [
       {
         contentId,
@@ -121,9 +123,15 @@ export class MirrorService {
       },
     ];
 
-    return prisma.mirror.createMany({
+    console.log('🪞 [MIRROR] Storing mirrors:', mirrors.map(m => ({ type: m.type, url: m.url })));
+
+    const result = await prisma.mirror.createMany({
       data: mirrors,
     });
+    
+    console.log(`✅ [MIRROR] Created ${result.count} mirrors`);
+    
+    return result;
   }
 
   /**

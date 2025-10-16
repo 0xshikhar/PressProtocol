@@ -22,7 +22,7 @@ The AnonPress WordPress plugin is now fully implemented and production-ready. It
                           │ HTTP/JSON
                           ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                  AnonPress Backend API                           │
+│                  PressProtocol Backend API                           │
 │  ┌──────────────────────────────────────────────────────────┐   │
 │  │  Identity → Storage → Tor → Mirror → Discovery Services  │   │
 │  └──────────────────────────────────────────────────────────┘   │

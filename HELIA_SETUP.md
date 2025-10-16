@@ -7,38 +7,6 @@
 ✅ **Backend works without Helia** (uses Pinata fallback)  
 ⚠️ **Helia requires native dependencies** (optional for P2P)
 
----
-
-## What Was Fixed
-
-**Problem:** Helia imports at the top of the file caused crashes before try-catch could handle them.
-
-**Solution:** Made all Helia imports **dynamic** (lazy-loaded inside try-catch).
-
-```typescript
-// Before (crashed at import time):
-import { createHelia } from 'helia';
-
-// After (loads on-demand, errors are caught):
-const { createHelia } = await import('helia');
-```
-
----
-
-## Why Helia Fails to Initialize (Expected)
-
-Helia uses libp2p which includes WebRTC transport. WebRTC requires native node modules that need to be compiled:
-
-```
-Error: Cannot find module '../../../build/Release/node_datachannel.node'
-```
-
-This is the native WebRTC binding used by `@ipshipyard/node-datachannel`.
-
-**This error is now caught and handled gracefully.**
-
----
-
 ## System Behavior
 
 ### Without Helia (Current - Works Fine ✅)

@@ -74,36 +74,46 @@ export class TorService {
   }
 
   /**
-   * Get onion URL for content (WordPress site)
-   * Returns the actual .onion address from onionize service
+   * Get onion URL for content via Tor hidden service
+   * Returns the actual .onion address from Docker onionize service
    */
   async createOnionService(contentCid: string, gatewayUrl: string): Promise<OnionServiceResult> {
     try {
-      // Get the real onion URL from onionize service
-      const onionUrl = await this.getOnionUrl('anonpress-wordpress');
+      console.log('🔍 [TOR] Creating onion service for content...');
+      console.log(`   CID: ${contentCid}`);
       
-      if (onionUrl) {
-        console.log('🧅 Using real Tor onion service (onionize)');
-        console.log(`   Access via Tor Browser: ${onionUrl}`);
+      // Get the real onion URL from Docker onionize service
+      const baseOnionUrl = await this.getOnionUrl('anonpress-backend');
+      
+      if (baseOnionUrl) {
+        // Construct full URL: http://{onion}/ipfs/{CID}
+        const fullOnionUrl = `${baseOnionUrl}/ipfs/${contentCid}`;
+        
+        console.log('✅ [TOR] Using real Docker Tor onion service!');
+        console.log(`   Base: ${baseOnionUrl}`);
+        console.log(`   Full: ${fullOnionUrl}`);
+        console.log(`   🧅 Access via Tor Browser: ${fullOnionUrl}`);
         
         return {
-          onionUrl,
-          serviceId: 'anonpress-wordpress',
+          onionUrl: fullOnionUrl,
+          serviceId: 'anonpress-backend',
         };
       }
 
-      // Fallback: Use Tor2Web gateway if onion service not ready yet
-      const tor2webUrl = `https://ipfs.io/ipfs/${contentCid}`;
+      // Fallback: Onion service not ready yet
+      console.warn('⚠️  [TOR] Onion service not available yet');
+      console.warn('   Docker onionize container may still be generating .onion address');
+      console.warn('   This takes ~30 seconds on first run');
       
-      console.log('🧅 Onion service not ready, using Tor2Web fallback');
-      console.log(`   Access via Tor Browser: https://ipfs.io/ipfs/${contentCid}`);
+      const fallbackUrl = `https://ipfs.io/ipfs/${contentCid}`;
+      console.log(`   Using fallback: ${fallbackUrl}`);
       
       return {
-        onionUrl: tor2webUrl,
-        serviceId: 'tor2web-fallback',
+        onionUrl: fallbackUrl,
+        serviceId: 'ipfs-fallback',
       };
     } catch (error) {
-      console.error('Error creating Tor access:', error);
+      console.error('❌ [TOR] Error creating Tor access:', error);
       // Fallback to IPFS gateway
       return {
         onionUrl: `https://ipfs.io/ipfs/${contentCid}`,

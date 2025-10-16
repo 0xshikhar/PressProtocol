@@ -169,6 +169,35 @@ export class ApiClient {
 
     return response.json();
   }
+
+  async getBackendOnionUrl(): Promise<{
+    onionUrl: string;
+    available: boolean;
+    message: string;
+  }> {
+    const response = await fetch(`${this.baseUrl}/api/mirrors/onion-url`);
+
+    if (!response.ok) {
+      throw new Error(`Failed to get onion URL: ${response.statusText}`);
+    }
+
+    return response.json();
+  }
+
+  async getFastestMirror(cid: string): Promise<{
+    type: "ipfs" | "tor" | "gateway";
+    url: string;
+    latency: number;
+  }> {
+    const response = await fetch(`${this.baseUrl}/api/mirrors/${cid}/fastest`);
+
+    if (!response.ok) {
+      throw new Error(`Failed to get fastest mirror: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    return result.data;
+  }
 }
 
 export const apiClient = new ApiClient();

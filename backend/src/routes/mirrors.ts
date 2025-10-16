@@ -78,13 +78,15 @@ export async function mirrorsRoutes(fastify: FastifyInstance) {
   });
 
   /**
-   * GET /api/mirrors/onion-url - Get the Tor onion URL for WordPress
+   * GET /api/mirrors/onion-url - Get the Tor onion URL for backend
    */
   fastify.get('/api/mirrors/onion-url', async (request, reply) => {
     try {
-      const onionUrl = await torService.getOnionUrl('anonpress-wordpress');
+      console.log('🔍 [API] Getting onion URL for backend...');
+      const onionUrl = await torService.getOnionUrl('anonpress-backend');
       
       if (!onionUrl) {
+        console.warn('⚠️  [API] Onion service not available yet');
         return reply.status(404).send({
           success: false,
           error: 'Onion service not available yet',
@@ -92,7 +94,9 @@ export async function mirrorsRoutes(fastify: FastifyInstance) {
         });
       }
 
-      const isAvailable = await torService.checkOnionAvailability('anonpress-wordpress');
+      const isAvailable = await torService.checkOnionAvailability('anonpress-backend');
+      
+      console.log('✅ [API] Onion URL retrieved:', { onionUrl, available: isAvailable });
 
       return reply.send({
         success: true,

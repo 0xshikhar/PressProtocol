@@ -14,6 +14,8 @@ import { calculateReadingTime } from "@/lib/reading-time";
 import { ReadingProgressBar } from "@/components/reader/ReadingProgressBar";
 import { TableOfContents } from "@/components/reader/TableOfContents";
 import { BookmarkButton } from "@/components/reader/BookmarkButton";
+import { TorShareSection } from "@/components/tor/TorShareSection";
+import { Separator } from "@/components/ui/separator";
 
 export default function ReadPage() {
   const params = useParams();
@@ -37,9 +39,21 @@ export default function ReadPage() {
       setLoading(true);
       setError(null);
       const data = await apiClient.getContent(cid);
+      
+      // 🔍 DEBUG: Log content data
+      console.log('📊 [READ PAGE] Content loaded:', {
+        cid: data.cid,
+        title: data.title,
+        hasMirrors: !!data.mirrors,
+        mirrors: data.mirrors,
+        hasTor: !!data.mirrors?.tor,
+        torAvailable: data.mirrors?.tor?.available,
+        torUrl: data.mirrors?.tor?.url,
+      });
+      
       setContent(data);
     } catch (err) {
-      console.error("Error loading content:", err);
+      console.error("❌ [READ PAGE] Error loading content:", err);
       setError("Failed to load content. The content may not exist or is temporarily unavailable.");
       toast.error("Failed to load content");
     } finally {
@@ -224,17 +238,18 @@ export default function ReadPage() {
                 <div className="flex items-center gap-3">
                   <div className={`h-3 w-3 rounded-full ${getMirrorStatusColor(content.mirrors.tor.available)}`} />
                   <div>
-                    <div className="font-medium">Tor</div>
+                    <div className="font-medium">Tor Network</div>
                     <div className="text-sm text-muted-foreground">
-                      {content.mirrors.tor.available ? "Available" : "Unavailable"}
+                      {content.mirrors.tor.available ? "Available via Tor Browser" : "Unavailable"}
                       {content.mirrors.tor.latency && ` • ${content.mirrors.tor.latency}ms`}
                     </div>
                   </div>
                 </div>
                 {content.mirrors.tor.available && (
-                  <div className="text-sm text-muted-foreground font-mono">
+                  <Badge variant="outline" className="flex items-center gap-1">
+                    <Shield className="h-3 w-3" />
                     .onion
-                  </div>
+                  </Badge>
                 )}
               </div>
             )}
@@ -273,6 +288,43 @@ export default function ReadPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* DEBUG CARD - Temporary */}
+      {/* <Card className="border-yellow-500 bg-yellow-50 dark:bg-yellow-950">
+        <CardHeader>
+          <CardTitle className="text-sm">🔍 DEBUG: Tor Mirror Data</CardTitle>
+        </CardHeader>
+        <CardContent className="text-xs font-mono space-y-2">
+          <div>mirrors.tor exists: {content.mirrors?.tor ? '✅ YES' : '❌ NO'}</div>
+          <div>mirrors.tor.available: {content.mirrors?.tor?.available ? '✅ true' : '❌ false'}</div>
+          <div>mirrors.tor.url: {content.mirrors?.tor?.url || '❌ NOT SET'}</div>
+          <div className="pt-2 border-t">Full mirrors object:</div>
+          <pre className="text-[10px] overflow-auto">
+            {JSON.stringify(content.mirrors, null, 2)}
+          </pre>
+        </CardContent>
+      </Card> */}
+
+      {/* Tor Onion Access Section */}
+      {content.mirrors.tor && content.mirrors.tor.available && content.mirrors.tor.url && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Shield className="h-5 w-5 text-purple-500" />
+              Access via Tor Network
+            </CardTitle>
+            <CardDescription>
+              Maximum privacy and censorship resistance
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <TorShareSection
+              onionUrl={content.mirrors.tor.url}
+              contentTitle={content.title}
+            />
+          </CardContent>
+        </Card>
+      )}
 
       {/* Publisher Info Card */}
       <Card>
