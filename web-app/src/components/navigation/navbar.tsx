@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { Search, Menu, X, Bell, BookMarked, TrendingUp, FileText, Home, BarChart3, Settings, HelpCircle, User } from "lucide-react";
+import { Search, Menu, X, Bell, BookMarked, TrendingUp, FileText, Home, BarChart3, Settings, HelpCircle, User, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AuthButton } from "@/components/AuthButton";
 import { Button } from "@/components/ui/button";
@@ -34,9 +34,9 @@ const Navbar = () => {
   const navLinks = [
     { href: "/explore", label: "Explore", icon: Search },
     // { href: "/trending", label: "Trending", icon: TrendingUp },
-    { href: "/publish", label: "Publish", icon: FileText },
+    { href: "/write", label: "Publish", icon: FileText },
     { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
-    { href: "/profile", label: "Profile", icon: User },
+    { href:"/explorer",label:"Explorer",icon:Globe}
   ];
 
   return (
@@ -76,9 +76,9 @@ const Navbar = () => {
         </div>
 
         {/* Desktop Actions */}
-        <div className="hidden items-center space-x-3 md:flex">
+        <div className="hidden items-center space-x-2 md:flex">
           {/* Search */}
-          <div className="relative">
+          {/* <div className="relative">
             <form onSubmit={handleSearch} className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -89,16 +89,16 @@ const Navbar = () => {
                 className="w-64 pl-9 pr-4"
               />
             </form>
-          </div>
+          </div> */}
 
           {/* Bookmarks */}
-          <Button variant="ghost" size="icon" onClick={() => router.push("/bookmarks")}>
-            <BookMarked className="h-5 w-5" />
+          <Button variant="ghost" size="icon" onClick={() => router.push("/profile")}>
+            <User className="h-6 w-6" />
           </Button>
 
           {/* Notifications */}
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" onClick={() => router.push("/settings")}>
+            <Settings className="h-5 w-5" />
             <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-destructive" />
           </Button>
 
