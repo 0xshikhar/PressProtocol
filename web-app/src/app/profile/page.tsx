@@ -184,6 +184,47 @@ export default function ProfilePage() {
       </div>
 
       <div className="container mx-auto px-4 py-8 space-y-6">
+        {/* Profile Stats */}
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardDescription>Total Bookmarks</CardDescription>
+              <CardTitle className="text-4xl">{bookmarks.length}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-xs text-muted-foreground">
+                Saved locally on this device
+              </p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-3">
+              <CardDescription>Tags Following</CardDescription>
+              <CardTitle className="text-4xl">
+                {new Set(bookmarks.flatMap((b) => b.tags)).size}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-xs text-muted-foreground">
+                Unique tags in your bookmarks
+              </p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-3">
+              <CardDescription>Privacy Level</CardDescription>
+              <CardTitle className="text-4xl">100%</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-xs text-muted-foreground">
+                No tracking, fully anonymous
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Profile Info Card */}
         <Card>
           <CardHeader>
@@ -195,7 +236,7 @@ export default function ProfilePage() {
               Your profile data is stored locally on your device for privacy
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <Alert>
               <AlertDescription>
                 <strong>Privacy First:</strong> AnonPress doesn't track you. All your data
@@ -203,6 +244,36 @@ export default function ProfilePage() {
                 server-side tracking, no analytics, no profiling.
               </AlertDescription>
             </Alert>
+            
+            <div className="grid gap-4 text-sm">
+              <div className="grid grid-cols-3 gap-4 border-b pb-3">
+                <span className="font-medium text-muted-foreground">Status</span>
+                <span className="col-span-2 flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                  Anonymous (No tracking)
+                </span>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-4 border-b pb-3">
+                <span className="font-medium text-muted-foreground">Data Storage</span>
+                <span className="col-span-2">Local (Browser only)</span>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-4 border-b pb-3">
+                <span className="font-medium text-muted-foreground">Bookmarks</span>
+                <span className="col-span-2">{bookmarks.length} saved</span>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-4 border-b pb-3">
+                <span className="font-medium text-muted-foreground">Server Tracking</span>
+                <span className="col-span-2 text-green-600 font-medium">Disabled ✓</span>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-4">
+                <span className="font-medium text-muted-foreground">Data Ownership</span>
+                <span className="col-span-2 text-green-600 font-medium">You (100%) ✓</span>
+              </div>
+            </div>
           </CardContent>
         </Card>
 

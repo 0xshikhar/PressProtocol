@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     backendFormData.append("file", image);
 
     const backendUrl = env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:4000";
-    const response = await fetch(`${backendUrl}/api/upload`, {
+    const response = await fetch(`${backendUrl}/api/upload/image`, {
       method: "POST",
       body: backendFormData,
     });
@@ -54,10 +54,11 @@ export async function POST(request: NextRequest) {
 
     const result = await response.json();
 
+    // Backend returns: { success: true, data: { cid, url, ... } }
     // Return IPFS CID and gateway URL
     return NextResponse.json({
-      cid: result.cid,
-      url: result.url || `https://gateway.pinata.cloud/ipfs/${result.cid}`,
+      cid: result.data.cid,
+      url: result.data.url || `https://gateway.pinata.cloud/ipfs/${result.data.cid}`,
       success: true,
     });
   } catch (error: any) {

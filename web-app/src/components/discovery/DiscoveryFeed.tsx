@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Clock, ExternalLink, Search, Server } from "lucide-react";
+import { Clock, ExternalLink, Search, Server, Bookmark } from "lucide-react";
 import { discoveryService, type DiscoveryContent } from "@/lib/discovery";
 import { toast } from "sonner";
+import { isBookmarked, toggleBookmark } from "@/lib/bookmarks";
 
 export function DiscoveryFeed() {
   const [items, setItems] = useState<DiscoveryContent[]>([]);
@@ -181,6 +182,25 @@ export function DiscoveryFeed() {
                       {formatTimestamp(item.timestamp)}
                     </CardDescription>
                   </div>
+                  <Button
+                    variant={isBookmarked(item.cid) ? "default" : "ghost"}
+                    size="icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      try {
+                        const added = toggleBookmark({
+                          cid: item.cid,
+                          title: item.title,
+                          tags: item.tags || [],
+                        });
+                        toast.success(added ? "Bookmarked" : "Removed bookmark");
+                      } catch (error: any) {
+                        toast.error(error.message);
+                      }
+                    }}
+                  >
+                    <Bookmark className={`h-4 w-4 ${isBookmarked(item.cid) ? "fill-current" : ""}`} />
+                  </Button>
                   <Button
                     variant="ghost"
                     size="icon"

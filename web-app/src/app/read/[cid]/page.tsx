@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { calculateReadingTime } from "@/lib/reading-time";
 import { ReadingProgressBar } from "@/components/reader/ReadingProgressBar";
 import { TableOfContents } from "@/components/reader/TableOfContents";
+import { BookmarkButton } from "@/components/reader/BookmarkButton";
 
 export default function ReadPage() {
   const params = useParams();
@@ -115,24 +116,33 @@ export default function ReadPage() {
           </h1>
           
           {/* Meta Information */}
-          <div className="flex items-center gap-4 mb-8 text-sm text-muted-foreground">
-            {readingStats && (
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              {readingStats && (
+                <span className="flex items-center gap-1">
+                  <BookOpen className="h-4 w-4" />
+                  {readingStats.formattedTime}
+                </span>
+              )}
+              <span>•</span>
+              <time>{new Date(content.createdAt).toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+              })}</time>
+              <span>•</span>
               <span className="flex items-center gap-1">
-                <BookOpen className="h-4 w-4" />
-                {readingStats.formattedTime}
+                <Shield className="h-3 w-3" />
+                Verified
               </span>
-            )}
-            <span>•</span>
-            <time>{new Date(content.createdAt).toLocaleDateString('en-US', { 
-              year: 'numeric', 
-              month: 'short', 
-              day: 'numeric' 
-            })}</time>
-            <span>•</span>
-            <span className="flex items-center gap-1">
-              <Shield className="h-3 w-3" />
-              Verified
-            </span>
+            </div>
+            
+            {/* Bookmark Button */}
+            <BookmarkButton 
+              cid={cid} 
+              title={content.title}
+              tags={content.tags || []}
+            />
           </div>
           
           {/* Tags */}
