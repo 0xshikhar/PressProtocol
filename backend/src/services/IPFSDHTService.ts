@@ -44,21 +44,21 @@ export class IPFSDHTService {
   
   /**
    * Initialize DHT service
-   * Attempts to initialize Helia node for P2P operations
+   * Attempts to initialize Helia node for P2P operations (optional)
    */
   async init(): Promise<void> {
     if (this.isInitialized) return;
 
     try {
-      console.log('🚀 IPFS DHT Service initializing (Phase 2C with Helia)...');
+      console.log('🚀 IPFS DHT Service initializing (Phase 2C with optional Helia)...');
       
-      // Try to initialize Helia node
-      try {
-        await heliaNode.init();
+      // Try to initialize Helia node (this will gracefully fail if deps are missing)
+      await heliaNode.init();
+      
+      if (heliaNode.isReady()) {
         console.log('✅ Helia node ready for P2P operations');
-      } catch (heliaError) {
-        console.warn('⚠️  Helia initialization failed, using Pinata fallback:', heliaError);
-        // Continue with Pinata-only mode
+      } else {
+        console.log('ℹ️  Helia not available - using Pinata gateway (fully functional)');
       }
       
       console.log('📢 Manifests will be stored on IPFS for DHT discovery');
@@ -66,9 +66,10 @@ export class IPFSDHTService {
       
       this.isInitialized = true;
     } catch (error) {
-      console.error('❌ Failed to initialize IPFS DHT:', error);
-      this.isInitialized = false;
-      throw error;
+      console.error('❌ Failed to initialize IPFS DHT service:', error);
+      // Even if this fails, we can still work with just Pinata
+      this.isInitialized = true; // Set to true anyway
+      console.log('ℹ️  Continuing with Pinata-only mode');
     }
   }
 

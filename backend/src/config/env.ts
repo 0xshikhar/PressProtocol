@@ -23,7 +23,6 @@ const envSchema = z.object({
 export type Env = z.infer<typeof envSchema>;
 
 // Debug: Log all available environment variables (without values for security)
-console.log('🔍 Available environment variables:', Object.keys(process.env).sort().join(', '));
 console.log('🔍 Required variables check:');
 console.log('  - DATABASE_URL:', process.env.DATABASE_URL ? '✅ Set' : '❌ Missing');
 console.log('  - PINATA_API_KEY:', process.env.PINATA_API_KEY ? '✅ Set' : '❌ Missing');

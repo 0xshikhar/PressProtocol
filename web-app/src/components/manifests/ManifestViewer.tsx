@@ -79,7 +79,25 @@ export function ManifestViewer({ manifestCid }: ManifestViewerProps) {
   if (error || !manifest) {
     return (
       <Alert variant="destructive">
-        <AlertDescription>{error || "Manifest not found"}</AlertDescription>
+        <AlertDescription>
+          <div className="space-y-2">
+            <p className="font-semibold">{error || "Manifest not found"}</p>
+            <p className="text-sm">
+              <strong>Common Issues:</strong>
+            </p>
+            <ul className="text-sm list-disc list-inside space-y-1">
+              <li>You entered a <strong>Content CID</strong> instead of a <strong>Manifest CID</strong></li>
+              <li>When you publish content, you get TWO CIDs:
+                <ul className="ml-6 mt-1 space-y-1">
+                  <li>• Content CID: <code className="text-xs bg-muted px-1 rounded">QmContent...</code> (the actual article)</li>
+                  <li>• Manifest CID: <code className="text-xs bg-muted px-1 rounded">QmManifest...</code> (the metadata)</li>
+                </ul>
+              </li>
+              <li>Use the <strong>Manifest CID</strong> here, not the Content CID</li>
+              <li>Check the publish response or DHT Stats for valid manifest CIDs</li>
+            </ul>
+          </div>
+        </AlertDescription>
       </Alert>
     );
   }

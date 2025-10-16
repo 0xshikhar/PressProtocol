@@ -229,8 +229,8 @@ export function ManifestStats() {
             <li>Can be queried without database</li>
           </ul>
           <p className="mt-4 text-xs">
-            <strong>Note:</strong> In Phase 2C, this will query the actual IPFS DHT network
-            for truly decentralized discovery across all nodes.
+            <strong>Note:</strong>this will query the actual IPFS DHT network
+            for truly decentralized discovery across all nodes ( will be quite slow)
           </p>
         </CardContent>
       </Card>

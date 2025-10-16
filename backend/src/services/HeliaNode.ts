@@ -3,26 +3,34 @@
  * 
  * Creates and manages a Helia IPFS node with DHT support
  * Enables true peer-to-peer discovery without centralized servers
+ * 
+ * NOTE: Helia is completely optional. If native dependencies fail,
+ * the system falls back to Pinata gateway (fully functional).
  */
 
-import { createHelia, type Helia } from 'helia';
-import { unixfs, type UnixFS } from '@helia/unixfs';
-import { json, type JSON as HeliaJSON } from '@helia/json';
-
 export class HeliaNode {
-  private node: Helia | null = null;
-  private fs: UnixFS | null = null;
-  private jsonStore: HeliaJSON | null = null;
+  private node: any = null; // Using 'any' to avoid import-time errors
+  private fs: any = null;
+  private jsonStore: any = null;
   private isInitialized = false;
 
   /**
    * Initialize Helia node with DHT support
+   * This is completely optional - system works fine without it using Pinata
+   * 
+   * Uses dynamic imports to avoid loading native dependencies at startup
    */
   async init(): Promise<void> {
     if (this.isInitialized) return;
 
     try {
-      console.log('🚀 Initializing Helia IPFS node...');
+      console.log('🚀 Attempting to initialize Helia IPFS node...');
+      console.log('⚠️  Note: Helia requires native dependencies. If this fails, Pinata fallback will be used.');
+
+      // Dynamic import to avoid loading at startup
+      const { createHelia } = await import('helia');
+      const { unixfs } = await import('@helia/unixfs');
+      const { json } = await import('@helia/json');
 
       // Create Helia node with default configuration
       // This creates in-memory blockstore and datastore automatically
@@ -36,13 +44,15 @@ export class HeliaNode {
 
       this.isInitialized = true;
 
-      console.log('✅ Helia node initialized');
+      console.log('✅ Helia node initialized successfully!');
       console.log(`📍 Peer ID: ${this.node.libp2p.peerId.toString()}`);
       console.log(`🔗 Listening on: ${this.node.libp2p.getMultiaddrs().length} addresses`);
-    } catch (error) {
-      console.error('❌ Failed to initialize Helia node:', error);
+    } catch (error: any) {
+      console.warn('⚠️  Helia initialization failed - this is OK, using Pinata fallback');
+      console.warn('💡 Reason:', error.message || error);
+      console.warn('💡 To enable Helia P2P: npm install and rebuild native dependencies');
       this.isInitialized = false;
-      throw error;
+      // Don't throw - let the system continue with Pinata
     }
   }
 

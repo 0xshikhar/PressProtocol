@@ -118,24 +118,6 @@ model Draft {
   heroImage String?
   status    String   @default("draft")
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-```
-
----
-
-### Phase 4: Social Features (Week 4) - MEDIUM PRIORITY
-
-**Features:**
-- [ ] Claps/reactions (max 50 per user)
-- [ ] Bookmarks with reading lists
-- [ ] Anonymous comments (stored on IPFS)
-- [ ] Share functionality
-- [ ] Follow topics/tags
-- [ ] User engagement metrics
-
-**Components:**
-```
 web-app/src/components/reader/ClapButton.tsx - NEW
 web-app/src/components/reader/BookmarkButton.tsx - NEW
 web-app/src/components/reader/Comments.tsx - NEW
@@ -183,7 +165,17 @@ model Comment {
 
 ---
 
-### Phase 5: Content Curation (Week 5) - LOW PRIORITY
+### Phase 5: Content Curation - ⚠️ OUT OF SCOPE (Privacy Concerns)
+
+**Why Out of Scope:**
+- Curation requires centralized algorithms and tracking
+- Contradicts privacy-first philosophy
+- User preferences should be local, not server-tracked
+
+**Privacy-Preserving Alternative:**
+- Client-side filtering (localStorage preferences)
+- No server-side tracking
+- User-controlled algorithms
 
 **Features:**
 - [ ] Editorial picks
