@@ -19,6 +19,7 @@ jQuery(document).ready(function($) {
             data: {
                 action: 'anonpress_publish',
                 nonce: anonpressData.nonce,
+                post_id: postId
             },
             success: function(response) {
                 if (response.success) {

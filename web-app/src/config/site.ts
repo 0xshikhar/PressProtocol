@@ -6,7 +6,7 @@ export const siteConfig: SiteConfig = {
   name: "PressProtocol",
   author: "0xShikhar",
   description:
-    "Professional decentralized censorship-resistant publishing platform. Publish content across IPFS, Tor, and gateway mirrors with cryptographic verification and intelligent routing.",
+    "An open censorship-resistant publishing platform. Publish content across IPFS, Tor, and gateway mirrors with cryptographic verification and intelligent routing.",
   keywords: [
     "Decentralized Publishing",
     "IPFS",

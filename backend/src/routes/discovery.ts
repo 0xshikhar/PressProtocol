@@ -91,6 +91,26 @@ export async function discoveryRoutes(fastify: FastifyInstance) {
   });
 
   /**
+   * GET /api/discovery/stats - Get discovery statistics
+   */
+  fastify.get('/api/discovery/stats', async (request, reply) => {
+    try {
+      const stats = await discoveryService.getStats();
+
+      return reply.send({
+        success: true,
+        data: stats,
+      });
+    } catch (error) {
+      fastify.log.error(error);
+      return reply.status(500).send({
+        success: false,
+        error: 'Failed to fetch discovery stats',
+      });
+    }
+  });
+
+  /**
    * GET /api/discovery/publisher/:address - Get content by publisher
    */
   fastify.get('/api/discovery/publisher/:address', async (request, reply) => {

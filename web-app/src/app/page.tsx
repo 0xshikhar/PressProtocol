@@ -248,7 +248,7 @@ export default function Home() {
       </section>
 
       {/* Discovery Feed Section */}
-      <section id="discover" className="container mx-auto px-4 py-20">
+      {/* <section id="discover" className="container mx-auto px-4 py-20">
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 text-center">
             <Badge variant="outline" className="mb-4 border-blue-200">
@@ -262,7 +262,7 @@ export default function Home() {
           </div>
           <DiscoveryFeed />
         </div>
-      </section>
+      </section> */}
 
       {/* CTA Section */}
       <section className="border-t bg-gradient-to-br from-blue-50 via-white to-blue-50/50">

@@ -49,16 +49,12 @@ export interface ContentMetadata {
 export interface DiscoveryContent {
   cid: string;
   title: string;
-  excerpt: string;
   tags: string[];
-  timestamp: number;
+  createdAt: string; // ISO date string from backend
   publisher: {
-    pubkey: string;
-  };
-  mirrors: {
-    ipfs: string;
-    tor?: string;
-    gateway?: string;
+    publicKey: string;
+    walletAddress?: string;
+    username?: string;
   };
 }
 
@@ -273,13 +269,11 @@ export class DiscoveryService {
     return {
       cid: manifest.cid,
       title: manifest.title,
-      excerpt: manifest.excerpt,
       tags: manifest.tags,
-      timestamp: manifest.timestamp,
+      createdAt: new Date(manifest.timestamp).toISOString(),
       publisher: {
-        pubkey: manifest.publisher.pubkey,
+        publicKey: manifest.publisher.pubkey,
       },
-      mirrors: manifest.mirrors,
     };
   }
 

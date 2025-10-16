@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, Filter, SlidersHorizontal, Grid, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,22 +14,45 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DiscoveryFeed } from "@/components/discovery/DiscoveryFeed";
+import { BACKEND_URL } from "@/config/backend";
+
+interface CategoryStats {
+  category: string;
+  count: number;
+}
 
 export default function ExplorePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [categories, setCategories] = useState<{ value: string; label: string; count: number }[]>([
+    { value: "all", label: "All Content", count: 0 },
+  ]);
 
-  const categories = [
-    { value: "all", label: "All Content", count: 10234 },
-    { value: "technology", label: "Technology", count: 2341 },
-    { value: "politics", label: "Politics", count: 1876 },
-    { value: "science", label: "Science", count: 1523 },
-    { value: "culture", label: "Culture", count: 982 },
-    { value: "economics", label: "Economics", count: 756 },
-    { value: "privacy", label: "Privacy", count: 634 },
-    { value: "crypto", label: "Cryptocurrency", count: 523 },
-  ];
+  useEffect(() => {
+    fetchCategoryStats();
+  }, []);
+
+  const fetchCategoryStats = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/discovery/stats`);
+      const result = await response.json();
+      
+      if (result.success && result.data) {
+        const categoryList = [
+          { value: "all", label: "All Content", count: result.data.totalContent },
+          ...result.data.categories.map((cat: CategoryStats) => ({
+            value: cat.category,
+            label: cat.category.charAt(0).toUpperCase() + cat.category.slice(1),
+            count: cat.count,
+          })),
+        ];
+        setCategories(categoryList);
+      }
+    } catch (error) {
+      console.error("Failed to fetch category stats:", error);
+    }
+  };
 
   const trendingTags = [
     "decentralization",
@@ -47,7 +70,7 @@ export default function ExplorePage() {
       {/* Header */}
       <div className="border-b bg-gradient-to-b from-blue-50/50 to-white">
         <div className="container mx-auto px-4 py-12">
-          <h1 className="text-4xl font-bold mb-2">Explore Content</h1>
+          <h1 className="text-4xl font-bold mb-2">Discover Content</h1>
           <p className="text-lg text-muted-foreground">
             Discover censorship-resistant content from publishers worldwide
           </p>

@@ -1,40 +1,34 @@
 import Link from "next/link";
-import { FileText, Github, Twitter, Mail } from "lucide-react";
+import { FileText, Github, Twitter, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
 export default function Footer() {
   const footerLinks = {
-    product: [
-      { name: "Features", href: "/#features" },
-      { name: "Pricing", href: "/pricing" },
-      { name: "FAQ", href: "/help" },
-      { name: "Roadmap", href: "/roadmap" },
+    platform: [
+      { name: "Explore", href: "/explore" },
+      { name: "Publish", href: "/write" },
+      { name: "Explorer", href: "/explorer" },
+      { name: "How It Works", href: "/#features" },
     ],
     resources: [
       { name: "Documentation", href: "/docs" },
-      { name: "API Reference", href: "/api-docs" },
-      { name: "Community", href: "/community" },
-      { name: "Blog", href: "/blog" },
+      { name: "GitHub", href: "https://github.com/0xshikhar/anonpress" },
+      { name: "IPFS Guide", href: "/docs/ipfs" },
+      { name: "Tor Setup", href: "/docs/tor" },
     ],
-    company: [
+    legal: [
       { name: "About", href: "/about" },
       { name: "Privacy", href: "/privacy" },
       { name: "Terms", href: "/terms" },
       { name: "Contact", href: "/contact" },
     ],
-    support: [
-      { name: "Help Center", href: "/help" },
-      { name: "Status", href: "/status" },
-      { name: "Report Issue", href: "/report" },
-      { name: "Contact Support", href: "/support" },
-    ],
   };
 
   const socialLinks = [
-    { name: "GitHub", icon: Github, href: "https://github.com/anonpress" },
-    { name: "Twitter", icon: Twitter, href: "https://twitter.com/anonpress" },
-    { name: "Email", icon: Mail, href: "mailto:hello@anonpress.xyz" },
+    { name: "GitHub", icon: Github, href: "https://github.com/0xshikhar/pressprotocol" },
+    { name: "Twitter", icon: Twitter, href: "https://twitter.com/0xshikhar" },
+    { name: "Website", icon: Globe, href: "https://pressprotocol.com" },
   ];
 
   return (
@@ -50,7 +44,7 @@ export default function Footer() {
               <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">PressProtocol</span>
             </Link>
             <p className="mb-4 max-w-sm text-sm text-muted-foreground">
-              Professional decentralized publishing platform. Publish censorship-resistant content across IPFS, Tor, and gateway mirrors.
+              An open censorship-resistant publishing platform. Share your ideas freely across IPFS, Tor, and decentralized mirrors.
             </p>
             <div className="flex gap-2">
               {socialLinks.map((social) => {
@@ -78,9 +72,9 @@ export default function Footer() {
 
           {/* Links */}
           <div>
-            <h3 className="mb-4 text-sm font-semibold">Product</h3>
+            <h3 className="mb-4 text-sm font-semibold">Platform</h3>
             <ul className="space-y-3 text-sm">
-              {footerLinks.product.map((link) => (
+              {footerLinks.platform.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
@@ -101,6 +95,8 @@ export default function Footer() {
                   <Link
                     href={link.href}
                     className="text-muted-foreground hover:text-primary transition-colors"
+                    target={link.href.startsWith('http') ? '_blank' : undefined}
+                    rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                   >
                     {link.name}
                   </Link>
@@ -109,26 +105,10 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div>
-            <h3 className="mb-4 text-sm font-semibold">Company</h3>
+          <div className="lg:col-span-2">
+            <h3 className="mb-4 text-sm font-semibold">Legal</h3>
             <ul className="space-y-3 text-sm">
-              {footerLinks.company.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="mb-4 text-sm font-semibold">Support</h3>
-            <ul className="space-y-3 text-sm">
-              {footerLinks.support.map((link) => (
+              {footerLinks.legal.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}

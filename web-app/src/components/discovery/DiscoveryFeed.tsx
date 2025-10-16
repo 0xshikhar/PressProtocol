@@ -60,8 +60,8 @@ export function DiscoveryFeed() {
     }
   };
 
-  const formatTimestamp = (timestamp: number) => {
-    const date = new Date(timestamp);
+  const formatTimestamp = (createdAt: string) => {
+    const date = new Date(createdAt);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
@@ -179,7 +179,7 @@ export function DiscoveryFeed() {
                     </CardTitle>
                     <CardDescription className="flex items-center gap-2 mt-2">
                       <Clock className="h-3 w-3" />
-                      {formatTimestamp(item.timestamp)}
+                      {formatTimestamp(item.createdAt)}
                     </CardDescription>
                   </div>
                   <Button
@@ -235,7 +235,7 @@ export function DiscoveryFeed() {
               <CardContent>
                 <div className="text-sm text-muted-foreground">
                   <span className="font-mono text-xs">
-                    Publisher: {item.publisher?.pubkey?.slice(0, 16)}...
+                    Publisher: {item.publisher?.username || item.publisher?.publicKey?.slice(0, 16) + '...'}
                   </span>
                 </div>
               </CardContent>
