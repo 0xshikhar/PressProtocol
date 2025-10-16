@@ -10,6 +10,7 @@ import { identityRoutes } from './routes/identity.js';
 import { mirrorsRoutes } from './routes/mirrors.js';
 import { uploadRoutes } from './routes/upload.js';
 import { manifestRoutes } from './routes/manifest.js';
+import { ipfsDHTService } from './services/IPFSDHTService.js';
 
 const fastify = Fastify({
   logger: {
@@ -145,6 +146,10 @@ signals.forEach((signal) => {
 // Start server
 const start = async () => {
   try {
+    // Initialize IPFS DHT Service (with Helia if available)
+    console.log('🔧 Initializing IPFS DHT Service...');
+    await ipfsDHTService.init();
+    
     const port = parseInt(env.PORT);
     const host = '0.0.0.0'; // Listen on all interfaces
     
