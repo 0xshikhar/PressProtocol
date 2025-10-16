@@ -166,7 +166,7 @@ export function DiscoveryFeed() {
           {items.map((item) => (
             <Card
               key={item.cid}
-              className="hover:shadow-lg transition-shadow cursor-pointer"
+              className="hover:shadow-lg transition-all cursor-pointer hover:border-primary/30 border-2"
               onClick={() => {
                 window.location.href = `/read/${item.cid}`;
               }}
@@ -218,7 +218,7 @@ export function DiscoveryFeed() {
                       <Badge
                         key={tag}
                         variant="outline"
-                        className="cursor-pointer hover:bg-accent"
+                        className="cursor-pointer hover:bg-blue-50 hover:border-primary/50 transition-colors"
                         onClick={(e) => {
                           e.stopPropagation();
                           if (!filteredTags.includes(tag)) {

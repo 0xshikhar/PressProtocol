@@ -45,8 +45,8 @@ export default function ExplorePage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="border-b bg-muted/30">
-        <div className="container mx-auto px-4 py-8">
+      <div className="border-b bg-gradient-to-b from-blue-50/50 to-white">
+        <div className="container mx-auto px-4 py-12">
           <h1 className="text-4xl font-bold mb-2">Explore Content</h1>
           <p className="text-lg text-muted-foreground">
             Discover censorship-resistant content from publishers worldwide
@@ -68,10 +68,10 @@ export default function ExplorePage() {
                   <button
                     key={category.value}
                     onClick={() => setSelectedCategory(category.value)}
-                    className={`w-full flex items-center justify-between p-2 rounded-lg text-sm transition-colors ${
+                    className={`w-full flex items-center justify-between p-2 rounded-lg text-sm transition-all ${
                       selectedCategory === category.value
-                        ? "bg-primary text-primary-foreground"
-                        : "hover:bg-muted"
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "hover:bg-blue-50"
                     }`}
                   >
                     <span>{category.label}</span>
@@ -90,7 +90,7 @@ export default function ExplorePage() {
                   <Badge
                     key={tag}
                     variant="outline"
-                    className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                    className="cursor-pointer hover:bg-blue-50 hover:border-primary/50 transition-all"
                   >
                     #{tag}
                   </Badge>

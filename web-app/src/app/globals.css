@@ -26,9 +26,9 @@
     --muted: 220 13% 95%;
     --muted-foreground: 215 16% 47%;
     
-    /* Accent: Purple Accent */
-    --accent: 262 83% 58%;
-    --accent-foreground: 0 0% 100%;
+    /* Accent: Light Blue */
+    --accent: 210 100% 95%;
+    --accent-foreground: 221 83% 53%;
     
     /* Success */
     --success: 142 71% 45%;
@@ -50,10 +50,10 @@
     
     /* Chart Colors */
     --chart-1: 221 83% 53%;
-    --chart-2: 142 71% 45%;
-    --chart-3: 262 83% 58%;
-    --chart-4: 38 92% 50%;
-    --chart-5: 340 82% 52%;
+    --chart-2: 210 100% 60%;
+    --chart-3: 200 100% 50%;
+    --chart-4: 195 100% 45%;
+    --chart-5: 215 100% 40%;
   }
 }
 

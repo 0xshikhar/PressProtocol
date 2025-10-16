@@ -40,31 +40,31 @@ export default function Home() {
       icon: Network,
       title: "Multi-Network Distribution",
       description: "Automatic publishing to IPFS, Tor, and gateway mirrors for maximum availability and resilience.",
-      color: "text-accent"
+      color: "text-blue-600"
     },
     {
       icon: Zap,
       title: "Intelligent Routing",
       description: "Browser extension automatically selects the fastest available mirror for optimal reading experience.",
-      color: "text-warning"
+      color: "text-blue-500"
     },
     {
       icon: Lock,
       title: "Cryptographic Verification",
       description: "Ed25519 signatures ensure content authenticity and verify publisher identity.",
-      color: "text-success"
+      color: "text-primary"
     },
     {
       icon: Globe,
       title: "Decentralized Discovery",
       description: "IPFS DHT-based content discovery without relying on centralized servers.",
-      color: "text-primary"
+      color: "text-blue-600"
     },
     {
       icon: Database,
       title: "Permanent Storage",
       description: "Content stored permanently on IPFS with automatic pinning and replication.",
-      color: "text-accent"
+      color: "text-blue-500"
     },
   ];
 
@@ -80,7 +80,7 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative overflow-hidden border-b bg-gradient-to-br from-primary/5 via-background to-accent/5">
+      <section className="relative overflow-hidden border-b bg-gradient-to-br from-blue-50 via-white to-blue-50/50">
         <div className="absolute inset-0 bg-grid-pattern opacity-5" />
         <div className="container relative mx-auto px-4 py-24 sm:py-32">
           <div className="mx-auto max-w-4xl text-center">
@@ -91,7 +91,7 @@ export default function Home() {
             
             <h1 className="mb-6 text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
               Publish Content That
-              <span className="text-gradient block mt-2">Can&apos;t Be Silenced</span>
+              <span className="bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent block mt-2">Can&apos;t Be Silenced</span>
             </h1>
             
             <p className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground sm:text-xl">
@@ -100,14 +100,14 @@ export default function Home() {
             
             <div className="flex flex-wrap justify-center gap-4">
               <Link href="/publish">
-                <Button size="lg" className="gap-2 shadow-lg hover:shadow-xl transition-shadow">
+                <Button size="lg" className="gap-2 shadow-lg hover:shadow-xl transition-all hover:scale-105">
                   <FileText className="h-5 w-5" />
                   Start Publishing Free
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
               <Link href="/explore">
-                <Button size="lg" variant="outline" className="gap-2">
+                <Button size="lg" variant="outline" className="gap-2 hover:scale-105 transition-all">
                   <Globe className="h-5 w-5" />
                   Explore Content
                 </Button>
@@ -117,7 +117,7 @@ export default function Home() {
             <div className="mt-12 flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
               {benefits.slice(0, 3).map((benefit) => (
                 <div key={benefit} className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-success" />
+                  <CheckCircle2 className="h-4 w-4 text-blue-600" />
                   <span>{benefit}</span>
                 </div>
               ))}
@@ -127,17 +127,19 @@ export default function Home() {
       </section>
 
       {/* Stats Section */}
-      <section className="border-b bg-muted/30">
-        <div className="container mx-auto px-4 py-16">
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="border-b bg-gradient-to-b from-white to-blue-50/30">
+        <div className="container mx-auto px-4 py-20">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {stats.map((stat) => {
               const Icon = stat.icon;
               return (
-                <Card key={stat.label} className="border-2 hover:border-primary/50 transition-colors">
-                  <CardContent className="flex flex-col items-center p-6 text-center">
-                    <Icon className="h-8 w-8 text-primary mb-3" />
-                    <div className="text-4xl font-bold text-gradient mb-2">{stat.value}</div>
-                    <div className="text-sm text-muted-foreground">{stat.label}</div>
+                <Card key={stat.label} className="border-2 hover:border-primary/50 transition-all hover:shadow-lg hover:-translate-y-1">
+                  <CardContent className="flex flex-col items-center p-8 text-center">
+                    <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-blue-50">
+                      <Icon className="h-7 w-7 text-primary" />
+                    </div>
+                    <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent mb-2">{stat.value}</div>
+                    <div className="text-sm font-medium text-muted-foreground">{stat.label}</div>
                   </CardContent>
                 </Card>
               );
@@ -147,9 +149,9 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="container mx-auto px-4 py-20">
+      <section className="container mx-auto px-4 py-24">
         <div className="mb-16 text-center">
-          <Badge variant="outline" className="mb-4">
+          <Badge variant="outline" className="mb-4 border-blue-200">
             <Award className="mr-1 h-3 w-3" />
             Why Choose AnonPress
           </Badge>
@@ -159,16 +161,16 @@ export default function Home() {
           </p>
         </div>
         
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {features.map((feature) => {
             const Icon = feature.icon;
             return (
-              <Card key={feature.title} className="group hover:shadow-lg transition-all duration-300 border-2 hover:border-primary/30">
-                <CardHeader>
-                  <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                    <Icon className={`h-6 w-6 ${feature.color}`} />
+              <Card key={feature.title} className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/30 hover:-translate-y-1">
+                <CardHeader className="p-6">
+                  <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-blue-50 group-hover:bg-blue-100 transition-colors">
+                    <Icon className={`h-7 w-7 ${feature.color}`} />
                   </div>
-                  <CardTitle className="text-xl">{feature.title}</CardTitle>
+                  <CardTitle className="text-xl mb-2">{feature.title}</CardTitle>
                   <CardDescription className="text-base leading-relaxed">
                     {feature.description}
                   </CardDescription>
@@ -180,10 +182,10 @@ export default function Home() {
       </section>
 
       {/* How It Works Section */}
-      <section className="border-y bg-gradient-to-br from-muted/30 via-background to-muted/30">
+      <section className="border-y bg-gradient-to-br from-blue-50/50 via-white to-blue-50/30">
         <div className="container mx-auto px-4 py-20">
           <div className="mb-16 text-center">
-            <Badge variant="outline" className="mb-4">
+            <Badge variant="outline" className="mb-4 border-blue-200">
               <GitBranch className="mr-1 h-3 w-3" />
               Simple Workflow
             </Badge>
@@ -223,16 +225,16 @@ export default function Home() {
               ].map((item) => {
                 const Icon = item.icon;
                 return (
-                  <Card key={item.step} className="relative overflow-hidden border-2">
-                    <div className="absolute top-0 right-0 -mr-6 -mt-6 h-24 w-24 rounded-full bg-primary/5" />
-                    <CardHeader>
+                  <Card key={item.step} className="relative overflow-hidden border-2 hover:shadow-lg transition-all hover:-translate-y-1">
+                    <div className="absolute top-0 right-0 -mr-6 -mt-6 h-24 w-24 rounded-full bg-blue-50" />
+                    <CardHeader className="p-6">
                       <div className="mb-4">
-                        <span className="text-5xl font-bold text-primary/20">{item.step}</span>
+                        <span className="text-5xl font-bold text-blue-100">{item.step}</span>
                       </div>
-                      <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent">
-                        <Icon className="h-5 w-5 text-white" />
+                      <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-blue-400">
+                        <Icon className="h-6 w-6 text-white" />
                       </div>
-                      <CardTitle className="text-xl">{item.title}</CardTitle>
+                      <CardTitle className="text-xl mb-2">{item.title}</CardTitle>
                       <CardDescription className="text-base leading-relaxed">
                         {item.description}
                       </CardDescription>
@@ -249,7 +251,7 @@ export default function Home() {
       <section id="discover" className="container mx-auto px-4 py-20">
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 text-center">
-            <Badge variant="outline" className="mb-4">
+            <Badge variant="outline" className="mb-4 border-blue-200">
               <TrendingUp className="mr-1 h-3 w-3" />
               Latest Content
             </Badge>
@@ -263,11 +265,11 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="border-t bg-gradient-to-br from-primary/10 via-background to-accent/10">
+      <section className="border-t bg-gradient-to-br from-blue-50 via-white to-blue-50/50">
         <div className="container mx-auto px-4 py-20">
-          <Card className="mx-auto max-w-4xl border-2 shadow-xl">
+          <Card className="mx-auto max-w-4xl border-2 shadow-2xl hover:shadow-3xl transition-shadow">
             <CardContent className="p-12 text-center">
-              <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent">
+              <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-blue-400">
                 <FileText className="h-8 w-8 text-white" />
               </div>
               
@@ -282,14 +284,14 @@ export default function Home() {
               
               <div className="flex flex-wrap justify-center gap-4">
                 <Link href="/publish">
-                  <Button size="lg" className="gap-2">
+                  <Button size="lg" className="gap-2 hover:scale-105 transition-all">
                     <FileText className="h-5 w-5" />
                     Start Publishing Now
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
                 <Link href="/dashboard">
-                  <Button size="lg" variant="outline" className="gap-2">
+                  <Button size="lg" variant="outline" className="gap-2 hover:scale-105 transition-all">
                     View Dashboard
                   </Button>
                 </Link>
@@ -298,7 +300,7 @@ export default function Home() {
               <div className="mt-8 flex flex-wrap justify-center gap-x-8 gap-y-4 text-sm text-muted-foreground">
                 {benefits.slice(3).map((benefit) => (
                   <div key={benefit} className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-success" />
+                    <CheckCircle2 className="h-4 w-4 text-blue-600" />
                     <span>{benefit}</span>
                   </div>
                 ))}

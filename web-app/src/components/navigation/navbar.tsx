@@ -40,14 +40,14 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-lg supports-[backdrop-filter]:bg-white/60">
+    <nav className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur-lg supports-[backdrop-filter]:bg-white/90 shadow-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center space-x-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent">
+        <Link href="/" className="flex items-center space-x-2 group">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-400 group-hover:shadow-lg transition-all">
             <FileText className="h-5 w-5 text-white" />
           </div>
-          <span className="text-xl font-bold text-gradient">AnonPress</span>
+          <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">AnonPress</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -63,8 +63,8 @@ const Navbar = () => {
                   className={cn(
                     "gap-2 font-medium transition-all",
                     isActive
-                      ? "bg-primary/10 text-primary hover:bg-primary/20"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "bg-blue-50 text-primary hover:bg-blue-100"
+                      : "text-muted-foreground hover:text-primary hover:bg-blue-50/50"
                   )}
                 >
                   <Icon className="h-4 w-4" />
@@ -142,10 +142,10 @@ const Navbar = () => {
             <SheetContent side="right" className="w-[280px]">
               <SheetHeader className="mb-6">
                 <SheetTitle className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-400">
                     <FileText className="h-4 w-4 text-white" />
                   </div>
-                  <span className="text-gradient">AnonPress</span>
+                  <span className="bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">AnonPress</span>
                 </SheetTitle>
               </SheetHeader>
               
@@ -160,7 +160,7 @@ const Navbar = () => {
                         variant={isActive ? "secondary" : "ghost"}
                         className={cn(
                           "w-full justify-start gap-3",
-                          isActive && "bg-primary/10 text-primary hover:bg-primary/20"
+                          isActive && "bg-blue-50 text-primary hover:bg-blue-100"
                         )}
                       >
                         <Icon className="h-4 w-4" />

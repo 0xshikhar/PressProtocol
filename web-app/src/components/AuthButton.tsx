@@ -28,7 +28,7 @@ export function AuthButton() {
     };
 
     if (!ready) {
-        return <div className="px-4 py-2 bg-gray-500 text-white rounded animate-pulse">Loading...</div>;
+        return <Button disabled className="animate-pulse">Loading...</Button>;
     }
 
     return (
@@ -37,27 +37,27 @@ export function AuthButton() {
                 <Button
                     onClick={handleLogin}
                     disabled={isLoggingIn}
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
                 >
                     {isLoggingIn ? 'Connecting...' : 'Connect Wallet'}
                 </Button>
             ) : (
                 <div className="flex items-center gap-2">
-                    <div className="px-4 py-2 bg-gray-100 text-gray-800 rounded">
+                    <div className="px-3 py-1.5 bg-blue-50 text-primary rounded-md text-sm font-medium border border-blue-100">
                         {user?.wallet?.address ?
                             `${user.wallet.address.slice(0, 6)}...${user.wallet.address.slice(-4)}` :
                             user?.email?.address || 'Connected'}
                     </div>
                     <Button
                         onClick={logout}
-                        className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                        variant="destructive"
+                        size="sm"
                     >
                         Disconnect
                     </Button>
                 </div>
             )}
 
-            {error && <p className="text-red-500 w-full mt-2">{error}</p>}
+            {error && <p className="text-destructive text-sm w-full mt-2">{error}</p>}
         </div>
     );
 }

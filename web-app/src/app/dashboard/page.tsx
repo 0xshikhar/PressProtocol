@@ -96,20 +96,22 @@ export default function DashboardPage() {
   if (!authenticated) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="border-b bg-muted/30">
-          <div className="container mx-auto px-4 py-8">
+        <div className="border-b bg-gradient-to-b from-blue-50/50 to-white">
+          <div className="container mx-auto px-4 py-12">
             <h1 className="text-4xl font-bold">Publisher Dashboard</h1>
           </div>
         </div>
         <div className="container mx-auto max-w-4xl px-4 py-12">
-          <Card className="border-2">
+          <Card className="border-2 shadow-lg">
             <CardContent className="p-12 text-center">
-              <BarChart3 className="h-16 w-16 mx-auto mb-6 text-muted-foreground" />
+              <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-blue-50">
+                <BarChart3 className="h-8 w-8 text-primary" />
+              </div>
               <h2 className="text-2xl font-bold mb-2">Connect to View Dashboard</h2>
               <p className="text-muted-foreground mb-8 max-w-md mx-auto">
                 Connect your wallet to access your publisher dashboard and manage your content
               </p>
-              <Button onClick={login} size="lg" className="gap-2">
+              <Button onClick={login} size="lg" className="gap-2 hover:scale-105 transition-all">
                 Connect Wallet
               </Button>
             </CardContent>
@@ -146,8 +148,8 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="border-b bg-muted/30">
-        <div className="container mx-auto px-4 py-8">
+      <div className="border-b bg-gradient-to-b from-blue-50/50 to-white">
+        <div className="container mx-auto px-4 py-12">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold">Publisher Dashboard</h1>
@@ -156,7 +158,7 @@ export default function DashboardPage() {
               </p>
             </div>
             <Link href="/publish">
-              <Button size="lg" className="gap-2">
+              <Button size="lg" className="gap-2 hover:scale-105 transition-all">
                 <Plus className="h-5 w-5" />
                 New Publication
               </Button>
@@ -168,16 +170,18 @@ export default function DashboardPage() {
       <div className="container mx-auto px-4 py-8">
         {/* Analytics Cards */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-          <Card className="border-2">
+          <Card className="border-2 hover:shadow-lg transition-all hover:-translate-y-1">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <p className="text-sm font-medium text-muted-foreground">Total Views</p>
-                <Eye className="h-4 w-4 text-muted-foreground" />
+                <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center">
+                  <Eye className="h-5 w-5 text-primary" />
+                </div>
               </div>
               <div className="flex items-end justify-between">
                 <div>
                   <p className="text-3xl font-bold">{analytics.totalViews.toLocaleString()}</p>
-                  <Badge variant="outline" className="mt-2 gap-1 text-success border-success/30">
+                  <Badge variant="outline" className="mt-2 gap-1 text-green-600 border-green-200">
                     <TrendingUp className="h-3 w-3" />
                     +{analytics.viewsGrowth}%
                   </Badge>
@@ -186,16 +190,18 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-2">
+          <Card className="border-2 hover:shadow-lg transition-all hover:-translate-y-1">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <p className="text-sm font-medium text-muted-foreground">Total Shares</p>
-                <Share2 className="h-4 w-4 text-muted-foreground" />
+                <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center">
+                  <Share2 className="h-5 w-5 text-primary" />
+                </div>
               </div>
               <div className="flex items-end justify-between">
                 <div>
                   <p className="text-3xl font-bold">{analytics.totalShares.toLocaleString()}</p>
-                  <Badge variant="outline" className="mt-2 gap-1 text-success border-success/30">
+                  <Badge variant="outline" className="mt-2 gap-1 text-green-600 border-green-200">
                     <TrendingUp className="h-3 w-3" />
                     +{analytics.sharesGrowth}%
                   </Badge>
@@ -204,11 +210,13 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-2">
+          <Card className="border-2 hover:shadow-lg transition-all hover:-translate-y-1">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <p className="text-sm font-medium text-muted-foreground">Publications</p>
-                <FileText className="h-4 w-4 text-muted-foreground" />
+                <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center">
+                  <FileText className="h-5 w-5 text-primary" />
+                </div>
               </div>
               <div>
                 <p className="text-3xl font-bold">{analytics.totalPublications}</p>
@@ -217,11 +225,13 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-2">
+          <Card className="border-2 hover:shadow-lg transition-all hover:-translate-y-1">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <p className="text-sm font-medium text-muted-foreground">Active Readers</p>
-                <Users className="h-4 w-4 text-muted-foreground" />
+                <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center">
+                  <Users className="h-5 w-5 text-primary" />
+                </div>
               </div>
               <div>
                 <p className="text-3xl font-bold">{analytics.activeReaders.toLocaleString()}</p>
@@ -250,15 +260,17 @@ export default function DashboardPage() {
 
           <TabsContent value="all" className="space-y-4">
             {contents.length === 0 ? (
-              <Card className="border-2">
+              <Card className="border-2 shadow-lg">
                 <CardContent className="py-16 text-center">
-                  <FileText className="h-16 w-16 mx-auto mb-6 text-muted-foreground" />
+                  <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-blue-50">
+                    <FileText className="h-8 w-8 text-primary" />
+                  </div>
                   <h3 className="text-2xl font-bold mb-2">No publications yet</h3>
                   <p className="text-muted-foreground mb-8 max-w-md mx-auto">
                     Start publishing censorship-resistant content to see it here. Your content will be distributed across IPFS, Tor, and gateway mirrors.
                   </p>
                   <Link href="/publish">
-                    <Button size="lg" className="gap-2">
+                    <Button size="lg" className="gap-2 hover:scale-105 transition-all">
                       <Plus className="h-5 w-5" />
                       Create Your First Publication
                     </Button>
@@ -268,7 +280,7 @@ export default function DashboardPage() {
             ) : (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {contents.map((content) => (
-                  <Card key={content.id} className="group hover:shadow-lg transition-all border-2 hover:border-primary/30">
+                  <Card key={content.id} className="group hover:shadow-lg transition-all border-2 hover:border-primary/30 hover:-translate-y-1">
                     <CardHeader>
                       <div className="flex items-start justify-between gap-4 mb-2">
                         <CardTitle className="text-lg line-clamp-2 group-hover:text-primary transition-colors">
