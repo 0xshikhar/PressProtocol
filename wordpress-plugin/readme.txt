@@ -1,5 +1,5 @@
-=== AnonPress ===
-Contributors: anonpress
+=== PressProtocol Plugin ===
+Contributors: pressprotocol
 Tags: decentralized, ipfs, tor, censorship-resistant, publishing, blockchain
 Requires at least: 6.0
 Tested up to: 6.4
@@ -12,7 +12,7 @@ Publish your WordPress content to a decentralized, censorship-resistant network 
 
 == Description ==
 
-AnonPress enables censorship-resistant publishing by distributing your WordPress content across multiple decentralized networks:
+PressProtocol enables censorship-resistant publishing by distributing your WordPress content across multiple decentralized networks:
 
 * **IPFS** - Distributed storage that can't be taken down
 * **Tor** - Anonymous onion services for private access
@@ -32,11 +32,11 @@ AnonPress enables censorship-resistant publishing by distributing your WordPress
 = How It Works =
 
 1. Write your post in WordPress
-2. Click "Publish to AnonPress" button
+2. Click "Publish to PressProtocol" button
 3. Content is uploaded to IPFS (immutable storage)
 4. Tor onion service created (anonymous access)
 5. Announced to DHT (decentralized discovery)
-6. Get shareable `anonpress://` link
+6. Get shareable `https://pressprotocol.com/read/{CID}` link
 
 = networks Used =
 
@@ -57,7 +57,7 @@ AnonPress enables censorship-resistant publishing by distributing your WordPress
 
 * WordPress 6.0 or higher
 * PHP 8.0 or higher
-* AnonPress Backend API (self-hosted or managed)
+* PressProtocol Backend API (production: https://anonpress-production.up.railway.app)
 * (Optional) Ethereum wallet for authenticated publishing
 
 == Installation ==
@@ -65,7 +65,7 @@ AnonPress enables censorship-resistant publishing by distributing your WordPress
 = Automatic Installation =
 
 1. Go to Plugins > Add New
-2. Search for "AnonPress"
+2. Search for "PressProtocol"
 3. Click Install Now
 4. Activate the plugin
 
@@ -78,8 +78,8 @@ AnonPress enables censorship-resistant publishing by distributing your WordPress
 
 = Configuration =
 
-1. Go to **AnonPress > Settings**
-2. Enter **Backend API URL** (e.g., `http://localhost:4000` or your hosted URL)
+1. Go to **PressProtocol > Settings**
+2. **Backend API URL** is pre-configured to `https://anonpress-production.up.railway.app`
 3. Click **Test Connection** to verify
 4. (Optional) Enter your **Ethereum wallet address** for authenticated publishing
 5. Click **Save Settings**
@@ -87,16 +87,16 @@ AnonPress enables censorship-resistant publishing by distributing your WordPress
 = First Publish =
 
 1. Create or edit a post
-2. Look for **AnonPress Publishing** meta box in the sidebar
-3. Click **Publish to AnonPress**
+2. Look for **PressProtocol Publishing** meta box in the sidebar
+3. Click **Publish to PressProtocol**
 4. Wait 10-30 seconds for processing
-5. Copy your `anonpress://` share link!
+5. Copy your `https://pressprotocol.com/read/{CID}` share link!
 
 == Frequently Asked Questions ==
 
 = Do I need to run my own backend? =
 
-You can use a hosted AnonPress backend or run your own. Self-hosting gives you full control. See documentation for setup instructions.
+The plugin comes pre-configured with the production PressProtocol backend. You can also run your own backend for full control. See documentation for setup instructions.
 
 = Is my content really censorship-resistant? =
 
@@ -108,15 +108,15 @@ Absolutely! Leave the wallet address empty in settings. Each publish will use a 
 
 = What happens to my WordPress posts? =
 
-They remain unchanged in WordPress. AnonPress creates a separate, standalone copy on the decentralized network.
+They remain unchanged in WordPress. PressProtocol creates a separate, standalone copy on the decentralized network.
 
 = How do readers access my content? =
 
 They can use:
+- `https://pressprotocol.com/read/{CID}` links (public)
 - IPFS gateway URLs (public)
 - Tor .onion URLs (anonymous)
 - Web gateway (fast)
-- `anonpress://` links (with browser extension)
 
 = Is content signed cryptographically? =
 
@@ -143,7 +143,7 @@ The plugin is free and open source (MIT license). You'll need:
 
 == Screenshots ==
 
-1. Post editor with AnonPress publish button and status
+1. Post editor with PressProtocol publish button and status
 2. Admin dashboard showing all publications with stats
 3. Settings page with API configuration and connection test
 4. Published content meta box with mirror links
@@ -172,7 +172,7 @@ The plugin is free and open source (MIT license). You'll need:
 == Upgrade Notice ==
 
 = 1.0.0 =
-Initial release of AnonPress. Publish censorship-resistant content to IPFS, Tor, and DHT with one click!
+Initial release of PressProtocol. Publish censorship-resistant content to IPFS, Tor, and DHT with one click!
 
 == Technical Details ==
 
@@ -211,15 +211,14 @@ Plugin creates `wp_anonpress_publications` table to track publications locally.
 
 == Support ==
 
-* **Documentation**: https://docs.anonpress.io
-* **GitHub**: https://github.com/anonpress/wordpress-plugin
-* **Issues**: https://github.com/anonpress/wordpress-plugin/issues
-* **Discord**: https://discord.gg/anonpress
-* **Email**: support@anonpress.io
+* **Documentation**: https://docs.pressprotocol.com
+* **GitHub**: https://github.com/pressprotocol/wordpress-plugin
+* **Issues**: https://github.com/pressprotocol/wordpress-plugin/issues
+* **Email**: support@pressprotocol.com
 
 == Privacy Policy ==
 
-AnonPress respects your privacy:
+PressProtocol respects your privacy:
 
 * **Anonymous Mode**: No personal data collected or stored
 * **Authenticated Mode**: Only wallet address stored (no private keys in plaintext)
@@ -252,5 +251,5 @@ Planned features:
 
 == Support ==
 
-* Documentation: https://docs.anonpress.io
-* GitHub: https://github.com/anonpress
+* Documentation: https://docs.pressprotocol.com
+* GitHub: https://github.com/pressprotocol

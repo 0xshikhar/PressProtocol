@@ -1,13 +1,13 @@
 <?php
 /**
- * Plugin Name: AnonPress
- * Plugin URI: https://anonpress.io
+ * Plugin Name: PressProtocol Plugin
+ * Plugin URI: https://pressprotocol.com
  * Description: Publish your WordPress content to a decentralized, censorship-resistant network (IPFS + Tor)
  * Version: 1.0.0
- * Author: AnonPress Team
- * Author URI: https://anonpress.io
+ * Author: PressProtocol Team
+ * Author URI: https://pressprotocol.com
  * License: MIT
- * Text Domain: anonpress
+ * Text Domain: pressprotocol
  */
 
 if (!defined('ABSPATH')) {
@@ -86,8 +86,8 @@ class AnonPress {
     
     public function add_admin_menu() {
         add_menu_page(
-            'AnonPress',
-            'AnonPress',
+            'PressProtocol',
+            'PressProtocol',
             'manage_options',
             'anonpress',
             array($this, 'render_dashboard'),
@@ -120,7 +120,7 @@ class AnonPress {
     public function add_meta_box() {
         add_meta_box(
             'anonpress_publish',
-            'AnonPress Publishing',
+            'PressProtocol Publishing',
             array($this, 'render_meta_box'),
             array('post', 'page'),
             'side',

@@ -1,6 +1,6 @@
-# AnonPress WordPress Plugin
+# PressProtocol WordPress Plugin
 
-WordPress plugin for publishing content to the AnonPress decentralized network.
+WordPress plugin for publishing content to the PressProtocol network.
 
 ## Features
 
@@ -14,31 +14,70 @@ WordPress plugin for publishing content to the AnonPress decentralized network.
 
 ### Manual Installation
 
-1. Download or clone this repository
+1. Download or clone this repository folder
 2. Copy to `wp-content/plugins/anonpress`
 3. Activate in WordPress admin
-4. Configure settings at **AnonPress > Settings**
+4. Configure settings at **PressProtocol > Settings**
+
+
+### Zip Installation
+
+1. Download or clone this repository folder and zip it
+2. Open Wordpress admin panel and select **Plugins > Add New > Upload Plugin**
+3. Upload the zip file
+4. Activate in WordPress admin panel
+5. Configure settings at **PressProtocol > Settings**
 
 ### Configuration
 
 Required settings:
 
-- **Backend API URL** - Default: `http://localhost:4000`
-- **Wallet Address** - Your Ethereum address for identity
+- **Backend API URL** - Default: `https://anonpress-production.up.railway.app`
+- **Wallet Address** - Your Ethereum address for identity (optional - can publish anonymously)
 
 ## Usage
 
 ### Publishing a Post
 
 1. Create or edit a post
-2. Look for "AnonPress Publishing" meta box in sidebar
-3. Click "Publish to AnonPress" button
-4. Copy the `anonpress://` share link
+2. Look for "PressProtocol Publishing" meta box in sidebar
+3. Click "Publish to PressProtocol" button
+4. Copy the `https://pressprotocol.com/read/{CID}` share link
 5. Share anywhere!
+
+
+## Architecture Overview
+
+```
+WordPress Post → Plugin → Backend API → IPFS + Tor + Gateway
+                                            ↓
+                                    Decentralized Network
+```
+
+### What Happens When You Publish?
+
+1. **Content Extraction**: Plugin grabs title, content, images, tags
+2. **HTML Generation**: Creates standalone styled HTML page
+3. **Backend Processing**: 
+   - Uploads to IPFS (immutable storage)
+   - Creates Tor onion service (anonymous access)
+   - Announces to DHT (decentralized discovery)
+4. **Result**: Get CID and multiple access URLs
+
+## Integration with Backend
+
+### Backend API Endpoints Used
+
+| Endpoint | Purpose | Method |
+|----------|---------|--------|
+| `/api/content` | Publish content | POST |
+| `/api/content/:cid` | Retrieve content | GET |
+| `/api/mirrors/:cid/health` | Check mirrors | GET |
+| `/api/identity` | Create identity | 
 
 ### Viewing Publications
 
-Go to **AnonPress > Dashboard** to see:
+Go to **PressProtocol > Dashboard** to see:
 
 - All published posts
 - Mirror status
@@ -49,12 +88,12 @@ Go to **AnonPress > Dashboard** to see:
 
 - WordPress 6.0+
 - PHP 8.0+
-- AnonPress Backend API running
-- Wallet address
+- PressProtocol Backend API running
+- Wallet address (optional)
 
 ## API Integration
 
-The plugin communicates with the AnonPress backend API:
+The plugin communicates with the PressProtocol backend API:
 
 - `POST /api/content` - Publish content
 - `GET /api/content/:cid` - Fetch content
@@ -121,8 +160,8 @@ apply_filters('anonpress_prepare_content', $content, $post);
 
 ### "Please configure wallet address"
 
-- Go to AnonPress > Settings
-- Enter your Ethereum wallet address
+- Go to PressProtocol > Settings
+- Enter your Ethereum wallet address (optional - can publish anonymously)
 - Save settings
 
 ### "Failed to publish"
@@ -137,6 +176,6 @@ MIT License - See LICENSE file
 
 ## Support
 
-- Documentation: https://docs.anonpress.io
-- GitHub: https://github.com/anonpress/wordpress-plugin
-- Issues: https://github.com/anonpress/wordpress-plugin/issues
+- Documentation: https://docs.pressprotocol.com
+- GitHub: https://github.com/pressprotocol/wordpress-plugin
+- Issues: https://github.com/pressprotocol/wordpress-plugin/issues

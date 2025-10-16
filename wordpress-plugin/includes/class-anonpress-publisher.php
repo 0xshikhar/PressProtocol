@@ -65,7 +65,7 @@ class AnonPress_Publisher {
         $html .= '<head>';
         $html .= '<meta charset="UTF-8">';
         $html .= '<meta name="viewport" content="width=device-width, initial-scale=1.0">';
-        $html .= '<meta name="generator" content="AnonPress WordPress Plugin">';
+        $html .= '<meta name="generator" content="PressProtocol WordPress Plugin">';
         $html .= '<title>' . esc_html($post->post_title) . '</title>';
         
         // Add meta tags for better display
@@ -132,7 +132,7 @@ class AnonPress_Publisher {
         
         $html .= '</article>';
         $html .= '<footer>';
-        $html .= '<p>Published with <a href="https://anonpress.io" target="_blank" rel="noopener">AnonPress</a> - Censorship-resistant publishing</p>';
+        $html .= '<p>Published with <a href="https://pressprotocol.com" target="_blank" rel="noopener">PressProtocol</a> - Censorship-resistant publishing</p>';
         $html .= '<p class="disclaimer">Content published on decentralized networks (IPFS, Tor) for permanent accessibility</p>';
         $html .= '</footer>';
         $html .= '</body>';

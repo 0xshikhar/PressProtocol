@@ -5,7 +5,15 @@
  * This ensures the platform works even if all centralized indexers go down
  */
 
-import { env } from "@/env.mjs";
+import { BACKEND_URL } from "@/config/backend";
+
+// Types matching the backend API
+export interface IndexerConfig {
+  url: string;
+  type: "official" | "community";
+  trusted: boolean;
+  enabled: boolean;
+}
 
 export interface ContentManifest {
   version: string;
@@ -25,17 +33,10 @@ export interface ContentManifest {
     gateway?: string;
   };
   wordCount?: number;
-  readingTime?: number; // minutes
+  readingTime?: number;
 }
 
-export interface IndexerConfig {
-  url: string;
-  type: "official" | "community" | "self-hosted";
-  trusted: boolean;
-  enabled: boolean;
-}
-
-export interface DiscoveryContent {
+export interface ContentMetadata {
   cid: string;
   title: string;
   tags: string[];
@@ -45,9 +46,25 @@ export interface DiscoveryContent {
   };
 }
 
+export interface DiscoveryContent {
+  cid: string;
+  title: string;
+  excerpt: string;
+  tags: string[];
+  timestamp: number;
+  publisher: {
+    pubkey: string;
+  };
+  mirrors: {
+    ipfs: string;
+    tor?: string;
+    gateway?: string;
+  };
+}
+
 const DEFAULT_INDEXERS: IndexerConfig[] = [
   {
-    url: env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:4000",
+    url: BACKEND_URL,
     type: "official",
     trusted: true,
     enabled: true,

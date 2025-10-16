@@ -1,7 +1,7 @@
 <div class="anonpress-meta-box">
     <?php if ($publication): ?>
         <div class="anonpress-published">
-            <p class="success">✅ Published to AnonPress</p>
+            <p class="success">✅ Published to PressProtocol</p>
             
             <div class="publication-info">
                 <div class="info-row">
@@ -11,7 +11,7 @@
                 
                 <div class="info-row">
                     <strong>Share URL:</strong>
-                    <input type="text" readonly value="anonpress://<?php echo esc_attr($publication->cid); ?>" class="widefat" onclick="this.select()" />
+                    <input type="text" readonly value="https://pressprotocol.com/read/<?php echo esc_attr($publication->cid); ?>" class="widefat" onclick="this.select()" />
                 </div>
                 
                 <div class="mirrors">
@@ -50,7 +50,7 @@
                     <button type="button" class="button" id="anonpress-check-status" data-cid="<?php echo esc_attr($publication->cid); ?>">
                         Check Mirror Status
                     </button>
-                    <button type="button" class="button" onclick="navigator.clipboard.writeText('anonpress://<?php echo esc_js($publication->cid); ?>')">
+                    <button type="button" class="button" onclick="navigator.clipboard.writeText('https://pressprotocol.com/read/<?php echo esc_js($publication->cid); ?>')">
                         Copy Share Link
                     </button>
                 </div>
@@ -61,26 +61,30 @@
             </p>
             
             <button type="button" class="button button-primary button-large" id="anonpress-republish" data-post-id="<?php echo esc_attr($post->ID); ?>">
-                Republish to AnonPress
+                Republish to PressProtocol
             </button>
         </div>
     <?php else: ?>
         <div class="anonpress-unpublished">
-            <p>This post has not been published to AnonPress yet.</p>
+            <p>This post has not been published to PressProtocol yet.</p>
             
             <?php if (empty(get_option('anonpress_wallet_address'))): ?>
-                <p class="notice notice-warning">
-                    ⚠️ Please configure your wallet address in <a href="<?php echo admin_url('admin.php?page=anonpress-settings'); ?>">AnonPress Settings</a> first.
+                <p class="notice notice-info" style="background: #e7f3ff; border-left-color: #2196F3;">
+                    ℹ️ <strong>Anonymous Publishing Mode:</strong> No wallet configured. Content will be published with a temporary identity. <a href="<?php echo admin_url('admin.php?page=anonpress-settings'); ?>">Add wallet</a> for persistent identity.
                 </p>
             <?php else: ?>
-                <button type="button" class="button button-primary button-large" id="anonpress-publish" data-post-id="<?php echo esc_attr($post->ID); ?>">
-                    🚀 Publish to AnonPress
-                </button>
-                
-                <p class="description">
-                    Your content will be published to IPFS, Tor, and gateway mirrors for censorship-resistant access.
+                <p class="notice notice-success" style="background: #e8f5e9; border-left-color: #4CAF50;">
+                    ✓ <strong>Authenticated Publishing Mode:</strong> Content will be signed with your wallet identity.
                 </p>
             <?php endif; ?>
+            
+            <button type="button" class="button button-primary button-large" id="anonpress-publish" data-post-id="<?php echo esc_attr($post->ID); ?>">
+                🚀 Publish to PressProtocol
+            </button>
+            
+            <p class="description">
+                Your content will be published to IPFS, Tor, and gateway mirrors for censorship-resistant access.
+            </p>
         </div>
     <?php endif; ?>
     

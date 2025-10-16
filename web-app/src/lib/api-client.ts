@@ -1,6 +1,4 @@
-import { env } from "@/env.mjs";
-
-const BACKEND_URL = env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:4000";
+import { BACKEND_URL } from "@/config/backend";
 
 export interface PublishContentRequest {
   title: string;

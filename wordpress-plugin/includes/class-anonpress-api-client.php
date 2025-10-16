@@ -6,7 +6,7 @@ class AnonPress_API_Client {
     private $timeout_publish = 60;
     
     public function __construct() {
-        $this->api_url = rtrim(get_option('anonpress_api_url', 'http://localhost:4000'), '/');
+        $this->api_url = rtrim(get_option('anonpress_api_url', 'https://anonpress-production.up.railway.app'), '/');
     }
     
     /**
@@ -36,7 +36,7 @@ class AnonPress_API_Client {
         
         return array(
             'success' => true,
-            'message' => 'Successfully connected to AnonPress backend',
+            'message' => 'Successfully connected to PressProtocol backend',
         );
     }
     

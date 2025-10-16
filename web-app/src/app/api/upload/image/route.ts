@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { env } from "@/env.mjs";
+import { getBackendUrl } from "@/config/backend";
 
 /**
  * Image Upload API Route
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     const backendFormData = new FormData();
     backendFormData.append("file", image);
 
-    const backendUrl = env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:4000";
+    const backendUrl = getBackendUrl();
     const response = await fetch(`${backendUrl}/api/upload/image`, {
       method: "POST",
       body: backendFormData,

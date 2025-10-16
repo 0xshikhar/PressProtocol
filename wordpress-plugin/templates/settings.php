@@ -1,5 +1,5 @@
 <div class="wrap">
-    <h1>AnonPress Settings</h1>
+    <h1>PressProtocol Settings</h1>
     
     <?php settings_errors(); ?>
     
@@ -21,15 +21,15 @@
                     <li>Enter your wallet address</li>
                     <li>Configure Backend API URL (if self-hosting)</li>
                     <li>Create or edit a post</li>
-                    <li>Click "Publish to AnonPress" button</li>
-                    <li>Share the anonpress:// link</li>
+                    <li>Click "Publish to PressProtocol" button</li>
+                    <li>Share the pressprotocol.com link</li>
                 </ol>
             </div>
             
             <div class="sidebar-card">
                 <h3>ℹ️ About</h3>
                 <p>
-                    AnonPress publishes your WordPress content to a decentralized network:
+                    PressProtocol publishes your WordPress content to a decentralized network:
                 </p>
                 <ul>
                     <li><strong>IPFS</strong> - Distributed storage</li>
@@ -41,9 +41,9 @@
             <div class="sidebar-card">
                 <h3>🔗 Resources</h3>
                 <ul>
-                    <li><a href="https://anonpress.io" target="_blank">Website</a></li>
-                    <li><a href="https://docs.anonpress.io" target="_blank">Documentation</a></li>
-                    <li><a href="https://github.com/anonpress" target="_blank">GitHub</a></li>
+                    <li><a href="https://pressprotocol.com" target="_blank">Website</a></li>
+                    <li><a href="https://docs.pressprotocol.com" target="_blank">Documentation</a></li>
+                    <li><a href="https://github.com/pressprotocol" target="_blank">GitHub</a></li>
                 </ul>
             </div>
             
@@ -60,7 +60,7 @@
 <script>
 jQuery(document).ready(function($) {
     // Check system status
-    $.get('<?php echo get_option('anonpress_api_url', 'http://localhost:4000'); ?>/health')
+    $.get('<?php echo get_option('anonpress_api_url', 'https://anonpress-production.up.railway.app'); ?>/health')
         .done(function(data) {
             $('#anonpress-system-status').html(
                 '<p class="status-ok">✅ Backend API: Connected</p>' +

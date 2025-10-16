@@ -3,8 +3,9 @@
 // All database operations happen in the backend (anonpress-backend)
 
 import { NextRequest, NextResponse } from "next/server";
+import { getBackendUrl } from "@/config/backend";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:4000";
+const BACKEND_URL = getBackendUrl();
 
 export async function POST(req: NextRequest) {
   try {

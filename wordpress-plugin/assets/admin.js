@@ -11,7 +11,7 @@ jQuery(document).ready(function($) {
         
         // Disable button and show loading
         $button.prop('disabled', true).text('Publishing...');
-        $status.removeClass('success error').addClass('loading').show().text('⏳ Publishing to AnonPress network...');
+        $status.removeClass('success error').addClass('loading').show().text('⏳ Publishing to PressProtocol network...');
         
         $.ajax({
             url: anonpressData.ajax_url,
@@ -19,16 +19,17 @@ jQuery(document).ready(function($) {
             data: {
                 action: 'anonpress_publish',
                 nonce: anonpressData.nonce,
-                post_id: postId
             },
             success: function(response) {
                 if (response.success) {
                     const data = response.data;
                     
+                    const shareUrl = 'https://pressprotocol.com/read/' + data.cid;
                     $status.removeClass('loading').addClass('success').html(
-                        '✅ Successfully published to AnonPress!<br>' +
-                        '<strong>Share URL:</strong> <code>anonpress://' + data.cid + '</code><br>' +
-                        '<button class="button" onclick="navigator.clipboard.writeText(\'anonpress://' + data.cid + '\')">Copy Link</button>'
+                        '✅ Successfully published to PressProtocol!<br>' +
+                        '<strong>Share URL:</strong><br>' +
+                        '<input type="text" readonly value="' + shareUrl + '" style="width: 100%; margin: 5px 0;" onclick="this.select()" /><br>' +
+                        '<button class="button" onclick="navigator.clipboard.writeText(\'' + shareUrl + '\');">Copy Link</button>'
                     );
                     
                     // Reload page after 2 seconds to show updated meta box
@@ -37,12 +38,12 @@ jQuery(document).ready(function($) {
                     }, 2000);
                 } else {
                     $status.removeClass('loading').addClass('error').text('❌ Error: ' + response.data);
-                    $button.prop('disabled', false).text('🚀 Publish to AnonPress');
+                    $button.prop('disabled', false).text('🚀 Publish to PressProtocol');
                 }
             },
             error: function(xhr, status, error) {
                 $status.removeClass('loading').addClass('error').text('❌ Error: ' + error);
-                $button.prop('disabled', false).text('🚀 Publish to AnonPress');
+                $button.prop('disabled', false).text('🚀 Publish to PressProtocol');
             }
         });
     });
@@ -126,8 +127,8 @@ jQuery(document).ready(function($) {
     });
     
     // Copy link helper
-    window.copyAnonPressLink = function(cid) {
-        const link = 'anonpress://' + cid;
+    window.copyPressProtocolLink = function(cid) {
+        const link = 'https://pressprotocol.com/read/' + cid;
         
         if (navigator.clipboard) {
             navigator.clipboard.writeText(link).then(function() {

@@ -1,5 +1,5 @@
 <div class="wrap">
-    <h1>AnonPress Dashboard</h1>
+    <h1>PressProtocol Dashboard</h1>
     
     <div class="anonpress-dashboard">
         <?php
@@ -36,7 +36,7 @@
             <div class="notice notice-warning">
                 <p>
                     <strong>Setup Required:</strong> 
-                    Please <a href="<?php echo admin_url('admin.php?page=anonpress-settings'); ?>">configure your wallet address</a> to start publishing.
+                    Please <a href="<?php echo admin_url('admin.php?page=anonpress-settings'); ?>">configure your wallet address</a> to start publishing (optional - can publish anonymously).
                 </p>
             </div>
         <?php endif; ?>
@@ -82,7 +82,7 @@
                             </td>
                             <td>
                                 <a href="<?php echo esc_url($pub->gateway_url); ?>" target="_blank" class="button button-small">View</a>
-                                <button class="button button-small" onclick="navigator.clipboard.writeText('anonpress://<?php echo esc_js($pub->cid); ?>')">Copy Link</button>
+                                <button class="button button-small" onclick="navigator.clipboard.writeText('https://pressprotocol.com/read/<?php echo esc_js($pub->cid); ?>')">Copy Link</button>
                             </td>
                         </tr>
                     <?php endforeach; ?>

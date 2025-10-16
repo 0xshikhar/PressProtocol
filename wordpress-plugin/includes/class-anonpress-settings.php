@@ -50,16 +50,16 @@ class AnonPress_Settings {
     }
     
     public static function section_callback() {
-        echo '<p>Configure your AnonPress backend API connection and identity.</p>';
+        echo '<p>Configure your PressProtocol backend API connection and identity.</p>';
         echo '<p><strong>Note:</strong> Wallet address is optional. You can publish anonymously without it.</p>';
     }
     
     public static function api_url_callback() {
-        $value = get_option('anonpress_api_url', 'http://localhost:4000');
+        $value = get_option('anonpress_api_url', 'https://anonpress-production.up.railway.app');
         echo '<input type="text" id="anonpress_api_url" name="anonpress_api_url" value="' . esc_attr($value) . '" class="regular-text" />';
         echo ' <button type="button" id="anonpress-test-connection" class="button">Test Connection</button>';
         echo '<div id="connection-status" style="margin-top: 10px;"></div>';
-        echo '<p class="description">URL of your AnonPress backend API (default: http://localhost:4000)</p>';
+        echo '<p class="description">URL of your PressProtocol backend API (default: https://anonpress-production.up.railway.app)</p>';
     }
     
     public static function wallet_address_callback() {
@@ -92,7 +92,7 @@ class AnonPress_Settings {
                 'invalid_url',
                 'Please enter a valid URL for the API endpoint'
             );
-            return get_option('anonpress_api_url', 'http://localhost:4000');
+            return get_option('anonpress_api_url', 'https://anonpress-production.up.railway.app');
         }
         
         return $value;
