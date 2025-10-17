@@ -43,7 +43,7 @@ export function IndexerSettings() {
   const handleToggle = (url: string) => {
     discoveryService.toggleIndexer(url);
     loadIndexers();
-    toast.success("Indexer updated");
+    toast.success("Indexer updated - refresh explore page to see changes");
   };
 
   const handleRemove = (url: string) => {
@@ -77,7 +77,7 @@ export function IndexerSettings() {
     loadIndexers();
     setShowAddDialog(false);
     setNewIndexerUrl("");
-    toast.success("Indexer added");
+    toast.success("Indexer added - refresh explore page to see changes");
   };
 
   const getTypeColor = (type: IndexerConfig["type"]) => {

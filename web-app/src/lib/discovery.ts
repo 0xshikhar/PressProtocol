@@ -10,7 +10,7 @@ import { BACKEND_URL } from "@/config/backend";
 // Types matching the backend API
 export interface IndexerConfig {
   url: string;
-  type: "official" | "community";
+  type: "official" | "community" | "self-hosted";
   trusted: boolean;
   enabled: boolean;
 }
@@ -115,8 +115,10 @@ export class DiscoveryService {
 
   /**
    * Get current indexer configuration
+   * Always reload from localStorage to ensure consistency across tabs/components
    */
   getIndexers(): IndexerConfig[] {
+    this.indexers = this.loadIndexersFromStorage();
     return this.indexers;
   }
 
@@ -129,6 +131,8 @@ export class DiscoveryService {
     tags?: string[],
     limit: number = 20
   ): Promise<DiscoveryContent[]> {
+    // Reload indexers to get latest config
+    this.indexers = this.loadIndexersFromStorage();
     const enabledIndexers = this.indexers.filter((i) => i.enabled);
 
     // Try each indexer in order
@@ -140,9 +144,15 @@ export class DiscoveryService {
         if (content.length > 0) {
           console.log(`✅ Discovered ${content.length} items via ${indexer.url}`);
           return content;
+        } else {
+          console.log(`⚠️  Indexer ${indexer.url} returned 0 items`);
         }
-      } catch (error) {
-        console.warn(`⚠️  Indexer ${indexer.url} failed:`, error);
+      } catch (error: any) {
+        console.error(`❌ Indexer ${indexer.url} failed:`, {
+          message: error?.message,
+          status: error?.status,
+          error
+        });
         // Continue to next indexer
       }
     }
@@ -166,18 +176,25 @@ export class DiscoveryService {
     }
     params.append("limit", limit.toString());
 
-    const response = await fetch(
-      `${indexer.url}/api/discovery?${params.toString()}`,
-      {
-        signal: AbortSignal.timeout(10000), // 10 second timeout
+    const url = `${indexer.url}/api/discovery?${params.toString()}`;
+    console.log(`🔍 Fetching from: ${url}`);
+
+    const response = await fetch(url, {
+      signal: AbortSignal.timeout(10000), // 10 second timeout
+      headers: {
+        'Accept': 'application/json',
       }
-    );
+    });
+
+    console.log(`📥 Response status: ${response.status} from ${indexer.url}`);
 
     if (!response.ok) {
-      throw new Error(`Indexer returned ${response.status}`);
+      const errorText = await response.text().catch(() => 'Unknown error');
+      throw new Error(`Indexer returned ${response.status}: ${errorText}`);
     }
 
     const result = await response.json();
+    console.log(`📦 Data received:`, { itemCount: result?.data?.length || 0 });
     return result.data || [];
   }
 
@@ -256,11 +273,13 @@ export class DiscoveryService {
     return {
       cid: manifest.cid,
       title: manifest.title,
+      excerpt: manifest.excerpt,
       tags: manifest.tags,
       timestamp: manifest.timestamp,
       publisher: {
         pubkey: manifest.publisher.pubkey,
       },
+      mirrors: manifest.mirrors,
     };
   }
 
