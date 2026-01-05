@@ -1,15 +1,23 @@
 import "./globals.css"
-
 import type { Metadata, Viewport } from "next"
-import { Inter } from "next/font/google"
+import { Inter, Instrument_Serif, JetBrains_Mono } from "next/font/google"
 import { siteConfig } from "@/config/site"
 import { cn } from "@/lib/utils"
-import { ThemeProvider } from "@/components/theme-provider"
 import { Providers } from "@/app/providers"
 import Navbar from "@/components/navigation/navbar"
 import Footer from "@/components/navigation/footer"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-instrument-serif",
+  adjustFontFallback: false,
+})
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains",
+})
 
 interface RootLayoutProps {
   children: React.ReactNode
@@ -71,7 +79,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <head />
       <body
         className={cn(
-          "min-h-screen bg-background antialiased flex flex-col",
+          "min-h-screen bg-background antialiased flex flex-col font-sans",
+          inter.variable,
+          instrumentSerif.variable,
+          jetbrainsMono.variable,
           inter.className
         )}
       >
