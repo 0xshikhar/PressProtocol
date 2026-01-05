@@ -112,7 +112,7 @@ export default function DashboardPage() {
                 Connect your wallet to access your publisher dashboard and manage your content
               </p>
               <Button onClick={login} size="lg" className="gap-2 hover:scale-105 transition-all">
-                Connect Wallet
+                Login / SignUp
               </Button>
             </CardContent>
           </Card>
