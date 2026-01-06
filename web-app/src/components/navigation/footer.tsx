@@ -1,9 +1,14 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { FileText, Github, Twitter, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
 export default function Footer() {
+  const pathname = usePathname();
+  if (pathname === "/") return null;
   const footerLinks = {
     platform: [
       { name: "Explore", href: "/explore" },
