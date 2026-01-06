@@ -38,7 +38,7 @@ export function AuthButton() {
                     onClick={handleLogin}
                     disabled={isLoggingIn}
                 >
-                    {isLoggingIn ? 'Connecting...' : 'Connect Wallet'}
+                    {isLoggingIn ? 'Connecting...' : 'Login / SignUp'}
                 </Button>
             ) : (
                 <div className="flex items-center gap-2">
