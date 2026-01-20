@@ -1,11 +1,13 @@
 import { LandingNavigation } from "@/components/landing/LandingNavigation";
 import { Hero } from "@/components/landing/Hero";
-import { GatewayTelemetry } from "@/components/landing/GatewayTelemetry";
-import { ProcessStepper } from "@/components/landing/ProcessStepper";
-import { TransportNetwork } from "@/components/landing/TransportNetwork";
+import { FeaturesSection } from "@/components/landing/FeaturesSection";
+import { ProcessSection } from "@/components/landing/ProcessSection";
+import { InfrastructureSection } from "@/components/landing/InfrastructureSection";
+import { MetricsSection } from "@/components/landing/MetricsSection";
 import { ProtocolSandbox } from "@/components/landing/ProtocolSandbox";
-import { EcosystemBento } from "@/components/landing/EcosystemBento";
-import { PrivacyThreatModel } from "@/components/landing/PrivacyThreatModel";
+import { IntegrationsSection } from "@/components/landing/IntegrationsSection";
+import { SecuritySection } from "@/components/landing/SecuritySection";
+import { PricingSection } from "@/components/landing/PricingSection";
 import { CallToAction } from "@/components/landing/CallToAction";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 
@@ -16,32 +18,38 @@ export default function Home() {
       <LandingNavigation />
 
       <main>
-        {/* P2: Hero & Live Protocol Metric Bar */}
+        {/* 1. Hero Section with Looping Background Video, Blur Words, and Metric Bar */}
         <Hero />
 
-        {/* Real-time Gateway Pings & Relay Telemetry */}
-        <GatewayTelemetry />
+        {/* 2. Capabilities & Features with Particle Canvas and 3D Architectural Render */}
+        <FeaturesSection />
 
-        {/* P4: 3-Step Interactive Process Stepper (Write -> Sign -> Pin) */}
-        <ProcessStepper />
+        {/* 3. How It Works (Write -> Sign -> Distribute) with Monolith Artwork & Code Terminal */}
+        <ProcessSection />
 
-        {/* P5: Multi-Transport Failover Network (IPFS + Tor + Mirrors) */}
-        <TransportNetwork />
+        {/* 4. Global Infrastructure with 3D Globe Sphere, Animated Circuit SVG, and ISP Failover */}
+        <InfrastructureSection />
 
-        {/* P3: Crown Jewel Interactive Protocol Sandbox & Signature Verifier */}
+        {/* 5. Live Protocol Telemetry with GridBackground Canvas, Wave Ribbon, and Number Scrambler */}
+        <MetricsSection />
+
+        {/* 6. Interactive Protocol Sandbox & Live In-Browser Ed25519 Cryptographic Verifier */}
         <ProtocolSandbox />
 
-        {/* P6: Universal Ecosystem Bento Grid & Downloads (WordPress, Chrome MV3, SDK) */}
-        <EcosystemBento />
+        {/* 7. Ecosystem & Integrations with Full-Width Neural Banner and Halo Cards */}
+        <IntegrationsSection />
 
-        {/* P7: Security & Formal Threat Model (Octant Public Goods Review) */}
-        <PrivacyThreatModel />
+        {/* 8. Security & Threat Model with Cross-Fading Images and Certifications */}
+        <SecuritySection />
 
-        {/* Primary Call to Action */}
+        {/* 9. Public Goods & Sustainability Model with 3D Whale and Outline Typography */}
+        <PricingSection />
+
+        {/* 10. Call to Action with Glowing Trees Bridge Artwork and Spotlight */}
         <CallToAction />
       </main>
 
-      {/* Cyber-Infrastructure Animated Wave Footer */}
+      {/* 11. Panoramic Bioluminescent Horizon Banner and Harmonic Wave Footer */}
       <LandingFooter />
     </div>
   );
