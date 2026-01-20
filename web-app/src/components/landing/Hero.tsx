@@ -116,21 +116,53 @@ export function Hero() {
 
   return (
     <section className="relative min-h-[90vh] lg:min-h-screen flex flex-col justify-center overflow-hidden bg-black pt-28 pb-16">
-      {/* Background Architectural Grid */}
-      <div className="absolute inset-0 z-0 hairline-grid opacity-40 pointer-events-none" />
+      {/* Background Hero Video */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          aria-hidden="true"
+          className="w-full h-full object-cover object-center opacity-70"
+        >
+          <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/bg-hero-0BnFGdr81Ifnj3WbBZoNt1KE4D5DMT.mp4" type="video/mp4" />
+        </video>
+        {/* Subtle overlays to guarantee text readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80" />
+      </div>
+
+      {/* Subtle grid lines */}
+      <div className="absolute inset-0 z-[1] overflow-hidden pointer-events-none opacity-20">
+        {[...Array(8)].map((_, i) => (
+          <div
+            key={`h-${i}`}
+            className="absolute h-px bg-white/10"
+            style={{
+              top: `${12.5 * (i + 1)}%`,
+              left: 0,
+              right: 0,
+            }}
+          />
+        ))}
+        {[...Array(12)].map((_, i) => (
+          <div
+            key={`v-${i}`}
+            className="absolute w-px bg-white/10"
+            style={{
+              left: `${8.33 * (i + 1)}%`,
+              top: 0,
+              bottom: 0,
+            }}
+          />
+        ))}
+      </div>
 
       {/* Radial atmospheric glows */}
-      <div className="absolute top-1/4 -left-48 w-96 h-96 rounded-full bg-cyan-500/10 blur-[120px] pointer-events-none" />
-      <div className="absolute top-1/3 -right-48 w-96 h-96 rounded-full bg-emerald-500/10 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-gradient-to-t from-cyan-950/20 to-transparent blur-3xl pointer-events-none" />
-
-      {/* Structural Horizontal/Vertical Wire lines */}
-      <div className="absolute inset-0 z-[1] pointer-events-none opacity-25">
-        <div className="absolute top-1/3 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-        <div className="absolute top-2/3 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-        <div className="hidden lg:block absolute left-1/4 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
-        <div className="hidden lg:block absolute right-1/4 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
-      </div>
+      <div className="absolute top-1/4 -left-48 w-96 h-96 rounded-full bg-cyan-500/10 blur-[120px] pointer-events-none z-[1]" />
+      <div className="absolute top-1/3 -right-48 w-96 h-96 rounded-full bg-emerald-500/10 blur-[120px] pointer-events-none z-[1]" />
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-gradient-to-t from-cyan-950/20 to-transparent blur-3xl pointer-events-none z-[1]" />
 
       <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 lg:px-12 my-auto">
         <div className="max-w-4xl">
