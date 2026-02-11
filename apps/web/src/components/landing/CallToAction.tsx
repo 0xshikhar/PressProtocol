@@ -97,13 +97,34 @@ export function CallToAction() {
                 </p>
               </div>
 
-              {/* Right Bridge Image from original template */}
-              <div className="hidden lg:flex items-end justify-center w-[520px] h-[520px] -mr-12 shrink-0">
-                <img
-                  src="/images/bridge.png"
-                  alt="Two glowing trees connected by electrical arcs"
-                  className="w-full h-full object-contain object-bottom filter drop-shadow-[0_20px_40px_rgba(6,182,212,0.2)]"
-                />
+              {/* Right: Cryptographic Manifest Signer Card */}
+              <div className="hidden lg:flex flex-col justify-between p-7 rounded-2xl border border-white/15 bg-black/70 backdrop-blur-2xl w-[420px] shrink-0 font-mono shadow-2xl relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
+                <div className="w-full pb-4 border-b border-white/10 flex items-center justify-between text-xs text-white/40 relative z-10">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-white font-medium">SOVEREIGN PROTOCOL KERNEL</span>
+                  </div>
+                  <span className="text-cyan-400 text-[11px]">v1.0.0</span>
+                </div>
+                <div className="w-full py-5 text-xs space-y-3.5 text-white/70 relative z-10">
+                  <div>
+                    <span className="text-white/40 block text-[10px] uppercase tracking-wider mb-0.5">Cryptography</span>
+                    <span className="text-white text-xs">Ed25519-SHA256 (RFC 8032 in-browser)</span>
+                  </div>
+                  <div>
+                    <span className="text-white/40 block text-[10px] uppercase tracking-wider mb-0.5">Distribution</span>
+                    <span className="text-white text-xs">Multi-Transport Failover (IPFS + Tor Onion)</span>
+                  </div>
+                  <div>
+                    <span className="text-white/40 block text-[10px] uppercase tracking-wider mb-0.5">Key Custody</span>
+                    <span className="text-emerald-400 text-xs font-semibold">100% Volatile Client RAM (Zero Server Leak)</span>
+                  </div>
+                </div>
+                <div className="w-full pt-4 border-t border-white/10 flex items-center justify-between text-[11px] text-white/40 relative z-10">
+                  <span>Tamper Verification</span>
+                  <span className="text-cyan-400">Deterministic CIDv1</span>
+                </div>
               </div>
             </div>
           </div>

@@ -102,17 +102,11 @@ function AnimatedWaveCanvas() {
 
 export function LandingFooter() {
   return (
-    <footer className="relative bg-black text-white">
-      {/* Panoramic Bioluminescent Banner Image from original template */}
-      <div className="relative w-full h-[320px] md:h-[440px] overflow-hidden">
-        <img
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Upscaled%20Image%20%2810%29-UnDKstODkIENp5xqTYUEpt0Sm8tNOw.png"
-          alt="Bioluminescent landscape"
-          className="w-full h-full object-cover object-center"
-        />
-        {/* Gradient fade to black at bottom and sides */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-black/50" />
+    <footer className="relative bg-black text-white border-t border-white/10">
+      {/* Sleek Harmonic Wave Canvas Header */}
+      <div className="h-24 w-full relative overflow-hidden bg-gradient-to-b from-black via-zinc-950/60 to-black">
+        <AnimatedWaveCanvas />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none" />
       </div>
 
       {/* Footer Content */}
