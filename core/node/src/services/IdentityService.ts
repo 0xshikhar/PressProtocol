@@ -1,5 +1,5 @@
 import * as ed25519 from '@noble/ed25519';
-import { sha512 } from '@noble/hashes/sha512';
+import { sha512 } from '@noble/hashes/sha2.js';
 import { prisma } from '../lib/prisma.js';
 
 // Set up SHA512 for ed25519 (required for @noble/ed25519 v2+)

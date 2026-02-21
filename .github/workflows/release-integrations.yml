@@ -1,0 +1,38 @@
+name: Package Ecosystem Integrations
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  package-integrations:
+    name: Package Integrations (.zip)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Package Browser Extension
+        run: |
+          cd integrations/browser-extension
+          pnpm install --frozen-lockfile
+          zip -r ../../PressProtocol_Browser_Extension.zip . -x "node_modules/*" ".git/*"
+
+      - name: Package WordPress Plugin
+        run: |
+          cd integrations/wordpress-plugin
+          zip -r ../../PressProtocol_Wordpress_Plugin.zip . -x ".git/*"
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pressprotocol-release-integrations
+          path: |
+            PressProtocol_Browser_Extension.zip
+            PressProtocol_Wordpress_Plugin.zip

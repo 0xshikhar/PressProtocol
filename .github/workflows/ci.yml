@@ -1,0 +1,61 @@
+name: PressProtocol CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  validate-web:
+    name: Validate Web Portal (apps/web)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+          cache-dependency-path: apps/web/pnpm-lock.yaml
+
+      - name: Install Dependencies
+        run: pnpm --dir apps/web install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm --dir apps/web exec tsc --noEmit
+
+      - name: Build Web Portal
+        run: pnpm --dir apps/web build
+        env:
+          NEXT_PUBLIC_BACKEND_API_URL: "https://api.pressprotocol.com"
+
+  validate-node:
+    name: Validate P2P Core Node (core/node)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+          cache-dependency-path: core/node/pnpm-lock.yaml
+
+      - name: Install Dependencies
+        run: pnpm --dir core/node install --frozen-lockfile
+
+      - name: Typecheck & Build Node
+        run: pnpm --dir core/node build
