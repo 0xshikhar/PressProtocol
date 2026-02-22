@@ -117,7 +117,7 @@ fastify.get('/', async (request, reply) => {
 });
 
 // Error handler
-fastify.setErrorHandler((error, request, reply) => {
+fastify.setErrorHandler((error: any, request, reply) => {
   fastify.log.error(error);
   
   reply.status(error.statusCode || 500).send({
