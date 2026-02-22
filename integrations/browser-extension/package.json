@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Browser extension for censorship-resistant content access",
   "scripts": {
-    "build": "tsc && npm run copy",
+    "build": "tsc && pnpm run copy",
     "copy": "cp manifest.json dist/ && cp popup.html dist/ && cp popup.css dist/ && mkdir -p dist/icons",
     "watch": "tsc --watch",
     "clean": "rm -rf dist"

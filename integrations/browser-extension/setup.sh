@@ -7,11 +7,11 @@ echo ""
 
 # Install dependencies
 echo "📦 Installing dependencies..."
-npm install
+pnpm install
 
 # Build extension
-echo "🔨 Building extension..."
-npm run build
+echo "Building extension..."
+pnpm run build
 
 # Create icons directory
 echo "🎨 Creating placeholder icons..."

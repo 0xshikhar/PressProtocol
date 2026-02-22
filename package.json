@@ -1,0 +1,12 @@
+{
+  "name": "pressprotocol-workspace",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "./scripts/dev.sh",
+    "dev:node": "./scripts/dev.sh --node",
+    "dev:web": "./scripts/dev.sh --web",
+    "build": "pnpm --recursive run build",
+    "test": "./scripts/test.sh"
+  }
+}
