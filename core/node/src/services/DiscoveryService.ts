@@ -214,34 +214,34 @@ export class DiscoveryService {
   /**
    * Get discovery statistics
    */
-  // async getStats(): Promise<{
-  //   totalContent: number;
-  //   categories: { category: string; count: number }[];
-  // }> {
-  //   const totalContent = await prisma.content.count();
+  async getStats(): Promise<{
+    totalContent: number;
+    categories: { category: string; count: number }[];
+  }> {
+    const totalContent = await prisma.content.count();
     
-  //   const allContent = await prisma.content.findMany({
-  //     select: { tags: true },
-  //   });
+    const allContent = await prisma.content.findMany({
+      select: { tags: true },
+    });
 
-  //   const categoryCounts = new Map<string, number>();
+    const categoryCounts = new Map<string, number>();
     
-  //   for (const content of allContent) {
-  //     if (content.tags.length > 0) {
-  //       const category = content.tags[0].toLowerCase();
-  //       categoryCounts.set(category, (categoryCounts.get(category) || 0) + 1);
-  //     }
-  //   }
+    for (const content of allContent) {
+      if (content.tags.length > 0) {
+        const category = content.tags[0].toLowerCase();
+        categoryCounts.set(category, (categoryCounts.get(category) || 0) + 1);
+      }
+    }
 
-  //   const categories = Array.from(categoryCounts.entries())
-  //     .map(([category, count]) => ({ category, count }))
-  //     .sort((a, b) => b.count - a.count);
+    const categories = Array.from(categoryCounts.entries())
+      .map(([category, count]) => ({ category, count }))
+      .sort((a, b) => b.count - a.count);
 
-  //   return {
-  //     totalContent,
-  //     categories,
-  //   };
-  // }
+    return {
+      totalContent,
+      categories,
+    };
+  }
 
   /**
    * Announce content to IPFS DHT network (Phase 2B)
