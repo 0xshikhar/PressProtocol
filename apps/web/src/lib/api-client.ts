@@ -101,14 +101,74 @@ export class ApiClient {
   }
 
   async getContent(cid: string): Promise<ResolveContentResponse> {
-    const response = await fetch(`${this.baseUrl}/api/content/${cid}`);
+    // 1. Try configured backend with a 3s timeout
+    try {
+      const response = await fetch(`${this.baseUrl}/api/content/${cid}`, {
+        signal: AbortSignal.timeout(3000),
+      });
 
-    if (!response.ok) {
-      throw new Error(`Failed to get content: ${response.statusText}`);
+      if (response.ok) {
+        const result = await response.json();
+        if (result.data) return result.data;
+      }
+    } catch (e) {
+      console.warn(`[ApiClient] Failed to fetch from baseUrl ${this.baseUrl}, trying resilient edge fallback...`);
     }
 
-    const result = await response.json();
-    return result.data;
+    // 2. If running in browser and baseUrl was external/failed, query local Next.js proxy route
+    if (typeof window !== "undefined") {
+      try {
+        const localResponse = await fetch(`/api/content/${cid}`, {
+          signal: AbortSignal.timeout(5000),
+        });
+        if (localResponse.ok) {
+          const result = await localResponse.json();
+          if (result.data) return result.data;
+        }
+      } catch (e) {
+        console.warn("[ApiClient] Local proxy route failed, querying public IPFS gateways directly...");
+      }
+    }
+
+    // 3. Direct browser IPFS gateway query as ultimate safeguard
+    const publicGateways = [
+      "https://gateway.pinata.cloud/ipfs",
+      "https://cloudflare-ipfs.com/ipfs",
+      "https://ipfs.io/ipfs",
+    ];
+
+    for (const gateway of publicGateways) {
+      try {
+        const res = await fetch(`${gateway}/${cid}`, {
+          signal: AbortSignal.timeout(4000),
+        });
+        if (res.ok) {
+          const raw = await res.json();
+          return {
+            cid,
+            title: raw.title || "Untitled",
+            content: raw.content || "",
+            tags: raw.tags || [],
+            mirrors: {
+              ipfs: { url: `${gateway}/${cid}`, available: true },
+              tor: { url: "", available: false },
+              gateway: { url: `https://cloudflare-ipfs.com/ipfs/${cid}`, available: true },
+            },
+            recommended: "ipfs",
+            publisher: {
+              walletAddress: raw.publisher?.walletAddress || "",
+              pubkey: raw.publisher?.pubkey || "",
+              signature: raw.publisher?.signature || "unsigned",
+            },
+            createdAt: raw.timestamp || new Date().toISOString(),
+          };
+        }
+      } catch (e) {
+        // Continue to next gateway
+      }
+    }
+
+    throw new Error(`Failed to resolve content: Unable to load CID ${cid} from backend daemon or IPFS swarms.`);
   }
 
   async discoverContent(
