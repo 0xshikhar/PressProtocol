@@ -9,9 +9,33 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Check, Loader2, Save, Eye } from "lucide-react";
+import {
+  Check,
+  Loader2,
+  Save,
+  Eye,
+  Shield,
+  Flame,
+  User,
+  ChevronDown,
+  Send,
+  Copy,
+} from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 import { calculateReadingTime } from "@/lib/reading-time";
+import {
+  getOrCreateBurnerWallet,
+  burnCurrentWallet,
+  saveBurnerArticle,
+  type BurnerWallet,
+} from "@/lib/burner-wallet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Draft {
   title: string;
@@ -35,6 +59,26 @@ export default function WritePage() {
   const [lastSaved, setLastSaved] = useState<number | null>(null);
   const [autoSaving, setAutoSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+
+  // Dual-Identity State: 'anonymous' (Burner) or 'verified' (Privy)
+  const [burnerWallet, setBurnerWallet] = useState<BurnerWallet | null>(null);
+  const [identityMode, setIdentityMode] = useState<"anonymous" | "verified">("anonymous");
+
+  // Initialize burner wallet
+  useEffect(() => {
+    getOrCreateBurnerWallet().then((wallet) => {
+      setBurnerWallet(wallet);
+    });
+  }, []);
+
+  // Sync default mode with authentication state
+  useEffect(() => {
+    if (authenticated) {
+      setIdentityMode("verified");
+    } else {
+      setIdentityMode("anonymous");
+    }
+  }, [authenticated]);
 
   // Load draft from localStorage on mount
   useEffect(() => {
@@ -103,6 +147,24 @@ export default function WritePage() {
     setTags(tags.filter((t) => t !== tag));
   };
 
+  const handleBurnWallet = async () => {
+    try {
+      const fresh = await burnCurrentWallet(false);
+      setBurnerWallet(fresh);
+      toast.success("Burner identity regenerated. New Ed25519 keypair active.");
+    } catch (err) {
+      console.error("Failed to burn wallet:", err);
+      toast.error("Failed to regenerate burner identity");
+    }
+  };
+
+  const handleCopyPublicKey = () => {
+    if (burnerWallet?.publicKey) {
+      navigator.clipboard.writeText(burnerWallet.publicKey);
+      toast.success("Public key copied to clipboard");
+    }
+  };
+
   const handlePublish = async () => {
     if (!title.trim() || !content.trim()) {
       toast.error("Please provide both title and content");
@@ -112,7 +174,8 @@ export default function WritePage() {
     setIsPublishing(true);
 
     try {
-      const walletAddress = user?.wallet?.address;
+      const isAnonymousPublish = !authenticated || identityMode === "anonymous";
+      const walletAddress = isAnonymousPublish ? undefined : user?.wallet?.address;
 
       const response = await apiClient.publishContent(
         {
@@ -123,7 +186,21 @@ export default function WritePage() {
         walletAddress
       );
 
-      toast.success("Content published successfully!");
+      // Track anonymous article in burner local history
+      if (isAnonymousPublish && burnerWallet) {
+        saveBurnerArticle({
+          cid: response.cid,
+          title: title.trim(),
+          publishedAt: Date.now(),
+          pseudonym: burnerWallet.pseudonym,
+        });
+      }
+
+      toast.success(
+        isAnonymousPublish
+          ? "Content published anonymously to IPFS & Tor!"
+          : "Content published successfully under your verified profile!"
+      );
 
       // Clear draft after successful publish
       clearDraft();
@@ -150,12 +227,14 @@ export default function WritePage() {
     return `Saved ${Math.floor(secondsAgo / 3600)} hours ago`;
   };
 
+  const isAnon = !authenticated || identityMode === "anonymous";
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="border-b sticky top-0 bg-background z-10">
-        <div className="container mx-auto max-w-5xl px-4 py-4">
-          <div className="flex items-center justify-between">
+      <div className="border-b sticky top-0 bg-background/95 backdrop-blur z-10">
+        <div className="container mx-auto max-w-5xl px-4 py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-3">
             {/* Left: Save status */}
             <div className="flex items-center gap-3">
               <Button
@@ -165,7 +244,7 @@ export default function WritePage() {
               >
                 ← Back
               </Button>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
                 {autoSaving ? (
                   <>
                     <Loader2 className="h-3 w-3 animate-spin" />
@@ -185,10 +264,10 @@ export default function WritePage() {
               </div>
             </div>
 
-            {/* Right: Actions */}
-            <div className="flex items-center gap-2">
+            {/* Right: Identity Selector + Actions */}
+            <div className="flex items-center gap-2 flex-wrap justify-end">
               {readingStats && (
-                <span className="text-sm text-muted-foreground mr-2">
+                <span className="hidden md:inline text-xs text-muted-foreground mr-1">
                   {readingStats.formattedTime} • {readingStats.words} words
                 </span>
               )}
@@ -198,7 +277,7 @@ export default function WritePage() {
                 size="sm"
                 onClick={() => setShowPreview(!showPreview)}
               >
-                <Eye className="h-4 w-4 mr-2" />
+                <Eye className="h-4 w-4 mr-1.5" />
                 {showPreview ? "Edit" : "Preview"}
               </Button>
 
@@ -207,31 +286,181 @@ export default function WritePage() {
                 size="sm"
                 onClick={saveDraft}
                 disabled={autoSaving || (!title && !content)}
+                className="hidden sm:inline-flex"
               >
-                <Save className="h-4 w-4 mr-2" />
+                <Save className="h-4 w-4 mr-1.5" />
                 Save Draft
               </Button>
 
+              {/* Dual-Identity Selector Dropdown */}
               {!authenticated ? (
-                <Button size="sm" onClick={login}>
-                  Connect to Publish
-                </Button>
+                // Unauthenticated visitor: Burner Identity Active by default
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1.5 border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20"
+                    >
+                      <Shield className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                      <span className="font-mono text-xs">
+                        {burnerWallet?.pseudonym || "Anon Burner"}
+                      </span>
+                      <ChevronDown className="h-3 w-3 opacity-60" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-72 p-3 space-y-2">
+                    <div className="flex items-center justify-between pb-1 border-b">
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        Burner Identity
+                      </span>
+                      <Badge variant="outline" className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-0">
+                        Active
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Publishing anonymously with an ephemeral sovereign Ed25519 keypair. No account, tracking, or KYC.
+                    </p>
+                    {burnerWallet && (
+                      <div className="bg-muted p-2 rounded text-[11px] font-mono break-all select-all flex items-center justify-between gap-1">
+                        <span className="truncate">{burnerWallet.publicKey}</span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5 shrink-0"
+                          onClick={handleCopyPublicKey}
+                          title="Copy public key"
+                        >
+                          <Copy className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
+                    <div className="pt-1 flex flex-col gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full justify-start text-xs h-8 gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={handleBurnWallet}
+                      >
+                        <Flame className="h-3.5 w-3.5" />
+                        Burn & Regenerate Identity
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full justify-start text-xs h-8 gap-2 text-muted-foreground hover:text-foreground"
+                        onClick={login}
+                      >
+                        <User className="h-3.5 w-3.5" />
+                        Sign in for Verified Profile
+                      </Button>
+                    </div>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               ) : (
-                <Button
-                  size="sm"
-                  onClick={handlePublish}
-                  disabled={isPublishing || !title.trim() || !content.trim()}
-                >
-                  {isPublishing ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Publishing...
-                    </>
-                  ) : (
-                    "Publish"
-                  )}
-                </Button>
+                // Authenticated user: Switch between Verified and Burner Identity
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-1.5">
+                      {identityMode === "verified" ? (
+                        <>
+                          <User className="h-3.5 w-3.5 text-primary" />
+                          <span className="text-xs font-medium max-w-[120px] truncate">
+                            {user?.email?.address ||
+                              (user?.wallet?.address
+                                ? `${user.wallet.address.slice(0, 6)}...`
+                                : "Verified Author")}
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <Shield className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                          <span className="font-mono text-xs text-emerald-600 dark:text-emerald-400">
+                            {burnerWallet?.pseudonym || "Anon Burner"}
+                          </span>
+                        </>
+                      )}
+                      <ChevronDown className="h-3 w-3 opacity-60" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-64 p-2 space-y-1">
+                    <div className="px-2 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      Select Author Identity
+                    </div>
+                    <DropdownMenuItem
+                      className={`text-xs gap-2 cursor-pointer ${
+                        identityMode === "verified" ? "bg-accent font-medium" : ""
+                      }`}
+                      onClick={() => setIdentityMode("verified")}
+                    >
+                      <User className="h-3.5 w-3.5 text-primary" />
+                      <div className="flex flex-col">
+                        <span>Verified Profile</span>
+                        <span className="text-[10px] text-muted-foreground">
+                          Linked to your account / wallet
+                        </span>
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className={`text-xs gap-2 cursor-pointer ${
+                        identityMode === "anonymous" ? "bg-accent font-medium" : ""
+                      }`}
+                      onClick={() => setIdentityMode("anonymous")}
+                    >
+                      <Shield className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                      <div className="flex flex-col">
+                        <span>Anonymous Burner</span>
+                        <span className="text-[10px] text-muted-foreground">
+                          Zero user link • Ed25519 key
+                        </span>
+                      </div>
+                    </DropdownMenuItem>
+                    {identityMode === "anonymous" && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full justify-start text-xs h-7 gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+                          onClick={handleBurnWallet}
+                        >
+                          <Flame className="h-3.5 w-3.5" />
+                          Burn & Regenerate Key
+                        </Button>
+                      </>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
+
+              {/* Primary Publish Action */}
+              <Button
+                size="sm"
+                className={
+                  isAnon
+                    ? "bg-emerald-600 hover:bg-emerald-500 text-white gap-2 font-medium"
+                    : "gap-2"
+                }
+                onClick={handlePublish}
+                disabled={isPublishing || !title.trim() || !content.trim()}
+              >
+                {isPublishing ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Publishing...
+                  </>
+                ) : isAnon ? (
+                  <>
+                    <Send className="h-3.5 w-3.5" />
+                    Publish Anonymously
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-3.5 w-3.5" />
+                    Publish
+                  </>
+                )}
+              </Button>
             </div>
           </div>
         </div>
@@ -255,7 +484,7 @@ export default function WritePage() {
             )}
 
             <div
-              className="prose prose-lg max-w-none"
+              className="prose prose-lg max-w-none dark:prose-invert"
               dangerouslySetInnerHTML={{ __html: content }}
             />
           </div>
@@ -268,7 +497,7 @@ export default function WritePage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Article title..."
-                className="text-4xl font-bold border-0 px-0 font-serif placeholder:text-muted-foreground/50 focus-visible:ring-0"
+                className="text-3xl sm:text-4xl font-bold border-0 px-0 font-serif placeholder:text-muted-foreground/50 focus-visible:ring-0"
               />
             </div>
 
@@ -318,14 +547,17 @@ export default function WritePage() {
               placeholder="Tell your story..."
             />
 
-            {/* Tips */}
-            <div className="text-sm text-muted-foreground bg-muted/30 p-4 rounded-lg">
-              <p className="font-medium mb-2">💡 Writing Tips:</p>
-              <ul className="space-y-1 list-disc list-inside">
-                <li>Your draft auto-saves every 30 seconds to your browser</li>
-                <li>Images are uploaded to IPFS for permanent storage</li>
-                <li>Published content is immutable and censorship-resistant</li>
-                <li>You can publish anonymously (no wallet needed)</li>
+            {/* Tips & Sovereign Identity Info */}
+            <div className="text-sm text-muted-foreground bg-muted/30 p-4 rounded-lg border border-border/40">
+              <p className="font-medium mb-2 text-foreground flex items-center gap-1.5">
+                <Shield className="h-4 w-4 text-emerald-500" />
+                PressProtocol Sovereign Publishing:
+              </p>
+              <ul className="space-y-1 list-disc list-inside text-xs sm:text-sm">
+                <li>Your draft auto-saves locally every 30 seconds to your browser</li>
+                <li>Anonymous articles are signed with your in-browser Ed25519 key</li>
+                <li>Content is permanently addressed via IPFS CID and replicated to Tor hidden services</li>
+                <li>You can burn and regenerate your anonymous identity at any time before publishing</li>
               </ul>
             </div>
           </div>

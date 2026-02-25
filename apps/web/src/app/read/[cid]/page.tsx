@@ -329,13 +329,38 @@ export default function ReadPage() {
       {/* Publisher Info Card */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Publisher Information</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">Publisher Information</CardTitle>
+            {(!content.publisher.walletAddress || content.publisher.walletAddress === "anonymous" || (content.publisher as any).isAnonymous) ? (
+              <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 gap-1 font-mono text-xs">
+                <Shield className="h-3 w-3" /> Anonymous Sovereign
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30 text-xs">
+                Verified Author
+              </Badge>
+            )}
+          </div>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div>
-            <div className="text-sm font-medium text-muted-foreground">Wallet Address</div>
-            <div className="font-mono text-sm mt-1">{content.publisher.walletAddress}</div>
-          </div>
+          {(!content.publisher.walletAddress || content.publisher.walletAddress === "anonymous" || (content.publisher as any).isAnonymous) ? (
+            <div>
+              <div className="text-sm font-medium text-muted-foreground">Pseudonym</div>
+              <div className="font-mono text-sm font-semibold mt-1 text-emerald-600 dark:text-emerald-400">
+                {content.publisher.pubkey
+                  ? `Anon-${content.publisher.pubkey.slice(0, 4)}...${content.publisher.pubkey.slice(-4)}`
+                  : "Anonymous Author"}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Published without account linkage. Identity is cryptographically anchored to an Ed25519 keypair.
+              </p>
+            </div>
+          ) : (
+            <div>
+              <div className="text-sm font-medium text-muted-foreground">Wallet Address</div>
+              <div className="font-mono text-sm mt-1">{content.publisher.walletAddress}</div>
+            </div>
+          )}
           {content.publisher.username && (
             <div>
               <div className="text-sm font-medium text-muted-foreground">Username</div>
@@ -343,12 +368,29 @@ export default function ReadPage() {
             </div>
           )}
           <div>
-            <div className="text-sm font-medium text-muted-foreground">Public Key</div>
-            <div className="font-mono text-xs mt-1 break-all">{content?.publisher?.pubkey}</div>
+            <div className="text-sm font-medium text-muted-foreground flex items-center justify-between">
+              <span>Ed25519 Public Key</span>
+              {content.publisher.pubkey && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 px-2 text-xs"
+                  onClick={() => {
+                    navigator.clipboard.writeText(content.publisher.pubkey);
+                    toast.success("Public key copied to clipboard");
+                  }}
+                >
+                  Copy
+                </Button>
+              )}
+            </div>
+            <div className="font-mono text-xs mt-1 break-all bg-muted/40 p-2 rounded border border-border/40 select-all">
+              {content?.publisher?.pubkey || "Unknown"}
+            </div>
           </div>
-          <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+          <div className="flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400 pt-1">
             <Shield className="h-4 w-4" />
-            <span>Content signature verified</span>
+            <span>Cryptographic payload verified</span>
           </div>
         </CardContent>
       </Card>
