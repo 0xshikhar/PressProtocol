@@ -45,7 +45,8 @@ export class StorageService {
     title: string,
     content: string,
     tags: string[],
-    publisher?: { pubkey: string; signature: string }
+    publisher?: { pubkey: string; signature: string },
+    timestamp?: string
   ): Promise<UploadContentResult> {
     try {
       // Create a JSON object with the FULL content
@@ -54,7 +55,7 @@ export class StorageService {
         title,
         content, // Full HTML content stored on IPFS
         tags,
-        timestamp: new Date().toISOString(),
+        timestamp: timestamp || new Date().toISOString(),
         publisher,
       };
 

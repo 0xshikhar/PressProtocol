@@ -14,6 +14,9 @@ const publishContentSchema = z.object({
   tags: z.array(z.string()).default([]),
   walletAddress: z.string().optional(), // Optional - anonymous publishing
   privateKey: z.string().optional(), // For signing, should be handled securely
+  publicKey: z.string().optional(), // Optional - client-provided Ed25519 public key
+  signature: z.string().optional(), // Optional - client-provided Ed25519 signature
+  timestamp: z.string().optional(), // Optional - client-signed timestamp
 });
 
 const getContentQuerySchema = z.object({
@@ -35,6 +38,9 @@ export async function contentRoutes(fastify: FastifyInstance) {
       let userId = null;
       let identity = null;
       let privateKey = body.privateKey;
+      let publicKey = body.publicKey;
+      let signature = body.signature;
+      const publishedTimestamp = body.timestamp || new Date().toISOString();
 
       if (body.walletAddress) {
         // Authenticated publishing
@@ -59,6 +65,21 @@ export async function contentRoutes(fastify: FastifyInstance) {
           privateKey = keypair.privateKey;
           identity = await identityService.createIdentity(user.id, keypair.publicKey);
         }
+        publicKey = identity.publicKey;
+      } else if (body.publicKey) {
+        // Client provided sovereign burner public key
+        identity = await prisma.identity.findUnique({
+          where: { publicKey: body.publicKey },
+        });
+
+        if (!identity) {
+          identity = await prisma.identity.create({
+            data: {
+              publicKey: body.publicKey,
+            },
+          });
+        }
+        publicKey = identity.publicKey;
       } else {
         // Anonymous publishing - generate ephemeral keypair
         const keypair = await identityService.generateKeypair();
@@ -68,30 +89,31 @@ export async function contentRoutes(fastify: FastifyInstance) {
         identity = await prisma.identity.create({
           data: {
             publicKey: keypair.publicKey,
-            // userId is optional - omit for anonymous
           },
         });
+        publicKey = identity.publicKey;
       }
 
-      const publicKey = identity.publicKey;
-
-      // 2. Sign content BEFORE uploading to IPFS
+      // 2. Sign content BEFORE uploading to IPFS if not already signed client-side
       const contentToSign = JSON.stringify({
         title: body.title,
         tags: body.tags,
-        timestamp: new Date().toISOString(),
+        timestamp: publishedTimestamp,
       });
 
-      const signature = privateKey
-        ? await identityService.signContent(contentToSign, privateKey)
-        : 'unsigned';
+      if (!signature) {
+        signature = privateKey
+          ? await identityService.signContent(contentToSign, privateKey)
+          : 'unsigned';
+      }
 
-      // 3. Upload FULL content to IPFS (source of truth)
+      // 3. Upload FULL content to IPFS (source of truth) with synchronized timestamp
       const ipfsResult = await storageService.uploadContent(
         body.title,
         body.content,
         body.tags,
-        { pubkey: publicKey, signature }
+        { pubkey: publicKey, signature },
+        publishedTimestamp
       );
 
       // 4. Create Tor onion service
@@ -103,7 +125,6 @@ export async function contentRoutes(fastify: FastifyInstance) {
       console.log('🧅 [PUBLISH] Tor onion result:', onionResult);
 
       // 5. Store metadata in database (CACHE LAYER ONLY)
-      // Full content lives on IPFS - database just has CID + metadata
       const content = await prisma.content.create({
         data: {
           cid: ipfsResult.cid,
@@ -112,6 +133,7 @@ export async function contentRoutes(fastify: FastifyInstance) {
           publisherPubKey: publicKey,
           userId: userId || undefined, // undefined for anonymous
           signature,
+          createdAt: new Date(publishedTimestamp),
         },
       });
 
