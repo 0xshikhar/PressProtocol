@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ExternalLink, Download, Shield, Clock, BookOpen } from "lucide-react";
+import { ExternalLink, Download, Shield, Clock, BookOpen, ShieldCheck, ShieldAlert, Loader2 } from "lucide-react";
 import { apiClient, type ResolveContentResponse } from "@/lib/api-client";
 import { toast } from "sonner";
 import { calculateReadingTime } from "@/lib/reading-time";
@@ -16,6 +16,7 @@ import { TableOfContents } from "@/components/reader/TableOfContents";
 import { BookmarkButton } from "@/components/reader/BookmarkButton";
 import { TorShareSection } from "@/components/tor/TorShareSection";
 import { Separator } from "@/components/ui/separator";
+import { verifyArticleSignature, type VerificationResult } from "@/lib/signature-verifier";
 
 export default function ReadPage() {
   const params = useParams();
@@ -23,6 +24,8 @@ export default function ReadPage() {
   const [content, setContent] = useState<ResolveContentResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   
   const readingStats = content ? calculateReadingTime(content.content) : null;
@@ -52,6 +55,19 @@ export default function ReadPage() {
       });
       
       setContent(data);
+
+      // Perform authentic in-browser Ed25519 signature verification
+      setIsVerifying(true);
+      verifyArticleSignature(data)
+        .then((res) => {
+          setVerificationResult(res);
+        })
+        .catch((vErr) => {
+          console.error("❌ [READ PAGE] Cryptographic verification failed:", vErr);
+        })
+        .finally(() => {
+          setIsVerifying(false);
+        });
     } catch (err) {
       console.error("❌ [READ PAGE] Error loading content:", err);
       setError("Failed to load content. The content may not exist or is temporarily unavailable.");
@@ -146,8 +162,26 @@ export default function ReadPage() {
               })}</time>
               <span>•</span>
               <span className="flex items-center gap-1">
-                <Shield className="h-3 w-3" />
-                Verified
+                {isVerifying ? (
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground animate-pulse">
+                    <Loader2 className="h-3 w-3 animate-spin" /> Verifying...
+                  </span>
+                ) : verificationResult?.isValid ? (
+                  <span className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                    <ShieldCheck className="h-3.5 w-3.5" />
+                    Ed25519 Verified ({verificationResult.latencyMs}ms)
+                  </span>
+                ) : verificationResult?.status === "unsigned" ? (
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Shield className="h-3.5 w-3.5 text-muted-foreground" />
+                    Unsigned
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1 text-xs text-amber-500 font-medium">
+                    <ShieldAlert className="h-3.5 w-3.5" />
+                    Unverified
+                  </span>
+                )}
               </span>
             </div>
             
@@ -388,9 +422,57 @@ export default function ReadPage() {
               {content?.publisher?.pubkey || "Unknown"}
             </div>
           </div>
-          <div className="flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400 pt-1">
-            <Shield className="h-4 w-4" />
-            <span>Cryptographic payload verified</span>
+          {/* Cryptographic Provenance Section */}
+          <div className="pt-2 border-t border-border/40 space-y-2">
+            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Cryptographic Provenance
+            </div>
+            {isVerifying ? (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground p-2.5 rounded-md bg-muted/30">
+                <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+                <span>Verifying Ed25519 signature in-browser via WebCrypto...</span>
+              </div>
+            ) : verificationResult?.isValid ? (
+              <div className="p-3 rounded-lg border border-emerald-500/30 bg-emerald-500/5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-medium text-sm">
+                    <ShieldCheck className="h-4 w-4" />
+                    <span>Ed25519 Signature Verified</span>
+                  </div>
+                  <Badge variant="outline" className="text-[10px] border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono">
+                    {verificationResult.latencyMs}ms
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Verified in-browser using RFC 8032 / SHA-512. The author&apos;s sovereign private key signed this payload without intermediary authority.
+                </p>
+                {verificationResult.signature && (
+                  <div className="text-[10px] font-mono text-muted-foreground bg-background/50 p-2 rounded border border-border/30 break-all select-all">
+                    <span className="text-foreground/70 font-semibold">SIG:</span> {verificationResult.signature}
+                  </div>
+                )}
+              </div>
+            ) : verificationResult?.status === "unsigned" ? (
+              <div className="p-3 rounded-lg border border-amber-500/30 bg-amber-500/5 space-y-1">
+                <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-medium text-sm">
+                  <ShieldAlert className="h-4 w-4" />
+                  <span>Unsigned Article</span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  This document was published without an Ed25519 cryptographic signature.
+                </p>
+              </div>
+            ) : (
+              <div className="p-3 rounded-lg border border-destructive/30 bg-destructive/5 space-y-1">
+                <div className="flex items-center gap-2 text-destructive font-medium text-sm">
+                  <ShieldAlert className="h-4 w-4" />
+                  <span>Signature Mismatch / Untrusted</span>
+                </div>
+                <p className="text-xs text-destructive/80">
+                  {verificationResult?.error || "The cryptographic signature could not be verified against the content payload."}
+                </p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
