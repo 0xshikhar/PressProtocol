@@ -5,6 +5,9 @@ export interface PublishContentRequest {
   content: string;
   tags: string[];
   media?: string[];
+  publicKey?: string;
+  signature?: string;
+  timestamp?: string;
 }
 
 // Publish response - simple mirror URLs (from POST /api/content)

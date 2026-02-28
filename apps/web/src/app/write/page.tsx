@@ -27,6 +27,7 @@ import {
   getOrCreateBurnerWallet,
   burnCurrentWallet,
   saveBurnerArticle,
+  signWithBurner,
   type BurnerWallet,
 } from "@/lib/burner-wallet";
 import {
@@ -177,11 +178,28 @@ export default function WritePage() {
       const isAnonymousPublish = !authenticated || identityMode === "anonymous";
       const walletAddress = isAnonymousPublish ? undefined : user?.wallet?.address;
 
+      let clientSignature: string | undefined = undefined;
+      let clientPubKey: string | undefined = undefined;
+      const publishedTimestamp = new Date().toISOString();
+
+      if (isAnonymousPublish && burnerWallet?.privateKey) {
+        const canonicalPayload = JSON.stringify({
+          title: title.trim(),
+          tags,
+          timestamp: publishedTimestamp,
+        });
+        clientSignature = await signWithBurner(canonicalPayload, burnerWallet.privateKey);
+        clientPubKey = burnerWallet.publicKey;
+      }
+
       const response = await apiClient.publishContent(
         {
           title: title.trim(),
           content,
           tags,
+          publicKey: clientPubKey,
+          signature: clientSignature,
+          timestamp: publishedTimestamp,
         },
         walletAddress
       );
