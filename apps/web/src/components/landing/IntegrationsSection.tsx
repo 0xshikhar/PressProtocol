@@ -9,7 +9,7 @@ const integrations = [
     category: "CMS",
     description: "One-click decentralized publishing alongside your standard WordPress loop.",
     action: "download",
-    target: "/downloads/press-protocol-wordpress.zip",
+    target: "/downloads/PressProtocol_Wordpress_Plugin.zip",
     badge: "v1.2.0",
   },
   {
@@ -17,7 +17,7 @@ const integrations = [
     category: "Extension",
     description: "In-browser Ed25519 signing key management & IPFS reader sidebar.",
     action: "download",
-    target: "/downloads/press-protocol-extension.zip",
+    target: "/downloads/PressProtocol_Browser_Extension.zip",
     badge: "MV3 Ready",
   },
   {
@@ -25,7 +25,7 @@ const integrations = [
     category: "Dev SDK",
     description: "Publish and verify manifests programmatically via @pressprotocol/sdk.",
     action: "copy",
-    snippet: "bun add @pressprotocol/sdk",
+    snippet: "pnpm add @pressprotocol/sdk",
     badge: "Type-Safe",
   },
   {
@@ -76,18 +76,13 @@ export function IntegrationsSection() {
     setTimeout(() => setCopiedSdk(false), 2000);
   };
 
-  const handleDownload = (filename: string) => {
-    const blob = new Blob([`// PressProtocol Package Placeholder - ${filename}`], {
-      type: "application/zip",
-    });
-    const url = URL.createObjectURL(blob);
+  const handleDownload = (targetPath: string, filename: string) => {
     const a = document.createElement("a");
-    a.href = url;
+    a.href = targetPath || `/downloads/${filename}`;
     a.download = filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
   return (
@@ -191,7 +186,7 @@ export function IntegrationsSection() {
               <div className="relative z-10 pt-4 border-t border-white/10 flex items-center justify-between">
                 {integration.action === "download" && (
                   <button
-                    onClick={() => handleDownload((integration.target ?? "package.zip").split("/").pop() || "package.zip")}
+                    onClick={() => handleDownload(integration.target || "", (integration.target ?? "package.zip").split("/").pop() || "package.zip")}
                     className="flex items-center gap-2 text-xs font-mono text-cyan-400 hover:text-cyan-300 transition-colors"
                   >
                     <Download className="w-3.5 h-3.5" />

@@ -65,14 +65,14 @@ export function EcosystemBento() {
             </div>
 
             <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-white/10">
-              <a href="https://github.com/0xshikhar/anonpress/tree/main/wordpress-plugin" target="_blank" rel="noopener noreferrer">
+              <a href="/downloads/PressProtocol_Wordpress_Plugin.zip" download="PressProtocol_Wordpress_Plugin.zip">
                 <Button className="bg-white hover:bg-white/90 text-black h-11 px-6 rounded-xl font-medium text-xs font-mono shadow-lg hover:shadow-cyan-500/20 group">
                   <Download className="w-3.5 h-3.5 mr-2" />
                   Download Plugin .zip
                 </Button>
               </a>
               <a
-                href="https://github.com/0xshikhar/anonpress/tree/main/wordpress-plugin"
+                href="https://github.com/0xshikhar/anonpress/tree/main/integrations/wordpress-plugin"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs font-mono text-white/60 hover:text-white flex items-center gap-1.5 transition-colors"
@@ -101,7 +101,7 @@ export function EcosystemBento() {
             </div>
 
             <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-              <a href="https://github.com/0xshikhar/anonpress/tree/main/browser-extension" target="_blank" rel="noopener noreferrer">
+              <a href="/downloads/PressProtocol_Browser_Extension.zip" download="PressProtocol_Browser_Extension.zip">
                 <Button variant="outline" size="sm" className="border-white/20 text-white hover:bg-white/10 text-xs font-mono h-9">
                   <Download className="w-3.5 h-3.5 mr-1.5" />
                   Download MV3 .zip
