@@ -7,6 +7,9 @@
     "dev:node": "./scripts/dev.sh --node",
     "dev:web": "./scripts/dev.sh --web",
     "build": "pnpm --recursive run build",
-    "test": "./scripts/test.sh"
+    "test": "./scripts/test.sh",
+    "package:extension": "./scripts/package-extension.sh",
+    "package:wordpress": "./scripts/package-wordpress.sh",
+    "package:all": "./scripts/package-extension.sh && ./scripts/package-wordpress.sh"
   }
 }
