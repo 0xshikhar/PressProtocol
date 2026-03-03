@@ -15,8 +15,8 @@ const footerLinks: Record<string, FooterLink[]> = {
   Protocol: [
     { name: "Write Article", href: "/write" },
     { name: "Explore Manifests", href: "/explore" },
-    { name: "CID Explorer", href: "/explorer" },
-    { name: "Live Sandbox", href: "#sandbox" },
+    { name: "Protocol Spec", href: "/spec" },
+    { name: "Documentation", href: "/docs" },
   ],
   Transports: [
     { name: "Pinata IPFS Gateway", href: "https://gateway.pinata.cloud", external: true },
@@ -25,16 +25,16 @@ const footerLinks: Record<string, FooterLink[]> = {
     { name: "Tor v3 Onion Mirror", href: "http://anonpress.onion", external: true },
   ],
   Developers: [
-    { name: "GitHub Repository", href: "https://github.com/OxShikhar/anonpress", external: true },
-    { name: "Ed25519 Spec (RFC 8032)", href: "https://datatracker.ietf.org/doc/html/rfc8032", external: true },
+    { name: "GitHub Repository", href: "https://github.com/0xshikhar/anonpress", external: true },
+    { name: "Ed25519 Spec (RFC 8032)", href: "/spec" },
     { name: "WordPress Plugin", href: "#integrations" },
     { name: "Chromium Extension", href: "#integrations" },
   ],
   Governance: [
     { name: "Octant Epoch Grants", href: "https://octant.build", external: true, badge: "Grantee" },
-    { name: "Public Goods Trust", href: "#pricing" },
-    { name: "Threat Model", href: "#security" },
-    { name: "Documentation", href: "https://github.com/OxShikhar/anonpress#readme", external: true },
+    { name: "About PressProtocol", href: "/about" },
+    { name: "Zero-Log Privacy", href: "/privacy" },
+    { name: "Terms & Legal", href: "/terms" },
   ],
 };
 
@@ -184,12 +184,16 @@ export function LandingFooter() {
             &copy; 2026 PressProtocol. An open censorship-resistant public good under MIT License.
           </p>
 
-          <div className="flex items-center gap-6 text-xs font-mono text-white/50">
-            <span className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-6 text-xs font-mono text-white/50">
+            <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
+            <Link href="/spec" className="hover:text-white transition-colors">Spec</Link>
+            <Link href="/about" className="hover:text-white transition-colors">About</Link>
+            <span className="hidden sm:inline text-white/20">|</span>
+            <span className="flex items-center gap-2 text-emerald-400">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               All 3 Transports Operational
             </span>
-            <span>CIDv1 Native</span>
           </div>
         </div>
       </div>
