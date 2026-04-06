@@ -7,6 +7,7 @@ export interface DiscoveryItem {
   title: string;
   tags: string[];
   createdAt: Date;
+  signature?: string;
   publisher: {
     publicKey: string;
     walletAddress?: string;
@@ -58,6 +59,7 @@ export class DiscoveryService {
         walletAddress: item.user?.walletAddress,
         username: item.user?.username || undefined,
       },
+      signature: item.signature,
     }));
   }
 
@@ -98,6 +100,7 @@ export class DiscoveryService {
         walletAddress: item.user?.walletAddress,
         username: item.user?.username || undefined,
       },
+      signature: item.signature,
     }));
   }
 
@@ -139,6 +142,7 @@ export class DiscoveryService {
         walletAddress: item.user?.walletAddress,
         username: item.user?.username || undefined,
       },
+      signature: item.signature,
     }));
   }
 
