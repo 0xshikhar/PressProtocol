@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 
 export default function Footer() {
   const pathname = usePathname();
-  if (pathname === "/") return null;
+  if (pathname === "/" || pathname?.startsWith("/embed")) return null;
   const footerLinks = {
     platform: [
       { name: "Explore", href: "/explore" },

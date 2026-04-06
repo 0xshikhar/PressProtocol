@@ -14,6 +14,7 @@ import { calculateReadingTime } from "@/lib/reading-time";
 import { ReadingProgressBar } from "@/components/reader/ReadingProgressBar";
 import { TableOfContents } from "@/components/reader/TableOfContents";
 import { BookmarkButton } from "@/components/reader/BookmarkButton";
+import { EmbedDialog } from "@/components/reader/EmbedDialog";
 import { TorShareSection } from "@/components/tor/TorShareSection";
 import { Separator } from "@/components/ui/separator";
 import { verifyArticleSignature, type VerificationResult } from "@/lib/signature-verifier";
@@ -185,12 +186,15 @@ export default function ReadPage() {
               </span>
             </div>
             
-            {/* Bookmark Button */}
-            <BookmarkButton 
-              cid={cid} 
-              title={content.title}
-              tags={content.tags || []}
-            />
+            {/* Actions: Embed & Bookmark */}
+            <div className="flex items-center gap-2">
+              <EmbedDialog cid={cid} title={content.title} />
+              <BookmarkButton 
+                cid={cid} 
+                title={content.title}
+                tags={content.tags || []}
+              />
+            </div>
           </div>
           
           {/* Tags */}

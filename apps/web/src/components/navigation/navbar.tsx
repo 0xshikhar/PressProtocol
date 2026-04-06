@@ -22,7 +22,7 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  if (pathname === "/") return null;
+  if (pathname === "/" || pathname?.startsWith("/embed")) return null;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
