@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Menu, X, ArrowRight, ShieldCheck, Terminal, Layers } from "lucide-react";
+import { Menu, X, ArrowRight, ShieldCheck, Terminal, Layers, Sparkles } from "lucide-react";
 
 const navLinks = [
   { name: "Capabilities", href: "#capabilities" },
@@ -76,6 +76,16 @@ export function LandingNavigation() {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-3">
+            <Link href="/import">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs font-mono text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 h-9 px-3 rounded-lg border border-cyan-500/20"
+              >
+                <Sparkles className="w-3.5 h-3.5 mr-1.5" />
+                CMS Importer
+              </Button>
+            </Link>
             <Link href="/explorer">
               <Button
                 variant="ghost"
@@ -128,6 +138,12 @@ export function LandingNavigation() {
           </div>
 
           <div className="flex flex-col gap-3 pt-6 border-t border-white/10">
+            <Link href="/import" onClick={() => setIsMobileMenuOpen(false)}>
+              <Button variant="outline" className="w-full justify-center border-cyan-500/30 text-cyan-400 h-12">
+                <Sparkles className="w-4 h-4 mr-2" />
+                Universal CMS Importer
+              </Button>
+            </Link>
             <Link href="/explorer" onClick={() => setIsMobileMenuOpen(false)}>
               <Button variant="outline" className="w-full justify-center border-white/20 text-white h-12">
                 <Terminal className="w-4 h-4 mr-2 text-cyan-400" />
