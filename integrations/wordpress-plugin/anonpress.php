@@ -55,6 +55,9 @@ class AnonPress {
         // AJAX actions
         add_action('wp_ajax_anonpress_publish', array($this, 'ajax_publish'));
         add_action('wp_ajax_anonpress_check_status', array($this, 'ajax_check_status'));
+
+        // Frontend hooks
+        add_filter('the_content', array($this, 'append_sovereign_badge'));
     }
     
     public function activate() {
@@ -183,6 +186,57 @@ class AnonPress {
         }
         
         wp_send_json_success($mirrors);
+    }
+
+    /**
+     * Appends sovereign cryptographic verification badge to single posts
+     */
+    public function append_sovereign_badge($content) {
+        if (!is_singular('post') || !in_the_loop() || !is_main_query()) {
+            return $content;
+        }
+
+        global $post;
+        if (!$post) {
+            return $content;
+        }
+
+        $cid = get_post_meta($post->ID, '_pressprotocol_cid', true);
+        if (empty($cid)) {
+            $cid = get_post_meta($post->ID, '_anonpress_cid', true);
+        }
+
+        if (empty($cid)) {
+            return $content;
+        }
+
+        $read_url = 'https://pressprotocol.com/read/' . esc_attr($cid);
+        $embed_url = 'https://pressprotocol.com/embed/' . esc_attr($cid) . '?theme=cyber';
+
+        $badge_html = '
+        <div class="pressprotocol-sovereign-badge" style="margin-top: 2.5rem; padding: 1.25rem 1.5rem; background: #09090b; border: 1px solid rgba(6, 182, 212, 0.3); border-radius: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; color: #f4f4f5; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.75rem; margin-bottom: 0.75rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+                    <strong style="color: #06b6d4; font-size: 0.85rem; letter-spacing: 0.05em; text-transform: uppercase;">Verified Sovereign Publication</strong>
+                </div>
+                <span style="font-size: 0.75rem; color: #71717a;">RFC 8032 Ed25519 Signed</span>
+            </div>
+            <p style="margin: 0 0 0.75rem 0; font-size: 0.8rem; line-height: 1.5; color: #a1a1aa;">
+                This post is cryptographically signed and syndicated to the decentralized censorship-resistant web across IPFS and Tor v3 onion services.
+            </p>
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; font-size: 0.75rem;">
+                <div style="color: #71717a;">
+                    CID: <code style="color: #22d3ee; background: rgba(0,0,0,0.5); padding: 2px 6px; border-radius: 4px;">' . esc_html(substr($cid, 0, 16)) . '...' . esc_html(substr($cid, -8)) . '</code>
+                </div>
+                <div style="display: flex; gap: 0.75rem;">
+                    <a href="' . esc_url($read_url) . '" target="_blank" rel="noopener noreferrer" style="color: #06b6d4; text-decoration: none; font-weight: 600;">↗ Open Reader</a>
+                    <a href="' . esc_url($embed_url) . '" target="_blank" rel="noopener noreferrer" style="color: #a1a1aa; text-decoration: none;">↗ Inspect Embed</a>
+                </div>
+            </div>
+        </div>';
+
+        return $content . $badge_html;
     }
 }
 

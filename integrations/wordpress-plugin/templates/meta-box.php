@@ -13,6 +13,11 @@
                     <strong>Share URL:</strong>
                     <input type="text" readonly value="https://pressprotocol.com/read/<?php echo esc_attr($publication->cid); ?>" class="widefat" onclick="this.select()" />
                 </div>
+
+                <div class="info-row" style="margin-top: 10px;">
+                    <strong>Sovereign Embed Code:</strong>
+                    <textarea readonly class="widefat" rows="3" style="font-family: monospace; font-size: 11px;" onclick="this.select()">&lt;iframe src="https://pressprotocol.com/embed/<?php echo esc_attr($publication->cid); ?>?theme=cyber" width="100%" height="600" frameborder="0" loading="lazy" allowfullscreen sandbox="allow-scripts allow-same-origin allow-popups"&gt;&lt;/iframe&gt;</textarea>
+                </div>
                 
                 <div class="mirrors">
                     <h4>Mirrors:</h4>

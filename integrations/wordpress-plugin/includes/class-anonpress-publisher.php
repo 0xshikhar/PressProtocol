@@ -269,6 +269,16 @@ class AnonPress_Publisher {
         }
         
         // Store additional metadata
+        if (isset($result['cid'])) {
+            update_post_meta($post_id, '_pressprotocol_cid', sanitize_text_field($result['cid']));
+            update_post_meta($post_id, '_anonpress_cid', sanitize_text_field($result['cid']));
+            $embed_code = sprintf(
+                '<iframe src="https://pressprotocol.com/embed/%s?theme=cyber" width="100%%" height="600" frameborder="0" loading="lazy" allowfullscreen sandbox="allow-scripts allow-same-origin allow-popups"></iframe>',
+                esc_attr($result['cid'])
+            );
+            update_post_meta($post_id, '_pressprotocol_embed_code', $embed_code);
+        }
+
         if (isset($result['publisher'])) {
             update_post_meta($post_id, '_anonpress_public_key', $result['publisher']['publicKey']);
             update_post_meta($post_id, '_anonpress_is_anonymous', $result['publisher']['isAnonymous'] ? '1' : '0');
