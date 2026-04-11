@@ -8,3 +8,11 @@
 # Docker files (use backend/docker-compose.yml instead)
 docker-compose.yml
 docker-compose.override.yml
+
+node_modules
+
+# Build outputs (tsc / Next.js) — regenerated via pnpm build, never committed
+dist/
+.next/
+*.tsbuildinfo
+coverage/
