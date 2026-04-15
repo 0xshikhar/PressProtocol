@@ -1,0 +1,237 @@
+import * as ed from "@noble/ed25519";
+import { sha512 } from "@noble/hashes/sha2.js";
+import type { KeyPair } from "./types.js";
+
+// Bind SHA-512 for @noble/ed25519 v2
+ed.etc.sha512Sync = (...m) => sha512(ed.etc.concatBytes(...m));
+ed.etc.sha512Async = (...m) => Promise.resolve(sha512(ed.etc.concatBytes(...m)));
+
+/**
+ * Converts a Uint8Array to a hex string.
+ */
+export function bytesToHex(bytes: Uint8Array): string {
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+/**
+ * Converts a hex string to a Uint8Array.
+ */
+export function hexToBytes(hex: string): Uint8Array {
+  const clean = hex.startsWith("0x") ? hex.slice(2) : hex;
+  if (clean.length % 2 !== 0) {
+    throw new Error("Invalid hex string length");
+  }
+  const bytes = new Uint8Array(clean.length / 2);
+  for (let i = 0; i < clean.length; i += 2) {
+    bytes[i / 2] = parseInt(clean.substring(i, i + 2), 16);
+  }
+  return bytes;
+}
+
+/**
+ * Validates if a string is a valid hex of expected byte length.
+ */
+export function isValidHex(str: string, expectedByteLength: number): boolean {
+  if (typeof str !== "string") return false;
+  const clean = str.startsWith("0x") ? str.slice(2) : str;
+  if (clean.length !== expectedByteLength * 2) return false;
+  return /^[0-9a-fA-F]+$/.test(clean);
+}
+
+/**
+ * Generates an authentic RFC 8032 Ed25519 keypair in hex format.
+ */
+export async function generateKeypair(): Promise<KeyPair> {
+  const privateKeyBytes = ed.utils.randomPrivateKey();
+  const publicKeyBytes = await ed.getPublicKeyAsync(privateKeyBytes);
+
+  return {
+    publicKey: bytesToHex(publicKeyBytes),
+    privateKey: bytesToHex(privateKeyBytes),
+  };
+}
+
+/**
+ * Synchronous Ed25519 keypair generator.
+ */
+export function generateKeypairSync(): KeyPair {
+  const privateKeyBytes = ed.utils.randomPrivateKey();
+  const publicKeyBytes = ed.getPublicKey(privateKeyBytes);
+
+  return {
+    publicKey: bytesToHex(publicKeyBytes),
+    privateKey: bytesToHex(privateKeyBytes),
+  };
+}
+
+/**
+ * Derives public key from an existing private key hex.
+ */
+export async function getPublicKey(privateKeyHex: string): Promise<string> {
+  const privBytes = hexToBytes(privateKeyHex);
+  const pubBytes = await ed.getPublicKeyAsync(privBytes);
+  return bytesToHex(pubBytes);
+}
+
+/**
+ * Constructs the canonical deterministic JSON payload for article signing.
+ */
+export function createCanonicalPayload(
+  title: string,
+  tags: string[] = [],
+  timestamp?: string | number | Date
+): string {
+  const isoTimestamp = timestamp ? new Date(timestamp).toISOString() : new Date().toISOString();
+  return JSON.stringify({
+    title,
+    tags,
+    timestamp: isoTimestamp,
+  });
+}
+
+/**
+ * Cryptographically signs a message payload using an Ed25519 private key.
+ */
+export async function signPayload(
+  payload: string,
+  privateKeyHex: string
+): Promise<string> {
+  const privBytes = hexToBytes(privateKeyHex);
+  const msgBytes = new TextEncoder().encode(payload);
+  const sigBytes = await ed.signAsync(msgBytes, privBytes);
+  return bytesToHex(sigBytes);
+}
+
+/**
+ * Verifies an Ed25519 signature against a string payload.
+ */
+export async function verifySignature(
+  payload: string,
+  signatureHex: string,
+  publicKeyHex: string
+): Promise<boolean> {
+  try {
+    if (!isValidHex(publicKeyHex, 32) || !isValidHex(signatureHex, 64)) {
+      return false;
+    }
+    const pubBytes = hexToBytes(publicKeyHex);
+    const sigBytes = hexToBytes(signatureHex);
+    const msgBytes = new TextEncoder().encode(payload);
+    return await ed.verifyAsync(sigBytes, msgBytes, pubBytes);
+  } catch {
+    return false;
+  }
+}
+
+export interface VerificationResult {
+  isValid: boolean;
+  status: "verified" | "invalid" | "unsigned" | "malformed";
+  algorithm: string;
+  publicKey: string;
+  signature: string;
+  latencyMs: number;
+  matchedPayload?: string;
+  error?: string;
+}
+
+/**
+ * Verifies an article's Ed25519 signature across canonical payload candidates.
+ */
+export async function verifyArticle(article: {
+  title: string;
+  content?: string;
+  tags?: string[];
+  createdAt?: string | number | Date;
+  publisher?: {
+    pubkey?: string;
+    publicKey?: string;
+    signature?: string;
+  };
+  signature?: string;
+}): Promise<VerificationResult> {
+  const start = performance.now();
+  const signatureHex = article.signature || article.publisher?.signature;
+  const publicKeyHex = article.publisher?.pubkey || article.publisher?.publicKey;
+
+  if (!signatureHex || signatureHex === "unsigned" || !publicKeyHex) {
+    return {
+      isValid: false,
+      status: "unsigned",
+      algorithm: "None (Unsigned)",
+      publicKey: publicKeyHex || "",
+      signature: signatureHex || "unsigned",
+      latencyMs: Math.round((performance.now() - start) * 100) / 100,
+    };
+  }
+
+  if (!isValidHex(publicKeyHex, 32) || !isValidHex(signatureHex, 64)) {
+    return {
+      isValid: false,
+      status: "malformed",
+      algorithm: "Ed25519 (RFC 8032)",
+      publicKey: publicKeyHex,
+      signature: signatureHex,
+      latencyMs: Math.round((performance.now() - start) * 100) / 100,
+      error: "Public key or signature has invalid hex encoding length.",
+    };
+  }
+
+  const tags = Array.isArray(article.tags) ? article.tags : [];
+  const timestamp = article.createdAt ? new Date(article.createdAt).toISOString() : undefined;
+
+  const candidatePayloads: string[] = [];
+  if (timestamp) {
+    candidatePayloads.push(
+      JSON.stringify({
+        title: article.title,
+        tags,
+        timestamp,
+      })
+    );
+  }
+
+  if (article.content) {
+    candidatePayloads.push(
+      JSON.stringify({
+        title: article.title,
+        content: article.content,
+        tags,
+      })
+    );
+  }
+
+  candidatePayloads.push(
+    JSON.stringify({
+      title: article.title,
+      tags,
+    })
+  );
+  candidatePayloads.push(article.title);
+
+  for (const payload of candidatePayloads) {
+    const isMatch = await verifySignature(payload, signatureHex, publicKeyHex);
+    if (isMatch) {
+      return {
+        isValid: true,
+        status: "verified",
+        algorithm: "Ed25519 (RFC 8032 / SHA-512)",
+        publicKey: publicKeyHex,
+        signature: signatureHex,
+        matchedPayload: payload,
+        latencyMs: Math.round((performance.now() - start) * 100) / 100,
+      };
+    }
+  }
+
+  return {
+    isValid: false,
+    status: "invalid",
+    algorithm: "Ed25519 (RFC 8032 / SHA-512)",
+    publicKey: publicKeyHex,
+    signature: signatureHex,
+    latencyMs: Math.round((performance.now() - start) * 100) / 100,
+    error: "Signature does not match canonical article content.",
+  };
+}
