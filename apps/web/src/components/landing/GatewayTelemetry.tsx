@@ -1,25 +1,27 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Activity, Server, Radio, Shield, Globe2, ArrowUpRight } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Activity, RefreshCw, Zap, ShieldCheck } from "lucide-react";
 
-interface GatewayPing {
+export interface GatewayPing {
   id: string;
   name: string;
   region: string;
   type: string;
-  baseLatency: number;
+  latencyMs: number;
   uptime: string;
-  status: "optimal" | "operational";
+  status: "optimal" | "operational" | "degraded" | "offline";
+  lastChecked?: string;
+  error?: string;
 }
 
-const gateways: GatewayPing[] = [
+const DEFAULT_GATEWAYS: GatewayPing[] = [
   {
     id: "pinata",
     name: "Pinata IPFS Dedicated",
     region: "Global CDN (Edge)",
     type: "Clearnet IPFS",
-    baseLatency: 78,
+    latencyMs: 78,
     uptime: "99.98%",
     status: "optimal",
   },
@@ -28,7 +30,7 @@ const gateways: GatewayPing[] = [
     name: "Cloudflare Web3 Gateway",
     region: "North America & Europe",
     type: "HTTP/3 Anycast",
-    baseLatency: 92,
+    latencyMs: 92,
     uptime: "99.99%",
     status: "optimal",
   },
@@ -37,8 +39,17 @@ const gateways: GatewayPing[] = [
     name: "IPFS.io Public Mirror",
     region: "Decentralized Public",
     type: "DHT P2P",
-    baseLatency: 142,
+    latencyMs: 142,
     uptime: "99.74%",
+    status: "operational",
+  },
+  {
+    id: "dweb",
+    name: "Protocol Labs dweb.link",
+    region: "Global Edge",
+    type: "Decentralized Gateway",
+    latencyMs: 165,
+    uptime: "99.85%",
     status: "operational",
   },
   {
@@ -46,32 +57,87 @@ const gateways: GatewayPing[] = [
     name: "PressProtocol Tor Service",
     region: "Anonymous Onion Circuit",
     type: "Tor v3 Hidden",
-    baseLatency: 380,
+    latencyMs: 380,
     uptime: "100.0%",
     status: "optimal",
   },
 ];
 
 export function GatewayTelemetry() {
-  const [latencies, setLatencies] = useState<Record<string, number>>({
-    pinata: 78,
-    cloudflare: 92,
-    "ipfs-io": 142,
-    "tor-onion": 380,
-  });
+  const [gateways, setGateways] = useState<GatewayPing[]>(DEFAULT_GATEWAYS);
+  const [activeDHTNodes, setActiveDHTNodes] = useState<number>(312);
+  const [dropRate, setDropRate] = useState<string>("0.00%");
+  const [averageLatency, setAverageLatency] = useState<number>(171);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const [lastUpdated, setLastUpdated] = useState<string>("Just now");
+  const [isCached, setIsCached] = useState<boolean>(false);
 
-  // Simulated live latency jitter
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setLatencies((prev) => ({
-        pinata: Math.max(65, 78 + Math.floor((Math.random() - 0.5) * 12)),
-        cloudflare: Math.max(80, 92 + Math.floor((Math.random() - 0.5) * 14)),
-        "ipfs-io": Math.max(120, 142 + Math.floor((Math.random() - 0.5) * 20)),
-        "tor-onion": Math.max(340, 380 + Math.floor((Math.random() - 0.5) * 30)),
-      }));
-    }, 2400);
-    return () => clearInterval(interval);
+  const fetchTelemetry = useCallback(async (manual: boolean = false) => {
+    if (manual) setIsRefreshing(true);
+    try {
+      const res = await fetch("/api/gateways");
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      if (data.gateways && Array.isArray(data.gateways)) {
+        setGateways(data.gateways);
+        setActiveDHTNodes(data.activeDHTNodes || 312);
+        setDropRate(data.dropRate || "0.00%");
+        setAverageLatency(data.averageLatencyMs || 171);
+        setIsCached(Boolean(data.cached));
+        setLastUpdated(new Date().toLocaleTimeString());
+      }
+    } catch (err) {
+      console.warn("Could not fetch real-time gateway telemetry, using baseline telemetry:", err);
+    } finally {
+      if (manual) {
+        setTimeout(() => setIsRefreshing(false), 500);
+      }
+    }
   }, []);
+
+  // Initial fetch and 15s recurring probe sync
+  useEffect(() => {
+    fetchTelemetry(false);
+    const interval = setInterval(() => {
+      fetchTelemetry(false);
+    }, 15000);
+    return () => clearInterval(interval);
+  }, [fetchTelemetry]);
+
+  const getStatusBadge = (status: GatewayPing["status"]) => {
+    switch (status) {
+      case "optimal":
+        return (
+          <span className="flex items-center gap-1.5 font-mono text-[10px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            optimal
+          </span>
+        );
+      case "operational":
+        return (
+          <span className="flex items-center gap-1.5 font-mono text-[10px] text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 rounded border border-cyan-500/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+            operational
+          </span>
+        );
+      case "degraded":
+        return (
+          <span className="flex items-center gap-1.5 font-mono text-[10px] text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+            degraded
+          </span>
+        );
+      case "offline":
+      default:
+        return (
+          <span className="flex items-center gap-1.5 font-mono text-[10px] text-rose-400 bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+            offline
+          </span>
+        );
+    }
+  };
 
   return (
     <section id="capabilities" className="relative py-20 bg-[#04070e] text-white overflow-hidden border-t border-white/10">
@@ -82,53 +148,81 @@ export function GatewayTelemetry() {
               <Activity className="w-5 h-5 animate-pulse" />
             </div>
             <div>
-              <h3 className="font-display text-2xl text-white font-medium">
-                Live Gateway & Relay Telemetry
-              </h3>
-              <p className="text-xs text-white/50 font-mono">
-                Continuous synthetic health probes every 2,500ms
+              <div className="flex items-center gap-2">
+                <h3 className="font-display text-2xl text-white font-medium">
+                  Live Gateway & Relay Telemetry
+                </h3>
+                <span className="font-mono text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30 uppercase">
+                  LIVE PROBES
+                </span>
+              </div>
+              <p className="text-xs text-white/50 font-mono flex items-center gap-2 mt-0.5">
+                <span>Concurrent synthetic health probes every 15s</span>
+                <span>·</span>
+                <span>Avg: {averageLatency}ms</span>
+                <span>·</span>
+                <span>Updated: {lastUpdated}</span>
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-6 font-mono text-xs text-white/60">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4 font-mono text-xs text-white/60">
+            <div className="hidden sm:flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400" />
-              <span>312 Active DHT Nodes</span>
+              <span>{activeDHTNodes} Active DHT Nodes</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="hidden sm:flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-cyan-400" />
-              <span>Zero Drop Rate</span>
+              <span>{dropRate} Drop Rate</span>
             </div>
+
+            <button
+              onClick={() => fetchTelemetry(true)}
+              disabled={isRefreshing}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-white/10 bg-white/5 hover:bg-white/10 text-white/80 hover:text-white transition-colors text-[11px]"
+              title="Trigger immediate edge latency probe"
+            >
+              <RefreshCw className={`w-3 h-3 ${isRefreshing ? "animate-spin text-cyan-400" : ""}`} />
+              <span>Probe Now</span>
+            </button>
           </div>
         </div>
 
         {/* Grid of gateway monitors */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
           {gateways.map((gw) => (
             <div
               key={gw.id}
-              className="p-5 rounded-xl border border-white/10 bg-black/40 backdrop-blur-md flex flex-col justify-between gap-4 hover:border-white/20 transition-all"
+              className="p-5 rounded-xl border border-white/10 bg-black/40 backdrop-blur-md flex flex-col justify-between gap-4 hover:border-white/20 transition-all group"
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-mono text-[10px] uppercase tracking-wider text-white/40">
                     {gw.type}
                   </span>
-                  <span className="flex items-center gap-1.5 font-mono text-[10px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    {gw.status}
-                  </span>
+                  {getStatusBadge(gw.status)}
                 </div>
-                <h4 className="font-semibold text-sm text-white mb-1">{gw.name}</h4>
-                <p className="text-xs text-white/40 font-mono">{gw.region}</p>
+                <h4 className="font-semibold text-sm text-white mb-1 group-hover:text-cyan-300 transition-colors">
+                  {gw.name}
+                </h4>
+                <p className="text-xs text-white/40 font-mono truncate">{gw.region}</p>
               </div>
 
               <div className="pt-3 border-t border-white/5 flex items-center justify-between font-mono">
                 <div>
                   <span className="text-[10px] text-white/40 block">LATENCY</span>
-                  <span className="text-base text-cyan-400 font-bold">
-                    {latencies[gw.id]}ms
+                  <span
+                    className={`text-base font-bold ${
+                      gw.status === "offline"
+                        ? "text-rose-400"
+                        : gw.latencyMs < 120
+                        ? "text-cyan-400"
+                        : gw.latencyMs < 250
+                        ? "text-emerald-400"
+                        : "text-amber-400"
+                    }`}
+                  >
+                    {gw.latencyMs}ms
                   </span>
                 </div>
                 <div className="text-right">
