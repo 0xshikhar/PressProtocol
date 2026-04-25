@@ -33,7 +33,7 @@ export function ManifestStats() {
     try {
       setRefreshing(true);
       
-      const response = await fetch("http://localhost:4000/api/manifests/stats");
+      const response = await fetch("/api/manifests/stats");
       
       if (!response.ok) {
         throw new Error("Failed to fetch stats");
