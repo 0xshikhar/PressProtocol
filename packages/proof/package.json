@@ -1,0 +1,35 @@
+{
+  "name": "@pressprotocol/proof",
+  "version": "1.0.0",
+  "description": "Deterministic In-Browser CIDv1 Multihash & Air-Gapped .pressproof.json Cryptographic Codec",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./encoder": {
+      "import": "./dist/encoder.js",
+      "types": "./dist/encoder.d.ts"
+    },
+    "./decoder": {
+      "import": "./dist/decoder.js",
+      "types": "./dist/decoder.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@noble/ed25519": "^2.1.0",
+    "@noble/hashes": "^1.7.1",
+    "@pressprotocol/sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}
