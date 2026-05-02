@@ -20,3 +20,13 @@ export {
   extractContentFromProof,
   type PressProofVerificationResult,
 } from "./decoder.js";
+
+export {
+  splitIntoQrPackets,
+  parseQrPacket,
+  reassembleQrPackets,
+  computeChunkChecksum,
+  type QrPacket,
+  type QrSplitOptions,
+  type QrReassemblyResult,
+} from "./qr.js";

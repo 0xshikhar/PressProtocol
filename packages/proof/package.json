@@ -17,6 +17,10 @@
     "./decoder": {
       "import": "./dist/decoder.js",
       "types": "./dist/decoder.d.ts"
+    },
+    "./qr": {
+      "import": "./dist/qr.js",
+      "types": "./dist/qr.d.ts"
     }
   },
   "scripts": {
