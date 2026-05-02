@@ -20,7 +20,9 @@ import {
   ChevronDown,
   Send,
   Copy,
+  FileCheck,
 } from "lucide-react";
+import { calculateDeterministicCIDv1, exportPressProof, downloadPressProofFile } from "@pressprotocol/proof";
 import { apiClient } from "@/lib/api-client";
 import { calculateReadingTime } from "@/lib/reading-time";
 import {
@@ -135,6 +137,50 @@ export default function WritePage() {
     setContent("");
     setTags([]);
     setLastSaved(null);
+  };
+
+  const handleExportAirGappedProof = async () => {
+    if (!title.trim() || !content.trim()) {
+      toast.error("Please provide both title and content before exporting proof.");
+      return;
+    }
+
+    try {
+      const timestamp = new Date().toISOString();
+      const deterministicCid = calculateDeterministicCIDv1(content);
+
+      let pubKey = "";
+      let signature = "unsigned";
+
+      if (identityMode === "anonymous" && burnerWallet) {
+        pubKey = burnerWallet.publicKey;
+        const canonicalPayload = JSON.stringify({
+          title: title.trim(),
+          tags,
+          timestamp,
+        });
+        signature = await signWithBurner(canonicalPayload, burnerWallet.privateKey);
+      }
+
+      const proof = exportPressProof({
+        cid: deterministicCid,
+        title: title.trim(),
+        content,
+        tags,
+        timestamp,
+        publisher: {
+          publicKey: pubKey,
+          signature,
+          walletAddress: identityMode === "verified" ? user?.wallet?.address : undefined,
+          username: identityMode === "anonymous" ? burnerWallet?.pseudonym : user?.email?.address,
+        },
+      });
+
+      downloadPressProofFile(proof);
+      toast.success("Exported air-gapped cryptographic proof (.pressproof.json)");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to export proof");
+    }
   };
 
   const handleAddTag = () => {
@@ -308,6 +354,18 @@ export default function WritePage() {
               >
                 <Save className="h-4 w-4 mr-1.5" />
                 Save Draft
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportAirGappedProof}
+                disabled={!title.trim() || !content.trim()}
+                className="hidden md:inline-flex gap-1.5 font-mono text-xs border-cyan-500/30 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/10"
+                title="Export offline air-gapped cryptographic proof (.pressproof.json)"
+              >
+                <FileCheck className="h-3.5 w-3.5" />
+                <span>Export Proof</span>
               </Button>
 
               {/* Dual-Identity Selector Dropdown */}

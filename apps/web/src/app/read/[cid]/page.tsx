@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ExternalLink, Download, Shield, Clock, BookOpen, ShieldCheck, ShieldAlert, Loader2 } from "lucide-react";
+import { ExternalLink, Download, Shield, Clock, BookOpen, ShieldCheck, ShieldAlert, Loader2, FileCheck, Archive } from "lucide-react";
 import { apiClient, type ResolveContentResponse } from "@/lib/api-client";
 import { toast } from "sonner";
 import { calculateReadingTime } from "@/lib/reading-time";
@@ -18,6 +18,7 @@ import { EmbedDialog } from "@/components/reader/EmbedDialog";
 import { TorShareSection } from "@/components/tor/TorShareSection";
 import { Separator } from "@/components/ui/separator";
 import { verifyArticleSignature, type VerificationResult } from "@/lib/signature-verifier";
+import { exportPressProof, downloadPressProofFile } from "@pressprotocol/proof";
 
 export default function ReadPage() {
   const params = useParams();
@@ -27,9 +28,68 @@ export default function ReadPage() {
   const [error, setError] = useState<string | null>(null);
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [isArchiving, setIsArchiving] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   
   const readingStats = content ? calculateReadingTime(content.content) : null;
+
+  const handleExportProof = () => {
+    if (!content) return;
+    try {
+      const proof = exportPressProof({
+        cid: content.cid,
+        title: content.title,
+        content: content.content,
+        tags: content.tags,
+        timestamp: content.createdAt,
+        publisher: {
+          publicKey: content.publisher?.pubkey || "",
+          signature: content.publisher?.signature || "unsigned",
+          walletAddress: content.publisher?.walletAddress,
+          username: content.publisher?.username,
+        },
+        mirrors: {
+          ipfs: content.mirrors?.ipfs?.url || `ipfs://${content.cid}`,
+          tor: content.mirrors?.tor?.url,
+          gateway: content.mirrors?.gateway?.url,
+        },
+      });
+
+      downloadPressProofFile(proof);
+      toast.success("Downloaded offline cryptographic proof (.pressproof.json)");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to export proof");
+    }
+  };
+
+  const handleArchiveWayback = async () => {
+    if (!content) return;
+    setIsArchiving(true);
+    try {
+      const res = await fetch("/api/archive", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cid: content.cid }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(
+          data.status === "saved"
+            ? "Preserved on Wayback Machine!"
+            : "Archival request queued on Wayback Machine!"
+        );
+        if (data.snapshotUrl) {
+          window.open(data.snapshotUrl, "_blank", "noopener,noreferrer");
+        }
+      } else {
+        throw new Error(data.error || "Archival request failed");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Could not preserve to Wayback Machine");
+    } finally {
+      setIsArchiving(false);
+    }
+  };
 
   useEffect(() => {
     if (cid) {
@@ -186,8 +246,31 @@ export default function ReadPage() {
               </span>
             </div>
             
-            {/* Actions: Embed & Bookmark */}
-            <div className="flex items-center gap-2">
+            {/* Actions: Embed, Bookmark, Proof Export & Wayback Archive */}
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportProof}
+                className="h-8 gap-1.5 text-xs font-mono border-primary/30 text-primary hover:bg-primary/10"
+                title="Export offline cryptographic proof (.pressproof.json)"
+              >
+                <FileCheck className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Export Proof</span>
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleArchiveWayback}
+                disabled={isArchiving}
+                className="h-8 gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+                title="Preserve snapshot on Internet Archive / Wayback Machine"
+              >
+                <Archive className={`h-3.5 w-3.5 ${isArchiving ? "animate-spin text-cyan-500" : ""}`} />
+                <span className="hidden sm:inline">Wayback</span>
+              </Button>
+
               <EmbedDialog cid={cid} title={content.title} />
               <BookmarkButton 
                 cid={cid} 
@@ -495,6 +578,49 @@ export default function ReadPage() {
             <div className="text-sm font-medium text-muted-foreground">Share Link</div>
             <div className="font-mono text-sm mt-1 break-all">anonpress://{content.cid}</div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Standalone Proof & Delay-Tolerant Preservation Card */}
+      <Card className="border-cyan-500/20 bg-cyan-950/10">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base flex items-center gap-2 text-cyan-400">
+              <FileCheck className="h-4 w-4" />
+              Air-Gapped Cryptographic Proof
+            </CardTitle>
+            <Badge variant="outline" className="border-cyan-500/30 text-cyan-300 font-mono text-[10px]">
+              .pressproof.json
+            </Badge>
+          </div>
+          <CardDescription className="text-xs">
+            Export a self-contained, air-gapped cryptographic package verifying this article&apos;s SHA-256 multihash and author Ed25519 signature with zero network dependency.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              onClick={handleExportProof}
+              size="sm"
+              className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold text-xs gap-2"
+            >
+              <Download className="h-3.5 w-3.5" />
+              Export .pressproof.json
+            </Button>
+            <Button
+              onClick={handleArchiveWayback}
+              disabled={isArchiving}
+              variant="outline"
+              size="sm"
+              className="border-white/20 text-xs gap-2"
+            >
+              <Archive className={`h-3.5 w-3.5 ${isArchiving ? "animate-spin text-cyan-400" : ""}`} />
+              Snapshot to Wayback Machine
+            </Button>
+          </div>
+          <p className="text-[11px] text-muted-foreground font-mono">
+            Standard: RFC-8032 · Base32 CIDv1 · Offline Verifiable Codec
+          </p>
         </CardContent>
       </Card>
         </div>
