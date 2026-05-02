@@ -10,6 +10,7 @@
     "test": "./scripts/test.sh",
     "package:extension": "./scripts/package-extension.sh",
     "package:wordpress": "./scripts/package-wordpress.sh",
-    "package:all": "./scripts/package-extension.sh && ./scripts/package-wordpress.sh"
+    "package:all": "./scripts/package-extension.sh && ./scripts/package-wordpress.sh",
+    "pressprotocol": "pnpm --filter @pressprotocol/sdk run cli"
   }
 }
