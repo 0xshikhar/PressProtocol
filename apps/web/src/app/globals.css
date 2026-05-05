@@ -170,4 +170,43 @@
     50%  { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
   }
+
+  /* TipTap Editor & Callout Styles */
+  .tiptap p.is-editor-empty:first-child::before {
+    color: hsl(var(--muted-foreground));
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .press-callout {
+    margin: 1.5rem 0;
+    padding: 1rem 1.25rem;
+    border-radius: 0.75rem;
+    border-left-width: 4px;
+    background-color: hsl(var(--muted) / 0.35);
+    border-color: hsl(var(--border));
+    transition: all 0.2s ease;
+  }
+
+  .press-callout-info {
+    border-left-color: #0ea5e9;
+    background-color: rgba(14, 165, 233, 0.07);
+  }
+
+  .press-callout-warning {
+    border-left-color: #f59e0b;
+    background-color: rgba(245, 158, 11, 0.07);
+  }
+
+  .press-callout-whistleblower {
+    border-left-color: #10b981;
+    background-color: rgba(16, 185, 129, 0.07);
+  }
+
+  .press-callout p {
+    margin: 0.25rem 0;
+  }
 }
