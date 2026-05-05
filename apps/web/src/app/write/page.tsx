@@ -620,20 +620,31 @@ export default function WritePage() {
             <EnhancedEditor
               content={content}
               onChange={setContent}
-              placeholder="Tell your story..."
+              placeholder="Tell your story... (Type '/' for commands, or select text for formatting)"
             />
 
             {/* Tips & Sovereign Identity Info */}
-            <div className="text-sm text-muted-foreground bg-muted/30 p-4 rounded-lg border border-border/40">
-              <p className="font-medium mb-2 text-foreground flex items-center gap-1.5">
-                <Shield className="h-4 w-4 text-emerald-500" />
-                PressProtocol Sovereign Publishing:
-              </p>
-              <ul className="space-y-1 list-disc list-inside text-xs sm:text-sm">
-                <li>Your draft auto-saves locally every 30 seconds to your browser</li>
-                <li>Anonymous articles are signed with your in-browser Ed25519 key</li>
-                <li>Content is permanently addressed via IPFS CID and replicated to Tor hidden services</li>
-                <li>You can burn and regenerate your anonymous identity at any time before publishing</li>
+            <div className="text-sm text-muted-foreground bg-muted/20 p-4 rounded-xl border border-border/50 space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-border/30">
+                <p className="font-medium text-foreground flex items-center gap-1.5 text-xs sm:text-sm">
+                  <Shield className="h-4 w-4 text-emerald-500" />
+                  PressProtocol Sovereign Studio
+                </p>
+                <div className="flex items-center gap-2 text-[11px] font-mono text-muted-foreground">
+                  <span className="px-2 py-0.5 rounded bg-muted border border-border/40">
+                    <strong className="text-foreground">/</strong> for commands
+                  </span>
+                  <span className="px-2 py-0.5 rounded bg-muted border border-border/40">
+                    Select text to format
+                  </span>
+                </div>
+              </div>
+              <ul className="space-y-1.5 list-disc list-inside text-xs text-muted-foreground">
+                <li>Type <span className="font-mono text-foreground font-semibold">/</span> on any line to quickly insert Headings, Pull-Quotes, Code, Images, or Callouts</li>
+                <li>Highlight any word or passage to trigger the floating contextual formatting toolbar</li>
+                <li>Your draft auto-saves locally in volatile memory every 30 seconds</li>
+                <li>Anonymous articles are cryptographically signed with your in-browser Ed25519 key</li>
+                <li>Content is permanently addressed via IPFS multihash and distributed to Tor hidden services</li>
               </ul>
             </div>
           </div>
