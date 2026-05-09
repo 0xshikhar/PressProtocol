@@ -21,8 +21,12 @@ import {
   Send,
   Copy,
   FileCheck,
+  Maximize2,
 } from "lucide-react";
 import { calculateDeterministicCIDv1, exportPressProof, downloadPressProofFile } from "@pressprotocol/proof";
+import { CryptographicPreFlightHUD } from "@/components/editor/CryptographicPreFlightHUD";
+import { ZenModeOverlay } from "@/components/editor/ZenModeOverlay";
+import { cleanseTrackersFromContent } from "@/lib/privacy-scanner";
 import { apiClient } from "@/lib/api-client";
 import { calculateReadingTime } from "@/lib/reading-time";
 import {
@@ -66,6 +70,34 @@ export default function WritePage() {
   // Dual-Identity State: 'anonymous' (Burner) or 'verified' (Privy)
   const [burnerWallet, setBurnerWallet] = useState<BurnerWallet | null>(null);
   const [identityMode, setIdentityMode] = useState<"anonymous" | "verified">("anonymous");
+  const [isZenMode, setIsZenMode] = useState(false);
+  const [liveCid, setLiveCid] = useState("");
+
+  // Calculate real-time in-browser deterministic CIDv1 as content changes
+  useEffect(() => {
+    if (content && content.trim()) {
+      try {
+        const computed = calculateDeterministicCIDv1(content);
+        setLiveCid(computed);
+      } catch {
+        setLiveCid("");
+      }
+    } else {
+      setLiveCid("");
+    }
+  }, [content]);
+
+  // Keyboard shortcut listener for Zen Focus Mode (⌘+Shift+F or Ctrl+Shift+F)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === "f") {
+        e.preventDefault();
+        setIsZenMode((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   // Initialize burner wallet
   useEffect(() => {
@@ -212,6 +244,16 @@ export default function WritePage() {
     }
   };
 
+  const handleCleanseTrackers = () => {
+    const { cleanContent, cleansedCount } = cleanseTrackersFromContent(content);
+    if (cleansedCount > 0) {
+      setContent(cleanContent);
+      toast.success(`Cleanse complete: Stripped ${cleansedCount} tracking parameter(s)`);
+    } else {
+      toast.info("Content is already clean (zero tracking parameters detected)");
+    }
+  };
+
   const handlePublish = async () => {
     if (!title.trim() || !content.trim()) {
       toast.error("Please provide both title and content");
@@ -335,6 +377,17 @@ export default function WritePage() {
                   {readingStats.formattedTime} • {readingStats.words} words
                 </span>
               )}
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsZenMode(true)}
+                className="hidden lg:inline-flex gap-1.5 font-mono text-xs"
+                title="Enter Zen Focus Mode (⌘+Shift+F)"
+              >
+                <Maximize2 className="h-3.5 w-3.5" />
+                <span>Zen Mode</span>
+              </Button>
 
               <Button
                 variant="outline"
@@ -650,6 +703,39 @@ export default function WritePage() {
           </div>
         )}
       </div>
+
+      {/* Real-Time Cryptographic Pre-Flight Telemetry HUD */}
+      <CryptographicPreFlightHUD
+        cid={liveCid}
+        content={content}
+        title={title}
+        burnerWallet={burnerWallet}
+        onBurnWallet={handleBurnWallet}
+        identityMode={identityMode}
+        onCleanseTrackers={handleCleanseTrackers}
+        onZenToggle={() => setIsZenMode((prev) => !prev)}
+        isZenMode={isZenMode}
+      />
+
+      {/* Fullscreen Distraction-Free Zen Focus Mode */}
+      <ZenModeOverlay
+        isOpen={isZenMode}
+        onClose={() => setIsZenMode(false)}
+        title={title}
+        onTitleChange={setTitle}
+        isPublishing={isPublishing}
+        onPublish={handlePublish}
+        isAnon={isAnon}
+        autoSaving={autoSaving}
+        lastSavedText={getLastSavedText()}
+      >
+        <EnhancedEditor
+          content={content}
+          onChange={setContent}
+          placeholder="Write your story in Zen Mode... (Type '/' for slash commands)"
+        />
+      </ZenModeOverlay>
     </div>
   );
 }
+
