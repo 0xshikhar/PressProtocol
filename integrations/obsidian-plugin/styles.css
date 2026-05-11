@@ -1,0 +1,46 @@
+/* PressProtocol Obsidian Community Plugin Styles */
+
+.pressprotocol-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.pressprotocol-success-banner {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 8px;
+  padding: 12px;
+  color: #10b981;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.pressprotocol-telemetry-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--background-secondary);
+  border-radius: 6px;
+  font-family: var(--font-monospace);
+  font-size: 12px;
+}
+
+.pressprotocol-link-field {
+  width: 100%;
+  font-family: var(--font-monospace);
+  font-size: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  color: var(--text-normal);
+}
+
+.pressprotocol-button-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
