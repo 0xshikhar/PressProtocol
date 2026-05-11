@@ -1,0 +1,23 @@
+{
+  "name": "pressprotocol-obsidian",
+  "version": "1.0.0",
+  "description": "PressProtocol Sovereign Publishing Plugin for Obsidian",
+  "main": "main.js",
+  "scripts": {
+    "build": "tsc src/main.ts --outDir . --module CommonJS --target ES2020 --lib DOM,ES2020 --moduleResolution node --skipLibCheck"
+  },
+  "keywords": [
+    "obsidian",
+    "obsidian-plugin",
+    "ipfs",
+    "tor",
+    "pressprotocol",
+    "sovereignty"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "obsidian": "latest",
+    "typescript": "^5.3.3"
+  }
+}

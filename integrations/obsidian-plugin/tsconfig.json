@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "inlineSourceMap": false,
+    "module": "CommonJS",
+    "target": "ES2020",
+    "allowJs": true,
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "strictNullChecks": true,
+    "lib": ["DOM", "ES2020"],
+    "skipLibCheck": true
+  },
+  "files": ["src/main.ts"]
+}
