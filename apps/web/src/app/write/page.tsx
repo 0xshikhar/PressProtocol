@@ -22,10 +22,22 @@ import {
   Copy,
   FileCheck,
   Maximize2,
+  Archive,
 } from "lucide-react";
 import { calculateDeterministicCIDv1, exportPressProof, downloadPressProofFile } from "@pressprotocol/proof";
 import { CryptographicPreFlightHUD } from "@/components/editor/CryptographicPreFlightHUD";
 import { ZenModeOverlay } from "@/components/editor/ZenModeOverlay";
+import { DraftVaultModal } from "@/components/editor/DraftVaultModal";
+import {
+  getAllDrafts,
+  getActiveDraftId,
+  setActiveDraftId,
+  getDraft,
+  createDraft,
+  saveDraft as saveVaultDraft,
+  deleteDraft,
+  type DraftItem,
+} from "@/lib/draft-vault";
 import { cleanseTrackersFromContent } from "@/lib/privacy-scanner";
 import { apiClient } from "@/lib/api-client";
 import { calculateReadingTime } from "@/lib/reading-time";
@@ -44,16 +56,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-interface Draft {
-  title: string;
-  content: string;
-  tags: string[];
-  lastSaved: number;
-}
-
-const DRAFT_KEY = "anonpress_draft";
-const AUTO_SAVE_INTERVAL = 30000; // 30 seconds
-
 export default function WritePage() {
   const router = useRouter();
   const { authenticated, login, user } = usePrivy();
@@ -66,6 +68,11 @@ export default function WritePage() {
   const [lastSaved, setLastSaved] = useState<number | null>(null);
   const [autoSaving, setAutoSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+
+  // Draft Vault State
+  const [activeDraftId, setActiveDraftIdState] = useState<string | null>(null);
+  const [isVaultOpen, setIsVaultOpen] = useState(false);
+  const [draftsCount, setDraftsCount] = useState(0);
 
   // Dual-Identity State: 'anonymous' (Burner) or 'verified' (Privy)
   const [burnerWallet, setBurnerWallet] = useState<BurnerWallet | null>(null);
@@ -115,48 +122,91 @@ export default function WritePage() {
     }
   }, [authenticated]);
 
-  // Load draft from localStorage on mount
+  // Initialize active draft from multi-draft vault on mount
   useEffect(() => {
-    const savedDraft = localStorage.getItem(DRAFT_KEY);
-    if (savedDraft) {
-      try {
-        const draft: Draft = JSON.parse(savedDraft);
-        setTitle(draft.title);
-        setContent(draft.content);
-        setTags(draft.tags);
-        setLastSaved(draft.lastSaved);
-        toast.success("Draft loaded from local storage");
-      } catch (error) {
-        console.error("Failed to load draft:", error);
-      }
+    const drafts = getAllDrafts();
+    setDraftsCount(drafts.length);
+
+    const savedActiveId = getActiveDraftId();
+    let current = savedActiveId ? drafts.find((d) => d.id === savedActiveId) : null;
+
+    if (!current && drafts.length > 0) {
+      current = drafts[0];
+    }
+
+    if (current) {
+      setActiveDraftIdState(current.id);
+      setActiveDraftId(current.id);
+      setTitle(current.title);
+      setContent(current.content);
+      setTags(current.tags);
+      setLastSaved(current.updatedAt);
+    } else {
+      const fresh = createDraft();
+      setActiveDraftIdState(fresh.id);
+      setActiveDraftId(fresh.id);
+      setTitle(fresh.title);
+      setContent(fresh.content);
+      setTags(fresh.tags);
+      setLastSaved(fresh.updatedAt);
+      setDraftsCount(1);
     }
   }, []);
 
-  // Auto-save draft every 30 seconds
+  // 3-second debounced autosave to local vault
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (title || content) {
-        saveDraft();
+    if (!activeDraftId) return;
+
+    const timer = setTimeout(() => {
+      setAutoSaving(true);
+      try {
+        const saved = saveVaultDraft(activeDraftId, {
+          title,
+          content,
+          tags,
+        });
+        setLastSaved(saved.updatedAt);
+        const count = getAllDrafts().length;
+        setDraftsCount(count);
+      } catch (err) {
+        console.error("Vault autosave failed:", err);
+      } finally {
+        setAutoSaving(false);
       }
-    }, AUTO_SAVE_INTERVAL);
+    }, 3000);
 
-    return () => clearInterval(interval);
-  }, [title, content, tags]);
+    return () => clearTimeout(timer);
+  }, [title, content, tags, activeDraftId]);
 
-  const saveDraft = () => {
+  const handleSelectDraft = (draft: DraftItem) => {
+    setActiveDraftIdState(draft.id);
+    setActiveDraftId(draft.id);
+    setTitle(draft.title);
+    setContent(draft.content);
+    setTags(draft.tags);
+    setLastSaved(draft.updatedAt);
+    setDraftsCount(getAllDrafts().length);
+  };
+
+  const handleNewDraft = () => {
+    const fresh = createDraft();
+    handleSelectDraft(fresh);
+  };
+
+  const handleManualSave = () => {
+    if (!activeDraftId) return;
     setAutoSaving(true);
     try {
-      const draft: Draft = {
+      const saved = saveVaultDraft(activeDraftId, {
         title,
         content,
         tags,
-        lastSaved: Date.now(),
-      };
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-      setLastSaved(Date.now());
-      toast.success("Draft saved locally", { duration: 1500 });
-    } catch (error) {
-      console.error("Failed to save draft:", error);
+      });
+      setLastSaved(saved.updatedAt);
+      setDraftsCount(getAllDrafts().length);
+      toast.success("Draft saved to offline vault");
+    } catch (err) {
+      console.error("Failed to save draft:", err);
       toast.error("Failed to save draft");
     } finally {
       setAutoSaving(false);
@@ -164,11 +214,11 @@ export default function WritePage() {
   };
 
   const clearDraft = () => {
-    localStorage.removeItem(DRAFT_KEY);
-    setTitle("");
-    setContent("");
-    setTags([]);
-    setLastSaved(null);
+    if (activeDraftId) {
+      deleteDraft(activeDraftId);
+    }
+    const fresh = createDraft();
+    handleSelectDraft(fresh);
   };
 
   const handleExportAirGappedProof = async () => {
@@ -381,6 +431,17 @@ export default function WritePage() {
               <Button
                 variant="outline"
                 size="sm"
+                onClick={() => setIsVaultOpen(true)}
+                className="gap-1.5 font-mono text-xs"
+                title="Open Offline Drafts Vault"
+              >
+                <Archive className="h-3.5 w-3.5 text-primary" />
+                <span>Vault ({draftsCount})</span>
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setIsZenMode(true)}
                 className="hidden lg:inline-flex gap-1.5 font-mono text-xs"
                 title="Enter Zen Focus Mode (⌘+Shift+F)"
@@ -401,7 +462,7 @@ export default function WritePage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={saveDraft}
+                onClick={handleManualSave}
                 disabled={autoSaving || (!title && !content)}
                 className="hidden sm:inline-flex"
               >
@@ -728,6 +789,8 @@ export default function WritePage() {
         isAnon={isAnon}
         autoSaving={autoSaving}
         lastSavedText={getLastSavedText()}
+        onOpenVault={() => setIsVaultOpen(true)}
+        draftsCount={draftsCount}
       >
         <EnhancedEditor
           content={content}
@@ -735,6 +798,17 @@ export default function WritePage() {
           placeholder="Write your story in Zen Mode... (Type '/' for slash commands)"
         />
       </ZenModeOverlay>
+
+      {/* Offline-First Multi-Draft Vault & Version Snapshots Modal */}
+      <DraftVaultModal
+        open={isVaultOpen}
+        onOpenChange={setIsVaultOpen}
+        currentDraftId={activeDraftId}
+        onSelectDraft={handleSelectDraft}
+        onNewDraft={handleNewDraft}
+        currentTitle={title}
+        currentContent={content}
+      />
     </div>
   );
 }

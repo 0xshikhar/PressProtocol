@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { Minimize2, Shield, Loader2, Send } from "lucide-react";
+import { Minimize2, Shield, Loader2, Send, Archive } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ZenModeOverlayProps {
@@ -15,6 +15,8 @@ interface ZenModeOverlayProps {
   isAnon?: boolean;
   autoSaving?: boolean;
   lastSavedText?: string | null;
+  onOpenVault?: () => void;
+  draftsCount?: number;
 }
 
 export function ZenModeOverlay({
@@ -28,6 +30,8 @@ export function ZenModeOverlay({
   isAnon = true,
   autoSaving = false,
   lastSavedText = "",
+  onOpenVault,
+  draftsCount = 0,
 }: ZenModeOverlayProps) {
   // Listen for Escape or ⌘+Shift+F to exit Zen mode
   useEffect(() => {
@@ -89,6 +93,19 @@ export function ZenModeOverlay({
                     Publish
                   </>
                 )}
+              </Button>
+            )}
+
+            {onOpenVault && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 text-xs h-8 font-mono"
+                onClick={onOpenVault}
+                title="Open Drafts Vault"
+              >
+                <Archive className="h-3.5 w-3.5 text-primary" />
+                <span className="hidden sm:inline">Vault ({draftsCount})</span>
               </Button>
             )}
 
