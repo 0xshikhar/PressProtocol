@@ -19,6 +19,12 @@ import { TorShareSection } from "@/components/tor/TorShareSection";
 import { Separator } from "@/components/ui/separator";
 import { verifyArticleSignature, type VerificationResult } from "@/lib/signature-verifier";
 import { exportPressProof, downloadPressProofFile } from "@pressprotocol/proof";
+import {
+  ReaderTypographyDrawer,
+  useReaderSettings,
+} from "@/components/reader/ReaderTypographyDrawer";
+import { CryptographicProvenanceModal } from "@/components/reader/CryptographicProvenanceModal";
+import { QuoteSharePill } from "@/components/reader/QuoteSharePill";
 
 export default function ReadPage() {
   const params = useParams();
@@ -29,6 +35,8 @@ export default function ReadPage() {
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isArchiving, setIsArchiving] = useState(false);
+  const [isProvenanceOpen, setIsProvenanceOpen] = useState(false);
+  const { settings: readerSettings, updateSettings: setReaderSettings } = useReaderSettings();
   const contentRef = useRef<HTMLDivElement>(null);
   
   const readingStats = content ? calculateReadingTime(content.content) : null;
@@ -175,6 +183,32 @@ export default function ReadPage() {
     return available ? "bg-green-500" : "bg-red-500";
   };
 
+  const getThemeClass = () => {
+    switch (readerSettings.theme) {
+      case "sepia":
+        return "bg-[#fbf7ee] text-[#2d2b28] selection:bg-[#ecdcc5]";
+      case "paper":
+        return "bg-[#ffffff] text-[#111827] selection:bg-neutral-200";
+      case "cyber":
+        return "bg-[#050d0a] text-[#a7f3d0] selection:bg-emerald-950";
+      case "dark":
+      default:
+        return "bg-background text-foreground";
+    }
+  };
+
+  const getTypefaceClass = () => {
+    switch (readerSettings.typeface) {
+      case "sans":
+        return "font-sans";
+      case "mono":
+        return "font-mono";
+      case "serif":
+      default:
+        return "font-serif";
+    }
+  };
+
   return (
     <>
       {/* Reading Progress Bar */}
@@ -182,8 +216,16 @@ export default function ReadPage() {
       
       {/* Table of Contents */}
       <TableOfContents contentRef={contentRef} />
+
+      {/* Quote-to-Share Contextual Selection Pill */}
+      <QuoteSharePill
+        cid={cid}
+        articleTitle={content.title}
+        authorName={content.publisher?.username || (content.publisher?.pubkey ? `Anon-${content.publisher.pubkey.slice(0, 4)}` : undefined)}
+        containerRef={contentRef}
+      />
       
-      <div className="min-h-screen bg-background">
+      <div className={`min-h-screen transition-colors duration-200 ${getThemeClass()}`}>
         {/* Extension Install Banner */}
         <div className="border-b bg-muted/30">
           <div className="container mx-auto max-w-4xl px-4 py-3">
@@ -199,16 +241,16 @@ export default function ReadPage() {
           </div>
         </div>
 
-        {/* Article Content - Medium Style */}
-        <article className="mx-auto max-w-[680px] px-6 py-12">
+        {/* Article Content - Sublime Editorial Reading Canvas */}
+        <article className="mx-auto max-w-[720px] px-6 py-12">
           {/* Title */}
-          <h1 className="font-serif text-4xl sm:text-5xl font-bold leading-tight mb-6">
+          <h1 className={`${getTypefaceClass()} text-4xl sm:text-5xl font-bold leading-tight mb-6`}>
             {content.title}
           </h1>
           
           {/* Meta Information */}
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          <div className="flex items-center justify-between mb-8 flex-wrap gap-3">
+            <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
               {readingStats && (
                 <span className="flex items-center gap-1">
                   <BookOpen className="h-4 w-4" />
@@ -222,32 +264,42 @@ export default function ReadPage() {
                 day: 'numeric' 
               })}</time>
               <span>•</span>
-              <span className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setIsProvenanceOpen(true)}
+                className="flex items-center gap-1 hover:opacity-80 transition-opacity cursor-pointer group text-left"
+                title="Click to inspect zero-trust cryptographic provenance"
+              >
                 {isVerifying ? (
                   <span className="flex items-center gap-1 text-xs text-muted-foreground animate-pulse">
                     <Loader2 className="h-3 w-3 animate-spin" /> Verifying...
                   </span>
                 ) : verificationResult?.isValid ? (
-                  <span className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-                    <ShieldCheck className="h-3.5 w-3.5" />
+                  <span className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-medium group-hover:underline">
+                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
                     Ed25519 Verified ({verificationResult.latencyMs}ms)
                   </span>
                 ) : verificationResult?.status === "unsigned" ? (
-                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground group-hover:underline">
                     <Shield className="h-3.5 w-3.5 text-muted-foreground" />
                     Unsigned
                   </span>
                 ) : (
-                  <span className="flex items-center gap-1 text-xs text-amber-500 font-medium">
+                  <span className="flex items-center gap-1 text-xs text-amber-500 font-medium group-hover:underline">
                     <ShieldAlert className="h-3.5 w-3.5" />
                     Unverified
                   </span>
                 )}
-              </span>
+              </button>
             </div>
             
-            {/* Actions: Embed, Bookmark, Proof Export & Wayback Archive */}
+            {/* Actions: Typography Customizer, Embed, Bookmark, Proof Export & Wayback Archive */}
             <div className="flex items-center gap-1.5 sm:gap-2">
+              <ReaderTypographyDrawer
+                settings={readerSettings}
+                onSettingsChange={setReaderSettings}
+              />
+
               <Button
                 variant="outline"
                 size="sm"
@@ -291,17 +343,21 @@ export default function ReadPage() {
             </div>
           )}
 
-          {/* Content - Medium Typography */}
+          {/* Content - Fluid Editorial Typography */}
           <div
             ref={contentRef}
-            className="article-content
+            style={{
+              fontSize: `${readerSettings.fontSize}px`,
+              lineHeight: `${Math.round(readerSettings.fontSize * 1.62)}px`,
+            }}
+            className={`article-content
                        prose prose-lg max-w-none
+                       ${getTypefaceClass()}
                        prose-headings:font-sans prose-headings:font-bold
                        prose-h1:text-4xl prose-h1:mb-4 prose-h1:mt-12
                        prose-h2:text-3xl prose-h2:mb-3 prose-h2:mt-10
                        prose-h3:text-2xl prose-h3:mb-2 prose-h3:mt-8
-                       prose-p:text-[21px] prose-p:leading-[1.58] prose-p:mb-8
-                       prose-p:font-serif prose-p:text-foreground
+                       prose-p:mb-8
                        prose-a:text-primary prose-a:no-underline hover:prose-a:underline
                        prose-strong:font-semibold
                        prose-blockquote:border-l-4 prose-blockquote:border-primary
@@ -311,9 +367,8 @@ export default function ReadPage() {
                        prose-code:bg-muted prose-code:px-2 prose-code:py-1
                        prose-code:rounded prose-code:text-sm
                        prose-pre:bg-muted prose-pre:border
-                       prose-li:text-[21px] prose-li:leading-[1.58]
-                       prose-li:font-serif prose-li:mb-2
-                       dark:prose-invert"
+                       prose-li:mb-2
+                       dark:prose-invert`}
             dangerouslySetInnerHTML={{ __html: content.content }}
           />
         </article>
@@ -560,6 +615,16 @@ export default function ReadPage() {
                 </p>
               </div>
             )}
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsProvenanceOpen(true)}
+              className="w-full text-xs font-mono gap-1.5 border-primary/30 text-primary hover:bg-primary/10 mt-2"
+            >
+              <ShieldCheck className="h-3.5 w-3.5" />
+              Inspect Full Cryptographic Provenance & CLI
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -625,6 +690,17 @@ export default function ReadPage() {
       </Card>
         </div>
       </div>
+
+      {/* Zero-Trust Cryptographic Provenance Inspector Modal */}
+      {content && (
+        <CryptographicProvenanceModal
+          open={isProvenanceOpen}
+          onOpenChange={setIsProvenanceOpen}
+          content={content}
+          verificationResult={verificationResult}
+          cid={cid}
+        />
+      )}
     </>
   );
 }
