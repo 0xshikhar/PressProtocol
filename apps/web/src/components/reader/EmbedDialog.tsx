@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Code2, Copy, Check, ExternalLink, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -171,6 +172,23 @@ export function EmbedDialog({ cid, title }: EmbedDialogProps) {
           <pre className="p-3 rounded-lg bg-slate-900 border border-slate-800 text-[11px] font-mono text-emerald-300 overflow-x-auto select-all max-h-24">
             {iframeSnippet}
           </pre>
+        </div>
+
+        <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between">
+          <span className="text-[11px] text-slate-400">
+            Need custom widths, Web Component tags, or React snippets?
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            asChild
+            className="h-7 text-xs gap-1.5 font-mono text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/10"
+          >
+            <Link href={`/embed/builder?cid=${encodeURIComponent(cid)}`}>
+              <Sparkles className="h-3 w-3" />
+              <span>Open Embed Studio</span>
+            </Link>
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
