@@ -58,6 +58,9 @@ class AnonPress {
 
         // Frontend hooks
         add_filter('the_content', array($this, 'append_sovereign_badge'));
+
+        // Gutenberg Block hooks
+        add_action('init', array($this, 'register_gutenberg_block'));
     }
     
     public function activate() {
@@ -237,6 +240,56 @@ class AnonPress {
         </div>';
 
         return $content . $badge_html;
+    }
+
+    /**
+     * Register Gutenberg Block for /press embed
+     */
+    public function register_gutenberg_block() {
+        if (!function_exists('register_block_type')) {
+            return;
+        }
+
+        wp_register_script(
+            'pressprotocol-block-script',
+            ANONPRESS_PLUGIN_URL . 'assets/block.js',
+            array('wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components'),
+            ANONPRESS_VERSION
+        );
+
+        register_block_type('pressprotocol/embed', array(
+            'editor_script' => 'pressprotocol-block-script',
+            'render_callback' => array($this, 'render_embed_block'),
+            'attributes' => array(
+                'cid' => array('type' => 'string', 'default' => ''),
+                'theme' => array('type' => 'string', 'default' => 'cyber'),
+                'compact' => array('type' => 'boolean', 'default' => false),
+                'height' => array('type' => 'number', 'default' => 650),
+            ),
+        ));
+    }
+
+    /**
+     * Render callback for the dynamic Gutenberg block
+     */
+    public function render_embed_block($attributes) {
+        $cid = isset($attributes['cid']) ? sanitize_text_field($attributes['cid']) : '';
+        if (empty($cid)) {
+            return '';
+        }
+        $theme = isset($attributes['theme']) ? sanitize_text_field($attributes['theme']) : 'cyber';
+        $compact = !empty($attributes['compact']);
+        $height = $compact ? 320 : 650;
+
+        $embed_url = 'https://pressprotocol.com/embed/' . rawurlencode($cid) . '?theme=' . rawurlencode($theme) . ($compact ? '&compact=true' : '');
+
+        return sprintf(
+            '<div class="pressprotocol-embed-container" style="margin: 24px 0;">
+                <iframe src="%s" width="100%%" height="%d" frameborder="0" loading="lazy" allow="clipboard-write" style="border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);" title="PressProtocol Sovereign Reader"></iframe>
+            </div>',
+            esc_url($embed_url),
+            intval($height)
+        );
     }
 }
 
