@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "AnonPress",
-  "version": "1.0.0",
-  "description": "Browser extension for censorship-resistant content access via AnonPress network",
+  "name": "PressProtocol Sovereign Web Clipper",
+  "version": "2.0.0",
+  "description": "Preserve and syndicate articles, blogs, and highlighted quotes from anywhere on the web directly into PressProtocol with client-side Ed25519 signing.",
   "icons": {
     "16": "icons/icon-16.png",
     "48": "icons/icon-48.png",
@@ -11,20 +11,22 @@
   "permissions": [
     "storage",
     "tabs",
+    "activeTab",
+    "scripting",
     "contextMenus",
+    "clipboardWrite",
     "webNavigation"
   ],
   "host_permissions": [
-    "http://localhost:4000/*",
-    "https://*.pinata.cloud/*",
-    "https://*.anonpress.io/*",
-    "https://anonpress-2we663lev-linux369s-projects.vercel.app/*"
+    "<all_urls>"
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
   },
   "action": {
     "default_popup": "popup.html",
+    "default_title": "PressProtocol Sovereign Clipper",
     "default_icon": {
       "16": "icons/icon-16.png",
       "48": "icons/icon-48.png"
