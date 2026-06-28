@@ -3,37 +3,262 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AnonPress</title>
+  <title>PressProtocol Sovereign Web Clipper</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <div class="popup-container">
-    <header class="popup-header">
-      <div class="logo">
-        <span class="logo-icon">🛡️</span>
-        <h1>AnonPress</h1>
+  <div class="extension-shell">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-badge">
+          <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z"/>
+            <path d="M12 7v5l3 3"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">PressProtocol</div>
+          <div class="brand-subtitle">Sovereign Web Clipper</div>
+        </div>
       </div>
-      <p class="tagline">Censorship-Resistant Publishing</p>
+      <div class="burner-pill" id="headerBurnerPill" title="Active Ed25519 Burner Identity">
+        <span class="status-dot"></span>
+        <span id="headerPseudonym" class="mono">Anon...</span>
+      </div>
     </header>
 
-    <main class="popup-content" id="content">
-      <div class="status-card">
-        <div class="icon">ℹ️</div>
-        <h3>Ready</h3>
-        <p>Navigate to AnonPress content to see mirror status</p>
-        <a href="https://anonpress-2we663lev-linux369s-projects.vercel.app" target="_blank" class="btn btn-primary">
-          Open AnonPress
-        </a>
-      </div>
+    <!-- Navigation Tabs -->
+    <nav class="tab-nav">
+      <button class="tab-btn active" data-tab="tabClip">
+        <span class="tab-icon">⚡</span>
+        <span>Clip Article</span>
+      </button>
+      <button class="tab-btn" data-tab="tabScraps">
+        <span class="tab-icon">📚</span>
+        <span>Scraps</span>
+        <span class="badge-count" id="scrapsCountBadge">0</span>
+      </button>
+      <button class="tab-btn" data-tab="tabNetwork">
+        <span class="tab-icon">🌐</span>
+        <span>Identity & Node</span>
+      </button>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="tab-content-area">
+      <!-- TAB 1: CLIP ARTICLE -->
+      <section id="tabClip" class="tab-pane active">
+        <!-- Reader Page Banner (if already on /read/[cid]) -->
+        <div id="readerBanner" class="banner-reader hidden">
+          <div class="banner-badge">READER ACTIVE</div>
+          <div class="banner-title" id="readerTitle">PressProtocol Article</div>
+          <div class="banner-cid mono" id="readerCid">bafy...</div>
+          <div class="mirrors-health-list" id="mirrorsList">
+            <!-- Dynamic mirror items -->
+          </div>
+        </div>
+
+        <!-- Web Page Target Info -->
+        <div id="webTargetCard" class="card target-card">
+          <div class="target-meta">
+            <span class="domain-tag" id="targetDomain">detecting...</span>
+            <span class="privacy-tag">
+              <span class="pulse-dot"></span>
+              De-Surveillance Engine Ready
+            </span>
+          </div>
+          <h2 class="target-title" id="targetTitle">Loading active page...</h2>
+          <div class="target-submeta">
+            <span id="targetAuthor">By Unknown Author</span>
+            <span class="bullet">•</span>
+            <span id="targetReadTime">~0 min read</span>
+          </div>
+        </div>
+
+        <!-- Action Button -->
+        <div class="cta-container">
+          <button id="btnClipNow" class="btn-primary-clip">
+            <span class="btn-glow"></span>
+            <span class="btn-icon">⚡</span>
+            <span class="btn-label">Clip & Syndicate to PressProtocol</span>
+          </button>
+        </div>
+
+        <!-- Telemetry & Progress Box (hidden initially) -->
+        <div id="clipProgressCard" class="card progress-card hidden">
+          <div class="stepper-header">
+            <span class="stepper-title">Cryptographic Syndication Pipeline</span>
+            <span class="stepper-spinner"></span>
+          </div>
+          <ul class="pipeline-steps">
+            <li class="step-item" id="stepExtract">
+              <span class="step-dot"></span>
+              <span class="step-text">Extracting article body & typography...</span>
+            </li>
+            <li class="step-item" id="stepScrub">
+              <span class="step-dot"></span>
+              <span class="step-text">Scrubbing tracking beacons & paywalls...</span>
+            </li>
+            <li class="step-item" id="stepSign">
+              <span class="step-dot"></span>
+              <span class="step-text">Signing with in-memory Ed25519 key...</span>
+            </li>
+            <li class="step-item" id="stepBroadcast">
+              <span class="step-dot"></span>
+              <span class="step-text">Broadcasting to IPFS Swarm & Tor...</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Success Result Card (hidden initially) -->
+        <div id="clipSuccessCard" class="card success-card hidden">
+          <div class="success-header">
+            <div class="success-icon-badge">✓</div>
+            <div>
+              <div class="success-title">Sovereign Archive Published</div>
+              <div class="success-copy-hint">Permalink automatically copied to clipboard</div>
+            </div>
+          </div>
+
+          <div class="cid-field">
+            <span class="field-label">IMMUTABLE CID</span>
+            <div class="cid-copy-row">
+              <code class="cid-value mono" id="publishedCid">bafy...</code>
+              <button class="btn-icon-copy" id="btnCopyCid" title="Copy CID">📋</button>
+            </div>
+          </div>
+
+          <!-- Transport Telemetry -->
+          <div class="transports-grid">
+            <div class="transport-pill">
+              <span class="transport-icon">📦</span>
+              <span class="transport-name">IPFS Pinned</span>
+              <span class="transport-status">✓ 100%</span>
+            </div>
+            <div class="transport-pill">
+              <span class="transport-icon">🧅</span>
+              <span class="transport-name">Tor v3 Onion</span>
+              <span class="transport-status">✓ Live</span>
+            </div>
+            <div class="transport-pill">
+              <span class="transport-icon">✍️</span>
+              <span class="transport-name">Ed25519</span>
+              <span class="transport-status">✓ Verified</span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="success-actions">
+            <a href="#" id="btnOpenReader" target="_blank" class="btn-action-primary">
+              📖 Open in Sovereign Reader
+            </a>
+            <button id="btnCopyEmbedCode" class="btn-action-secondary">
+              &lt;/&gt; Copy Embed Code
+            </button>
+          </div>
+        </div>
+
+        <!-- Privacy & Protection Guarantee Footnote -->
+        <div class="privacy-guarantee">
+          <span class="shield-mini">🛡️</span>
+          <span>Paywalls, cookie banners, tracking beacons, and surveillance scripts are permanently stripped prior to cryptographic hashing.</span>
+        </div>
+      </section>
+
+      <!-- TAB 2: SCRAP VAULT -->
+      <section id="tabScraps" class="tab-pane">
+        <div class="vault-header">
+          <div>
+            <h3 class="vault-title">Sovereign Scrap Vault</h3>
+            <p class="vault-desc">Passages clipped via right-click on any web page.</p>
+          </div>
+          <button id="btnClearScraps" class="btn-text-danger" title="Clear all scraps">Clear</button>
+        </div>
+
+        <div id="scrapsEmpty" class="empty-state">
+          <div class="empty-icon">✂️</div>
+          <div class="empty-title">Vault is empty</div>
+          <div class="empty-desc">Highlight any text on any webpage, right-click, and select <strong>"Preserve Quote on PressProtocol"</strong>.</div>
+        </div>
+
+        <div id="scrapsList" class="scraps-container">
+          <!-- Dynamic scrap cards rendered here -->
+        </div>
+
+        <div class="vault-footer hidden" id="vaultFooter">
+          <button id="btnSendToWriter" class="btn-primary-clip">
+            <span>✍️ Send All to Sovereign Studio</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- TAB 3: NETWORK & IDENTITY -->
+      <section id="tabNetwork" class="tab-pane">
+        <!-- Identity Section -->
+        <div class="card settings-card">
+          <div class="card-heading">
+            <span class="heading-icon">🔑</span>
+            <span class="heading-title">Cryptographic Burner Identity</span>
+          </div>
+          <p class="card-desc">Your ephemeral Ed25519 identity signs content directly in memory. Zero centralized accounts or tracking.</p>
+          
+          <div class="identity-info">
+            <div class="info-row">
+              <span class="info-label">PSEUDONYM:</span>
+              <span class="info-val mono" id="settingsPseudonym">Anon-...</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">PUBLIC KEY:</span>
+              <span class="info-val mono text-truncate" id="settingsPubKey">...</span>
+              <button class="btn-copy-inline" id="btnCopyPubKey">Copy</button>
+            </div>
+          </div>
+
+          <div class="burn-action-row">
+            <button id="btnBurnIdentity" class="btn-burn-wallet">
+              <span>🔥 Burn & Generate Fresh Identity</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Node Configuration -->
+        <div class="card settings-card">
+          <div class="card-heading">
+            <span class="heading-icon">🌐</span>
+            <span class="heading-title">Gateway & Node Rails</span>
+          </div>
+
+          <div class="form-group">
+            <label for="inputApiUrl" class="form-label">Backend Node Endpoint</label>
+            <input type="text" id="inputApiUrl" class="form-input mono" placeholder="http://localhost:4000" />
+          </div>
+
+          <div class="form-group">
+            <label for="inputWebAppUrl" class="form-label">Sovereign Reader Web URL</label>
+            <input type="text" id="inputWebAppUrl" class="form-input mono" placeholder="https://pressprotocol.com" />
+          </div>
+
+          <button id="btnSaveSettings" class="btn-action-primary">
+            Save Configuration
+          </button>
+          <div id="settingsSavedToast" class="save-toast hidden">✓ Configuration updated</div>
+        </div>
+      </section>
     </main>
 
-    <footer class="popup-footer">
-      <a href="https://anonpress-2we663lev-linux369s-projects.vercel.app" target="_blank">Home</a>
-      <a href="https://anonpress-2we663lev-linux369s-projects.vercel.app/publish" target="_blank">Publish</a>
-      <a href="https://anonpress-2we663lev-linux369s-projects.vercel.app/explore" target="_blank">Explore</a>
+    <!-- Footer Status Bar -->
+    <footer class="app-footer">
+      <div class="footer-left">
+        <span class="status-indicator"></span>
+        <span class="footer-status-text" id="footerTransportStatus">IPFS Swarm Active</span>
+      </div>
+      <div class="footer-right">
+        <a href="https://pressprotocol.com" target="_blank" class="footer-link">pressprotocol.com</a>
+      </div>
     </footer>
   </div>
 
-  <script src="dist/popup.js"></script>
+  <script type="module" src="popup.js"></script>
 </body>
 </html>
