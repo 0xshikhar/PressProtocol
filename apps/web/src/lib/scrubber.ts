@@ -540,3 +540,137 @@ function parseRssFeedItem(xmlString: string, feedUrl: string): ScrubbedArticle {
     telemetry,
   };
 }
+
+export interface RssFeedItem {
+  id: string;
+  title: string;
+  author: string;
+  link: string;
+  publishedAt: string;
+  excerpt: string;
+  rawContentHtml: string;
+  cleanHtml: string;
+  tags: string[];
+  wordCount: number;
+  readingTimeMinutes: number;
+  telemetry: ScrubberTelemetry;
+}
+
+export interface ParsedRssFeed {
+  title: string;
+  description: string;
+  link: string;
+  language: string;
+  feedUrl: string;
+  totalItems: number;
+  items: RssFeedItem[];
+}
+
+/**
+ * Parses an entire RSS or Atom publication feed, extracting and scrubbing all articles.
+ */
+export function parseFullRssFeed(xmlString: string, feedUrl: string): ParsedRssFeed {
+  const $ = cheerio.load(xmlString, { xmlMode: true });
+
+  const feedTitle =
+    $("channel > title").first().text().trim() ||
+    $("feed > title").first().text().trim() ||
+    "Untitled Publication";
+
+  const feedDescription =
+    $("channel > description").first().text().trim() ||
+    $("feed > subtitle").first().text().trim() ||
+    "";
+
+  const channelLink =
+    $("channel > link").first().text().trim() ||
+    $("feed > link[rel='alternate']").first().attr("href") ||
+    $("feed > link").first().attr("href") ||
+    feedUrl;
+
+  const language =
+    $("channel > language").first().text().trim() ||
+    $("feed").attr("xml:lang") ||
+    "en";
+
+  const defaultAuthor =
+    $("channel > dc\\:creator, channel > author, feed > author > name").first().text().trim() ||
+    feedTitle;
+
+  const rawElements = $("item").length ? $("item").toArray() : $("entry").toArray();
+  const items: RssFeedItem[] = [];
+
+  rawElements.forEach((el, index) => {
+    const $item = $(el);
+
+    const title = $item.find("title").first().text().trim() || `Article #${index + 1}`;
+
+    const author =
+      $item.find("author name").first().text().trim() ||
+      $item.find("dc\\:creator").first().text().trim() ||
+      $item.find("author").first().text().trim() ||
+      defaultAuthor ||
+      "Sovereign Author";
+
+    const contentEncoded = $item.find("content\\:encoded").first().text();
+    const atomContent = $item.find("content").first().text();
+    const description = $item.find("description").first().text();
+    const rawContentHtml = contentEncoded || atomContent || description || "";
+
+    const link =
+      $item.find("link").first().text().trim() ||
+      $item.find("link[rel='alternate']").attr("href") ||
+      $item.find("link").attr("href") ||
+      feedUrl;
+
+    const pubDate =
+      $item.find("pubDate").first().text().trim() ||
+      $item.find("published").first().text().trim() ||
+      $item.find("updated").first().text().trim() ||
+      new Date().toISOString();
+
+    const guid =
+      $item.find("guid").first().text().trim() ||
+      $item.find("id").first().text().trim() ||
+      link ||
+      `rss_item_${index}_${Date.now()}`;
+
+    const tags: string[] = [];
+    $item.find("category").each((_, cat) => {
+      const tagText = $(cat).text().trim() || $(cat).attr("term")?.trim();
+      if (tagText && !tags.includes(tagText)) {
+        tags.push(tagText);
+      }
+    });
+
+    const excerptText = description.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+    const excerpt = excerptText.slice(0, 240);
+
+    const { cleanHtml, telemetry } = scrubArticleHtml(rawContentHtml);
+
+    items.push({
+      id: guid,
+      title,
+      author,
+      link,
+      publishedAt: pubDate,
+      excerpt,
+      rawContentHtml,
+      cleanHtml,
+      tags: tags.slice(0, 6),
+      wordCount: telemetry.wordCount,
+      readingTimeMinutes: telemetry.readingTimeMinutes,
+      telemetry,
+    });
+  });
+
+  return {
+    title: feedTitle,
+    description: feedDescription,
+    link: channelLink,
+    language,
+    feedUrl,
+    totalItems: items.length,
+    items,
+  };
+}
