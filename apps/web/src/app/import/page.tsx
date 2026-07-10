@@ -22,12 +22,16 @@ import {
   RefreshCw,
   Eye,
   Key,
+  Rss,
+  Layers,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BulkRssImporter } from "@/components/import/BulkRssImporter";
+import { NotionImporter } from "@/components/import/NotionImporter";
 
 interface PurgeTelemetry {
   scriptsPurged: number;
@@ -205,13 +209,48 @@ export default function ImportPage() {
           </div>
         </div>
 
-        {/* Input Studio Card */}
-        <Card className="border-white/10 bg-zinc-950/80 backdrop-blur-md shadow-2xl">
-          <CardHeader>
-            <CardTitle className="text-lg font-serif flex items-center justify-between text-white">
-              <span className="flex items-center gap-2">
-                <Radio className="w-4 h-4 text-cyan-400" /> Syndicate Publication
-              </span>
+        {/* Top-Level Mode Selector */}
+        <Tabs defaultValue="bulk" className="space-y-8">
+          <TabsList className="bg-zinc-900 border border-white/10 p-1 w-full sm:w-auto grid grid-cols-3">
+            <TabsTrigger
+              value="bulk"
+              className="data-[state=active]:bg-cyan-500 data-[state=active]:text-black text-xs font-semibold gap-2 py-2.5 transition-all"
+            >
+              <Rss className="w-4 h-4" /> Bulk RSS Archiver
+            </TabsTrigger>
+            <TabsTrigger
+              value="notion"
+              className="data-[state=active]:bg-cyan-500 data-[state=active]:text-black text-xs font-semibold gap-2 py-2.5 transition-all"
+            >
+              <Layers className="w-4 h-4" /> Notion Importer
+            </TabsTrigger>
+            <TabsTrigger
+              value="single"
+              className="data-[state=active]:bg-cyan-500 data-[state=active]:text-black text-xs font-semibold gap-2 py-2.5 transition-all"
+            >
+              <Radio className="w-4 h-4" /> Single Article Scrubber
+            </TabsTrigger>
+          </TabsList>
+
+          {/* TAB 1: BULK PUBLICATION ARCHIVER */}
+          <TabsContent value="bulk">
+            <BulkRssImporter />
+          </TabsContent>
+
+          {/* TAB 2: NOTION IMPORTER */}
+          <TabsContent value="notion">
+            <NotionImporter />
+          </TabsContent>
+
+          {/* TAB 3: SINGLE ARTICLE / VISUAL SCRUBBER */}
+          <TabsContent value="single" className="space-y-8">
+            {/* Input Studio Card */}
+            <Card className="border-white/10 bg-zinc-950/80 backdrop-blur-md shadow-2xl">
+              <CardHeader>
+                <CardTitle className="text-lg font-serif flex items-center justify-between text-white">
+                  <span className="flex items-center gap-2">
+                    <Radio className="w-4 h-4 text-cyan-400" /> Syndicate Single Article
+                  </span>
               <span className="text-xs font-mono text-zinc-500 font-normal">
                 Supports Substack · Medium · Ghost · RSS 2.0 · Atom · Web
               </span>
@@ -616,9 +655,11 @@ export default function ImportPage() {
             </Tabs>
           </div>
         )}
+      </TabsContent>
+    </Tabs>
 
-        {/* CMS Integrations Bridge Grid (Ghost & WordPress) */}
-        <div className="grid md:grid-cols-2 gap-6 pt-6">
+    {/* CMS Integrations Bridge Grid (Ghost & WordPress) */}
+    <div className="grid md:grid-cols-2 gap-6 pt-6">
           {/* Ghost CMS Automated Webhook Card */}
           <Card className="border-white/10 bg-zinc-950/60 backdrop-blur-sm">
             <CardHeader>
