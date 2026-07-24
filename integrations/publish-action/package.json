@@ -1,0 +1,35 @@
+{
+  "name": "@pressprotocol/publish-action",
+  "version": "1.0.0",
+  "description": "GitHub Action to automatically sign, syndicate, and pin markdown articles to IPFS and Tor from static site generator repositories",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit && esbuild src/index.ts --bundle --platform=node --target=node20 --format=esm --outfile=dist/index.js --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\"",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "github-action",
+    "pressprotocol",
+    "ipfs",
+    "tor",
+    "ed25519",
+    "sovereign-publishing",
+    "markdown",
+    "hugo",
+    "astro",
+    "jekyll"
+  ],
+  "author": "PressProtocol",
+  "license": "MIT",
+  "dependencies": {
+    "@noble/ed25519": "^2.2.3",
+    "@noble/hashes": "^1.7.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "esbuild": "^0.28.2",
+    "typescript": "^5.4.5"
+  }
+}

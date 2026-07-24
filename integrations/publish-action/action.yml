@@ -1,0 +1,56 @@
+name: 'PressProtocol Sovereign Publish Action'
+description: 'Automatically sign, syndicate, and pin markdown posts to IPFS and Tor from static site generator repositories on git push'
+author: 'PressProtocol'
+branding:
+  icon: 'globe'
+  color: 'green'
+
+inputs:
+  content_dir:
+    description: 'Directory containing markdown articles (e.g. ./content/posts, src/content/blog, _posts)'
+    required: false
+    default: './content/posts'
+  private_key:
+    description: 'Ed25519 64-character hex scalar private key for sovereign provenance signing (typically from ${{ secrets.PRESSPROTOCOL_PRIVATE_KEY }})'
+    required: false
+    default: ''
+  gateway_url:
+    description: 'PressProtocol node daemon or gateway URL for syndication'
+    required: false
+    default: 'https://pressprotocol.com'
+  author_pseudonym:
+    description: 'Author byline or cryptographic pseudonym for the articles'
+    required: false
+    default: 'Sovereign Developer'
+  manifest_path:
+    description: 'Path to generate or update the syndication manifest JSON file'
+    required: false
+    default: 'pressprotocol-manifest.json'
+  filter_modified_only:
+    description: 'When true, only publishes files added or modified in the latest git commit'
+    required: false
+    default: 'false'
+  dry_run:
+    description: 'When true, parses frontmatter, transpiles HTML, generates CIDs and signatures without broadcasting to remote node'
+    required: false
+    default: 'false'
+  tags:
+    description: 'Additional comma-separated global tags to attach to published articles'
+    required: false
+    default: 'git-publish,sovereign-doc'
+
+outputs:
+  published_count:
+    description: 'Number of articles successfully signed and syndicated'
+  latest_cid:
+    description: 'IPFS CIDv1 of the most recently published article'
+  manifest_path:
+    description: 'Path to the generated or updated publication manifest'
+  cids:
+    description: 'JSON array containing all published CIDs from this run'
+  public_key:
+    description: 'Author Ed25519 public key (64 hex characters)'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
