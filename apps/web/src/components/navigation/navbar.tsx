@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { Search, Menu, X, Bell, BookMarked, TrendingUp, FileText, Home, BarChart3, Settings, HelpCircle, User, Globe } from "lucide-react";
+import { Search, Menu, X, Bell, BookMarked, TrendingUp, FileText, Home, BarChart3, Settings, HelpCircle, User, Globe, UploadCloud } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AuthButton } from "@/components/AuthButton";
 import { Button } from "@/components/ui/button";
@@ -35,10 +35,10 @@ const Navbar = () => {
 
   const navLinks = [
     { href: "/explore", label: "Discover", icon: Search },
-    // { href: "/trending", label: "Trending", icon: TrendingUp },
+    { href: "/bookmarks", label: "Reading List", icon: BookMarked },
+    { href: "/import", label: "Import", icon: UploadCloud },
     { href: "/write", label: "Publish", icon: FileText },
-    // { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
-    { href:"/explorer",label:"Explorer",icon:Globe}
+    { href: "/explorer", label: "Explorer", icon: Globe },
   ];
 
   return (
