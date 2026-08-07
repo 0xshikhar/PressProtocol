@@ -1,11 +1,20 @@
 /**
- * Bookmark Management (Local Storage)
+ * Bookmark Management & Offline Integration
  * 
  * Privacy-first bookmark system:
  * - All data stored locally in browser
- * - No server-side tracking
+ * - Zero server-side telemetry or tracking
+ * - Backed by both IndexedDB offline cache and localStorage
  * - Exportable/importable for data portability
  */
+
+import {
+  saveArticleOffline,
+  removeOfflineArticle,
+  isArticleOfflineSync,
+  classifySourceRail,
+  type OfflineArticle,
+} from "./offline-storage";
 
 export interface BookmarkItem {
   cid: string;
@@ -13,12 +22,16 @@ export interface BookmarkItem {
   tags: string[];
   savedAt: number;
   excerpt?: string;
+  author?: string;
+  content?: string;
+  sourceRail?: string;
+  isVerified?: boolean;
 }
 
 const STORAGE_KEY = "anonpress_bookmarks";
 
 /**
- * Get all bookmarks
+ * Get all bookmarks from localStorage (synchronous)
  */
 export function getBookmarks(): BookmarkItem[] {
   if (typeof window === "undefined") return [];
@@ -39,17 +52,18 @@ export function getBookmarks(): BookmarkItem[] {
  * Check if a CID is bookmarked
  */
 export function isBookmarked(cid: string): boolean {
+  if (!cid) return false;
+  if (isArticleOfflineSync(cid)) return true;
   const bookmarks = getBookmarks();
   return bookmarks.some((b) => b.cid === cid);
 }
 
 /**
- * Add a bookmark
+ * Add a bookmark and persist to offline storage
  */
 export function addBookmark(bookmark: Omit<BookmarkItem, "savedAt">): void {
   const bookmarks = getBookmarks();
   
-  // Check if already bookmarked
   if (bookmarks.some((b) => b.cid === bookmark.cid)) {
     throw new Error("Already bookmarked");
   }
@@ -59,8 +73,27 @@ export function addBookmark(bookmark: Omit<BookmarkItem, "savedAt">): void {
     savedAt: Date.now(),
   };
 
-  bookmarks.unshift(newBookmark); // Add to beginning
+  bookmarks.unshift(newBookmark);
   saveBookmarks(bookmarks);
+
+  // Sync to offline database in background
+  if (typeof window !== "undefined") {
+    const offlineItem: OfflineArticle = {
+      cid: bookmark.cid,
+      title: bookmark.title,
+      content: bookmark.content || `<p>${bookmark.excerpt || bookmark.title}</p>`,
+      tags: bookmark.tags || [],
+      author: bookmark.author || "Sovereign Author",
+      createdAt: new Date().toISOString(),
+      savedAt: Date.now(),
+      wordCount: (bookmark.content || bookmark.excerpt || "").split(/\s+/).filter(Boolean).length || 50,
+      readingTimeMinutes: Math.max(1, Math.ceil(((bookmark.content || "").split(/\s+/).length || 50) / 200)),
+      excerpt: bookmark.excerpt,
+      sourceRail: (bookmark.sourceRail as any) || classifySourceRail(bookmark.tags || []),
+      isVerified: bookmark.isVerified ?? false,
+    };
+    saveArticleOffline(offlineItem).catch(() => {});
+  }
 }
 
 /**
@@ -70,6 +103,10 @@ export function removeBookmark(cid: string): void {
   const bookmarks = getBookmarks();
   const filtered = bookmarks.filter((b) => b.cid !== cid);
   saveBookmarks(filtered);
+
+  if (typeof window !== "undefined") {
+    removeOfflineArticle(cid).catch(() => {});
+  }
 }
 
 /**
@@ -118,14 +155,12 @@ export function importBookmarks(jsonString: string): number {
       throw new Error("Invalid format: expected array");
     }
 
-    // Validate bookmark structure
     for (const item of imported) {
       if (!item.cid || !item.title) {
         throw new Error("Invalid bookmark structure");
       }
     }
 
-    // Merge with existing (avoid duplicates)
     const existing = getBookmarks();
     const existingCids = new Set(existing.map((b) => b.cid));
     const newBookmarks = imported.filter(
@@ -135,7 +170,25 @@ export function importBookmarks(jsonString: string): number {
     const merged = [...existing, ...newBookmarks];
     saveBookmarks(merged);
 
-    return newBookmarks.length; // Return count of new bookmarks
+    // Sync to offline database in background
+    for (const b of newBookmarks) {
+      saveArticleOffline({
+        cid: b.cid,
+        title: b.title,
+        content: b.content || `<p>${b.excerpt || b.title}</p>`,
+        tags: b.tags || [],
+        author: b.author || "Sovereign Author",
+        createdAt: new Date().toISOString(),
+        savedAt: b.savedAt || Date.now(),
+        wordCount: 100,
+        readingTimeMinutes: 1,
+        excerpt: b.excerpt,
+        sourceRail: classifySourceRail(b.tags || []),
+        isVerified: false,
+      }).catch(() => {});
+    }
+
+    return newBookmarks.length;
   } catch (error) {
     console.error("Import failed:", error);
     throw new Error("Failed to import bookmarks");
@@ -156,3 +209,5 @@ export function clearAllBookmarks(): void {
 export function getBookmarkCount(): number {
   return getBookmarks().length;
 }
+
+export * from "./offline-storage";

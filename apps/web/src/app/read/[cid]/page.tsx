@@ -20,6 +20,11 @@ import { Separator } from "@/components/ui/separator";
 import { verifyArticleSignature, type VerificationResult } from "@/lib/signature-verifier";
 import { exportPressProof, downloadPressProofFile } from "@pressprotocol/proof";
 import {
+  getOfflineArticle,
+  saveArticleOffline,
+  classifySourceRail,
+} from "@/lib/offline-storage";
+import {
   ReaderTypographyDrawer,
   useReaderSettings,
 } from "@/components/reader/ReaderTypographyDrawer";
@@ -33,6 +38,7 @@ export default function ReadPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
+  const [isOfflineMode, setIsOfflineMode] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isArchiving, setIsArchiving] = useState(false);
   const [isProvenanceOpen, setIsProvenanceOpen] = useState(false);
@@ -112,18 +118,27 @@ export default function ReadPage() {
       setError(null);
       const data = await apiClient.getContent(cid);
       
-      // 🔍 DEBUG: Log content data
-      console.log('📊 [READ PAGE] Content loaded:', {
+      setContent(data);
+      setIsOfflineMode(false);
+
+      // Cache article payload for zero-telemetry offline reading
+      saveArticleOffline({
         cid: data.cid,
         title: data.title,
-        hasMirrors: !!data.mirrors,
+        content: data.content,
+        tags: data.tags || [],
+        author: data.publisher?.username || "Sovereign Author",
+        publicKey: data.publisher?.pubkey,
+        signature: data.publisher?.signature,
+        walletAddress: data.publisher?.walletAddress,
+        createdAt: data.createdAt,
+        savedAt: Date.now(),
         mirrors: data.mirrors,
-        hasTor: !!data.mirrors?.tor,
-        torAvailable: data.mirrors?.tor?.available,
-        torUrl: data.mirrors?.tor?.url,
-      });
-      
-      setContent(data);
+        wordCount: (data.content || "").split(/\s+/).filter(Boolean).length || 50,
+        readingTimeMinutes: Math.max(1, Math.ceil(((data.content || "").split(/\s+/).filter(Boolean).length || 50) / 200)),
+        sourceRail: classifySourceRail(data.tags || [], data.content),
+        isVerified: !!(data.publisher?.pubkey && data.publisher?.signature && data.publisher?.signature !== "unsigned"),
+      }).catch(() => {});
 
       // Perform authentic in-browser Ed25519 signature verification
       setIsVerifying(true);
@@ -138,6 +153,47 @@ export default function ReadPage() {
           setIsVerifying(false);
         });
     } catch (err) {
+      console.warn("⚠️ Network fetch failed, checking local offline vault for CID:", cid);
+      try {
+        const offlineArticle = await getOfflineArticle(cid);
+        if (offlineArticle) {
+          console.log("⚡ [READ PAGE] Restored article from local offline storage:", cid);
+          const fallbackData = {
+            cid: offlineArticle.cid,
+            title: offlineArticle.title,
+            content: offlineArticle.content,
+            tags: offlineArticle.tags,
+            createdAt: offlineArticle.createdAt,
+            publisher: {
+              pubkey: offlineArticle.publicKey || "",
+              signature: offlineArticle.signature || "",
+              walletAddress: offlineArticle.walletAddress,
+              username: offlineArticle.author,
+            },
+            mirrors: offlineArticle.mirrors || {
+              ipfs: { url: `ipfs://${offlineArticle.cid}`, available: true },
+            },
+            recommended: "ipfs",
+            views: 0,
+            readingStats: {
+              words: offlineArticle.wordCount,
+              minutes: offlineArticle.readingTimeMinutes,
+            },
+          } as any;
+
+          setContent(fallbackData);
+          setIsOfflineMode(true);
+          toast.info("Offline mode active: Viewing locally cached article snapshot");
+
+          verifyArticleSignature(fallbackData)
+            .then((res) => setVerificationResult(res))
+            .catch(() => {});
+          return;
+        }
+      } catch (offlineErr) {
+        console.error("Offline fallback check failed:", offlineErr);
+      }
+
       console.error("❌ [READ PAGE] Error loading content:", err);
       setError("Failed to load content. The content may not exist or is temporarily unavailable.");
       toast.error("Failed to load content");
@@ -243,6 +299,28 @@ export default function ReadPage() {
 
         {/* Article Content - Sublime Editorial Reading Canvas */}
         <article className="mx-auto max-w-[720px] px-6 py-12">
+          {/* Offline Mode Banner */}
+          {isOfflineMode && (
+            <div className="mb-8 p-4 rounded-2xl border border-amber-500/30 bg-amber-950/20 flex items-center justify-between gap-4 text-amber-200">
+              <div className="flex items-center gap-3">
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/20 text-amber-400 font-bold text-xs">
+                  ⚡
+                </span>
+                <div>
+                  <div className="font-semibold text-xs tracking-wide uppercase font-mono text-amber-300">
+                    Offline Mode Active
+                  </div>
+                  <p className="text-xs text-amber-300/80 mt-0.5">
+                    Reading preserved snapshot directly from your browser's local sovereign vault.
+                  </p>
+                </div>
+              </div>
+              <Badge variant="outline" className="border-amber-500/40 text-amber-300 text-[10px] uppercase font-mono px-2 py-0.5">
+                Local Cache
+              </Badge>
+            </div>
+          )}
+
           {/* Title */}
           <h1 className={`${getTypefaceClass()} text-4xl sm:text-5xl font-bold leading-tight mb-6`}>
             {content.title}
@@ -328,6 +406,11 @@ export default function ReadPage() {
                 cid={cid} 
                 title={content.title}
                 tags={content.tags || []}
+                content={content.content}
+                author={content.publisher?.username}
+                signature={content.publisher?.signature}
+                publicKey={content.publisher?.pubkey}
+                mirrors={content.mirrors}
               />
             </div>
           </div>
