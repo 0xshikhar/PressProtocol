@@ -48,6 +48,10 @@ await fastify.register(multipart, {
   },
 });
 
+import { nodeRoutes } from './routes/node.js';
+import { torService } from './services/TorService.js';
+import { federationService } from './services/FederationService.js';
+
 // Health check routes
 fastify.get('/health', async (request, reply) => {
   return reply.send({
@@ -60,13 +64,15 @@ fastify.get('/health', async (request, reply) => {
 
 fastify.get('/health/ready', async (request, reply) => {
   try {
-    // Check database connection
-    await prisma.$queryRaw`SELECT 1`;
+    // Check database connection if configured
+    if (env.DATABASE_URL) {
+      await prisma.$queryRaw`SELECT 1`;
+    }
     
     return reply.send({
       status: 'ready',
       timestamp: new Date().toISOString(),
-      database: 'connected',
+      database: env.DATABASE_URL ? 'connected' : 'embedded',
     });
   } catch (error) {
     return reply.status(503).send({
@@ -86,6 +92,7 @@ fastify.get('/health/live', async (request, reply) => {
 });
 
 // Register API routes
+await fastify.register(nodeRoutes);
 await fastify.register(contentRoutes);
 await fastify.register(resolveRoutes);
 await fastify.register(discoveryRoutes);
@@ -96,11 +103,19 @@ await fastify.register(manifestRoutes);
 
 // Root route
 fastify.get('/', async (request, reply) => {
+  const onionAddress = await torService.getSelfOnionAddress();
   return reply.send({
-    name: 'AnonPress Backend API',
-    version: '1.0.0',
-    description: 'Decentralized censorship-resistant publishing platform',
+    name: 'PressProtocol Sovereign Node API',
+    version: '1.0.0-sovereign',
+    specification: 'RFC-PP-007-WAVE4-COMPLETE-INFRA',
+    description: 'Decentralized, zero-SPOF censorship-resistant publishing and federation node',
+    onionAddress: onionAddress || 'Pending daemon startup',
     endpoints: {
+      nodeStatus: '/api/node/status',
+      nodeHealth: '/api/node/health',
+      federationPeers: '/api/node/federation/peers',
+      federationGossip: '/api/node/gossip',
+      federationPolicy: '/api/node/federation/policy',
       content: '/api/content',
       resolve: '/api/resolve/:cid',
       discovery: '/api/discovery',
@@ -135,7 +150,9 @@ signals.forEach((signal) => {
     fastify.log.info(`Received ${signal}, closing gracefully...`);
     
     try {
-      await prisma.$disconnect();
+      if (env.DATABASE_URL) {
+        await prisma.$disconnect();
+      }
       await fastify.close();
       process.exit(0);
     } catch (error) {
@@ -157,9 +174,23 @@ const start = async () => {
     
     await fastify.listen({ port, host });
     
-    fastify.log.info(`🚀 AnonPress Backend running at http://${host}:${port}`);
+    const onionAddress = await torService.getSelfOnionAddress();
+    const isSovereign = !env.PINATA_API_KEY;
+
+    console.log('');
+    console.log('===============================================================');
+    console.log('  🌐 PRESSPROTOCOL AUTONOMOUS COMMUNITY NODE (WAVE 4)');
+    console.log('===============================================================');
+    console.log(`  🚀 API Gateway:     http://${host}:${port}`);
+    console.log(`  🧅 Tor Onion:       ${onionAddress ? `http://${onionAddress}` : 'Initializing v3 key...'}`);
+    console.log(`  📦 Node Mode:       ${isSovereign ? '🌱 Pure Sovereign (Helia/Tor)' : '⚡ Hybrid (Pinata/Cloud)'}`);
+    console.log(`  📁 Storage Path:    ${env.DATA_DIR}`);
+    console.log(`  📡 Node Status:     http://${host}:${port}/api/node/status`);
+    console.log('===============================================================');
+    console.log('');
+
+    fastify.log.info(`🚀 PressProtocol Node running at http://${host}:${port}`);
     fastify.log.info(`📝 Environment: ${env.NODE_ENV}`);
-    fastify.log.info(`🗄️  Database: Connected`);
     fastify.log.info(`🌐 CORS Origin: ${env.CORS_ORIGIN}`);
   } catch (error) {
     fastify.log.error(error);
