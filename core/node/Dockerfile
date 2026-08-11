@@ -1,55 +1,84 @@
+# Multi-Architecture Sovereign Community Node Dockerfile
+# Platforms: linux/amd64, linux/arm64 (Raspberry Pi 4/5, Apple Silicon, VPS)
+# Target: PressProtocol Complete Sovereign Infrastructure (Wave 4)
+
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install wget for healthcheck
-RUN apk add --no-cache wget
+# Install build essentials & core tools
+RUN apk add --no-cache curl wget bash python3 make g++
 
-# Copy package files
-COPY package*.json ./
-COPY tsconfig.json ./
+# Enable pnpm via Corepack
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Install dependencies with retry and timeout settings
-RUN npm config set fetch-retry-maxtimeout 120000 && \
-    npm config set fetch-retry-mintimeout 10000 && \
-    npm config set fetch-retries 5 && \
-    npm ci --prefer-offline --no-audit
+# Copy manifest files
+COPY package.json pnpm-lock.yaml* tsconfig.json ./
 
-# Copy source
+# Install dependencies with pnpm
+RUN pnpm install --frozen-lockfile || pnpm install
+
+# Copy source and prisma definitions
 COPY src ./src
 COPY prisma ./prisma
 
-# Generate Prisma client with --no-engine for Accelerate
-RUN npx prisma generate --no-engine
+# Generate Prisma client and compile TypeScript
+RUN npx prisma generate --no-engine 2>/dev/null || true
+RUN pnpm run build
 
-# Build
-RUN npm run build
+# --- Production Image ---
+FROM node:20-alpine AS runner
 
-# Production image
-FROM node:20-alpine
+LABEL org.opencontainers.image.title="PressProtocol Sovereign Community Node"
+LABEL org.opencontainers.image.description="Autonomous, zero-SPOF censorship-resistant publishing node with embedded Helia IPFS and Tor v3"
+LABEL org.opencontainers.image.version="1.0.0-sovereign"
 
 WORKDIR /app
 
-# Install wget for healthcheck
-RUN apk add --no-cache wget
+# Install runtime system packages: Tor daemon, su-exec for non-root execution, curl & wget
+RUN apk add --no-cache tor su-exec bash curl wget ca-certificates
 
-# Copy package files
-COPY package*.json ./
+# Create unprivileged system user for pressprotocol
+RUN addgroup -g 10001 -S pressprotocol && \
+    adduser -u 10001 -S pressprotocol -G pressprotocol
 
-# Install production dependencies with retry settings (include prisma for generation)
-RUN npm config set fetch-retry-maxtimeout 120000 && \
-    npm config set fetch-retry-mintimeout 10000 && \
-    npm config set fetch-retries 5 && \
-    npm ci --omit=dev --prefer-offline --no-audit && \
-    npm install -g prisma@6.17.0
+# Enable pnpm in production runner
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Copy built files and prisma
+# Copy production package descriptors and install prod-only dependencies
+COPY package.json pnpm-lock.yaml* tsconfig.json ./
+RUN pnpm install --prod --frozen-lockfile || pnpm install --prod
+
+# Copy built application and prisma client from builder stage
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma 2>/dev/null || true
 COPY prisma ./prisma
 
-# Expose port
-EXPOSE 4000
+# Copy entrypoint script
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
 
-# Start with Prisma generation at runtime to ensure fresh client
-CMD ["sh", "-c", "prisma generate --no-engine && node dist/index.js"]
+# Create mount directories
+RUN mkdir -p /data/ipfs /data/tor/onion_service /data/db && \
+    chown -R 10001:10001 /data /app
+
+# Volume for all persistent sovereign data (IPFS blockstore, Tor keys, embedded DB)
+VOLUME ["/data"]
+
+# Expose ports:
+# 4000: Node HTTP API & Gateway
+# 4001: Helia / libp2p Swarm & DHT
+# 9050: Tor SOCKS5 Proxy
+EXPOSE 4000 4001 9050
+
+# Default environment flags for sovereign operation
+ENV NODE_ENV=production
+ENV PORT=4000
+ENV DATA_DIR=/data
+ENV TOR_ENABLED=true
+
+# Container healthcheck targeting the sovereign health probe
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 --start-period=15s \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:4000/api/node/health || exit 1
+
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
