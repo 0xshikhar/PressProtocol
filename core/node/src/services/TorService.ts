@@ -44,16 +44,69 @@ export class TorService {
   }
 
   /**
-   * Get the real onion URL for a service
-   * Reads from the onionize-generated hostname file
+   * Resolve self .onion address from container volume, env, or onionize
    */
-  async getOnionUrl(serviceName: string = 'anonpress-wordpress'): Promise<string | null> {
+  async getSelfOnionAddress(): Promise<string | null> {
+    // 1. Explicit env override
+    if (env.TOR_ONION_ADDRESS) {
+      return env.TOR_ONION_ADDRESS.trim();
+    }
+
+    // 2. Candidate paths in autonomous container or onionize volume
+    const candidatePaths = [
+      `${env.DATA_DIR}/tor/onion_service/hostname`,
+      `/data/tor/onion_service/hostname`,
+      `/data/tor/hostname`,
+      `${this.onionServicesPath}/anonpress-backend/hostname`,
+      `${this.onionServicesPath}/anonpress-wordpress/hostname`,
+    ];
+
+    for (const p of candidatePaths) {
+      if (existsSync(p)) {
+        try {
+          const content = await readFile(p, 'utf-8');
+          const address = content.trim();
+          if (address && address.endsWith('.onion')) {
+            return address;
+          }
+        } catch {
+          // continue checking next path
+        }
+      }
+    }
+
+    // 3. In dev / test / fallback: Generate a deterministic v3 onion address for the node
+    // Format: 56 characters base32 (a-z, 2-7) + .onion
+    if (env.NODE_ENV === 'test' || env.NODE_ENV === 'development') {
+      const fallbackHash = 'pressprotocol7sovereign4node6federation3mesh7relay5v3';
+      const padded = (fallbackHash + '234567abcdefghijklmnopqrstuvwxyz').slice(0, 56);
+      return `${padded}.onion`;
+    }
+
+    return null;
+  }
+
+  /**
+   * Get the real onion URL for a service
+   * Reads from the autonomous container volume or onionize-generated hostname file
+   */
+  async getOnionUrl(serviceName: string = 'anonpress-backend'): Promise<string | null> {
     try {
+      if (serviceName === 'anonpress-backend' || serviceName === 'self') {
+        const selfOnion = await this.getSelfOnionAddress();
+        if (selfOnion) {
+          return selfOnion.startsWith('http') ? selfOnion : `http://${selfOnion}`;
+        }
+      }
+
       const hostnameFile = `${this.onionServicesPath}/${serviceName}/hostname`;
       
       if (!existsSync(hostnameFile)) {
-        console.log(`⚠️  Onion hostname file not found: ${hostnameFile}`);
-        console.log('   Make sure onionize container is running and has had time to generate the address');
+        // Check if self onion address is available
+        const selfOnion = await this.getSelfOnionAddress();
+        if (selfOnion) {
+          return selfOnion.startsWith('http') ? selfOnion : `http://${selfOnion}`;
+        }
         return null;
       }
 
@@ -71,6 +124,25 @@ export class TorService {
       console.error('Error reading onion hostname:', error);
       return null;
     }
+  }
+
+  /**
+   * Get comprehensive Tor daemon status
+   */
+  async getTorStatus(): Promise<{
+    enabled: boolean;
+    onionAddress: string | null;
+    socksProxy: string;
+    ready: boolean;
+  }> {
+    const isEnabled = env.TOR_ENABLED !== 'false';
+    const onionAddress = await this.getSelfOnionAddress();
+    return {
+      enabled: isEnabled,
+      onionAddress,
+      socksProxy: `${this.proxyHost}:${this.proxyPort}`,
+      ready: isEnabled && onionAddress !== null,
+    };
   }
 
   /**
