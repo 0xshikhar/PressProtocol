@@ -30,3 +30,9 @@ pnpm-debug.log*
 # Prisma
 prisma/migrations/dev.db
 prisma/migrations/dev.db-journal
+
+# Persistent Node Data
+.data/
+data/
+*.tmp*
+
