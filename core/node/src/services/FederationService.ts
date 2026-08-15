@@ -43,6 +43,9 @@ export interface NodeStatusResponse {
     autoPinPolicy: AutoPinPolicy;
     gossipsRelayed: number;
     followedKeysCount: number;
+    gatedSwarm: boolean;
+    pskProtected: boolean;
+    whitelistActive: boolean;
   };
   storage: {
     totalContent: number;
@@ -57,9 +60,39 @@ export class FederationService {
   private followedKeys = new Set<string>();
   private trendingScores = new Map<string, number>(); // CID -> count
   private gossipedCids = new Set<string>(); // to prevent loops
+  private federationPsk: string = env.FEDERATION_PSK || '';
+  private peerWhitelist = new Set<string>(
+    (env.PEER_WHITELIST || '').split(',').map((s) => s.trim()).filter(Boolean)
+  );
 
   constructor() {
     this.autoPinPolicy = (env.AUTO_PIN_POLICY as AutoPinPolicy) || 'all';
+  }
+
+  public setPsk(psk: string): void {
+    this.federationPsk = psk.trim();
+  }
+
+  public getPsk(): string {
+    return this.federationPsk;
+  }
+
+  public setPeerWhitelist(whitelist: string[]): void {
+    this.peerWhitelist = new Set(whitelist.map((s) => s.trim()).filter(Boolean));
+  }
+
+  public getPeerWhitelist(): string[] {
+    return Array.from(this.peerWhitelist);
+  }
+
+  public validatePsk(incomingPsk?: string): boolean {
+    if (!this.federationPsk) return true; // Open federation
+    return incomingPsk === this.federationPsk;
+  }
+
+  public isPeerAllowed(identifier: string): boolean {
+    if (this.peerWhitelist.size === 0) return true; // Open whitelist
+    return this.peerWhitelist.has(identifier);
   }
 
   public async getStatus(): Promise<NodeStatusResponse> {
@@ -93,6 +126,9 @@ export class FederationService {
         autoPinPolicy: this.autoPinPolicy,
         gossipsRelayed: meta.gossipCount,
         followedKeysCount: this.followedKeys.size,
+        gatedSwarm: Boolean(this.federationPsk || this.peerWhitelist.size > 0),
+        pskProtected: Boolean(this.federationPsk),
+        whitelistActive: this.peerWhitelist.size > 0,
       },
       storage: {
         totalContent,
@@ -128,11 +164,28 @@ export class FederationService {
     };
   }
 
-  public async handleGossip(payload: GossipPayload): Promise<{
+  public async handleGossip(
+    payload: GossipPayload,
+    options?: { psk?: string; senderUrl?: string }
+  ): Promise<{
     accepted: boolean;
     pinned: boolean;
     reason?: string;
   }> {
+    // 1. Enforce Pre-Shared Key (PSK) if configured for gated consortium swarms
+    if (this.federationPsk && !this.validatePsk(options?.psk)) {
+      return { accepted: false, pinned: false, reason: 'Unauthorized: Invalid Federation PSK' };
+    }
+
+    // 2. Enforce Peer Whitelist if configured for gated consortium swarms
+    if (this.peerWhitelist.size > 0) {
+      const allowedByPubKey = payload.publicKey && this.isPeerAllowed(payload.publicKey);
+      const allowedBySender = options?.senderUrl && this.isPeerAllowed(options.senderUrl);
+      if (!allowedByPubKey && !allowedBySender) {
+        return { accepted: false, pinned: false, reason: 'Forbidden: Peer not in private consortium whitelist' };
+      }
+    }
+
     if (!payload.cid || !payload.title) {
       return { accepted: false, pinned: false, reason: 'Missing CID or title in gossip payload' };
     }

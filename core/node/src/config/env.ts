@@ -24,6 +24,8 @@ const envSchema = z.object({
   AUTO_PIN_POLICY: z.enum(['all', 'followed', 'trending']).default('all'),
   TOR_ENABLED: z.string().default('true'),
   TOR_ONION_ADDRESS: z.string().optional(),
+  FEDERATION_PSK: z.string().optional().default(''),
+  PEER_WHITELIST: z.string().optional().default(''),
 });
 
 export type Env = z.infer<typeof envSchema>;

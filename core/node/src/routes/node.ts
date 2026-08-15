@@ -120,8 +120,23 @@ export async function nodeRoutes(fastify: FastifyInstance) {
    */
   fastify.post('/api/node/gossip', async (request, reply) => {
     try {
+      const pskHeader = request.headers['x-federation-psk'] as string | undefined;
       const body = gossipPayloadSchema.parse(request.body) as GossipPayload;
-      const result = await federationService.handleGossip(body);
+      const result = await federationService.handleGossip(body, { psk: pskHeader });
+      
+      if (!result.accepted && result.reason?.startsWith('Unauthorized')) {
+        return reply.status(401).send({
+          success: false,
+          ...result,
+        });
+      }
+      if (!result.accepted && result.reason?.startsWith('Forbidden')) {
+        return reply.status(403).send({
+          success: false,
+          ...result,
+        });
+      }
+
       return reply.send({
         success: true,
         ...result,
@@ -131,6 +146,49 @@ export async function nodeRoutes(fastify: FastifyInstance) {
       return reply.status(400).send({
         success: false,
         error: error.message || 'Invalid gossip payload',
+      });
+    }
+  });
+
+  /**
+   * GET /api/node/federation/gated
+   * Inspect private consortium swarm security configuration
+   */
+  fastify.get('/api/node/federation/gated', async (request, reply) => {
+    return reply.send({
+      success: true,
+      pskProtected: Boolean(federationService.getPsk()),
+      whitelist: federationService.getPeerWhitelist(),
+    });
+  });
+
+  /**
+   * PUT /api/node/federation/gated
+   * Update PSK and peer whitelist for private newsroom swarms
+   */
+  fastify.put('/api/node/federation/gated', async (request, reply) => {
+    try {
+      const body = z.object({
+        psk: z.string().optional(),
+        whitelist: z.array(z.string()).optional(),
+      }).parse(request.body);
+
+      if (body.psk !== undefined) {
+        federationService.setPsk(body.psk);
+      }
+      if (body.whitelist !== undefined) {
+        federationService.setPeerWhitelist(body.whitelist);
+      }
+
+      return reply.send({
+        success: true,
+        pskProtected: Boolean(federationService.getPsk()),
+        whitelist: federationService.getPeerWhitelist(),
+      });
+    } catch (error: any) {
+      return reply.status(400).send({
+        success: false,
+        error: error.message || 'Invalid gated swarm configuration',
       });
     }
   });
