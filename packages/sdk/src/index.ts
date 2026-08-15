@@ -16,6 +16,7 @@ export {
   bytesToHex,
   hexToBytes,
   isValidHex,
+  calculateDeterministicCIDv1,
   type VerificationResult,
 } from "./crypto.js";
 
