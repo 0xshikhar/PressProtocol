@@ -91,6 +91,8 @@ fastify.get('/health/live', async (request, reply) => {
   });
 });
 
+import { bridgeRoutes } from './routes/bridge.js';
+
 // Register API routes
 await fastify.register(nodeRoutes);
 await fastify.register(contentRoutes);
@@ -100,6 +102,7 @@ await fastify.register(identityRoutes);
 await fastify.register(mirrorsRoutes);
 await fastify.register(uploadRoutes);
 await fastify.register(manifestRoutes);
+await fastify.register(bridgeRoutes);
 
 // Root route
 fastify.get('/', async (request, reply) => {
@@ -107,8 +110,8 @@ fastify.get('/', async (request, reply) => {
   return reply.send({
     name: 'PressProtocol Sovereign Node API',
     version: '1.0.0-sovereign',
-    specification: 'RFC-PP-007-WAVE4-COMPLETE-INFRA',
-    description: 'Decentralized, zero-SPOF censorship-resistant publishing and federation node',
+    specification: 'RFC-PP-008-WAVE5-GLOBAL-INFRA-INTEGRATIONS',
+    description: 'Universal decentralized publishing substrate, P2P federation, and CMS bridge node',
     onionAddress: onionAddress || 'Pending daemon startup',
     endpoints: {
       nodeStatus: '/api/node/status',
@@ -126,6 +129,13 @@ fastify.get('/', async (request, reply) => {
       manifest: '/api/manifest/:cid',
       manifestsRecent: '/api/manifests/recent',
       manifestsStats: '/api/manifests/stats',
+      bridgeStatus: '/api/bridge/status',
+      bridgeMedium: '/api/bridge/medium',
+      bridgeSubstack: '/api/bridge/substack',
+      bridgeGhost: '/api/bridge/ghost',
+      bridgeStrapi: '/api/bridge/strapi',
+      bridgeCms: '/api/bridge/cms',
+      bridgeCleanse: '/api/bridge/cleanse',
     },
     docs: 'https://github.com/anonpress/backend',
   });

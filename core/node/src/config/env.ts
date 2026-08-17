@@ -26,6 +26,8 @@ const envSchema = z.object({
   TOR_ONION_ADDRESS: z.string().optional(),
   FEDERATION_PSK: z.string().optional().default(''),
   PEER_WHITELIST: z.string().optional().default(''),
+  GHOST_WEBHOOK_SECRET: z.string().optional().default(''),
+  STRAPI_WEBHOOK_SECRET: z.string().optional().default(''),
 });
 
 export type Env = z.infer<typeof envSchema>;
