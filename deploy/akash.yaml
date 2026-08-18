@@ -1,0 +1,57 @@
+---
+# Akash Network SDL 2.0 (Stack Definition Language)
+# Censorship-Resistant Decentralized Cloud Deployment for PressProtocol Node
+version: "2.0"
+
+services:
+  pressprotocol-node:
+    image: pressprotocol/node:latest
+    expose:
+      - port: 4000
+        as: 80
+        to:
+          - global: true
+      - port: 9050
+        to:
+          - global: false
+    env:
+      - PORT=4000
+      - NODE_ENV=production
+      - DATA_DIR=/data
+      - TOR_ENABLED=true
+      - AUTO_PIN_POLICY=all
+      - NODE_NAME=PressProtocol Akash Decentralized Node
+    params:
+      storage:
+        data:
+          mount: /data
+
+profiles:
+  compute:
+    pressprotocol-node:
+      resources:
+        cpu:
+          units: 1.0
+        memory:
+          size: 512Mi
+        storage:
+          - size: 1Gi
+          - name: data
+            size: 10Gi
+            attributes:
+              persistent: true
+              class: beta3
+  placement:
+    dcloud:
+      attributes:
+        host: akash
+      pricing:
+        pressprotocol-node:
+          denom: uakt
+          amount: 10000
+
+deployment:
+  pressprotocol-node:
+    dcloud:
+      profile: pressprotocol-node
+      count: 1

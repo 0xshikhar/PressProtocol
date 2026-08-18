@@ -1,0 +1,42 @@
+# Fly.io App Configuration for PressProtocol Autonomous Sovereign Node
+# 1-Click Launch: fly launch --config deploy/fly.toml
+
+app = "pressprotocol-node"
+primary_region = "iad"
+
+[build]
+  dockerfile = "core/node/Dockerfile"
+  ignorefile = "core/node/.dockerignore"
+
+[mounts]
+  source = "pressprotocol_data"
+  destination = "/data"
+  initial_size = "10gb"
+
+[http_service]
+  internal_port = 4000
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+[[http_service.checks]]
+  grace_period = "20s"
+  interval = "30s"
+  method = "GET"
+  timeout = "5s"
+  path = "/api/node/health"
+
+[env]
+  PORT = "4000"
+  NODE_ENV = "production"
+  DATA_DIR = "/data"
+  TOR_ENABLED = "true"
+  AUTO_PIN_POLICY = "all"
+  NODE_NAME = "PressProtocol Fly Node"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 512

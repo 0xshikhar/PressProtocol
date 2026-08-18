@@ -1,0 +1,28 @@
+# Render Blueprint Specification for PressProtocol Autonomous Sovereign Node
+# 1-Click Deploy: Connect repository to Render and sync blueprint
+services:
+  - type: web
+    name: pressprotocol-node
+    env: docker
+    dockerfilePath: core/node/Dockerfile
+    dockerContext: core/node
+    plan: starter
+    region: oregon
+    healthCheckPath: /api/node/health
+    disk:
+      name: pressprotocol-data
+      mountPath: /data
+      sizeGB: 10
+    envVars:
+      - key: PORT
+        value: 4000
+      - key: NODE_ENV
+        value: production
+      - key: DATA_DIR
+        value: /data
+      - key: TOR_ENABLED
+        value: "true"
+      - key: AUTO_PIN_POLICY
+        value: all
+      - key: NODE_NAME
+        value: PressProtocol Render Node
