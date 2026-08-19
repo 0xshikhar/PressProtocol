@@ -1,0 +1,37 @@
+{
+  "name": "@pressprotocol/widget",
+  "version": "0.1.0",
+  "description": "Universal Drop-In Sovereign Publishing Web Component (<pressprotocol-publish>) and Editor Connectors",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "pressprotocol",
+    "web-component",
+    "sovereign-publishing",
+    "tiptap",
+    "lexical",
+    "quill",
+    "prosemirror",
+    "slate",
+    "tinymce"
+  ],
+  "author": "0xShikhar",
+  "license": "MIT",
+  "dependencies": {
+    "@noble/ed25519": "^2.1.0",
+    "@noble/hashes": "^2.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "typescript": "^5.4.5"
+  }
+}
