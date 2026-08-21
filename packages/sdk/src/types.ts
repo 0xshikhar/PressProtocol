@@ -93,6 +93,7 @@ export interface HealthResult {
 
 export interface ClientConfig {
   endpoint?: string; // Default backend API endpoint
+  apiKey?: string; // API Key for authenticated publishing (pp_live_* or pp_test_*)
   privateKey?: string; // Default sovereign signing key
   gateways?: string[]; // Fallback public IPFS gateways
   timeoutMs?: number;

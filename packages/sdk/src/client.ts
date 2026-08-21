@@ -28,6 +28,7 @@ const DEFAULT_PUBLIC_GATEWAYS = [
 
 export class PressProtocolClient {
   private endpoint: string;
+  private apiKey?: string;
   private privateKey?: string;
   private gateways: string[];
   private timeoutMs: number;
@@ -40,6 +41,7 @@ export class PressProtocolClient {
         ? DEFAULT_PRODUCTION_ENDPOINT
         : DEFAULT_LOCAL_ENDPOINT);
 
+    this.apiKey = config.apiKey || (typeof process !== "undefined" ? process.env?.PRESSPROTOCOL_API_KEY : undefined);
     this.privateKey = config.privateKey || (typeof process !== "undefined" ? process.env?.PRESSPROTOCOL_PRIVATE_KEY : undefined);
     this.gateways = config.gateways || DEFAULT_PUBLIC_GATEWAYS;
     this.timeoutMs = config.timeoutMs || 10000;
@@ -338,5 +340,123 @@ export class PressProtocolClient {
           }
         : undefined,
     };
+  }
+
+  /**
+   * Publishes content via the v1 REST API with node-side signing (POST /api/v1/publish/raw).
+   */
+  async publishRaw(options: {
+    title: string;
+    content: string;
+    format?: "markdown" | "html" | "json";
+    tags?: string[];
+    author?: string;
+    metadata?: Record<string, any>;
+  }): Promise<any> {
+    const endpoint = this.endpoint.replace(/\/$/, "");
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+    if (this.apiKey) {
+      headers["Authorization"] = `Bearer ${this.apiKey}`;
+      headers["X-API-Key"] = this.apiKey;
+    }
+
+    const res = await fetch(`${endpoint}/api/v1/publish/raw`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        title: options.title,
+        content: options.content,
+        format: options.format || "markdown",
+        tags: options.tags || [],
+        author: options.author,
+        metadata: options.metadata,
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`publishRaw failed (${res.status}): ${err}`);
+    }
+
+    return res.json();
+  }
+
+  /**
+   * Relays a client-signed article via the v1 REST API (POST /api/v1/publish/signed - Zero-Custody).
+   */
+  async publishSigned(options: {
+    title: string;
+    content: string;
+    tags?: string[];
+    timestamp: string;
+    publicKey: string;
+    signature: string;
+  }): Promise<any> {
+    const endpoint = this.endpoint.replace(/\/$/, "");
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+    if (this.apiKey) {
+      headers["Authorization"] = `Bearer ${this.apiKey}`;
+    }
+
+    const res = await fetch(`${endpoint}/api/v1/publish/signed`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(options),
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`publishSigned failed (${res.status}): ${err}`);
+    }
+
+    return res.json();
+  }
+
+  /**
+   * Cryptographic verification audit via v1 API (POST /api/v1/verify).
+   */
+  async verifyContent(options: {
+    content: string;
+    publicKey: string;
+    signature: string;
+    cid?: string;
+    title?: string;
+    tags?: string[];
+    timestamp?: string;
+  }): Promise<any> {
+    const endpoint = this.endpoint.replace(/\/$/, "");
+    const res = await fetch(`${endpoint}/api/v1/verify`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(options),
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`verifyContent failed (${res.status}): ${err}`);
+    }
+
+    return res.json();
+  }
+
+  /**
+   * Retrieves enterprise gateway metrics (GET /api/v1/metrics).
+   */
+  async getMetrics(): Promise<any> {
+    const endpoint = this.endpoint.replace(/\/$/, "");
+    const res = await fetch(`${endpoint}/api/v1/metrics`);
+    if (!res.ok) {
+      throw new Error(`getMetrics failed: ${res.statusText}`);
+    }
+    return res.json();
   }
 }
