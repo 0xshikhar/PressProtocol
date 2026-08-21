@@ -93,6 +93,8 @@ fastify.get('/health/live', async (request, reply) => {
 
 import { bridgeRoutes } from './routes/bridge.js';
 
+import { v1Routes } from './routes/v1.js';
+
 // Register API routes
 await fastify.register(nodeRoutes);
 await fastify.register(contentRoutes);
@@ -103,6 +105,7 @@ await fastify.register(mirrorsRoutes);
 await fastify.register(uploadRoutes);
 await fastify.register(manifestRoutes);
 await fastify.register(bridgeRoutes);
+await fastify.register(v1Routes);
 
 // Root route
 fastify.get('/', async (request, reply) => {
@@ -110,8 +113,8 @@ fastify.get('/', async (request, reply) => {
   return reply.send({
     name: 'PressProtocol Sovereign Node API',
     version: '1.0.0-sovereign',
-    specification: 'RFC-PP-008-WAVE5-GLOBAL-INFRA-INTEGRATIONS',
-    description: 'Universal decentralized publishing substrate, P2P federation, and CMS bridge node',
+    specification: 'RFC-PP-009-ENTERPRISE-GATEWAY-AND-API',
+    description: 'Universal decentralized publishing substrate, P2P federation, OpenAPI 3.1 gateway, and multi-tenant publishing engine',
     onionAddress: onionAddress || 'Pending daemon startup',
     endpoints: {
       nodeStatus: '/api/node/status',
@@ -136,6 +139,13 @@ fastify.get('/', async (request, reply) => {
       bridgeStrapi: '/api/bridge/strapi',
       bridgeCms: '/api/bridge/cms',
       bridgeCleanse: '/api/bridge/cleanse',
+      v1PublishRaw: '/api/v1/publish/raw',
+      v1PublishSigned: '/api/v1/publish/signed',
+      v1Resolve: '/api/v1/resolve/:cid',
+      v1Verify: '/api/v1/verify',
+      v1OpenApi: '/api/v1/openapi.json',
+      v1AdminKeys: '/api/v1/admin/keys',
+      v1Metrics: '/api/v1/metrics',
     },
     docs: 'https://github.com/anonpress/backend',
   });
