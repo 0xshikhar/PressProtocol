@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pressprotocol-py"
+version = "1.0.0"
+description = "Official PressProtocol Python SDK - Sovereign Publishing & Multi-Transport Resolution"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "PressProtocol Architects" }]
+keywords = ["pressprotocol", "sovereign", "publishing", "ipfs", "tor", "ed25519"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
