@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { Search, Menu, X, Bell, BookMarked, TrendingUp, FileText, Home, BarChart3, Settings, HelpCircle, User, Globe, UploadCloud } from "lucide-react";
+import { Search, Menu, X, Bell, BookMarked, TrendingUp, FileText, Home, BarChart3, Settings, HelpCircle, User, Globe, UploadCloud, Terminal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AuthButton } from "@/components/AuthButton";
 import { Button } from "@/components/ui/button";
@@ -39,6 +39,7 @@ const Navbar = () => {
     { href: "/import", label: "Import", icon: UploadCloud },
     { href: "/write", label: "Publish", icon: FileText },
     { href: "/explorer", label: "Explorer", icon: Globe },
+    { href: "/developers", label: "Developers", icon: Terminal },
   ];
 
   return (

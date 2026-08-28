@@ -18,6 +18,8 @@ export default function Footer() {
     ],
     resources: [
       { name: "Documentation", href: "/docs" },
+      { name: "Developer Portal", href: "/developers" },
+      { name: "OpenAPI Spec", href: "/api/v1/openapi.json" },
       { name: "GitHub", href: "https://github.com/0xshikhar/anonpress" },
       { name: "IPFS Guide", href: "/docs/ipfs" },
       { name: "Tor Setup", href: "/docs/tor" },
