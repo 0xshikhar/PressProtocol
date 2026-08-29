@@ -98,3 +98,45 @@ export interface ClientConfig {
   gateways?: string[]; // Fallback public IPFS gateways
   timeoutMs?: number;
 }
+
+export type WebhookEventType =
+  | "article.published"
+  | "article.verified"
+  | "mirror.health_changed"
+  | "*";
+
+export interface WebhookSubscriptionStats {
+  deliveredCount: number;
+  failureCount: number;
+  lastDeliveryStatus?: "success" | "failed";
+  lastDeliveryAt?: string;
+  lastLatencyMs?: number;
+}
+
+export interface WebhookSubscription {
+  id: string;
+  url: string;
+  events: WebhookEventType[];
+  secret: string;
+  description?: string;
+  status: "active" | "disabled";
+  createdAt: string;
+  updatedAt: string;
+  metadata?: Record<string, any>;
+  stats: WebhookSubscriptionStats;
+}
+
+export interface CreateWebhookOptions {
+  url: string;
+  events?: WebhookEventType[];
+  description?: string;
+  secret?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface WebhookVerificationResult {
+  valid: boolean;
+  reason?: string;
+  timestamp?: number;
+}
+
