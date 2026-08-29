@@ -20,6 +20,11 @@ export {
   type VerificationResult,
 } from "./crypto.js";
 
+export {
+  signWebhookPayload,
+  verifyWebhookSignature,
+} from "./webhooks.js";
+
 export type {
   ClientConfig,
   PublishOptions,
@@ -31,4 +36,10 @@ export type {
   MirrorStatus,
   ArticlePublisher,
   KeyPair,
+  WebhookEventType,
+  WebhookSubscriptionStats,
+  WebhookSubscription,
+  CreateWebhookOptions,
+  WebhookVerificationResult,
 } from "./types.js";
+

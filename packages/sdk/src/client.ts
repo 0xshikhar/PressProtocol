@@ -14,7 +14,12 @@ import type {
   HealthResult,
   MirrorProbe,
   KeyPair,
+  CreateWebhookOptions,
+  WebhookSubscription,
+  WebhookVerificationResult,
 } from "./types.js";
+import { verifyWebhookSignature } from "./webhooks.js";
+
 
 const DEFAULT_PRODUCTION_ENDPOINT = "https://anonpress-production.up.railway.app";
 const DEFAULT_LOCAL_ENDPOINT = "http://localhost:4000";
@@ -459,4 +464,155 @@ export class PressProtocolClient {
     }
     return res.json();
   }
+
+  /**
+   * Registers a new outbound webhook subscription on the PressProtocol gateway.
+   */
+  async createWebhookSubscription(options: CreateWebhookOptions): Promise<{
+    success: boolean;
+    subscription: WebhookSubscription;
+    instructions: string;
+  }> {
+    const endpoint = this.endpoint.replace(/\/$/, "");
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+    if (this.apiKey) {
+      headers["Authorization"] = `Bearer ${this.apiKey}`;
+      headers["X-API-Key"] = this.apiKey;
+    }
+
+    const res = await fetch(`${endpoint}/api/v1/webhooks/subscriptions`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(options),
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`createWebhookSubscription failed (${res.status}): ${err}`);
+    }
+
+    return res.json();
+  }
+
+  /**
+   * Lists registered webhook subscriptions on the gateway.
+   */
+  async listWebhookSubscriptions(): Promise<{
+    success: boolean;
+    subscriptions: WebhookSubscription[];
+    count: number;
+  }> {
+    const endpoint = this.endpoint.replace(/\/$/, "");
+    const headers: Record<string, string> = { Accept: "application/json" };
+    if (this.apiKey) {
+      headers["Authorization"] = `Bearer ${this.apiKey}`;
+      headers["X-API-Key"] = this.apiKey;
+    }
+
+    const res = await fetch(`${endpoint}/api/v1/webhooks/subscriptions`, { headers });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`listWebhookSubscriptions failed (${res.status}): ${err}`);
+    }
+
+    return res.json();
+  }
+
+  /**
+   * Retrieves an individual webhook subscription by ID.
+   */
+  async getWebhookSubscription(id: string): Promise<{
+    success: boolean;
+    subscription: WebhookSubscription;
+  }> {
+    const endpoint = this.endpoint.replace(/\/$/, "");
+    const headers: Record<string, string> = { Accept: "application/json" };
+    if (this.apiKey) {
+      headers["Authorization"] = `Bearer ${this.apiKey}`;
+      headers["X-API-Key"] = this.apiKey;
+    }
+
+    const res = await fetch(`${endpoint}/api/v1/webhooks/subscriptions/${id}`, { headers });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`getWebhookSubscription failed (${res.status}): ${err}`);
+    }
+
+    return res.json();
+  }
+
+  /**
+   * Deletes a registered webhook subscription.
+   */
+  async deleteWebhookSubscription(id: string): Promise<{
+    success: boolean;
+    message: string;
+  }> {
+    const endpoint = this.endpoint.replace(/\/$/, "");
+    const headers: Record<string, string> = { Accept: "application/json" };
+    if (this.apiKey) {
+      headers["Authorization"] = `Bearer ${this.apiKey}`;
+      headers["X-API-Key"] = this.apiKey;
+    }
+
+    const res = await fetch(`${endpoint}/api/v1/webhooks/subscriptions/${id}`, {
+      method: "DELETE",
+      headers,
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`deleteWebhookSubscription failed (${res.status}): ${err}`);
+    }
+
+    return res.json();
+  }
+
+  /**
+   * Sends an immediate test ping event to verify webhook connectivity.
+   */
+  async testWebhookSubscription(id: string): Promise<{
+    success: boolean;
+    message: string;
+    statusCode?: number;
+    latencyMs?: number;
+  }> {
+    const endpoint = this.endpoint.replace(/\/$/, "");
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+    if (this.apiKey) {
+      headers["Authorization"] = `Bearer ${this.apiKey}`;
+      headers["X-API-Key"] = this.apiKey;
+    }
+
+    const res = await fetch(`${endpoint}/api/v1/webhooks/subscriptions/${id}/test`, {
+      method: "POST",
+      headers,
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`testWebhookSubscription failed (${res.status}): ${err}`);
+    }
+
+    return res.json();
+  }
+
+  /**
+   * Helper to verify an incoming webhook payload using the shared secret.
+   */
+  verifyWebhook(
+    payload: string | object,
+    signatureHeader: string | null | undefined,
+    secret: string,
+    toleranceSeconds: number = 300
+  ): WebhookVerificationResult {
+    return verifyWebhookSignature(payload, signatureHeader, secret, toleranceSeconds);
+  }
 }
+
