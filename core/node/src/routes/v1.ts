@@ -6,6 +6,7 @@ import { storageService } from '../services/StorageService.js';
 import { torService } from '../services/TorService.js';
 import { resolverService } from '../services/ResolverService.js';
 import { calculateDeterministicCIDv1 } from '../lib/cid.js';
+import { webhookSubscriptionService } from '../services/WebhookSubscriptionService.js';
 
 // Schemas
 const publishRawSchema = z.object({
@@ -45,6 +46,14 @@ const createKeySchema = z.object({
   maxBytes: z.number().positive().optional(),
   isTest: z.boolean().optional(),
 });
+
+const webhookSubscriptionSchema = z.object({
+  url: z.string().url(),
+  events: z.array(z.enum(['article.published', 'article.verified', 'mirror.health_changed', '*'])).optional(),
+  secret: z.string().optional(),
+  description: z.string().optional(),
+});
+
 
 /**
  * Extracts API key from Authorization header ("Bearer <key>") or "x-api-key" header.
@@ -136,6 +145,24 @@ export async function v1Routes(fastify: FastifyInstance) {
           signature,
         },
       };
+
+      // Dispatches real-time outbound webhook event
+      webhookSubscriptionService.dispatch('article.published', {
+        cid: finalCID,
+        title: body.title,
+        tags: body.tags,
+        author: body.author,
+        timestamp,
+        publisher: {
+          publicKey: nodeKeypair.publicKey,
+          signature,
+        },
+        urls: {
+          ipfs: `https://ipfs.io/ipfs/${finalCID}`,
+          gateway: `http://127.0.0.1:4000/read/${finalCID}`,
+          tor: onionAddress ? `http://${onionAddress}/read/${finalCID}` : undefined,
+        },
+      });
 
       return reply.status(201).send({
         success: true,
@@ -232,6 +259,23 @@ export async function v1Routes(fastify: FastifyInstance) {
       if (keyRecord) {
         apiKeyService.recordUsage(keyRecord.id, Buffer.byteLength(body.content, 'utf8'));
       }
+
+      // Dispatches real-time outbound webhook event
+      webhookSubscriptionService.dispatch('article.published', {
+        cid: finalCID,
+        title: body.title,
+        tags: body.tags,
+        timestamp: body.timestamp,
+        publisher: {
+          publicKey: body.publicKey,
+          signature: body.signature,
+        },
+        urls: {
+          ipfs: `https://ipfs.io/ipfs/${finalCID}`,
+          tor: onionAddress ? `http://${onionAddress}/read/${finalCID}` : undefined,
+          local: `http://127.0.0.1:4000/read/${finalCID}`,
+        },
+      });
 
       return reply.status(201).send({
         success: true,
@@ -336,8 +380,21 @@ export async function v1Routes(fastify: FastifyInstance) {
 
       const latencyMs = Math.round((performance.now() - start) * 100) / 100;
 
+      const isValid = signatureValid && cidMatches;
+
+      if (isValid) {
+        webhookSubscriptionService.dispatch('article.verified', {
+          cid: computedCID,
+          title: body.title,
+          tags: body.tags,
+          timestamp: body.timestamp,
+          publicKey: body.publicKey,
+          isValid: true,
+        });
+      }
+
       return reply.send({
-        isValid: signatureValid && cidMatches,
+        isValid,
         cidMatches,
         signatureValid,
         algorithm: 'Ed25519 (RFC 8032)',
@@ -407,6 +464,16 @@ export async function v1Routes(fastify: FastifyInstance) {
             responses: {
               '200': { description: 'Mathematical validity report' },
             },
+          },
+        },
+        '/api/v1/webhooks/subscriptions': {
+          post: {
+            summary: 'Register outbound webhook subscription',
+            responses: { '201': { description: 'Subscription created with HMAC secret' } },
+          },
+          get: {
+            summary: 'List active webhook subscriptions',
+            responses: { '200': { description: 'List of registered webhooks' } },
           },
         },
         '/api/v1/metrics': {
@@ -484,6 +551,116 @@ export async function v1Routes(fastify: FastifyInstance) {
     const { id } = request.params as { id: string };
     const success = apiKeyService.revokeKey(id);
     return reply.send({ success, revokedId: id });
+  });
+
+  /**
+   * POST /api/v1/webhooks/subscriptions - Register Outbound Webhook Subscription
+   */
+  fastify.post('/api/v1/webhooks/subscriptions', async (request, reply) => {
+    const rawKey = extractApiKey(request);
+    let owner = 'anonymous';
+    if (rawKey) {
+      const auth = apiKeyService.validateKey(rawKey);
+      if (auth.valid && auth.record) {
+        owner = auth.record.id;
+      }
+    }
+
+    try {
+      const body = webhookSubscriptionSchema.parse(request.body);
+      const subscription = webhookSubscriptionService.createSubscription({
+        url: body.url,
+        events: body.events as any,
+        secret: body.secret,
+        owner,
+      });
+
+      return reply.status(201).send({
+        success: true,
+        subscription,
+      });
+    } catch (err: any) {
+      return reply.status(400).send({
+        success: false,
+        error: err.message || 'Invalid webhook subscription payload',
+      });
+    }
+  });
+
+  /**
+   * GET /api/v1/webhooks/subscriptions - List Webhook Subscriptions
+   */
+  fastify.get('/api/v1/webhooks/subscriptions', async (request, reply) => {
+    const rawKey = extractApiKey(request);
+    let owner: string | undefined = undefined;
+    if (rawKey) {
+      const auth = apiKeyService.validateKey(rawKey);
+      if (auth.valid && auth.record) {
+        owner = auth.record.id;
+      }
+    }
+
+    const subscriptions = webhookSubscriptionService.listSubscriptions(owner);
+    return reply.send({
+      success: true,
+      subscriptions,
+    });
+  });
+
+  /**
+   * GET /api/v1/webhooks/subscriptions/:id - Get Single Subscription Details
+   */
+  fastify.get('/api/v1/webhooks/subscriptions/:id', async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const subscription = webhookSubscriptionService.getSubscription(id);
+    if (!subscription) {
+      return reply.status(404).send({
+        success: false,
+        error: `Webhook subscription "${id}" not found`,
+      });
+    }
+    return reply.send({
+      success: true,
+      subscription,
+    });
+  });
+
+  /**
+   * DELETE /api/v1/webhooks/subscriptions/:id - Revoke Webhook Subscription
+   */
+  fastify.delete('/api/v1/webhooks/subscriptions/:id', async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const success = webhookSubscriptionService.deleteSubscription(id);
+    if (!success) {
+      return reply.status(404).send({
+        success: false,
+        error: `Webhook subscription "${id}" not found`,
+      });
+    }
+    return reply.send({
+      success: true,
+      revokedId: id,
+    });
+  });
+
+  /**
+   * POST /api/v1/webhooks/subscriptions/:id/test - Trigger Live Test Ping
+   */
+  fastify.post('/api/v1/webhooks/subscriptions/:id/test', async (request, reply) => {
+    const { id } = request.params as { id: string };
+    try {
+      const result = await webhookSubscriptionService.triggerTestPing(id);
+      return reply.send({
+        success: result.success,
+        statusCode: result.statusCode,
+        error: result.error,
+      });
+    } catch (err: any) {
+      return reply.status(404).send({
+        success: false,
+        error: err.message || 'Test ping failed',
+      });
+    }
   });
 
   /**
