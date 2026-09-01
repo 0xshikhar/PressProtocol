@@ -50,6 +50,11 @@ const DEFAULT_REQUESTS = {
     tags: ["decentralization"],
     timestamp: "2026-09-13T01:00:00.000Z",
   },
+  webhooks: {
+    url: "https://newsroom.example.com/api/webhooks/pressprotocol",
+    events: ["article.published", "article.verified"],
+    description: "Instant notification for published or verified investigative stories",
+  },
   metrics: {},
 };
 
@@ -58,11 +63,12 @@ interface ApiExplorerProps {
 }
 
 export default function ApiExplorer({ apiKey }: ApiExplorerProps) {
-  const [selectedEndpoint, setSelectedEndpoint] = useState<"publish_raw" | "publish_signed" | "resolve" | "verify" | "metrics">("publish_raw");
+  const [selectedEndpoint, setSelectedEndpoint] = useState<"publish_raw" | "publish_signed" | "resolve" | "verify" | "webhooks" | "metrics">("publish_raw");
   const [targetMode, setTargetMode] = useState<"sandbox" | "local" | "production">("sandbox");
   const [customNodeUrl, setCustomNodeUrl] = useState<string>("");
   const [requestBodyText, setRequestBodyText] = useState<string>("");
   const [resolveCidInput, setResolveCidInput] = useState<string>(DEFAULT_REQUESTS.resolve.cid);
+
   const [isExecuting, setIsExecuting] = useState<boolean>(false);
   const [copiedResponse, setCopiedResponse] = useState<boolean>(false);
   const [responseResult, setResponseResult] = useState<{
@@ -80,6 +86,8 @@ export default function ApiExplorer({ apiKey }: ApiExplorerProps) {
       setRequestBodyText(JSON.stringify(DEFAULT_REQUESTS.publish_signed, null, 2));
     } else if (selectedEndpoint === "verify") {
       setRequestBodyText(JSON.stringify(DEFAULT_REQUESTS.verify, null, 2));
+    } else if (selectedEndpoint === "webhooks") {
+      setRequestBodyText(JSON.stringify(DEFAULT_REQUESTS.webhooks, null, 2));
     } else {
       setRequestBodyText("");
     }
@@ -244,6 +252,42 @@ export default function ApiExplorer({ apiKey }: ApiExplorerProps) {
               auditTimestamp: new Date().toISOString(),
             },
           });
+        } else if (selectedEndpoint === "webhooks") {
+          const parsed = JSON.parse(requestBodyText || "{}");
+          const randomHex = Array.from(crypto.getRandomValues(new Uint8Array(16)))
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("");
+          const subId = `sub_${Date.now().toString(36)}_${randomHex.slice(0, 4)}`;
+          const secret = parsed.secret || `whsec_${randomHex}`;
+          const latencyMs = Math.round((performance.now() - startTime) * 100) / 100;
+          setResponseResult({
+            status: 201,
+            statusText: "Created",
+            latencyMs,
+            headers: {
+              "content-type": "application/json; charset=utf-8",
+              "x-ratelimit-limit": "120",
+              "x-ratelimit-remaining": "119",
+              "x-webhook-id": subId,
+            },
+            data: {
+              success: true,
+              subscription: {
+                id: subId,
+                url: parsed.url || "https://newsroom.example.com/api/webhooks/pressprotocol",
+                events: parsed.events || ["article.published", "article.verified"],
+                secret,
+                description: parsed.description || "Production Outbound Webhook",
+                status: "active",
+                createdAt: new Date().toISOString(),
+                stats: {
+                  deliveredCount: 0,
+                  failureCount: 0,
+                },
+              },
+              instructions: "Store the secret securely. Incoming webhooks will be signed with HMAC-SHA256 in the X-PressProtocol-Signature header.",
+            },
+          });
         } else if (selectedEndpoint === "metrics") {
           const latencyMs = Math.round((performance.now() - startTime) * 100) / 100;
           setResponseResult({
@@ -283,6 +327,10 @@ export default function ApiExplorer({ apiKey }: ApiExplorerProps) {
           method = "GET";
         } else if (selectedEndpoint === "verify") {
           url = `${activeUrl}/api/v1/verify`;
+          method = "POST";
+          body = requestBodyText;
+        } else if (selectedEndpoint === "webhooks") {
+          url = `${activeUrl}/api/v1/webhooks/subscriptions`;
           method = "POST";
           body = requestBodyText;
         } else if (selectedEndpoint === "metrics") {
@@ -452,6 +500,21 @@ export default function ApiExplorer({ apiKey }: ApiExplorerProps) {
             </button>
 
             <button
+              onClick={() => setSelectedEndpoint("webhooks")}
+              className={`p-2.5 text-left rounded-lg border text-xs transition-all ${
+                selectedEndpoint === "webhooks"
+                  ? "border-blue-500 bg-blue-500/10 text-blue-600 dark:text-blue-400 font-semibold shadow-sm"
+                  : "border-border hover:bg-muted/50 text-muted-foreground"
+              }`}
+            >
+              <div className="flex items-center gap-1.5">
+                <Badge variant="outline" className="px-1 py-0 text-[10px] font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20">POST</Badge>
+                <span className="font-mono truncate">/webhooks</span>
+              </div>
+              <div className="text-[11px] text-muted-foreground truncate mt-1">Outbound Events</div>
+            </button>
+
+            <button
               onClick={() => setSelectedEndpoint("metrics")}
               className={`p-2.5 text-left rounded-lg border text-xs transition-all ${
                 selectedEndpoint === "metrics"
@@ -476,7 +539,7 @@ export default function ApiExplorer({ apiKey }: ApiExplorerProps) {
                     {selectedEndpoint === "resolve" || selectedEndpoint === "metrics" ? "GET" : "POST"}
                   </span>
                   <span>
-                    /api/v1/{selectedEndpoint === "resolve" ? "resolve/{cid}" : selectedEndpoint.replace("_", "/")}
+                    /api/v1/{selectedEndpoint === "resolve" ? "resolve/{cid}" : selectedEndpoint === "webhooks" ? "webhooks/subscriptions" : selectedEndpoint.replace("_", "/")}
                   </span>
                 </CardTitle>
                 <CardDescription className="text-xs">
@@ -484,6 +547,7 @@ export default function ApiExplorer({ apiKey }: ApiExplorerProps) {
                   {selectedEndpoint === "publish_signed" && "Zero-custody distributor. Accepts client-signed payload without receiving private key."}
                   {selectedEndpoint === "resolve" && "Resolves content and queries live latency from Tor, IPFS, and local gateways."}
                   {selectedEndpoint === "verify" && "Audits any arbitrary text against signature and CID under RFC 8032."}
+                  {selectedEndpoint === "webhooks" && "Registers an HTTP endpoint to receive real-time signed event callbacks (article.published, article.verified)."}
                   {selectedEndpoint === "metrics" && "Queries node throughput, active keys, pinned bytes, and circuit telemetry."}
                 </CardDescription>
               </div>
@@ -518,6 +582,7 @@ export default function ApiExplorer({ apiKey }: ApiExplorerProps) {
                         if (selectedEndpoint === "publish_raw") setRequestBodyText(JSON.stringify(DEFAULT_REQUESTS.publish_raw, null, 2));
                         if (selectedEndpoint === "publish_signed") setRequestBodyText(JSON.stringify(DEFAULT_REQUESTS.publish_signed, null, 2));
                         if (selectedEndpoint === "verify") setRequestBodyText(JSON.stringify(DEFAULT_REQUESTS.verify, null, 2));
+                        if (selectedEndpoint === "webhooks") setRequestBodyText(JSON.stringify(DEFAULT_REQUESTS.webhooks, null, 2));
                       }}
                       className="text-muted-foreground hover:text-foreground text-[11px]"
                     >
