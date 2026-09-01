@@ -119,6 +119,47 @@ export async function GET() {
           },
         },
       },
+      "/api/v1/webhooks/subscriptions": {
+        post: {
+          summary: "Register outbound webhook subscription",
+          description: "Registers an HTTP endpoint to receive real-time signed event callbacks (article.published, article.verified) with HMAC-SHA256 signatures.",
+          security: [{ ApiKeyAuth: [] }, { BearerAuth: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["url"],
+                  properties: {
+                    url: { type: "string", format: "uri", example: "https://my-cms.example.com/api/pressprotocol-webhook" },
+                    events: {
+                      type: "array",
+                      items: {
+                        type: "string",
+                        enum: ["article.published", "article.verified", "mirror.health_changed", "*"],
+                      },
+                      example: ["article.published", "article.verified"],
+                    },
+                    secret: { type: "string", description: "Optional custom secret; auto-generated if omitted" },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            "201": { description: "Webhook subscription registered with shared secret" },
+            "400": { description: "Invalid URL or event parameters" },
+          },
+        },
+        get: {
+          summary: "List active webhook subscriptions",
+          security: [{ ApiKeyAuth: [] }, { BearerAuth: [] }],
+          responses: {
+            "200": { description: "Array of registered webhook subscriptions and delivery statistics" },
+          },
+        },
+      },
       "/api/v1/metrics": {
         get: {
           summary: "Enterprise node throughput and health metrics",
