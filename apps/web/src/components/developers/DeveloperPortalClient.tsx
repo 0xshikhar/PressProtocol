@@ -11,11 +11,12 @@ import { useSandboxKey } from "./useSandboxKey";
 
 export default function DeveloperPortalClient() {
   const { apiKey, keyCopied, generateNewSandboxKey, copyApiKey } = useSandboxKey();
+  const [selectedEndpoint, setSelectedEndpoint] = React.useState<any>("publish_raw");
 
   return (
     <div className="space-y-12">
       {/* Hero Header */}
-      <DeveloperHero />
+      <DeveloperHero onSelectEndpoint={setSelectedEndpoint} />
 
       {/* 1-Click Sandbox API Key */}
       <SandboxKeyCard
@@ -26,7 +27,7 @@ export default function DeveloperPortalClient() {
       />
 
       {/* Interactive API Explorer */}
-      <ApiExplorer apiKey={apiKey} />
+      <ApiExplorer apiKey={apiKey} initialEndpoint={selectedEndpoint} />
 
       {/* Universal Web Component Playground */}
       <WidgetPlayground />

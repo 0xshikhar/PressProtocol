@@ -9,6 +9,7 @@ interface SdkCodeSnippetsProps {
 
 export default function SdkCodeSnippets({ apiKey }: SdkCodeSnippetsProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [installMethod, setInstallMethod] = useState<"registry" | "git">("registry");
 
   const activeKeyDisplay = apiKey || "pp_test_your_sandbox_api_key";
   const defaultEndpoint = "https://node.pressprotocol.com";
@@ -17,6 +18,25 @@ export default function SdkCodeSnippets({ apiKey }: SdkCodeSnippetsProps) {
     navigator.clipboard.writeText(text);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const installCommands = {
+    typescript: {
+      registry: "pnpm add @pressprotocol/sdk",
+      git: "pnpm add git+https://github.com/0xshikhar/AnonPress.git#packages/sdk",
+    },
+    python: {
+      registry: "pip install pressprotocol-py",
+      git: 'pip install "git+https://github.com/0xshikhar/AnonPress.git#subdirectory=sdks/python"',
+    },
+    go: {
+      registry: "go get github.com/0xshikhar/AnonPress/sdks/go@v1.0.0",
+      git: "go get github.com/0xshikhar/AnonPress/sdks/go@master",
+    },
+    rust: {
+      registry: "cargo add pressprotocol-rs",
+      git: 'pressprotocol-rs = { git = "https://github.com/0xshikhar/AnonPress.git", branch = "master" }',
+    },
   };
 
   const snippets = {
@@ -55,15 +75,15 @@ post = client.publish_raw(
     tags=["science", "reproducibility"]
 )
 
-print(f"✅ Published CID: {post.cid}")
-print(f"📦 IPFS Gateway: {post.ipfs_url}")
-print(f"🧅 Tor Mirror: {post.tor_url}")`,
+print(f"✅ Published CID: {post['cid']}")
+print(f"📦 IPFS Gateway: {post.get('urls', {}).get('ipfs')}")
+print(f"🧅 Tor Mirror: {post.get('urls', {}).get('tor')}")`,
 
     go: `package main
 
 import (
     "fmt"
-    "github.com/pressprotocol/pressprotocol-go"
+    "github.com/0xshikhar/AnonPress/sdks/go"
 )
 
 func main() {
@@ -82,9 +102,11 @@ func main() {
     }
 
     fmt.Printf("✅ Published CID: %s\\n", result.CID)
+    fmt.Printf("📦 IPFS Mirror: %s\\n", result.URLs["ipfs"])
+    fmt.Printf("🧅 Tor Mirror: %s\\n", result.URLs["tor"])
 }`,
 
-    rust: `use pressprotocol::{Client, PublishRequest};
+    rust: `use pressprotocol_rs::{Client, PublishRequest};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -96,10 +118,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let res = client.publish_raw(PublishRequest {
         title: "Security Advisory Bulletin".into(),
         content: "# Zero-Day Mitigation\\nDeterministic archival.".into(),
+        format: Some("markdown".into()),
         tags: vec!["security".into(), "bulletin".into()],
+        author: Some("Security Council".into()),
     }).await?;
 
     println!("✅ Anchored CID: {}", res.cid);
+    println!("🌐 IPFS Mirror: {:?}", res.urls.get("ipfs"));
+    println!("🧅 Tor Mirror: {:?}", res.urls.get("tor"));
     Ok(())
 }`,
 
@@ -113,149 +139,126 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
   }'`,
   };
 
+  const renderTerminalWindow = (lang: "typescript" | "python" | "go" | "rust" | "curl", title: string) => {
+    const installCmd = lang !== "curl" ? installCommands[lang][installMethod] : null;
+    const code = snippets[lang];
+
+    return (
+      <div className="rounded-2xl border border-white/10 bg-[#0B0D14] overflow-hidden shadow-2xl space-y-0">
+        {/* macOS Terminal Window Titlebar Chrome */}
+        <div className="flex items-center justify-between px-4 py-3 bg-[#111420] border-b border-white/10">
+          <div className="flex items-center gap-2">
+            <span className="h-3 w-3 rounded-full bg-[#FF5F56] border border-[#E0443E]" />
+            <span className="h-3 w-3 rounded-full bg-[#FFBD2E] border border-[#DEA123]" />
+            <span className="h-3 w-3 rounded-full bg-[#27C93F] border border-[#1AAB29]" />
+            <span className="ml-2 font-mono text-xs text-white/50">{title}</span>
+          </div>
+
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => copyText(code, `${lang}-code`)}
+            className="h-7 text-xs font-mono border-white/10 bg-white/5 hover:bg-white/10 text-white/80 hover:text-white rounded-lg gap-1.5"
+          >
+            {copiedId === `${lang}-code` ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+            <span>{copiedId === `${lang}-code` ? "Copied Snippet" : "Copy Code"}</span>
+          </Button>
+        </div>
+
+        {/* 1-Line Installation Header if applicable */}
+        {installCmd && (
+          <div className="flex items-center justify-between px-4 py-2.5 bg-black/40 border-b border-white/5 text-xs font-mono text-cyan-300">
+            <div className="flex items-center gap-2 truncate">
+              <span className="text-white/40 select-none">$</span>
+              <span className="truncate">{installCmd}</span>
+            </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => copyText(installCmd, `${lang}-install`)}
+              className="h-6 px-2 text-xs font-mono text-white/60 hover:text-white shrink-0 ml-2"
+              title="Copy install command"
+            >
+              {copiedId === `${lang}-install` ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+            </Button>
+          </div>
+        )}
+
+        {/* Code Content */}
+        <div className="p-4 font-mono text-xs overflow-x-auto text-cyan-100/90 leading-relaxed whitespace-pre selection:bg-cyan-500/30">
+          {code}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <section className="space-y-6">
-      <div>
-        <div className="flex items-center gap-2">
-          <Layers className="h-5 w-5 text-blue-600" />
-          <h2 className="text-2xl font-bold tracking-tight">Multi-Language SDK Ecosystem</h2>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <Layers className="h-5 w-5 text-cyan-400" />
+            <h2 className="text-2xl font-bold tracking-tight text-white font-sans">Multi-Language SDK Ecosystem</h2>
+          </div>
+          <p className="text-sm text-white/60 mt-1 font-sans">
+            Native, idiomatic libraries with embedded cryptographic multihashing and automatic failover.
+          </p>
         </div>
-        <p className="text-sm text-muted-foreground mt-1">
-          Native, idiomatic libraries with embedded cryptographic multihashing and automatic failover.
-        </p>
+
+        {/* Public Registry vs Direct Git Install Toggle */}
+        <div className="flex items-center gap-1 p-1 rounded-xl bg-white/5 border border-white/10 self-start sm:self-auto">
+          <button
+            type="button"
+            onClick={() => setInstallMethod("registry")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${
+              installMethod === "registry"
+                ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold"
+                : "text-white/60 hover:text-white"
+            }`}
+          >
+            Public Registry
+          </button>
+          <button
+            type="button"
+            onClick={() => setInstallMethod("git")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${
+              installMethod === "git"
+                ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold"
+                : "text-white/60 hover:text-white"
+            }`}
+          >
+            Direct Git Install
+          </button>
+        </div>
       </div>
 
       <Tabs defaultValue="typescript" className="space-y-4">
-        <TabsList className="grid grid-cols-2 sm:grid-cols-5 w-full sm:w-auto h-auto p-1 bg-muted/60">
-          <TabsTrigger value="typescript" className="text-xs font-medium py-2">TypeScript / JS</TabsTrigger>
-          <TabsTrigger value="python" className="text-xs font-medium py-2">Python</TabsTrigger>
-          <TabsTrigger value="go" className="text-xs font-medium py-2">Go</TabsTrigger>
-          <TabsTrigger value="rust" className="text-xs font-medium py-2">Rust</TabsTrigger>
-          <TabsTrigger value="curl" className="text-xs font-medium py-2">cURL</TabsTrigger>
+        <TabsList className="grid grid-cols-2 sm:grid-cols-5 w-full sm:w-auto h-auto p-1 bg-white/5 border border-white/10 rounded-xl">
+          <TabsTrigger value="typescript" className="text-xs font-mono py-2 text-white/70 data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300 rounded-lg">TypeScript / JS</TabsTrigger>
+          <TabsTrigger value="python" className="text-xs font-mono py-2 text-white/70 data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300 rounded-lg">Python</TabsTrigger>
+          <TabsTrigger value="go" className="text-xs font-mono py-2 text-white/70 data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300 rounded-lg">Go</TabsTrigger>
+          <TabsTrigger value="rust" className="text-xs font-mono py-2 text-white/70 data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300 rounded-lg">Rust</TabsTrigger>
+          <TabsTrigger value="curl" className="text-xs font-mono py-2 text-white/70 data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300 rounded-lg">cURL</TabsTrigger>
         </TabsList>
 
-        {/* TypeScript */}
-        <TabsContent value="typescript" className="space-y-3">
-          <div className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border text-xs font-mono">
-            <span>pnpm add @pressprotocol/sdk</span>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => copyText("pnpm add @pressprotocol/sdk", "ts-install")}
-              className="h-6 px-2 text-xs"
-            >
-              {copiedId === "ts-install" ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
-            </Button>
-          </div>
-          <div className="relative rounded-lg bg-muted/60 p-4 font-mono text-xs overflow-x-auto border text-foreground leading-relaxed whitespace-pre">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => copyText(snippets.typescript, "ts-code")}
-              className="absolute top-3 right-3 h-7 gap-1 text-xs"
-            >
-              {copiedId === "ts-code" ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
-              {copiedId === "ts-code" ? "Copied" : "Copy"}
-            </Button>
-            {snippets.typescript}
-          </div>
+        <TabsContent value="typescript">
+          {renderTerminalWindow("typescript", "node — pressprotocol-sdk v1.0.0")}
         </TabsContent>
 
-        {/* Python */}
-        <TabsContent value="python" className="space-y-3">
-          <div className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border text-xs font-mono">
-            <span>pip install pressprotocol</span>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => copyText("pip install pressprotocol", "py-install")}
-              className="h-6 px-2 text-xs"
-            >
-              {copiedId === "py-install" ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
-            </Button>
-          </div>
-          <div className="relative rounded-lg bg-muted/60 p-4 font-mono text-xs overflow-x-auto border text-foreground leading-relaxed whitespace-pre">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => copyText(snippets.python, "py-code")}
-              className="absolute top-3 right-3 h-7 gap-1 text-xs"
-            >
-              {copiedId === "py-code" ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
-              {copiedId === "py-code" ? "Copied" : "Copy"}
-            </Button>
-            {snippets.python}
-          </div>
+        <TabsContent value="python">
+          {renderTerminalWindow("python", "python3 — pressprotocol v1.0.0")}
         </TabsContent>
 
-        {/* Go */}
-        <TabsContent value="go" className="space-y-3">
-          <div className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border text-xs font-mono">
-            <span>go get github.com/pressprotocol/pressprotocol-go</span>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => copyText("go get github.com/pressprotocol/pressprotocol-go", "go-install")}
-              className="h-6 px-2 text-xs"
-            >
-              {copiedId === "go-install" ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
-            </Button>
-          </div>
-          <div className="relative rounded-lg bg-muted/60 p-4 font-mono text-xs overflow-x-auto border text-foreground leading-relaxed whitespace-pre">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => copyText(snippets.go, "go-code")}
-              className="absolute top-3 right-3 h-7 gap-1 text-xs"
-            >
-              {copiedId === "go-code" ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
-              {copiedId === "go-code" ? "Copied" : "Copy"}
-            </Button>
-            {snippets.go}
-          </div>
+        <TabsContent value="go">
+          {renderTerminalWindow("go", "go run — main.go")}
         </TabsContent>
 
-        {/* Rust */}
-        <TabsContent value="rust" className="space-y-3">
-          <div className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border text-xs font-mono">
-            <span>cargo add pressprotocol</span>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => copyText("cargo add pressprotocol", "rs-install")}
-              className="h-6 px-2 text-xs"
-            >
-              {copiedId === "rs-install" ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
-            </Button>
-          </div>
-          <div className="relative rounded-lg bg-muted/60 p-4 font-mono text-xs overflow-x-auto border text-foreground leading-relaxed whitespace-pre">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => copyText(snippets.rust, "rs-code")}
-              className="absolute top-3 right-3 h-7 gap-1 text-xs"
-            >
-              {copiedId === "rs-code" ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
-              {copiedId === "rs-code" ? "Copied" : "Copy"}
-            </Button>
-            {snippets.rust}
-          </div>
+        <TabsContent value="rust">
+          {renderTerminalWindow("rust", "cargo run — main.rs")}
         </TabsContent>
 
-        {/* cURL */}
-        <TabsContent value="curl" className="space-y-3">
-          <div className="relative rounded-lg bg-muted/60 p-4 font-mono text-xs overflow-x-auto border text-foreground leading-relaxed whitespace-pre">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => copyText(snippets.curl, "curl-code")}
-              className="absolute top-3 right-3 h-7 gap-1 text-xs"
-            >
-              {copiedId === "curl-code" ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
-              {copiedId === "curl-code" ? "Copied" : "Copy"}
-            </Button>
-            {snippets.curl}
-          </div>
+        <TabsContent value="curl">
+          {renderTerminalWindow("curl", "bash — curl rest gateway")}
         </TabsContent>
       </Tabs>
     </section>
