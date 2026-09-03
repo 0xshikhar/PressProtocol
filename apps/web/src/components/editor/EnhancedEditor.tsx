@@ -75,7 +75,7 @@ export function EnhancedEditor({
     editorProps: {
       attributes: {
         class:
-          "prose prose-lg dark:prose-invert max-w-none focus:outline-none min-h-[480px] px-6 py-6 font-serif leading-relaxed text-foreground selection:bg-primary/20",
+          "prose prose-lg dark:prose-invert max-w-none focus:outline-none min-h-[450px] px-0 py-2 font-serif text-lg leading-relaxed text-neutral-200 selection:bg-cyan-500/30",
       },
     },
   });
@@ -160,7 +160,7 @@ export function EnhancedEditor({
   }
 
   return (
-    <div className="border border-border/70 rounded-xl overflow-hidden bg-background shadow-sm transition-all focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20">
+    <div className="w-full bg-transparent">
       {/* Hidden File Input for Slash Command Image Trigger */}
       <input
         ref={fileInputRef}
@@ -176,145 +176,193 @@ export function EnhancedEditor({
       {/* Slash Commands Dropdown Menu */}
       <SlashCommandMenu editor={editor} onImageTrigger={triggerImageUpload} />
 
-      {/* Top Toolbar */}
-      <div className="border-b border-border/60 bg-muted/20 px-3 py-2 flex flex-wrap items-center justify-between gap-1">
-        <div className="flex flex-wrap items-center gap-1">
+      {/* Floating Rounded Pill Toolbar */}
+      <div className="flex items-center justify-start my-4">
+        <div className="inline-flex flex-wrap items-center gap-1 rounded-full border border-white/10 bg-[#121520]/95 backdrop-blur-xl px-3 py-1.5 shadow-xl">
           {/* Headings */}
           <Button
             type="button"
-            variant={editor.isActive("heading", { level: 1 }) ? "secondary" : "ghost"}
+            variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0"
+            className={`h-7 w-7 p-0 rounded-full text-xs font-mono transition-colors ${
+              editor.isActive("heading", { level: 1 })
+                ? "bg-white/15 text-cyan-400 font-bold"
+                : "text-neutral-400 hover:text-white hover:bg-white/[0.08]"
+            }`}
             onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
             title="Heading 1 (/h1)"
           >
-            <Heading1 className="h-4 w-4" />
+            H1
           </Button>
           <Button
             type="button"
-            variant={editor.isActive("heading", { level: 2 }) ? "secondary" : "ghost"}
+            variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0"
+            className={`h-7 w-7 p-0 rounded-full text-xs font-mono transition-colors ${
+              editor.isActive("heading", { level: 2 })
+                ? "bg-white/15 text-cyan-400 font-bold"
+                : "text-neutral-400 hover:text-white hover:bg-white/[0.08]"
+            }`}
             onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
             title="Heading 2 (/h2)"
           >
-            <Heading2 className="h-4 w-4" />
+            H2
           </Button>
           <Button
             type="button"
-            variant={editor.isActive("heading", { level: 3 }) ? "secondary" : "ghost"}
+            variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0"
+            className={`h-7 w-7 p-0 rounded-full text-xs font-mono transition-colors ${
+              editor.isActive("heading", { level: 3 })
+                ? "bg-white/15 text-cyan-400 font-bold"
+                : "text-neutral-400 hover:text-white hover:bg-white/[0.08]"
+            }`}
             onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
             title="Heading 3 (/h3)"
           >
-            <Heading3 className="h-4 w-4" />
+            H3
           </Button>
 
-          <div className="w-px h-5 bg-border/60 mx-1" />
+          <div className="w-px h-4 bg-white/10 mx-1" />
 
           {/* Text formatting */}
           <Button
             type="button"
-            variant={editor.isActive("bold") ? "secondary" : "ghost"}
+            variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0"
+            className={`h-7 w-7 p-0 rounded-full transition-colors ${
+              editor.isActive("bold")
+                ? "bg-white/15 text-cyan-400"
+                : "text-neutral-400 hover:text-white hover:bg-white/[0.08]"
+            }`}
             onClick={() => editor.chain().focus().toggleBold().run()}
             title="Bold (⌘B)"
           >
-            <Bold className="h-4 w-4" />
+            <Bold className="h-3.5 w-3.5" />
           </Button>
           <Button
             type="button"
-            variant={editor.isActive("italic") ? "secondary" : "ghost"}
+            variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0"
+            className={`h-7 w-7 p-0 rounded-full transition-colors ${
+              editor.isActive("italic")
+                ? "bg-white/15 text-cyan-400"
+                : "text-neutral-400 hover:text-white hover:bg-white/[0.08]"
+            }`}
             onClick={() => editor.chain().focus().toggleItalic().run()}
             title="Italic (⌘I)"
           >
-            <Italic className="h-4 w-4" />
+            <Italic className="h-3.5 w-3.5" />
           </Button>
           <Button
             type="button"
-            variant={editor.isActive("strike") ? "secondary" : "ghost"}
+            variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0"
+            className={`h-7 w-7 p-0 rounded-full transition-colors ${
+              editor.isActive("strike")
+                ? "bg-white/15 text-cyan-400"
+                : "text-neutral-400 hover:text-white hover:bg-white/[0.08]"
+            }`}
             onClick={() => editor.chain().focus().toggleStrike().run()}
             title="Strikethrough"
           >
-            <Strikethrough className="h-4 w-4" />
+            <Strikethrough className="h-3.5 w-3.5" />
           </Button>
 
-          <div className="w-px h-5 bg-border/60 mx-1" />
+          <div className="w-px h-4 bg-white/10 mx-1" />
 
           {/* Lists */}
           <Button
             type="button"
-            variant={editor.isActive("bulletList") ? "secondary" : "ghost"}
+            variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0"
+            className={`h-7 w-7 p-0 rounded-full transition-colors ${
+              editor.isActive("bulletList")
+                ? "bg-white/15 text-cyan-400"
+                : "text-neutral-400 hover:text-white hover:bg-white/[0.08]"
+            }`}
             onClick={() => editor.chain().focus().toggleBulletList().run()}
             title="Bullet List (- item)"
           >
-            <List className="h-4 w-4" />
+            <List className="h-3.5 w-3.5" />
           </Button>
           <Button
             type="button"
-            variant={editor.isActive("orderedList") ? "secondary" : "ghost"}
+            variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0"
+            className={`h-7 w-7 p-0 rounded-full transition-colors ${
+              editor.isActive("orderedList")
+                ? "bg-white/15 text-cyan-400"
+                : "text-neutral-400 hover:text-white hover:bg-white/[0.08]"
+            }`}
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
             title="Numbered List (1. item)"
           >
-            <ListOrdered className="h-4 w-4" />
+            <ListOrdered className="h-3.5 w-3.5" />
           </Button>
 
-          <div className="w-px h-5 bg-border/60 mx-1" />
+          <div className="w-px h-4 bg-white/10 mx-1" />
 
           {/* Quote & Callout */}
           <Button
             type="button"
-            variant={editor.isActive("blockquote") ? "secondary" : "ghost"}
+            variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0"
+            className={`h-7 w-7 p-0 rounded-full transition-colors ${
+              editor.isActive("blockquote")
+                ? "bg-white/15 text-cyan-400"
+                : "text-neutral-400 hover:text-white hover:bg-white/[0.08]"
+            }`}
             onClick={() => editor.chain().focus().toggleBlockquote().run()}
             title="Pull Quote (> quote)"
           >
-            <Quote className="h-4 w-4" />
+            <Quote className="h-3.5 w-3.5" />
           </Button>
           <Button
             type="button"
-            variant={(editor.isActive as any)("callout") ? "secondary" : "ghost"}
+            variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0 text-emerald-600 dark:text-emerald-400"
+            className={`h-7 w-7 p-0 rounded-full transition-colors ${
+              (editor.isActive as any)("callout")
+                ? "bg-emerald-500/20 text-emerald-400"
+                : "text-neutral-400 hover:text-white hover:bg-white/[0.08]"
+            }`}
             onClick={() => (editor.chain().focus() as any).toggleCallout({ type: "info" }).run()}
             title="Whistleblower Callout Box (/callout)"
           >
-            <AlertCircle className="h-4 w-4" />
+            <AlertCircle className="h-3.5 w-3.5" />
           </Button>
           <Button
             type="button"
-            variant={editor.isActive("codeBlock") ? "secondary" : "ghost"}
+            variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0"
+            className={`h-7 w-7 p-0 rounded-full transition-colors ${
+              editor.isActive("codeBlock")
+                ? "bg-white/15 text-cyan-400"
+                : "text-neutral-400 hover:text-white hover:bg-white/[0.08]"
+            }`}
             onClick={() => editor.chain().focus().toggleCodeBlock().run()}
             title="Code Block (```)"
           >
-            <Code className="h-4 w-4" />
+            <Code className="h-3.5 w-3.5" />
           </Button>
 
-          <div className="w-px h-5 bg-border/60 mx-1" />
+          <div className="w-px h-4 bg-white/10 mx-1" />
 
           {/* Media & Links */}
           <Button
             type="button"
-            variant={editor.isActive("link") ? "secondary" : "ghost"}
+            variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0"
+            className={`h-7 w-7 p-0 rounded-full transition-colors ${
+              editor.isActive("link")
+                ? "bg-white/15 text-cyan-400"
+                : "text-neutral-400 hover:text-white hover:bg-white/[0.08]"
+            }`}
             onClick={setLink}
             title="Add Link"
           >
-            <LinkIcon className="h-4 w-4" />
+            <LinkIcon className="h-3.5 w-3.5" />
           </Button>
 
           <ImageUploadButton onImageUploaded={handleImageUploaded} disabled={!editable} />
@@ -323,18 +371,12 @@ export function EnhancedEditor({
             type="button"
             variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0"
+            className="h-7 w-7 p-0 rounded-full text-neutral-400 hover:text-white hover:bg-white/[0.08]"
             onClick={() => editor.chain().focus().setHorizontalRule().run()}
             title="Horizontal Line (---)"
           >
-            <Minus className="h-4 w-4" />
+            <Minus className="h-3.5 w-3.5" />
           </Button>
-        </div>
-
-        {/* Slash Command Hint Badge */}
-        <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-muted/60 text-[11px] text-muted-foreground border border-border/40 font-mono">
-          <Command className="h-3 w-3 text-primary" />
-          <span>Type <strong className="text-foreground">/</strong> for slash commands</span>
         </div>
       </div>
 

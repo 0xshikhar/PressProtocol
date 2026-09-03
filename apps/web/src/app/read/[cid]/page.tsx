@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ExternalLink, Download, Shield, Clock, BookOpen, ShieldCheck, ShieldAlert, Loader2, FileCheck, Archive } from "lucide-react";
+import { ExternalLink, Download, Shield, Clock, BookOpen, ShieldCheck, ShieldAlert, Loader2, FileCheck, Archive, Moon, Sun, Coffee } from "lucide-react";
 import { apiClient, type ResolveContentResponse } from "@/lib/api-client";
 import { toast } from "sonner";
 import { calculateReadingTime } from "@/lib/reading-time";
@@ -249,7 +249,7 @@ export default function ReadPage() {
         return "bg-[#050d0a] text-[#a7f3d0] selection:bg-emerald-950";
       case "dark":
       default:
-        return "bg-background text-foreground";
+        return "bg-[#050508] text-[#f8fafc] selection:bg-cyan-500/30 selection:text-cyan-200";
     }
   };
 
@@ -281,15 +281,107 @@ export default function ReadPage() {
         containerRef={contentRef}
       />
       
-      <div className={`min-h-screen transition-colors duration-200 ${getThemeClass()}`}>
+      <div className={`min-h-screen transition-colors duration-300 ${getThemeClass()}`}>
+        {/* Intentional Reading Mode Switcher Bar (Kindle, Apple Books & Readwise Gold Standard) */}
+        <div className={`sticky top-16 z-30 border-b backdrop-blur-xl transition-all duration-300 ${
+          readerSettings.theme === 'sepia'
+            ? 'bg-[#f4ece1]/90 border-amber-900/15 text-[#2d2b28] shadow-sm'
+            : readerSettings.theme === 'paper'
+            ? 'bg-white/95 border-neutral-200 text-neutral-900 shadow-sm'
+            : readerSettings.theme === 'cyber'
+            ? 'bg-[#051109]/90 border-emerald-900/30 text-emerald-300 shadow-lg'
+            : 'bg-[#050508]/85 border-white/10 text-white shadow-lg'
+        }`}>
+          <div className="container mx-auto max-w-4xl px-4 py-2.5 flex items-center justify-between gap-3 flex-wrap">
+            {/* Reading Mode Segmented Controls */}
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10">
+              <button
+                type="button"
+                onClick={() => setReaderSettings({ ...readerSettings, theme: "dark" })}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${
+                  readerSettings.theme === "dark"
+                    ? "bg-[#0b0d14] text-white shadow-sm border border-cyan-500/40 ring-1 ring-cyan-500/30 font-semibold"
+                    : "text-muted-foreground hover:text-foreground opacity-70 hover:opacity-100"
+                }`}
+                title="Onyx Dark (Sovereign Obsidian)"
+              >
+                <Moon className="h-3.5 w-3.5 text-cyan-400" />
+                <span>Onyx Dark</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setReaderSettings({ ...readerSettings, theme: "sepia" })}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${
+                  readerSettings.theme === "sepia"
+                    ? "bg-[#f4ece1] text-[#2d2b28] shadow-sm border border-amber-700/40 ring-1 ring-amber-700/30 font-semibold"
+                    : "text-muted-foreground hover:text-foreground opacity-70 hover:opacity-100"
+                }`}
+                title="Warm Sepia (Low Eyestrain)"
+              >
+                <Coffee className="h-3.5 w-3.5 text-amber-700" />
+                <span>Warm Sepia</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setReaderSettings({ ...readerSettings, theme: "paper" })}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${
+                  readerSettings.theme === "paper"
+                    ? "bg-white text-neutral-900 shadow-sm border border-neutral-400 ring-1 ring-neutral-400/30 font-semibold"
+                    : "text-muted-foreground hover:text-foreground opacity-70 hover:opacity-100"
+                }`}
+                title="Clean Paper (Daylight Editorial)"
+              >
+                <Sun className="h-3.5 w-3.5 text-amber-500" />
+                <span>Clean Paper</span>
+              </button>
+            </div>
+
+            {/* Quick Font Size Controls & Typeface Indicator */}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 px-1.5 py-1 rounded-lg border border-black/5 dark:border-white/10 bg-black/5 dark:bg-white/5 text-xs font-mono">
+                <button
+                  type="button"
+                  onClick={() => setReaderSettings({ ...readerSettings, fontSize: Math.max(15, readerSettings.fontSize - 1) })}
+                  className="px-2 py-0.5 hover:bg-black/10 dark:hover:bg-white/10 rounded transition-colors"
+                  title="Decrease font size"
+                >
+                  A-
+                </button>
+                <span className="text-[11px] opacity-70 px-1">{readerSettings.fontSize}px</span>
+                <button
+                  type="button"
+                  onClick={() => setReaderSettings({ ...readerSettings, fontSize: Math.min(26, readerSettings.fontSize + 1) })}
+                  className="px-2 py-0.5 hover:bg-black/10 dark:hover:bg-white/10 rounded transition-colors font-bold"
+                  title="Increase font size"
+                >
+                  A+
+                </button>
+              </div>
+
+              <ReaderTypographyDrawer
+                settings={readerSettings}
+                onSettingsChange={setReaderSettings}
+              />
+            </div>
+          </div>
+        </div>
+
         {/* Extension Install Banner */}
-        <div className="border-b bg-muted/30">
-          <div className="container mx-auto max-w-4xl px-4 py-3">
-            <Alert className="border-0 bg-transparent">
-              <Download className="h-4 w-4" />
-              <AlertDescription className="text-sm">
-                Install the PressProtocol browser extension for automatic multi-network routing.
-                <Button variant="link" className="ml-2 h-auto p-0 text-sm">
+        <div className={`border-b transition-colors ${
+          readerSettings.theme === 'sepia'
+            ? 'bg-amber-100/40 border-amber-900/10 text-[#5c4a38]'
+            : readerSettings.theme === 'paper'
+            ? 'bg-neutral-50 border-neutral-200 text-neutral-700'
+            : 'bg-white/[0.02] border-white/10 text-white/70'
+        }`}>
+          <div className="container mx-auto max-w-4xl px-4 py-2.5">
+            <Alert className="border-0 bg-transparent py-0">
+              <Download className="h-4 w-4 text-cyan-500" />
+              <AlertDescription className="text-xs font-mono">
+                Install the PressProtocol browser extension for automatic multi-network failover routing.
+                <Button variant="link" className="ml-2 h-auto p-0 text-xs font-mono text-cyan-400 hover:text-cyan-300">
                   Install Extension
                 </Button>
               </AlertDescription>
@@ -452,7 +544,7 @@ export default function ReadPage() {
                        prose-code:rounded prose-code:text-sm
                        prose-pre:bg-muted prose-pre:border
                        prose-li:mb-2
-                       dark:prose-invert`}
+                       ${(readerSettings.theme === 'dark' || readerSettings.theme === 'cyber') ? 'prose-invert' : 'prose-headings:text-neutral-900 prose-p:text-neutral-900'}`}
             dangerouslySetInnerHTML={{ __html: content.content }}
           />
         </article>

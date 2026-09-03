@@ -12,50 +12,50 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#050508] text-white selection:bg-cyan-500/30 selection:text-cyan-200 py-12 px-4 sm:px-6 lg:px-8">
       <div className="container mx-auto max-w-4xl space-y-10">
         {/* Navigation Breadcrumb */}
         <div>
           <Link href="/">
-            <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
+            <Button variant="ghost" size="sm" className="gap-2 text-neutral-400 hover:text-white hover:bg-white/[0.06] text-xs">
               <ArrowLeft className="h-4 w-4" /> Back to Home
             </Button>
           </Link>
         </div>
 
         {/* Page Header */}
-        <div className="space-y-4 border-b pb-8">
+        <div className="space-y-4 border-b border-white/10 pb-8">
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="border-cyan-500/30 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 font-mono text-xs">
-              <Scale className="h-3 w-3 mr-1" /> Protocol Agreement
+            <Badge variant="outline" className="border-cyan-500/30 bg-cyan-950/50 text-cyan-300 font-mono text-xs">
+              <Scale className="h-3 w-3 mr-1 text-cyan-400" /> Protocol Agreement
             </Badge>
-            <span className="text-xs text-muted-foreground font-mono">Last Updated: September 2026</span>
+            <span className="text-xs text-neutral-400 font-mono">Last Updated: September 2026</span>
           </div>
-          <h1 className="font-serif text-4xl sm:text-5xl font-bold tracking-tight">
+          <h1 className="font-sans text-4xl sm:text-5xl font-bold tracking-tight text-white">
             Terms of Service & Disclaimers
           </h1>
-          <p className="text-lg text-muted-foreground leading-relaxed">
+          <p className="text-lg text-neutral-300 leading-relaxed">
             PressProtocol is a set of autonomous, open-source smart contracts, peer-to-peer daemon software, and decentralized web interfaces. By accessing or interacting with the protocol, you acknowledge and agree to these terms.
           </p>
         </div>
 
         {/* Highlight Cards */}
         <div className="grid sm:grid-cols-2 gap-4">
-          <Card className="border-border/60 bg-muted/20">
+          <Card className="border-white/10 bg-[#0B0D14] text-white rounded-2xl">
             <CardContent className="p-6 space-y-3">
-              <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400">
+              <div className="h-10 w-10 rounded-lg bg-cyan-950/60 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
                 <Globe className="h-5 w-5" />
               </div>
-              <h3 className="font-semibold text-base">Autonomous Protocol</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <h3 className="font-semibold text-base text-white">Autonomous Protocol</h3>
+              <p className="text-sm text-neutral-400 leading-relaxed">
                 PressProtocol operates permissionlessly across decentralized networks. There is no central administrator capable of censoring, modifying, or reversing published data.
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-border/60 bg-muted/20">
+          <Card className="border-white/10 bg-[#0B0D14] text-white rounded-2xl">
             <CardContent className="p-6 space-y-3">
-              <div className="h-10 w-10 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-amber-400">
+              <div className="h-10 w-10 rounded-lg bg-amber-950/60 border border-amber-500/30 flex items-center justify-center text-amber-400">
                 <ShieldAlert className="h-5 w-5" />
               </div>
               <h3 className="font-semibold text-base">Author Responsibility</h3>
@@ -69,7 +69,7 @@ export default function TermsPage() {
         {/* Detailed Terms */}
         <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8">
           <section className="space-y-3">
-            <h2 className="text-2xl font-serif font-bold">1. Nature of the Protocol</h2>
+            <h2 className="text-2xl font-sans font-bold">1. Nature of the Protocol</h2>
             <p className="text-muted-foreground leading-relaxed">
               PressProtocol is an open-source decentralized communications tool. It is not an editorial publication, news agency, publisher, or hosting provider. 
               The software connects authors to peer-to-peer storage (IPFS) and anonymity layers (Tor v3) using public cryptographic primitives.
@@ -77,7 +77,7 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-serif font-bold">2. Permanent Content Immutability</h2>
+            <h2 className="text-2xl font-sans font-bold">2. Permanent Content Immutability</h2>
             <p className="text-muted-foreground leading-relaxed">
               Because content is stored on decentralized peer-to-peer networks using cryptographic content addressing (CIDs), 
               <strong>content once published cannot be modified or deleted by PressProtocol maintainers</strong>. 
@@ -86,7 +86,7 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-serif font-bold">3. Prohibited Conduct</h2>
+            <h2 className="text-2xl font-sans font-bold">3. Prohibited Conduct</h2>
             <p className="text-muted-foreground leading-relaxed">
               While the protocol is permissionless by design, the web portal interfaces maintained by the PressProtocol community enforce strict zero-tolerance policies regarding:
             </p>
@@ -101,14 +101,14 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-serif font-bold">4. Disclaimer of Warranties & Limitation of Liability</h2>
+            <h2 className="text-2xl font-sans font-bold">4. Disclaimer of Warranties & Limitation of Liability</h2>
             <p className="text-muted-foreground leading-relaxed font-mono text-xs bg-muted/40 p-4 rounded border">
               THE SOFTWARE IS PROVIDED &ldquo;AS IS&rdquo;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             </p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-serif font-bold">5. Open Source Licensing</h2>
+            <h2 className="text-2xl font-sans font-bold">5. Open Source Licensing</h2>
             <p className="text-muted-foreground leading-relaxed">
               PressProtocol is free software released under the <strong>MIT License</strong>. You are entitled to inspect, modify, fork, and self-host independent PressProtocol Nodes and web gateways without restriction.
             </p>
