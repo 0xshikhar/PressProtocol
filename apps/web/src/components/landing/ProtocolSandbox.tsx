@@ -65,28 +65,33 @@ export function ProtocolSandbox() {
         <div className="rounded-2xl border border-white/10 bg-black/70 backdrop-blur-2xl overflow-hidden shadow-2xl">
           {/* Input & Control Bar */}
           <div className="p-4 lg:p-6 border-b border-white/10 bg-white/[0.02] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-            <div className="flex-1 flex items-center gap-3 bg-black/60 border border-white/10 rounded-xl px-4 py-2">
-              <span className="font-mono text-xs text-white/40 uppercase tracking-widest shrink-0">
-                IPFS CID:
-              </span>
-              <Input
-                value={cidInput}
-                onChange={(e) => setCidInput(e.target.value)}
-                placeholder="bafybei... or Qm..."
-                className="bg-transparent border-0 font-mono text-xs text-cyan-400 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 h-7"
-              />
+            <div className="flex-1">
+              <div className="flex items-center gap-3 bg-black/60 border border-white/10 rounded-xl px-4 py-2">
+                <span className="font-mono text-xs text-white/40 uppercase tracking-widest shrink-0">
+                  IPFS CID:
+                </span>
+                <Input
+                  value={cidInput}
+                  onChange={(e) => setCidInput(e.target.value)}
+                  placeholder="bafybei... or Qm..."
+                  className="bg-transparent border-0 font-mono text-xs text-cyan-400 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 h-7"
+                />
+              </div>
+              <p className="text-[11px] font-mono text-white/40 mt-1.5 ml-1">
+                Try tampering with the demo, or paste your own CID.
+              </p>
             </div>
 
             <div className="flex items-center gap-3 shrink-0">
               <Button
                 onClick={handleResolve}
                 disabled={isResolving}
-                className="bg-white hover:bg-white/90 text-black font-medium h-11 px-6 rounded-xl font-mono text-xs transition-all shadow-lg hover:shadow-cyan-500/20"
+                className="bg-white hover:bg-white/90 text-black font-semibold h-11 px-6 rounded-xl font-mono text-xs transition-all shadow-lg hover:shadow-cyan-500/20"
               >
                 {isResolving ? (
                   <>
                     <RotateCcw className="w-3.5 h-3.5 mr-2 animate-spin text-cyan-600" />
-                    Resolving Transports...
+                    Computing Verification...
                   </>
                 ) : (
                   <>
@@ -156,7 +161,7 @@ export function ProtocolSandbox() {
                   {isTampered ? (
                     <>
                       <ShieldX className="w-5 h-5 text-red-400" />
-                      <span>✗ ZERO TAMPERING FAILED · DIGEST MISMATCH</span>
+                      <span>✗ DIGEST MISMATCH · SIGNATURE INVALID</span>
                     </>
                   ) : (
                     <>
@@ -167,8 +172,8 @@ export function ProtocolSandbox() {
                 </div>
                 <p className="text-xs text-white/70 font-light leading-relaxed">
                   {isTampered
-                    ? "A rogue CDN gateway attempted to alter article bytes. The client-side Ed25519 signature verification immediately rejected the payload."
-                    : "The cryptographic SHA-256 hash of the payload perfectly matches the author's Ed25519 curve signature. Authenticity 100% verified."}
+                    ? "A rogue CDN gateway altered article payload bytes. Client-side recomputed SHA-256 digest failed to match the author's Ed25519 signature."
+                    : "The client-computed SHA-256 digest matches the published manifest and verifies against the author's Ed25519 public key. Integrity 100% intact."}
                 </p>
               </div>
             </div>
@@ -200,14 +205,16 @@ export function ProtocolSandbox() {
               </div>
 
               {/* Terminal View */}
-              <div className="rounded-xl border border-white/10 bg-[#02050a] p-5 font-mono text-xs text-white/80 overflow-x-auto leading-relaxed shadow-inner">
+              <div className="rounded-xl border border-white/10 bg-[#02050a] p-5 font-mono text-xs text-white/80 overflow-x-auto leading-relaxed shadow-inner min-h-[260px]">
                 {activeTab === "verification" ? (
                   <div className="space-y-3">
-                    <div className="text-white/40">{"// In-browser verification steps:"}</div>
-                    <div>
-                      <span className="text-cyan-400">$ ed25519.verify</span> (signature, digest, authorPubKey)
+                    <div className="text-white/40">{"// In-browser verification pipeline:"}</div>
+                    <div className="space-y-1 text-cyan-300">
+                      <div>$ digest = sha256(article_body)</div>
+                      <div>$ ed25519.verify(signature, digest, authorPublicKey)</div>
                     </div>
-                    <div className="p-3 rounded bg-white/[0.02] border border-white/5 space-y-1 text-[11px]">
+
+                    <div className="p-3 rounded bg-white/[0.02] border border-white/5 space-y-1.5 text-[11px]">
                       <div>
                         <span className="text-white/50">Author Public Key: </span>
                         <span className="text-emerald-400">{canonicalData.authorPubKey}</span>
@@ -220,34 +227,62 @@ export function ProtocolSandbox() {
                       </div>
                       <div>
                         <span className="text-white/50">Attached Ed25519 Sig: </span>
-                        <span className="text-white/70">{canonicalData.signature.slice(0, 48)}...</span>
+                        <span className="text-white/70">{canonicalData.signature.slice(0, 44)}...</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 pt-2 text-xs">
-                      <span className="text-white/40">Status:</span>
+
+                    <div className="pt-2 border-t border-white/5 space-y-1 text-xs">
                       {isTampered ? (
-                        <span className="text-red-400 font-bold">
-                          [FAIL] Cryptographic integrity violation. Content rejected.
-                        </span>
+                        <>
+                          <div className="text-red-400 flex items-center gap-1.5">
+                            <span>→ digest matches published record:</span>
+                            <span className="font-bold">❌ (payload altered)</span>
+                          </div>
+                          <div className="text-red-400 flex items-center gap-1.5">
+                            <span>→ signature valid for author public key:</span>
+                            <span className="font-bold">❌ (verification failed)</span>
+                          </div>
+                          <div className="text-red-400 font-bold pt-1">
+                            [FAIL] Cryptographic integrity violation. Content rejected.
+                          </div>
+                        </>
                       ) : (
-                        <span className="text-emerald-400 font-bold">
-                          [SUCCESS] Verifiably unmodified since publication.
-                        </span>
+                        <>
+                          <div className="text-emerald-400 flex items-center gap-1.5">
+                            <span>→ digest matches published record:</span>
+                            <span className="font-bold">✅</span>
+                          </div>
+                          <div className="text-emerald-400 flex items-center gap-1.5">
+                            <span>→ signature valid for author public key:</span>
+                            <span className="font-bold">✅</span>
+                          </div>
+                          <div className="text-emerald-400 font-bold pt-1">
+                            [SUCCESS] Content is verifiably unmodified since publication.
+                          </div>
+                        </>
                       )}
                     </div>
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <div className="text-white/40">{"// Canonical JSON representation:"}</div>
-                    <pre className="text-white/90">
+                    <div className="text-white/40">{"// Canonical decoded article envelope:"}</div>
+                    <pre className="text-white/90 text-[11px] leading-relaxed">
                       {JSON.stringify(
                         {
+                          version: "1.0",
                           cid: canonicalData.cid,
                           title: canonicalData.title,
-                          author: canonicalData.authorPubKey,
-                          timestamp: canonicalData.timestamp,
-                          protocolVersion: "2.1.0",
+                          body: "Freedom of the press is not merely the freedom of journalists to write; it is the fundamental mathematical guarantee that no intermediary can alter or delete the historical record...",
+                          author: {
+                            pubKey: canonicalData.authorPubKey,
+                            algorithm: "Ed25519 (RFC 8032)",
+                          },
+                          integrity: {
+                            sha256: canonicalData.canonicalHash,
+                            signature: canonicalData.signature,
+                          },
                           transports: ["ipfs", "tor", "clearnet"],
+                          timestamp: canonicalData.timestamp,
                         },
                         null,
                         2

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Activity, RefreshCw, Zap, ShieldCheck } from "lucide-react";
+import { Activity, RefreshCw, Zap, ShieldCheck, Globe, Network, Radio, Cloud, Server } from "lucide-react";
 
 export interface GatewayPing {
   id: string;
@@ -65,12 +65,11 @@ const DEFAULT_GATEWAYS: GatewayPing[] = [
 
 export function GatewayTelemetry() {
   const [gateways, setGateways] = useState<GatewayPing[]>(DEFAULT_GATEWAYS);
-  const [activeDHTNodes, setActiveDHTNodes] = useState<number>(312);
+  const [activeDHTNodes, setActiveDHTNodes] = useState<number>(320);
   const [dropRate, setDropRate] = useState<string>("0.00%");
   const [averageLatency, setAverageLatency] = useState<number>(171);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [lastUpdated, setLastUpdated] = useState<string>("Just now");
-  const [isCached, setIsCached] = useState<boolean>(false);
 
   const fetchTelemetry = useCallback(async (manual: boolean = false) => {
     if (manual) setIsRefreshing(true);
@@ -81,14 +80,13 @@ export function GatewayTelemetry() {
 
       if (data.gateways && Array.isArray(data.gateways)) {
         setGateways(data.gateways);
-        setActiveDHTNodes(data.activeDHTNodes || 312);
+        setActiveDHTNodes(data.activeDHTNodes || 320);
         setDropRate(data.dropRate || "0.00%");
         setAverageLatency(data.averageLatencyMs || 171);
-        setIsCached(Boolean(data.cached));
         setLastUpdated(new Date().toLocaleTimeString());
       }
     } catch (err) {
-      console.warn("Could not fetch real-time gateway telemetry, using baseline telemetry:", err);
+      console.warn("Could not fetch real-time gateway telemetry, using calibrated baseline:", err);
     } finally {
       if (manual) {
         setTimeout(() => setIsRefreshing(false), 500);
@@ -139,8 +137,28 @@ export function GatewayTelemetry() {
     }
   };
 
+  const getTransportIcon = (type: string) => {
+    if (type.includes("Clearnet") || type.includes("Anycast")) {
+      return <Cloud className="w-3.5 h-3.5 text-cyan-400" />;
+    }
+    if (type.includes("Tor") || type.includes("Hidden")) {
+      return <Radio className="w-3.5 h-3.5 text-purple-400" />;
+    }
+    return <Network className="w-3.5 h-3.5 text-emerald-400" />;
+  };
+
+  const clearnetGateways = gateways.filter(
+    (g) => g.type.includes("Clearnet") || g.type.includes("Anycast")
+  );
+  const decentralizedGateways = gateways.filter(
+    (g) => !g.type.includes("Clearnet") && !g.type.includes("Anycast")
+  );
+
   return (
-    <section id="capabilities" className="relative py-20 bg-[#04070e] text-white overflow-hidden border-t border-white/10">
+    <section id="telemetry" className="relative py-20 bg-[#04070e] text-white overflow-hidden border-t border-white/10">
+      {/* Anchor alias for backwards compatibility */}
+      <div id="capabilities" className="absolute -top-24" />
+
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10 pb-6 border-b border-white/10">
           <div className="flex items-center gap-3">
@@ -167,9 +185,10 @@ export function GatewayTelemetry() {
           </div>
 
           <div className="flex items-center gap-4 font-mono text-xs text-white/60">
-            <div className="hidden sm:flex items-center gap-2">
+            <div className="hidden sm:flex items-center gap-2" title="Public IPFS network swarm, not operator-controlled">
               <span className="w-2 h-2 rounded-full bg-emerald-400" />
               <span>{activeDHTNodes} Active DHT Nodes</span>
+              <span className="text-[10px] text-white/40 hidden lg:inline">(public IPFS network)</span>
             </div>
             <div className="hidden sm:flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-cyan-400" />
@@ -188,50 +207,97 @@ export function GatewayTelemetry() {
           </div>
         </div>
 
-        {/* Grid of gateway monitors */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {gateways.map((gw) => (
-            <div
-              key={gw.id}
-              className="p-5 rounded-xl border border-white/10 bg-black/40 backdrop-blur-md flex flex-col justify-between gap-4 hover:border-white/20 transition-all group"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-mono text-[10px] uppercase tracking-wider text-white/40">
-                    {gw.type}
-                  </span>
-                  {getStatusBadge(gw.status)}
-                </div>
-                <h4 className="font-semibold text-sm text-white mb-1 group-hover:text-cyan-300 transition-colors">
-                  {gw.name}
-                </h4>
-                <p className="text-xs text-white/40 font-mono truncate">{gw.region}</p>
-              </div>
-
-              <div className="pt-3 border-t border-white/5 flex items-center justify-between font-mono">
-                <div>
-                  <span className="text-[10px] text-white/40 block">LATENCY</span>
-                  <span
-                    className={`text-base font-bold ${
-                      gw.status === "offline"
-                        ? "text-rose-400"
-                        : gw.latencyMs < 120
-                        ? "text-cyan-400"
-                        : gw.latencyMs < 250
-                        ? "text-emerald-400"
-                        : "text-amber-400"
-                    }`}
-                  >
-                    {gw.latencyMs}ms
-                  </span>
-                </div>
-                <div className="text-right">
-                  <span className="text-[10px] text-white/40 block">UPTIME</span>
-                  <span className="text-xs text-white/80">{gw.uptime}</span>
-                </div>
-              </div>
+        {/* Grouped Gateway Monitors */}
+        <div className="space-y-8">
+          {/* Sub-Group 1: Clearnet High-Speed Edge Gateways */}
+          <div>
+            <div className="flex items-center gap-2 mb-3 font-mono text-xs uppercase tracking-wider text-white/50">
+              <Cloud className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Clearnet Edge Mirrors & HTTP/3 Gateways</span>
             </div>
-          ))}
+            <div className="grid sm:grid-cols-2 gap-4">
+              {clearnetGateways.map((gw) => (
+                <div
+                  key={gw.id}
+                  className="p-5 rounded-xl border border-white/10 bg-black/40 backdrop-blur-md flex flex-col justify-between gap-4 hover:border-cyan-500/30 transition-all group"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-mono text-[10px] uppercase tracking-wider text-white/50 flex items-center gap-1.5">
+                        {getTransportIcon(gw.type)}
+                        {gw.type}
+                      </span>
+                      {getStatusBadge(gw.status)}
+                    </div>
+                    <h4 className="font-semibold text-sm text-white mb-1 group-hover:text-cyan-300 transition-colors">
+                      {gw.name}
+                    </h4>
+                    <p className="text-xs text-white/40 font-mono truncate">{gw.region}</p>
+                  </div>
+
+                  <div className="pt-3 border-t border-white/5 flex items-center justify-between font-mono">
+                    <div>
+                      <span className="text-[10px] text-white/40 block">LATENCY</span>
+                      <span className="text-base font-bold text-cyan-400">
+                        {gw.latencyMs}ms
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] text-white/40 block">UPTIME</span>
+                      <span className="text-xs text-white/80">{gw.uptime}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Sub-Group 2: Decentralized P2P & Onion Circuits */}
+          <div>
+            <div className="flex items-center gap-2 mb-3 font-mono text-xs uppercase tracking-wider text-white/50">
+              <Network className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Decentralized DHT Swarm & Tor Onion Circuits</span>
+            </div>
+            <div className="grid sm:grid-cols-3 gap-4">
+              {decentralizedGateways.map((gw) => (
+                <div
+                  key={gw.id}
+                  className="p-5 rounded-xl border border-white/10 bg-black/40 backdrop-blur-md flex flex-col justify-between gap-4 hover:border-emerald-500/30 transition-all group"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-mono text-[10px] uppercase tracking-wider text-white/50 flex items-center gap-1.5">
+                        {getTransportIcon(gw.type)}
+                        {gw.type}
+                      </span>
+                      {getStatusBadge(gw.status)}
+                    </div>
+                    <h4 className="font-semibold text-sm text-white mb-1 group-hover:text-emerald-300 transition-colors">
+                      {gw.name}
+                    </h4>
+                    <p className="text-xs text-white/40 font-mono truncate">{gw.region}</p>
+                  </div>
+
+                  <div className="pt-3 border-t border-white/5 flex items-center justify-between font-mono">
+                    <div>
+                      <span className="text-[10px] text-white/40 block">LATENCY</span>
+                      <span
+                        className={`text-base font-bold ${
+                          gw.type.includes("Tor") ? "text-purple-400" : "text-emerald-400"
+                        }`}
+                      >
+                        {gw.latencyMs}ms
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] text-white/40 block">UPTIME</span>
+                      <span className="text-xs text-white/80">{gw.uptime}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
