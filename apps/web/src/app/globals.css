@@ -3,57 +3,80 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    /* Modern Light Theme - Professional Color Palette */
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+  :root, .dark {
+    /* Sovereign Dark Theme - Elevation & Off-White Hierarchy (claude-design-system.md) */
+    --background: 240 23% 3%; /* #050508 - bg-base */
+    --foreground: 240 6% 94%; /* #EDEDF1 - text-primary (off-white, anti-glare) */
     
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card: 240 16% 6%; /* #0D0D12 - bg-surface */
+    --card-foreground: 240 6% 94%; /* #EDEDF1 */
     
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover: 240 13% 10%; /* #15151C - bg-elevated */
+    --popover-foreground: 240 6% 94%;
     
-    /* Primary: Modern Blue */
-    --primary: 221 83% 53%;
-    --primary-foreground: 0 0% 100%;
+    /* Primary: Electric Cyan Protocol Signal */
+    --primary: 189 94% 43%; /* #06B6D4 */
+    --primary-foreground: 240 23% 3%;
     
-    /* Secondary: Soft Gray */
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 222 47% 11%;
+    /* Secondary: bg-overlay */
+    --secondary: 240 13% 13%; /* #1C1C24 */
+    --secondary-foreground: 240 6% 94%;
     
-    /* Muted: Light Gray */
-    --muted: 220 13% 95%;
-    --muted-foreground: 215 16% 47%;
+    /* Muted: Supporting text & subtle containers */
+    --muted: 240 13% 10%; /* #15151C */
+    --muted-foreground: 240 5% 63%; /* #9A9AA6 - text-secondary */
     
-    /* Accent: Light Blue */
-    --accent: 210 100% 95%;
-    --accent-foreground: 221 83% 53%;
+    /* Semantic Status Accents */
+    --accent: 151 65% 54%; /* #3DD68C - accent-success (verified signatures, live peers) */
+    --accent-foreground: 240 23% 3%;
     
-    /* Success */
-    --success: 142 71% 45%;
-    --success-foreground: 0 0% 100%;
+    --success: 151 65% 54%; /* #3DD68C */
+    --success-foreground: 240 23% 3%;
     
-    /* Warning */
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
+    --warning: 42 79% 57%; /* #E8B339 - accent-warning (degraded, pending) */
+    --warning-foreground: 240 23% 3%;
     
-    /* Destructive: Modern Red */
-    --destructive: 0 84% 60%;
+    --destructive: 352 83% 64%; /* #F0576B - accent-danger (purged, invalid, delete) */
     --destructive-foreground: 0 0% 100%;
     
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 221 83% 53%;
+    --border: 240 10% 16%; /* rgba(255,255,255,0.10) */
+    --input: 240 10% 16%;
+    --ring: 189 94% 43%;
     
-    --radius: 0.5rem;
+    --radius: 0.5rem; /* 8px default mechanical radius */
     
     /* Chart Colors */
-    --chart-1: 221 83% 53%;
-    --chart-2: 210 100% 60%;
-    --chart-3: 200 100% 50%;
-    --chart-4: 195 100% 45%;
-    --chart-5: 215 100% 40%;
+    --chart-1: 189 94% 43%;
+    --chart-2: 151 65% 54%;
+    --chart-3: 240 70% 65%;
+    --chart-4: 42 79% 57%;
+    --chart-5: 352 83% 64%;
+  }
+
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 189 94% 43%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 220 13% 95%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 210 100% 95%;
+    --accent-foreground: 221 83% 53%;
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 189 94% 43%;
   }
 }
 
@@ -102,8 +125,41 @@
     font-family: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
   }
 
+  /* Scoped Reader Palettes (claude-design-system.md) */
+  .reader-onyx {
+    background-color: #0B0B0F;
+    color: #E4E4E9;
+  }
+
+  .reader-sepia {
+    background-color: #F4ECD8;
+    color: #3A2E1F;
+  }
+
+  .reader-paper {
+    background-color: #FAFAF8;
+    color: #1A1A1E;
+  }
+
+  .surface-card {
+    background-color: #0b0d14;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .hairline-border {
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .glow-cyan {
+    box-shadow: 0 0 25px rgba(6, 182, 212, 0.2);
+  }
+
+  .glow-emerald {
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.2);
+  }
+
   .glass-panel {
-    background: rgba(255, 255, 255, 0.025);
+    background: rgba(11, 13, 20, 0.7);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -114,8 +170,8 @@
   }
 
   .glass-panel-hover:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.18);
+    background: rgba(17, 20, 32, 0.85);
+    border-color: rgba(6, 182, 212, 0.3);
     transform: translateY(-2px);
   }
 
