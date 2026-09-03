@@ -1,6 +1,6 @@
 {
   "name": "anonpress-backend",
-  "version": "1.0.0",
+  "version": "1.0.6",
   "description": "AnonPress Backend API - Fastify server for content publishing, IPFS storage, Tor integration",
   "main": "dist/index.js",
   "type": "module",

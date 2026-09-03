@@ -1,6 +1,6 @@
 {
   "name": "@pressprotocol/publish-action",
-  "version": "1.0.0",
+  "version": "1.0.6",
   "description": "GitHub Action to automatically sign, syndicate, and pin markdown articles to IPFS and Tor from static site generator repositories",
   "main": "dist/index.js",
   "type": "module",

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pressprotocol-py"
-version = "1.0.0"
+version = "1.0.6"
 description = "Official PressProtocol Python SDK - Sovereign Publishing & Multi-Transport Resolution"
 readme = "README.md"
 requires-python = ">=3.9"

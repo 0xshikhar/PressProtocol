@@ -1,6 +1,6 @@
 {
   "name": "@pressprotocol/proof",
-  "version": "1.0.0",
+  "version": "1.0.6",
   "description": "Deterministic In-Browser CIDv1 Multihash & Air-Gapped .pressproof.json Cryptographic Codec",
   "type": "module",
   "main": "./dist/index.js",

@@ -1,6 +1,6 @@
 {
   "name": "@pressprotocol/widget",
-  "version": "0.1.0",
+  "version": "1.0.6",
   "description": "Universal Drop-In Sovereign Publishing Web Component (<pressprotocol-publish>) and Editor Connectors",
   "type": "module",
   "main": "dist/index.js",
