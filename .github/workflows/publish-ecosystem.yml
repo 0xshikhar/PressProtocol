@@ -1,0 +1,113 @@
+name: Publish Multi-Language Ecosystem & Registries
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+jobs:
+  publish-npm:
+    name: Publish TypeScript Packages to NPM
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Packages
+        run: pnpm --filter "@pressprotocol/*" run build
+
+      - name: Publish to NPM
+        run: |
+          pnpm --filter @pressprotocol/sdk publish --access public --no-git-checks
+          pnpm --filter @pressprotocol/proof publish --access public --no-git-checks
+          pnpm --filter @pressprotocol/widget publish --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-pypi:
+    name: Publish Python SDK to PyPI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Build Tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+
+      - name: Build Wheel & Tarball
+        run: python -m build sdks/python
+
+      - name: Publish to PyPI
+        run: python -m twine upload sdks/python/dist/* -u __token__ -p ${{ secrets.PYPI_TOKEN }} --skip-existing
+
+  publish-crates-io:
+    name: Publish Rust SDK to Crates.io
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Publish to Crates.io
+        run: cargo publish --manifest-path sdks/rust/Cargo.toml --token ${{ secrets.CRATES_IO_TOKEN }}
+
+  package-and-release:
+    name: Create GitHub Release & Package Integrations
+    runs-on: ubuntu-latest
+    needs: [publish-npm, publish-pypi, publish-crates-io]
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Package Browser Extension
+        run: |
+          cd integrations/browser-extension
+          pnpm install --frozen-lockfile
+          zip -r ../../PressProtocol_Browser_Extension.zip . -x "node_modules/*" ".git/*"
+          cd ../..
+
+      - name: Package WordPress Plugin
+        run: |
+          cd integrations/wordpress-plugin
+          zip -r ../../PressProtocol_Wordpress_Plugin.zip . -x ".git/*"
+          cd ../..
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            PressProtocol_Browser_Extension.zip
+            PressProtocol_Wordpress_Plugin.zip
+          generate_release_notes: true
