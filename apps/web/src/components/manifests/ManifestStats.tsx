@@ -76,15 +76,15 @@ export function ManifestStats() {
   return (
     <div className="space-y-6">
       {/* Stats Overview */}
-      <Card>
+      <Card className="border-white/10 bg-[#0B0D14]">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="flex items-center gap-2">
-                <Database className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-white">
+                <Database className="h-5 w-5 text-cyan-400" />
                 DHT Manifest Cache
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-neutral-400">
                 In-memory manifest index for fast discovery
               </CardDescription>
             </div>
@@ -93,8 +93,9 @@ export function ManifestStats() {
               size="sm"
               onClick={fetchStats}
               disabled={refreshing}
+              className="border-white/10 bg-white/[0.03] hover:bg-white/[0.06] text-neutral-300 hover:text-white"
             >
-              <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
+              <RefreshCw className={`h-4 w-4 mr-2 text-cyan-400 ${refreshing ? "animate-spin" : ""}`} />
               Refresh
             </Button>
           </div>
@@ -102,28 +103,28 @@ export function ManifestStats() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Manifest Count */}
-            <div className="flex flex-col items-center justify-center p-6 bg-muted/30 rounded-lg">
-              <FileText className="h-8 w-8 text-primary mb-2" />
-              <div className="text-3xl font-bold">{stats.manifestCount}</div>
-              <div className="text-sm text-muted-foreground">Manifests Cached</div>
+            <div className="flex flex-col items-center justify-center p-6 bg-white/[0.03] border border-white/10 rounded-xl">
+              <FileText className="h-8 w-8 text-cyan-400 mb-2" />
+              <div className="text-3xl font-bold text-white font-mono">{stats.manifestCount}</div>
+              <div className="text-xs text-neutral-400 mt-1 uppercase tracking-wider font-mono">Manifests Cached</div>
             </div>
 
             {/* Tag Count */}
-            <div className="flex flex-col items-center justify-center p-6 bg-muted/30 rounded-lg">
-              <Tag className="h-8 w-8 text-primary mb-2" />
-              <div className="text-3xl font-bold">{stats.tagCount}</div>
-              <div className="text-sm text-muted-foreground">Unique Tags</div>
+            <div className="flex flex-col items-center justify-center p-6 bg-white/[0.03] border border-white/10 rounded-xl">
+              <Tag className="h-8 w-8 text-cyan-400 mb-2" />
+              <div className="text-3xl font-bold text-white font-mono">{stats.tagCount}</div>
+              <div className="text-xs text-neutral-400 mt-1 uppercase tracking-wider font-mono">Unique Tags</div>
             </div>
 
             {/* Average Tags per Manifest */}
-            <div className="flex flex-col items-center justify-center p-6 bg-muted/30 rounded-lg">
-              <Database className="h-8 w-8 text-primary mb-2" />
-              <div className="text-3xl font-bold">
+            <div className="flex flex-col items-center justify-center p-6 bg-white/[0.03] border border-white/10 rounded-xl">
+              <Database className="h-8 w-8 text-cyan-400 mb-2" />
+              <div className="text-3xl font-bold text-white font-mono">
                 {stats.manifestCount > 0
                   ? (stats.tags.length / stats.manifestCount).toFixed(1)
                   : "0"}
               </div>
-              <div className="text-sm text-muted-foreground">Avg Tags/Manifest</div>
+              <div className="text-xs text-neutral-400 mt-1 uppercase tracking-wider font-mono">Avg Tags/Manifest</div>
             </div>
           </div>
         </CardContent>
@@ -131,18 +132,18 @@ export function ManifestStats() {
 
       {/* Helia Node Status (Phase 2C) */}
       {stats.heliaNode && (
-        <Card>
+        <Card className="border-white/10 bg-[#0B0D14]">
           <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Database className="h-5 w-5" />
+            <CardTitle className="text-lg flex items-center gap-2 text-white">
+              <Database className="h-5 w-5 text-cyan-400" />
               Helia IPFS Node Status
               {stats.heliaNode.ready ? (
-                <Badge variant="default" className="bg-green-500">Ready</Badge>
+                <Badge variant="default" className="bg-emerald-600/90 text-white font-mono">Ready</Badge>
               ) : (
-                <Badge variant="secondary">Offline</Badge>
+                <Badge variant="secondary" className="bg-white/10 text-neutral-300 font-mono">Offline</Badge>
               )}
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-neutral-400">
               Peer-to-peer IPFS node for decentralized content storage
             </CardDescription>
           </CardHeader>
@@ -150,29 +151,29 @@ export function ManifestStats() {
             {stats.heliaNode.ready ? (
               <div className="space-y-3">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="p-4 bg-muted/30 rounded-lg">
-                    <div className="text-sm text-muted-foreground mb-1">Peer ID</div>
-                    <div className="text-xs font-mono break-all">
+                  <div className="p-4 bg-white/[0.03] border border-white/10 rounded-xl">
+                    <div className="text-xs text-neutral-400 mb-1 font-mono uppercase">Peer ID</div>
+                    <div className="text-xs font-mono break-all text-cyan-300">
                       {stats.heliaNode.peerId?.slice(0, 16)}...
                     </div>
                   </div>
-                  <div className="p-4 bg-muted/30 rounded-lg">
-                    <div className="text-sm text-muted-foreground mb-1">Connected Peers</div>
-                    <div className="text-2xl font-bold">{stats.heliaNode.peers || 0}</div>
+                  <div className="p-4 bg-white/[0.03] border border-white/10 rounded-xl">
+                    <div className="text-xs text-neutral-400 mb-1 font-mono uppercase">Connected Peers</div>
+                    <div className="text-2xl font-bold font-mono text-white">{stats.heliaNode.peers || 0}</div>
                   </div>
-                  <div className="p-4 bg-muted/30 rounded-lg">
-                    <div className="text-sm text-muted-foreground mb-1">Addresses</div>
-                    <div className="text-2xl font-bold">{stats.heliaNode.addresses || 0}</div>
+                  <div className="p-4 bg-white/[0.03] border border-white/10 rounded-xl">
+                    <div className="text-xs text-neutral-400 mb-1 font-mono uppercase">Addresses</div>
+                    <div className="text-2xl font-bold font-mono text-white">{stats.heliaNode.addresses || 0}</div>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-emerald-400 font-mono">
                   ✅ P2P operations enabled: Manifests can be uploaded directly to IPFS network
                 </p>
               </div>
             ) : (
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm text-neutral-400">
                 <p>Helia node is not initialized. Using Pinata gateway fallback.</p>
-                <p className="mt-2 text-xs">
+                <p className="mt-2 text-xs text-neutral-500">
                   To enable P2P operations, ensure required dependencies are installed and the node can start.
                 </p>
               </div>
@@ -183,17 +184,17 @@ export function ManifestStats() {
 
       {/* Tag Cloud */}
       {stats.tags.length > 0 && (
-        <Card>
+        <Card className="border-white/10 bg-[#0B0D14]">
           <CardHeader>
-            <CardTitle className="text-lg">Tag Cloud</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-lg text-white">Tag Cloud</CardTitle>
+            <CardDescription className="text-neutral-400">
               All tags currently indexed in the DHT cache
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
               {stats.tags.sort().map((tag) => (
-                <Badge key={tag} variant="secondary">
+                <Badge key={tag} variant="outline" className="border-white/10 bg-white/[0.04] text-neutral-300 font-mono text-xs">
                   #{tag}
                 </Badge>
               ))}
@@ -203,15 +204,15 @@ export function ManifestStats() {
       )}
 
       {/* Info Card */}
-      <Card>
+      <Card className="border-white/10 bg-[#0B0D14]">
         <CardHeader>
-          <CardTitle className="text-lg">How It Works</CardTitle>
+          <CardTitle className="text-lg text-white">How It Works</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3 text-sm text-muted-foreground">
+        <CardContent className="space-y-3 text-sm text-neutral-300">
           <p>
-            <strong>Manifests</strong> are lightweight JSON files stored on IPFS that contain:
+            <strong className="text-white">Manifests</strong> are lightweight JSON files stored on IPFS that contain:
           </p>
-          <ul className="list-disc list-inside space-y-1 ml-4">
+          <ul className="list-disc list-inside space-y-1 ml-4 text-neutral-400">
             <li>Content CID and metadata</li>
             <li>Excerpt (first 200 characters)</li>
             <li>Tags for discovery</li>
@@ -220,17 +221,16 @@ export function ManifestStats() {
             <li>Reading statistics</li>
           </ul>
           <p className="mt-4">
-            <strong>DHT Cache</strong> is an in-memory index that:
+            <strong className="text-white">DHT Cache</strong> is an in-memory index that:
           </p>
-          <ul className="list-disc list-inside space-y-1 ml-4">
+          <ul className="list-disc list-inside space-y-1 ml-4 text-neutral-400">
             <li>Stores recently published manifests</li>
             <li>Enables fast tag-based discovery</li>
             <li>Provides fallback when indexers fail</li>
             <li>Can be queried without database</li>
           </ul>
-          <p className="mt-4 text-xs">
-            <strong>Note:</strong>this will query the actual IPFS DHT network
-            for truly decentralized discovery across all nodes ( will be quite slow)
+          <p className="mt-4 text-xs text-neutral-500 font-mono">
+            <strong>Note:</strong> In production, queries route across the IPFS DHT network for censorship-resistant multi-swarm discovery.
           </p>
         </CardContent>
       </Card>

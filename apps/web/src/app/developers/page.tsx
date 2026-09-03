@@ -13,8 +13,10 @@ export const metadata: Metadata = {
 
 export default function DevelopersPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background via-muted/20 to-background text-foreground py-10 px-4 sm:px-6 lg:px-8">
-      <div className="container mx-auto max-w-6xl space-y-12">
+    <main className="min-h-screen bg-[#050508] text-white py-10 px-4 sm:px-6 lg:px-8 selection:bg-cyan-500/30 selection:text-cyan-200 relative overflow-hidden">
+      {/* Ambient glow matching reference design */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[450px] bg-gradient-to-b from-indigo-950/25 via-cyan-950/15 to-transparent blur-3xl pointer-events-none" />
+      <div className="container relative z-10 mx-auto max-w-6xl space-y-16">
         <DeveloperPortalClient />
       </div>
     </main>

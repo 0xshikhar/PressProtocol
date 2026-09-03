@@ -30,6 +30,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getOrCreateBurnerWallet, type BurnerWallet } from "@/lib/burner-wallet";
+import { CidChip } from "@/components/protocol/CidChip";
 import type { ConvertedNotionArticle, NotionBlockStats } from "@/lib/notion";
 
 export function NotionImporter() {
@@ -184,44 +185,44 @@ curl -s https://pressprotocol.com/api/content/$CID | pressprotocol resolve --ver
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
       {/* Importer Config Card */}
-      <Card className="border-border/60 bg-card shadow-sm">
+      <Card className="border-white/[0.08] bg-[#0D0D12] shadow-sm">
         <CardHeader>
-          <CardTitle className="text-lg font-serif flex items-center justify-between text-card-foreground">
+          <CardTitle className="text-lg font-sans font-semibold flex items-center justify-between text-white">
             <span className="flex items-center gap-2">
-              <Layers className="w-4 h-4 text-primary" /> Notion 1-Click Sovereign Importer
+              <Layers className="w-4 h-4 text-cyan-400" /> Notion 1-Click Sovereign Importer
             </span>
-            <span className="text-xs font-mono text-muted-foreground font-normal">
+            <span className="text-xs font-mono text-zinc-500 font-normal">
               Zero-Token · Callout Preservation · Ed25519 Signed
             </span>
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-zinc-400 text-xs sm:text-sm leading-relaxed">
             Convert any public Notion page or pasted Markdown export into a censorship-resistant sovereign publication. Notion Callouts, Quotes, Headings, and Code blocks are transformed into semantic HTML5 and mirrored across IPFS & Tor.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Mode Switcher */}
-          <div className="flex rounded-lg border p-1 bg-muted w-full sm:w-auto self-start inline-flex">
+          <div className="flex rounded-lg border border-white/[0.08] p-1 bg-[#08090E] w-full sm:w-auto self-start inline-flex gap-1">
             <button
               type="button"
               onClick={() => setInputMode("url")}
-              className={`px-3 py-1.5 rounded text-xs font-medium transition-colors flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
                 inputMode === "url"
-                  ? "bg-background text-foreground font-semibold shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-[#15151C] text-white font-semibold shadow-sm border border-white/10"
+                  : "text-zinc-400 hover:text-white"
               }`}
             >
-              <Globe className="w-3.5 h-3.5" /> Public Notion Page URL
+              <Globe className="w-3.5 h-3.5 text-cyan-400" /> Public Notion Page URL
             </button>
             <button
               type="button"
               onClick={() => setInputMode("markdown")}
-              className={`px-3 py-1.5 rounded text-xs font-medium transition-colors flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
                 inputMode === "markdown"
-                  ? "bg-background text-foreground font-semibold shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-[#15151C] text-white font-semibold shadow-sm border border-white/10"
+                  : "text-zinc-400 hover:text-white"
               }`}
             >
-              <FileText className="w-3.5 h-3.5" /> Paste Notion Markdown / Export
+              <FileText className="w-3.5 h-3.5 text-cyan-400" /> Paste Notion Markdown / Export
             </button>
           </div>
 
@@ -369,55 +370,47 @@ curl -s https://pressprotocol.com/api/content/$CID | pressprotocol resolve --ver
 
       {/* Publication Confirmed Card */}
       {publishedCid && (
-        <Card className="border-emerald-200 bg-emerald-50/50">
+        <Card className="border-emerald-500/20 bg-emerald-500/5">
           <CardContent className="p-6 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono bg-emerald-100 text-emerald-800 border border-emerald-300 font-semibold">
-                  <Check className="w-3.5 h-3.5" /> NOTION PAGE SYNDICATED PERMANENTLY
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/25 font-semibold">
+                  <Check className="w-3.5 h-3.5 text-emerald-400" /> NOTION PAGE SYNDICATED PERMANENTLY
                 </span>
-                <h3 className="text-xl font-serif font-bold text-foreground mt-1">
+                <h3 className="text-xl font-sans font-bold text-white mt-1">
                   {convertedArticle?.title}
                 </h3>
               </div>
 
               <div className="flex items-center gap-2">
                 <Link href={`/read/${publishedCid}`} target="_blank">
-                  <Button size="sm" className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold gap-1.5">
+                  <Button size="sm" className="bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-semibold gap-1.5">
                     <ExternalLink className="w-3.5 h-3.5" /> Open Sovereign Reader
                   </Button>
                 </Link>
-                <Link href={`/embed/${publishedCid}?theme=light`} target="_blank">
-                  <Button size="sm" variant="outline" className="text-xs gap-1.5">
-                    <Code2 className="w-3.5 h-3.5" /> View Embed
+                <Link href={`/embed/${publishedCid}?theme=dark`} target="_blank">
+                  <Button size="sm" variant="outline" className="border-white/10 bg-white/5 hover:bg-white/10 text-white text-xs gap-1.5">
+                    <Code2 className="w-3.5 h-3.5 text-cyan-400" /> View Embed
                   </Button>
                 </Link>
               </div>
             </div>
 
             <div className="grid sm:grid-cols-2 gap-3 pt-2 font-mono text-xs">
-              <div className="flex items-center justify-between p-2.5 rounded bg-background border">
-                <span className="text-muted-foreground">IPFS CID:</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-primary truncate max-w-[200px]">{publishedCid}</span>
-                  <button
-                    onClick={() => copyToClipboard(publishedCid!, setCopiedCid)}
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    {copiedCid ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                  </button>
-                </div>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-[#08090E] border border-white/[0.08]">
+                <span className="text-muted-foreground text-xs">IPFS Content Identifier:</span>
+                <CidChip cid={publishedCid} showExplorerLink />
               </div>
 
-              <div className="flex items-center justify-between p-2.5 rounded bg-background border">
-                <span className="text-muted-foreground">Reader Link:</span>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-[#08090E] border border-white/[0.08]">
+                <span className="text-muted-foreground text-xs">Reader Link:</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-foreground truncate max-w-[200px]">{shareUrl}</span>
+                  <span className="text-zinc-200 truncate max-w-[200px]">{shareUrl}</span>
                   <button
                     onClick={() => copyToClipboard(shareUrl!, setCopiedShare)}
-                    className="text-muted-foreground hover:text-foreground"
+                    className="text-zinc-400 hover:text-white"
                   >
-                    {copiedShare ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiedShare ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>
                 </div>
               </div>
@@ -460,7 +453,7 @@ curl -s https://pressprotocol.com/api/content/$CID | pressprotocol resolve --ver
                 <span>Notion Source: {convertedArticle.title}</span>
                 <span>~{convertedArticle.readingTimeMinutes} min read</span>
               </div>
-              <CardTitle className="text-2xl font-serif text-card-foreground pt-2 flex items-center gap-2">
+              <CardTitle className="text-2xl font-sans font-bold text-white pt-2 flex items-center gap-2">
                 {convertedArticle.icon && <span>{convertedArticle.icon}</span>}
                 <span>{convertedArticle.title}</span>
               </CardTitle>

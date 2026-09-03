@@ -39,19 +39,22 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="border-t bg-gradient-to-b from-white to-blue-50/30">
+    <footer className="border-t border-white/10 bg-[#050508] text-white">
       <div className="container mx-auto px-4 py-12">
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-6">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <Link href="/" className="mb-4 flex items-center space-x-2 group">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-400 group-hover:shadow-lg transition-all">
-                <FileText className="h-5 w-5 text-white" />
+            <Link href="/" className="mb-4 flex items-center gap-2.5 group">
+              <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 border border-white/15 group-hover:border-cyan-400/50 transition-colors">
+                <span className="text-cyan-400 font-mono text-sm font-bold">¶</span>
+                <div className="absolute -inset-0.5 rounded-lg bg-cyan-500/20 blur opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">PressProtocol</span>
+              <span className="font-display tracking-tight text-xl text-white font-medium group-hover:text-cyan-300 transition-colors">
+                PressProtocol
+              </span>
             </Link>
-            <p className="mb-4 max-w-sm text-sm text-muted-foreground">
-              An open censorship-resistant publishing platform. Share your ideas freely across IPFS, Tor, and decentralized mirrors.
+            <p className="mb-4 max-w-sm text-xs text-white/60 leading-relaxed font-sans">
+              Autonomous censorship-resistant publishing infrastructure. Decentralized syndicated dispatch across IPFS swarms, Tor hidden services, and air-gapped cryptographic proofs.
             </p>
             <div className="flex gap-2">
               {socialLinks.map((social) => {
@@ -61,6 +64,7 @@ export default function Footer() {
                     key={social.name}
                     variant="outline"
                     size="icon"
+                    className="h-8 w-8 bg-white/5 border-white/10 text-white/70 hover:text-white hover:bg-white/10 hover:border-cyan-500/30"
                     asChild
                   >
                     <a
@@ -79,13 +83,13 @@ export default function Footer() {
 
           {/* Links */}
           <div>
-            <h3 className="mb-4 text-sm font-semibold">Platform</h3>
-            <ul className="space-y-3 text-sm">
+            <h3 className="mb-4 text-xs font-mono uppercase tracking-wider text-white/40">Platform</h3>
+            <ul className="space-y-2.5 text-xs font-mono">
               {footerLinks.platform.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-muted-foreground hover:text-primary transition-colors"
+                    className="text-white/60 hover:text-cyan-400 transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -95,13 +99,13 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="mb-4 text-sm font-semibold">Resources</h3>
-            <ul className="space-y-3 text-sm">
+            <h3 className="mb-4 text-xs font-mono uppercase tracking-wider text-white/40">Resources</h3>
+            <ul className="space-y-2.5 text-xs font-mono">
               {footerLinks.resources.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-muted-foreground hover:text-primary transition-colors"
+                    className="text-white/60 hover:text-cyan-400 transition-colors"
                     target={link.href.startsWith('http') ? '_blank' : undefined}
                     rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                   >
@@ -113,13 +117,13 @@ export default function Footer() {
           </div>
 
           <div className="lg:col-span-2">
-            <h3 className="mb-4 text-sm font-semibold">Legal</h3>
-            <ul className="space-y-3 text-sm">
+            <h3 className="mb-4 text-xs font-mono uppercase tracking-wider text-white/40">Guarantees</h3>
+            <ul className="space-y-2.5 text-xs font-mono">
               {footerLinks.legal.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-muted-foreground hover:text-primary transition-colors"
+                    className="text-white/60 hover:text-cyan-400 transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -129,21 +133,21 @@ export default function Footer() {
           </div>
         </div>
 
-        <Separator className="my-8" />
+        <div className="my-8 border-t border-white/10" />
 
-        <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-          <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} PressProtocol. Built for censorship-resistant publishing.
+        <div className="flex flex-col items-center justify-between gap-4 md:flex-row text-xs font-mono text-white/40">
+          <p>
+            © {new Date().getFullYear()} PressProtocol. Pure sovereign, zero-custody publishing.
           </p>
-          <div className="flex gap-4 text-sm text-muted-foreground">
-            <Link href="/privacy" className="hover:text-primary transition-colors">
+          <div className="flex gap-4">
+            <Link href="/privacy" className="hover:text-cyan-400 transition-colors">
               Privacy Policy
             </Link>
-            <Link href="/terms" className="hover:text-primary transition-colors">
+            <Link href="/terms" className="hover:text-cyan-400 transition-colors">
               Terms of Service
             </Link>
-            <Link href="/cookies" className="hover:text-primary transition-colors">
-              Cookie Policy
+            <Link href="/spec" className="hover:text-cyan-400 transition-colors">
+              Protocol Spec
             </Link>
           </div>
         </div>

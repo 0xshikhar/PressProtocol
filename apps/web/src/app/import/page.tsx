@@ -32,6 +32,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BulkRssImporter } from "@/components/import/BulkRssImporter";
 import { NotionImporter } from "@/components/import/NotionImporter";
+import { CidChip } from "@/components/protocol/CidChip";
 
 interface PurgeTelemetry {
   scriptsPurged: number;
@@ -157,45 +158,49 @@ export default function ImportPage() {
     <div className="min-h-screen bg-background text-foreground">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
         {/* Hero Banner */}
-        <div className="relative rounded-2xl border border-border/60 bg-gradient-to-b from-blue-50/40 via-white to-background p-6 sm:p-10 overflow-hidden shadow-sm">
-          <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative rounded-xl border border-white/[0.08] bg-gradient-to-b from-[#0E111A] to-[#07080C] p-6 sm:p-8 overflow-hidden shadow-2xl">
+          {/* Hairline Horizon Accent */}
+          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-500/40 to-transparent" />
+          
+          {/* Controlled Ambient Glow in background, zero bleed on text */}
+          <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/[0.04] rounded-full blur-3xl pointer-events-none" />
 
-          <div className="relative z-10 max-w-3xl space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-500/30 bg-blue-50 text-blue-700 font-mono text-xs">
-              <Flame className="w-3.5 h-3.5 text-blue-600 animate-pulse" />
-              <span>SURVEILLANCE-FREE SYNDICATION</span>
+          <div className="relative z-10 max-w-3xl space-y-3">
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 font-mono text-[11px] tracking-wider uppercase">
+              <Flame className="w-3 h-3 text-cyan-400" />
+              <span>Surveillance-Free Syndication Engine</span>
             </div>
-            <h1 className="text-3xl sm:text-5xl font-serif font-bold tracking-tight text-foreground">
+            
+            <h1 className="text-2xl sm:text-4xl font-sans font-bold tracking-tight text-white">
               Import Substack, Medium & Ghost in 1-Click
             </h1>
-            <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
-              Strip tracking pixels, Facebook/Google ad beacons, and surveillance tags from any article.
-              Canonicalize, sign with an Ed25519 sovereign key, and publish permanently across IPFS and Tor v3 onion services.
+            
+            <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed max-w-2xl">
+              Strip tracking pixels, surveillance scripts, and ad beacons. Canonicalize, sign with an Ed25519 sovereign key, and publish permanently across IPFS and Tor v3 onion services.
             </p>
           </div>
         </div>
 
         {/* Top-Level Mode Selector */}
         <Tabs defaultValue="bulk" className="space-y-8">
-          <TabsList className="bg-muted p-1 border w-full sm:w-auto grid grid-cols-3">
+          <TabsList className="bg-[#08090E] border border-white/[0.08] p-1 rounded-lg w-full sm:w-auto grid grid-cols-3 gap-1 h-auto">
             <TabsTrigger
               value="bulk"
-              className="data-[state=active]:bg-background data-[state=active]:text-foreground text-xs font-semibold gap-2 py-2.5 transition-all shadow-none data-[state=active]:shadow-sm"
+              className="rounded-md py-2 text-xs font-medium text-zinc-400 data-[state=active]:bg-[#15151C] data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-white/10 gap-2 transition-all"
             >
-              <Rss className="w-4 h-4" /> Bulk RSS Archiver
+              <Rss className="w-3.5 h-3.5 text-cyan-400" /> Bulk RSS Archiver
             </TabsTrigger>
             <TabsTrigger
               value="notion"
-              className="data-[state=active]:bg-background data-[state=active]:text-foreground text-xs font-semibold gap-2 py-2.5 transition-all shadow-none data-[state=active]:shadow-sm"
+              className="rounded-md py-2 text-xs font-medium text-zinc-400 data-[state=active]:bg-[#15151C] data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-white/10 gap-2 transition-all"
             >
-              <Layers className="w-4 h-4" /> Notion Importer
+              <Layers className="w-3.5 h-3.5 text-cyan-400" /> Notion Importer
             </TabsTrigger>
             <TabsTrigger
               value="single"
-              className="data-[state=active]:bg-background data-[state=active]:text-foreground text-xs font-semibold gap-2 py-2.5 transition-all shadow-none data-[state=active]:shadow-sm"
+              className="rounded-md py-2 text-xs font-medium text-zinc-400 data-[state=active]:bg-[#15151C] data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-white/10 gap-2 transition-all"
             >
-              <Radio className="w-4 h-4" /> Single Article Scrubber
+              <Radio className="w-3.5 h-3.5 text-cyan-400" /> Single Article Scrubber
             </TabsTrigger>
           </TabsList>
 
@@ -212,11 +217,11 @@ export default function ImportPage() {
           {/* TAB 3: SINGLE ARTICLE / VISUAL SCRUBBER */}
           <TabsContent value="single" className="space-y-8">
             {/* Input Studio Card */}
-            <Card className="border-border/60 bg-card shadow-sm">
+            <Card className="border-white/[0.08] bg-[#0D0D12] shadow-sm">
               <CardHeader>
-                <CardTitle className="text-lg font-serif flex items-center justify-between text-card-foreground">
+                <CardTitle className="text-lg font-sans font-semibold flex items-center justify-between text-white">
                   <span className="flex items-center gap-2">
-                    <Radio className="w-4 h-4 text-primary" /> Syndicate Single Article
+                    <Radio className="w-4 h-4 text-cyan-400" /> Syndicate Single Article
                   </span>
                   <span className="text-xs font-mono text-muted-foreground font-normal">
                     Supports Substack · Medium · Ghost · RSS 2.0 · Atom · Web
@@ -372,26 +377,26 @@ export default function ImportPage() {
                     </CardContent>
                   </Card>
 
-                  <Card className="border-blue-200 bg-blue-50/50">
+                  <Card className="border-white/[0.08] bg-[#0D0D12]">
                     <CardContent className="p-4 space-y-1">
                       <div className="flex items-center justify-between text-muted-foreground">
                         <span className="text-xs font-mono">UTM PARAMS PURGED</span>
-                        <Flame className="w-4 h-4 text-blue-500" />
+                        <Flame className="w-4 h-4 text-cyan-400" />
                       </div>
-                      <div className="text-2xl font-bold font-mono text-blue-600">
+                      <div className="text-2xl font-bold font-mono text-cyan-400">
                         {result.telemetry.trackingParamsPurged}
                       </div>
                       <p className="text-[11px] text-muted-foreground">Sanitized hyperlinks & media</p>
                     </CardContent>
                   </Card>
 
-                  <Card className="border-emerald-200 bg-emerald-50/50">
+                  <Card className="border-white/[0.08] bg-[#0D0D12]">
                     <CardContent className="p-4 space-y-1">
                       <div className="flex items-center justify-between text-muted-foreground">
                         <span className="text-xs font-mono">DATA REDUCTION</span>
-                        <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                        <ShieldCheck className="w-4 h-4 text-emerald-400" />
                       </div>
-                      <div className="text-2xl font-bold font-mono text-emerald-600">
+                      <div className="text-2xl font-bold font-mono text-emerald-400">
                         {result.telemetry.reductionPercentage}%
                       </div>
                       <p className="text-[11px] text-muted-foreground">
@@ -403,15 +408,15 @@ export default function ImportPage() {
 
                 {/* Specific Purged Surveillance Items Drawer */}
                 {result.telemetry.purgedTrackersList && result.telemetry.purgedTrackersList.length > 0 && (
-                  <div className="p-4 rounded-xl border border-red-200 bg-red-50/50 space-y-2">
-                    <div className="text-xs font-mono text-red-600 font-semibold flex items-center gap-1.5">
+                  <div className="p-4 rounded-lg border border-red-500/20 bg-red-500/5 space-y-2">
+                    <div className="text-xs font-mono text-red-400 font-semibold flex items-center gap-1.5">
                       <ShieldAlert className="w-3.5 h-3.5" /> PURGED SURVEILLANCE VECTORS (AUDIT LOG):
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                       {result.telemetry.purgedTrackersList.map((item, idx) => (
                         <span
                           key={idx}
-                          className="px-2 py-0.5 rounded bg-red-100 border border-red-200 text-[11px] font-mono text-red-700"
+                          className="px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-[11px] font-mono text-red-300"
                         >
                           ✕ {item}
                         </span>
@@ -422,54 +427,46 @@ export default function ImportPage() {
 
                 {/* Publication Success Details Banner */}
                 {result.published && result.cid && (
-                  <div className="p-6 rounded-xl border border-emerald-200 bg-emerald-50/50 space-y-4">
+                  <div className="p-6 rounded-xl border border-emerald-500/20 bg-emerald-500/5 space-y-4">
                     <div className="flex flex-wrap items-center justify-between gap-4">
                       <div>
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono bg-emerald-100 text-emerald-800 border border-emerald-300">
-                          <Check className="w-3.5 h-3.5" /> DECENTRALIZED SYNDICATION CONFIRMED
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/25">
+                          <Check className="w-3.5 h-3.5 text-emerald-400" /> DECENTRALIZED SYNDICATION CONFIRMED
                         </span>
-                        <h3 className="text-lg font-serif font-bold text-foreground mt-1">
+                        <h3 className="text-lg font-sans font-bold text-white mt-1">
                           {result.article.title}
                         </h3>
                       </div>
 
                       <div className="flex items-center gap-2">
                         <Link href={`/read/${result.cid}`} target="_blank">
-                          <Button size="sm" className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold gap-1.5">
+                          <Button size="sm" className="bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-semibold gap-1.5">
                             <ExternalLink className="w-3.5 h-3.5" /> Open Reader View
                           </Button>
                         </Link>
-                        <Link href={`/embed/${result.cid}?theme=light`} target="_blank">
-                          <Button size="sm" variant="outline" className="text-xs gap-1.5">
-                            <Eye className="w-3.5 h-3.5" /> Direct Embed
+                        <Link href={`/embed/${result.cid}?theme=dark`} target="_blank">
+                          <Button size="sm" variant="outline" className="border-white/10 bg-white/5 hover:bg-white/10 text-white text-xs gap-1.5">
+                            <Eye className="w-3.5 h-3.5 text-cyan-400" /> Direct Embed
                           </Button>
                         </Link>
                       </div>
                     </div>
 
                     <div className="grid sm:grid-cols-2 gap-3 pt-2 font-mono text-xs">
-                      <div className="flex items-center justify-between p-2.5 rounded bg-background border">
-                        <span className="text-muted-foreground">IPFS CID:</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-primary truncate max-w-[200px]">{result.cid}</span>
-                          <button
-                            onClick={() => copyToClipboard(result.cid!, setCopiedCid)}
-                            className="text-muted-foreground hover:text-foreground"
-                          >
-                            {copiedCid ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                          </button>
-                        </div>
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-[#08090E] border border-white/[0.08]">
+                        <span className="text-muted-foreground text-xs">IPFS Content Identifier:</span>
+                        <CidChip cid={result.cid} showExplorerLink />
                       </div>
 
-                      <div className="flex items-center justify-between p-2.5 rounded bg-background border">
-                        <span className="text-muted-foreground">Share URL:</span>
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-[#08090E] border border-white/[0.08]">
+                        <span className="text-muted-foreground text-xs">Share Gateway:</span>
                         <div className="flex items-center gap-2">
-                          <span className="text-foreground truncate max-w-[200px]">{result.shareUrl}</span>
+                          <span className="text-zinc-200 truncate max-w-[200px]">{result.shareUrl}</span>
                           <button
                             onClick={() => copyToClipboard(result.shareUrl!, setCopiedShare)}
-                            className="text-muted-foreground hover:text-foreground"
+                            className="text-zinc-400 hover:text-white"
                           >
-                            {copiedShare ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                            {copiedShare ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                           </button>
                         </div>
                       </div>
@@ -525,7 +522,7 @@ export default function ImportPage() {
                     <TabsContent value="embed" className="space-y-6">
                       <Card className="border-border/60 bg-card">
                         <CardHeader>
-                          <CardTitle className="text-lg font-serif text-card-foreground flex items-center justify-between">
+                          <CardTitle className="text-lg font-sans font-semibold text-card-foreground flex items-center justify-between">
                             <span>Universal Iframe Embed Code</span>
                             <span className="text-xs font-mono text-emerald-600">
                               CSP frame-ancestors * Compliant
@@ -628,32 +625,32 @@ export default function ImportPage() {
         {/* CMS Integrations Bridge Grid (Ghost & WordPress) */}
         <div className="grid md:grid-cols-2 gap-6 pt-6">
           {/* Ghost CMS Automated Webhook Card */}
-          <Card className="border-border/60 bg-card shadow-sm">
+          <Card className="border-white/[0.08] bg-[#0D0D12] shadow-sm">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono text-amber-600 font-semibold flex items-center gap-1.5">
+                <span className="text-xs font-mono text-amber-400 font-semibold flex items-center gap-1.5">
                   <Zap className="w-3.5 h-3.5" /> AUTOMATED SYNDICATION
                 </span>
-                <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700 font-mono text-[10px]">
+                <Badge variant="outline" className="border-amber-500/30 bg-amber-500/10 text-amber-300 font-mono text-[10px]">
                   GHOST WEBHOOK
                 </Badge>
               </div>
-              <CardTitle className="text-lg font-serif text-card-foreground">
+              <CardTitle className="text-lg font-sans font-semibold text-white">
                 Ghost CMS Publication Webhook
               </CardTitle>
-              <CardDescription className="text-xs leading-relaxed">
+              <CardDescription className="text-xs text-zinc-400 leading-relaxed">
                 Connect your Ghost blog to automatically syndicate every published article to PressProtocol with HMAC-SHA256 verification.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 text-xs font-mono">
-              <div className="p-3 rounded-lg bg-muted/50 border space-y-2">
-                <span className="text-muted-foreground block">Target URL:</span>
-                <code className="text-primary break-all select-all font-semibold">
+              <div className="p-3 rounded-lg bg-[#08090E] border border-white/[0.08] space-y-2">
+                <span className="text-zinc-500 block">Target URL:</span>
+                <code className="text-cyan-400 break-all select-all font-semibold">
                   https://pressprotocol.com/api/webhooks/ghost
                 </code>
               </div>
 
-              <div className="space-y-1.5 text-muted-foreground text-[11px] leading-relaxed">
+              <div className="space-y-1.5 text-zinc-400 text-[11px] leading-relaxed">
                 <p>1. In Ghost Admin, go to <strong>Settings → Integrations → Add Custom Integration</strong>.</p>
                 <p>2. Add Webhook for event <strong>&quot;Post published&quot;</strong>.</p>
                 <p>3. Set Target URL to the endpoint above and set secret to your <code>GHOST_WEBHOOK_SECRET</code>.</p>
@@ -662,25 +659,25 @@ export default function ImportPage() {
           </Card>
 
           {/* WordPress Super-Plugin Card */}
-          <Card className="border-border/60 bg-card shadow-sm">
+          <Card className="border-white/[0.08] bg-[#0D0D12] shadow-sm">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono text-blue-600 font-semibold flex items-center gap-1.5">
+                <span className="text-xs font-mono text-cyan-400 font-semibold flex items-center gap-1.5">
                   <ShieldCheck className="w-3.5 h-3.5" /> NATIVE CMS PLUGIN
                 </span>
-                <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-700 font-mono text-[10px]">
+                <Badge variant="outline" className="border-cyan-500/30 bg-cyan-500/10 text-cyan-300 font-mono text-[10px]">
                   WP PLUGIN v1.1
                 </Badge>
               </div>
-              <CardTitle className="text-lg font-serif text-card-foreground">
+              <CardTitle className="text-lg font-sans font-semibold text-white">
                 WordPress Sovereign Super-Plugin
               </CardTitle>
-              <CardDescription className="text-xs leading-relaxed">
+              <CardDescription className="text-xs text-zinc-400 leading-relaxed">
                 Publish directly from the WordPress editor. Automatically pins to IPFS, creates Tor v3 hidden services, and generates embed codes.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border text-xs font-mono">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-[#08090E] border border-white/[0.08] text-xs font-mono">
                 <div>
                   <div className="text-foreground font-semibold">press-protocol-wordpress.zip</div>
                   <div className="text-[11px] text-muted-foreground">Official WordPress Super-Plugin Bundle</div>

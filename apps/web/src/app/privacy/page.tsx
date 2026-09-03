@@ -12,50 +12,50 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#050508] text-white selection:bg-cyan-500/30 selection:text-cyan-200 py-12 px-4 sm:px-6 lg:px-8">
       <div className="container mx-auto max-w-4xl space-y-10">
         {/* Navigation Breadcrumb */}
         <div>
           <Link href="/">
-            <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
+            <Button variant="ghost" size="sm" className="gap-2 text-neutral-400 hover:text-white hover:bg-white/[0.06] text-xs">
               <ArrowLeft className="h-4 w-4" /> Back to Home
             </Button>
           </Link>
         </div>
 
         {/* Page Header */}
-        <div className="space-y-4 border-b pb-8">
+        <div className="space-y-4 border-b border-white/10 pb-8">
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono text-xs">
-              <Shield className="h-3 w-3 mr-1" /> Sovereign Architecture
+            <Badge variant="outline" className="border-emerald-500/30 bg-emerald-950/50 text-emerald-300 font-mono text-xs">
+              <Shield className="h-3 w-3 mr-1 text-emerald-400" /> Sovereign Architecture
             </Badge>
-            <span className="text-xs text-muted-foreground font-mono">Last Updated: September 2026</span>
+            <span className="text-xs text-neutral-400 font-mono">Last Updated: September 2026</span>
           </div>
-          <h1 className="font-serif text-4xl sm:text-5xl font-bold tracking-tight">
+          <h1 className="font-sans text-4xl sm:text-5xl font-bold tracking-tight text-white">
             Privacy Policy & Zero-Log Architecture
           </h1>
-          <p className="text-lg text-muted-foreground leading-relaxed">
+          <p className="text-lg text-neutral-300 leading-relaxed">
             PressProtocol is engineered for dissidents, whistleblowers, and independent journalists. Our core architectural invariant is simple: <strong>we cannot compromise your data because we never collect it.</strong>
           </p>
         </div>
 
         {/* Core Pillars */}
         <div className="grid sm:grid-cols-2 gap-4">
-          <Card className="border-border/60 bg-muted/20">
+          <Card className="border-white/10 bg-[#0B0D14] text-white rounded-2xl">
             <CardContent className="p-6 space-y-3">
-              <div className="h-10 w-10 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+              <div className="h-10 w-10 rounded-lg bg-emerald-950/60 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
                 <EyeOff className="h-5 w-5" />
               </div>
-              <h3 className="font-semibold text-base">Zero Access Logs</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <h3 className="font-semibold text-base text-white">Zero Access Logs</h3>
+              <p className="text-sm text-neutral-400 leading-relaxed">
                 PressProtocol Node daemons and edge relays do not retain IP addresses, HTTP user-agents, referrers, or reader browsing telemetry.
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-border/60 bg-muted/20">
+          <Card className="border-white/10 bg-[#0B0D14] text-white rounded-2xl">
             <CardContent className="p-6 space-y-3">
-              <div className="h-10 w-10 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-600 dark:text-cyan-400">
+              <div className="h-10 w-10 rounded-lg bg-cyan-950/60 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
                 <Key className="h-5 w-5" />
               </div>
               <h3 className="font-semibold text-base">Client-Side Private Keys</h3>
@@ -69,7 +69,7 @@ export default function PrivacyPage() {
         {/* In-Depth Sections */}
         <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8">
           <section className="space-y-3">
-            <h2 className="text-2xl font-serif font-bold">1. Anonymous Publishing & In-Browser Keypairs</h2>
+            <h2 className="text-2xl font-sans font-bold">1. Anonymous Publishing & In-Browser Keypairs</h2>
             <p className="text-muted-foreground leading-relaxed">
               When publishing without an account, PressProtocol generates an ephemeral <strong>Ed25519 cryptographic keypair</strong> inside your local browser runtime. 
               The private key is stored exclusively in your browser&apos;s <code className="text-xs font-mono bg-muted px-1.5 py-0.5 rounded">localStorage</code> under your control. 
@@ -78,7 +78,7 @@ export default function PrivacyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-serif font-bold">2. Decentralized Content Distribution</h2>
+            <h2 className="text-2xl font-sans font-bold">2. Decentralized Content Distribution</h2>
             <p className="text-muted-foreground leading-relaxed">
               Content published through PressProtocol is converted into an immutable, content-addressed <strong>IPFS CID (Content Identifier)</strong>. 
               Once published, the CID is replicated across public IPFS nodes, pinning clusters, and Tor v3 onion services. 
@@ -87,7 +87,7 @@ export default function PrivacyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-serif font-bold">3. Optional Privy Authentication & Profiles</h2>
+            <h2 className="text-2xl font-sans font-bold">3. Optional Privy Authentication & Profiles</h2>
             <p className="text-muted-foreground leading-relaxed">
               Authors who desire persistent, cross-device public profiles can optionally connect via <strong>Privy</strong> (social login or Web3 wallet). 
               If you authenticate via Privy:
@@ -100,7 +100,7 @@ export default function PrivacyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-serif font-bold">4. Cookies, Analytics & Third-Party Trackers</h2>
+            <h2 className="text-2xl font-sans font-bold">4. Cookies, Analytics & Third-Party Trackers</h2>
             <p className="text-muted-foreground leading-relaxed">
               PressProtocol does not use marketing cookies, tracking pixels, or intrusive third-party analytics (e.g., Google Analytics, Meta Pixel). 
               Local state (drafts, burner keypairs, theme preferences) is stored in standard HTML5 local storage on your client device and is never synchronized to central telemetry servers.
@@ -108,7 +108,7 @@ export default function PrivacyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-serif font-bold">5. Serverless Gateway Failover & Transport Telemetry</h2>
+            <h2 className="text-2xl font-sans font-bold">5. Serverless Gateway Failover & Transport Telemetry</h2>
             <p className="text-muted-foreground leading-relaxed">
               When reading content, our edge gateway queries public decentralized gateways (Pinata, Cloudflare, ipfs.io, dweb.link). 
               These requests transmit only the requested CID. No reader profile or reading session history is logged or monetized.

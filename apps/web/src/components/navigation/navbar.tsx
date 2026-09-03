@@ -43,18 +43,21 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur-lg supports-[backdrop-filter]:bg-white/90 shadow-sm">
+    <nav className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#050508]/85 backdrop-blur-2xl text-white shadow-2xl transition-colors">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center space-x-2 group">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-400 group-hover:shadow-lg transition-all">
-            <FileText className="h-5 w-5 text-white" />
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 border border-white/15 group-hover:border-cyan-400/50 transition-colors">
+            <span className="text-cyan-400 font-mono text-sm font-bold">¶</span>
+            <div className="absolute -inset-0.5 rounded-lg bg-cyan-500/20 blur opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
-          <span className="text-xl font-bold text-black font-sans">PressProtocol</span>
+          <span className="font-display tracking-tight text-xl text-white font-medium group-hover:text-cyan-300 transition-colors">
+            PressProtocol
+          </span>
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden items-center space-x-1 md:flex">
+        <div className="hidden items-center space-x-1.5 md:flex">
           {navLinks.map((link) => {
             const Icon = link.icon;
             const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
@@ -63,14 +66,15 @@ const Navbar = () => {
               <Link key={link.href} href={link.href}>
                 <Button
                   variant="ghost"
+                  size="sm"
                   className={cn(
-                    "gap-2 font-medium transition-all",
+                    "gap-2 text-xs font-mono tracking-wide transition-all h-9 px-3 rounded-lg border",
                     isActive
-                      ? "bg-blue-50 text-primary hover:bg-blue-100"
-                      : "text-muted-foreground hover:text-primary hover:bg-blue-50/50"
+                      ? "border-cyan-500/30 bg-cyan-500/10 text-cyan-300 shadow-sm shadow-cyan-500/10"
+                      : "border-transparent text-white/70 hover:text-white hover:bg-white/5 hover:border-white/10"
                   )}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className={cn("h-3.5 w-3.5", isActive ? "text-cyan-400" : "text-white/60")} />
                   {link.label}
                 </Button>
               </Link>
@@ -80,29 +84,26 @@ const Navbar = () => {
 
         {/* Desktop Actions */}
         <div className="hidden items-center space-x-2 md:flex">
-          {/* Search */}
-          {/* <div className="relative">
-            <form onSubmit={handleSearch} className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search content..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-64 pl-9 pr-4"
-              />
-            </form>
-          </div> */}
-
-          {/* Bookmarks */}
-          <Button variant="ghost" size="icon" onClick={() => router.push("/profile")}>
-            <User className="h-6 w-6" />
+          {/* Profile / Reading Vault */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.push("/profile")}
+            className="h-9 w-9 text-white/70 hover:text-white hover:bg-white/5 rounded-lg border border-transparent hover:border-white/10 transition-all"
+            title="Profile"
+          >
+            <User className="h-4 w-4" />
           </Button>
 
-          {/* Notifications */}
-          <Button variant="ghost" size="icon" onClick={() => router.push("/settings")}>
-            <Settings className="h-5 w-5" />
-            <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-destructive" />
+          {/* Settings */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.push("/settings")}
+            className="h-9 w-9 text-white/70 hover:text-white hover:bg-white/5 rounded-lg border border-transparent hover:border-white/10 relative transition-all"
+            title="Settings"
+          >
+            <Settings className="h-4 w-4" />
           </Button>
 
           {/* Auth */}
@@ -114,21 +115,21 @@ const Navbar = () => {
           {/* Mobile Search */}
           <Sheet open={isSearchOpen} onOpenChange={setIsSearchOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="text-white/80 hover:text-white hover:bg-white/5">
                 <Search className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="top" className="h-auto">
+            <SheetContent side="top" className="h-auto bg-[#050508]/95 backdrop-blur-2xl border-b border-white/10 text-white">
               <SheetHeader>
-                <SheetTitle>Search Content</SheetTitle>
+                <SheetTitle className="text-white font-mono text-xs uppercase tracking-wider">Search Content</SheetTitle>
               </SheetHeader>
               <form onSubmit={handleSearch} className="mt-4">
                 <Input
                   type="text"
-                  placeholder="Search content..."
+                  placeholder="Search decentralized publications..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full"
+                  className="w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-cyan-400"
                   autoFocus
                 />
               </form>
@@ -138,21 +139,24 @@ const Navbar = () => {
           {/* Mobile Navigation */}
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="text-white/80 hover:text-white hover:bg-white/5">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[280px]">
+            <SheetContent side="right" className="w-[290px] bg-[#050508]/95 backdrop-blur-3xl border-l border-white/10 text-white">
               <SheetHeader className="mb-6">
-                <SheetTitle className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-400">
-                    <FileText className="h-4 w-4 text-white" />
+                <SheetTitle className="flex items-center gap-2.5">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/5 border border-white/15">
+                    <span className="text-cyan-400 font-mono text-sm font-bold">¶</span>
                   </div>
-                  <span className="bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">PressProtocol</span>
+                  <span className="font-display text-lg text-white">PressProtocol</span>
                 </SheetTitle>
               </SheetHeader>
               
-              <div className="flex flex-col space-y-3">
+              <div className="flex flex-col space-y-2">
+                <div className="text-[10px] font-mono uppercase tracking-widest text-white/40 pb-1">
+                  Protocol Shell
+                </div>
                 {navLinks.map((link) => {
                   const Icon = link.icon;
                   const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
@@ -162,43 +166,40 @@ const Navbar = () => {
                       <Button
                         variant={isActive ? "secondary" : "ghost"}
                         className={cn(
-                          "w-full justify-start gap-3",
-                          isActive && "bg-blue-50 text-primary hover:bg-blue-100"
+                          "w-full justify-start gap-3 text-xs font-mono",
+                          isActive
+                            ? "bg-cyan-500/15 text-cyan-300 border border-cyan-500/30"
+                            : "text-white/70 hover:text-white hover:bg-white/5"
                         )}
                       >
-                        <Icon className="h-4 w-4" />
+                        <Icon className={cn("h-4 w-4", isActive ? "text-cyan-400" : "text-white/60")} />
                         {link.label}
                       </Button>
                     </Link>
                   );
                 })}
                 
-                <div className="my-4 border-t" />
+                <div className="my-3 border-t border-white/10" />
                 
                 <Link href="/bookmarks">
-                  <Button variant="ghost" className="w-full justify-start gap-3">
-                    <BookMarked className="h-4 w-4" />
-                    Bookmarks
+                  <Button variant="ghost" className="w-full justify-start gap-3 text-xs font-mono text-white/70 hover:text-white hover:bg-white/5">
+                    <BookMarked className="h-4 w-4 text-emerald-400" />
+                    Reading List
                   </Button>
                 </Link>
                 
                 <Link href="/settings">
-                  <Button variant="ghost" className="w-full justify-start gap-3">
+                  <Button variant="ghost" className="w-full justify-start gap-3 text-xs font-mono text-white/70 hover:text-white hover:bg-white/5">
                     <Settings className="h-4 w-4" />
                     Settings
                   </Button>
                 </Link>
                 
-                <Link href="/help">
-                  <Button variant="ghost" className="w-full justify-start gap-3">
-                    <HelpCircle className="h-4 w-4" />
-                    Help & Support
-                  </Button>
-                </Link>
+                <div className="my-3 border-t border-white/10" />
                 
-                <div className="my-4 border-t" />
-                
-                <AuthButton />
+                <div className="pt-1">
+                  <AuthButton />
+                </div>
               </div>
             </SheetContent>
           </Sheet>

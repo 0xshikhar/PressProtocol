@@ -94,28 +94,31 @@ export default function HelpPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#050508] text-white selection:bg-cyan-500/30 selection:text-cyan-200">
       {/* Header */}
-      <div className="border-b bg-gradient-to-br from-primary/5 via-background to-accent/5">
-        <div className="container mx-auto px-4 py-12">
+      <div className="border-b border-white/10 bg-[#0B0D14]/80 backdrop-blur-xl relative overflow-hidden">
+        {/* Ambient Glow */}
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top_left,rgba(6,182,212,0.12),transparent_70%)]" />
+
+        <div className="container relative z-10 mx-auto px-4 py-12">
           <div className="text-center max-w-3xl mx-auto">
-            <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent">
-              <HelpCircle className="h-8 w-8 text-white" />
+            <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-cyan-950/70 border border-cyan-500/30 text-cyan-400">
+              <HelpCircle className="h-8 w-8 text-cyan-400" />
             </div>
-            <h1 className="text-4xl font-bold mb-4">How can we help you?</h1>
-            <p className="text-lg text-muted-foreground mb-8">
-              Find answers, learn about features, and get the most out of PressProtocol
+            <h1 className="text-4xl md:text-5xl font-sans font-bold text-white mb-4 tracking-tight">How can we help you?</h1>
+            <p className="text-sm md:text-base text-neutral-400 mb-8 max-w-xl mx-auto">
+              Find answers, learn about protocol features, and get the most out of PressProtocol
             </p>
             
             {/* Search */}
             <div className="relative max-w-2xl mx-auto">
-              <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+              <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
               <Input
                 type="text"
-                placeholder="Search for help articles..."
+                placeholder="Search for help articles, cryptographic guides..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-14 pl-12 pr-4 text-lg"
+                className="h-14 pl-12 pr-4 text-base bg-[#0B0D14] border-white/10 text-white placeholder:text-neutral-500 rounded-2xl focus-visible:ring-cyan-500/30"
               />
             </div>
           </div>
@@ -125,21 +128,21 @@ export default function HelpPage() {
       <div className="container mx-auto px-4 py-12">
         {/* Help Categories */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold mb-6">Browse by Category</h2>
+          <h2 className="text-2xl font-sans font-bold text-white mb-6">Browse by Category</h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {helpCategories.map((category) => {
               const Icon = category.icon;
               return (
-                <Card key={category.title} className="hover:shadow-lg transition-all cursor-pointer border-2 hover:border-primary/30">
+                <Card key={category.title} className="hover:shadow-[0_0_25px_rgba(6,182,212,0.1)] transition-all cursor-pointer border border-white/10 bg-[#0B0D14] hover:border-cyan-500/40 rounded-2xl">
                   <CardHeader>
-                    <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                      <Icon className="h-6 w-6 text-primary" />
+                    <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-950/60 border border-cyan-500/30 text-cyan-400">
+                      <Icon className="h-6 w-6 text-cyan-400" />
                     </div>
-                    <CardTitle className="text-lg">{category.title}</CardTitle>
-                    <CardDescription>{category.description}</CardDescription>
+                    <CardTitle className="text-lg text-white font-sans font-bold">{category.title}</CardTitle>
+                    <CardDescription className="text-neutral-400 text-xs">{category.description}</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Badge variant="secondary">{category.articles} articles</Badge>
+                    <Badge variant="outline" className="border-white/10 bg-white/[0.04] text-cyan-300 font-mono text-xs">{category.articles} articles</Badge>
                   </CardContent>
                 </Card>
               );
@@ -150,20 +153,20 @@ export default function HelpPage() {
         {/* FAQs */}
         <div className="mb-16">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold mb-2">Frequently Asked Questions</h2>
-            <p className="text-muted-foreground">
-              Quick answers to common questions
+            <h2 className="text-3xl font-sans font-bold text-white mb-2">Frequently Asked Questions</h2>
+            <p className="text-sm text-neutral-400">
+              Quick answers to common questions about decentralized publishing
             </p>
           </div>
           
           <div className="max-w-3xl mx-auto">
-            <Accordion type="single" collapsible className="w-full">
+            <Accordion type="single" collapsible className="w-full space-y-2">
               {faqs.map((faq, index) => (
-                <AccordionItem key={index} value={`item-${index}`}>
-                  <AccordionTrigger className="text-left">
+                <AccordionItem key={index} value={`item-${index}`} className="border border-white/10 bg-[#0B0D14] rounded-xl px-4">
+                  <AccordionTrigger className="text-left text-white hover:text-cyan-300 text-sm font-medium py-4">
                     {faq.question}
                   </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground">
+                  <AccordionContent className="text-neutral-400 text-xs leading-relaxed pb-4">
                     {faq.answer}
                   </AccordionContent>
                 </AccordionItem>
@@ -174,17 +177,17 @@ export default function HelpPage() {
 
         {/* Quick Links */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold mb-6 text-center">More Resources</h2>
+          <h2 className="text-2xl font-sans font-bold text-white mb-6 text-center">More Resources</h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {quickLinks.map((link) => {
               const Icon = link.icon;
               return (
-                <Card key={link.title} className="hover:shadow-lg transition-all cursor-pointer">
+                <Card key={link.title} className="hover:shadow-[0_0_20px_rgba(6,182,212,0.1)] transition-all cursor-pointer border border-white/10 bg-[#0B0D14] hover:border-cyan-500/40 rounded-2xl">
                   <CardContent className="p-6 text-center">
-                    <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-secondary">
-                      <Icon className="h-6 w-6 text-primary" />
+                    <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-white/[0.04] border border-white/10 text-cyan-400">
+                      <Icon className="h-6 w-6 text-cyan-400" />
                     </div>
-                    <h3 className="font-semibold">{link.title}</h3>
+                    <h3 className="font-semibold text-white text-sm">{link.title}</h3>
                   </CardContent>
                 </Card>
               );
@@ -193,21 +196,22 @@ export default function HelpPage() {
         </div>
 
         {/* Contact Support */}
-        <Card className="border-2 bg-gradient-to-br from-primary/5 to-accent/5">
-          <CardContent className="p-12 text-center">
-            <MessageCircle className="h-12 w-12 mx-auto mb-4 text-primary" />
-            <h2 className="text-2xl font-bold mb-2">Still need help?</h2>
-            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              Our support team is here to help you with any questions or issues you may have.
+        <Card className="border border-white/10 bg-[#0B0D14] relative overflow-hidden rounded-2xl">
+          <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.08),transparent_70%)]" />
+          <CardContent className="p-12 text-center relative z-10">
+            <MessageCircle className="h-12 w-12 mx-auto mb-4 text-cyan-400" />
+            <h2 className="text-2xl font-sans font-bold text-white mb-2">Still need help?</h2>
+            <p className="text-neutral-400 mb-6 max-w-md mx-auto text-xs leading-relaxed">
+              Our open-source team and developer community are here to help you configure your gateway or self-hosted node.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Button size="lg" className="gap-2">
-                <MessageCircle className="h-5 w-5" />
-                Contact Support
+              <Button size="lg" className="gap-2 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold rounded-xl text-xs">
+                <MessageCircle className="h-4 w-4" />
+                Contact Protocol Support
               </Button>
-              <Button size="lg" variant="outline" className="gap-2">
-                <MessageCircle className="h-5 w-5" />
-                Join Community
+              <Button size="lg" variant="outline" className="gap-2 border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white rounded-xl text-xs">
+                <MessageCircle className="h-4 w-4" />
+                Join Community Swarm
               </Button>
             </div>
           </CardContent>

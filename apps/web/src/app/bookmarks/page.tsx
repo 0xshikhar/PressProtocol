@@ -35,6 +35,7 @@ import {
   type StorageMetrics,
 } from "@/lib/offline-storage";
 import { exportPressProof, downloadPressProofFile } from "@pressprotocol/proof";
+import { CidChip } from "@/components/protocol";
 
 const SOURCE_RAILS = [
   "All Rails",
@@ -195,41 +196,44 @@ export default function BookmarksPage() {
   const getRailBadgeStyle = (rail: string) => {
     switch (rail) {
       case "Notion":
-        return "border-cyan-200 bg-cyan-50 text-cyan-800";
+        return "border-cyan-500/30 bg-cyan-950/40 text-cyan-300";
       case "Substack/RSS":
-        return "border-orange-200 bg-orange-50 text-orange-800";
+        return "border-orange-500/30 bg-orange-950/40 text-orange-300";
       case "WordPress":
-        return "border-blue-200 bg-blue-50 text-blue-800";
+        return "border-blue-500/30 bg-blue-950/40 text-blue-300";
       case "Web Clipper":
-        return "border-emerald-200 bg-emerald-50 text-emerald-800";
+        return "border-emerald-500/30 bg-emerald-950/40 text-emerald-300";
       case "Git SSG":
-        return "border-purple-200 bg-purple-50 text-purple-800";
+        return "border-purple-500/30 bg-purple-950/40 text-purple-300";
       case "Studio":
-        return "border-teal-200 bg-teal-50 text-teal-800";
+        return "border-teal-500/30 bg-teal-950/40 text-teal-300";
       default:
-        return "border-border bg-muted/40 text-muted-foreground";
+        return "border-white/10 bg-white/[0.04] text-neutral-400";
     }
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans">
+    <div className="min-h-screen bg-[#050508] text-white selection:bg-cyan-500/30 selection:text-cyan-200 font-sans">
       {/* Top Banner & Header */}
-      <div className="border-b bg-gradient-to-b from-emerald-50/40 via-white to-background">
-        <div className="container mx-auto px-4 py-10 max-w-6xl">
+      <div className="border-b border-white/10 bg-[#0B0D14]/80 backdrop-blur-xl relative overflow-hidden">
+        {/* Ambient Glow */}
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top_left,rgba(6,182,212,0.12),transparent_70%)]" />
+
+        <div className="container relative z-10 mx-auto px-4 py-10 max-w-6xl">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
               <div className="flex items-center gap-2.5 mb-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700">
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-cyan-950/70 border border-cyan-500/30 text-cyan-400">
                   <BookMarked className="h-4 w-4" />
                 </span>
-                <span className="text-xs font-mono uppercase tracking-wider text-emerald-700 font-semibold">
+                <span className="text-xs font-mono uppercase tracking-wider text-cyan-400 font-semibold">
                   Zero-Telemetry Local Vault
                 </span>
               </div>
-              <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground tracking-tight">
+              <h1 className="text-2xl sm:text-4xl font-sans font-bold text-white tracking-tight">
                 Offline Reading List & Bookmarks
               </h1>
-              <p className="text-sm text-muted-foreground mt-1 max-w-xl">
+              <p className="text-xs sm:text-sm text-zinc-400 mt-2 max-w-xl leading-relaxed">
                 Censorship-resistant reading vault stored strictly inside your browser storage. Read full text and imagery anytime, even when completely offline.
               </p>
             </div>
@@ -240,9 +244,9 @@ export default function BookmarksPage() {
                 variant="outline"
                 size="sm"
                 onClick={handleExportVault}
-                className="gap-2 border-border bg-background hover:bg-muted text-foreground text-xs h-9 shadow-sm"
+                className="gap-2 border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-neutral-200 text-xs h-9 shadow-sm"
               >
-                <Download className="h-3.5 w-3.5 text-emerald-600" />
+                <Download className="h-3.5 w-3.5 text-cyan-400" />
                 Backup Vault (.json)
               </Button>
 
@@ -257,9 +261,9 @@ export default function BookmarksPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => fileInputRef.current?.click()}
-                className="gap-2 border-border bg-background hover:bg-muted text-foreground text-xs h-9 shadow-sm"
+                className="gap-2 border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-neutral-200 text-xs h-9 shadow-sm"
               >
-                <Upload className="h-3.5 w-3.5 text-primary" />
+                <Upload className="h-3.5 w-3.5 text-cyan-400" />
                 Restore Vault
               </Button>
 
@@ -268,7 +272,7 @@ export default function BookmarksPage() {
                   variant="ghost"
                   size="sm"
                   onClick={handleClearAll}
-                  className="gap-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 text-xs h-9"
+                  className="gap-1.5 text-neutral-400 hover:text-red-400 hover:bg-red-950/30 text-xs h-9"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                   Clear All
@@ -279,36 +283,36 @@ export default function BookmarksPage() {
 
           {/* Telemetry Stats Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-8">
-            <div className="rounded-xl border border-border/60 bg-card p-3.5 shadow-sm text-card-foreground">
-              <div className="flex items-center justify-between text-muted-foreground text-xs mb-1">
+            <div className="rounded-xl border border-white/10 bg-[#0B0D14] p-3.5 shadow-lg">
+              <div className="flex items-center justify-between text-neutral-400 text-xs mb-1">
                 <span>Articles Saved</span>
-                <FileText className="h-3.5 w-3.5 text-emerald-600" />
+                <FileText className="h-3.5 w-3.5 text-cyan-400" />
               </div>
-              <div className="text-xl font-bold font-mono text-foreground">{metrics.count}</div>
+              <div className="text-xl font-bold font-mono text-white">{metrics.count}</div>
             </div>
 
-            <div className="rounded-xl border border-border/60 bg-card p-3.5 shadow-sm text-card-foreground">
-              <div className="flex items-center justify-between text-muted-foreground text-xs mb-1">
+            <div className="rounded-xl border border-white/10 bg-[#0B0D14] p-3.5 shadow-lg">
+              <div className="flex items-center justify-between text-neutral-400 text-xs mb-1">
                 <span>Reading Time</span>
-                <Clock className="h-3.5 w-3.5 text-primary" />
+                <Clock className="h-3.5 w-3.5 text-cyan-400" />
               </div>
-              <div className="text-xl font-bold font-mono text-foreground">{metrics.totalReadTimeMinutes} min</div>
+              <div className="text-xl font-bold font-mono text-white">{metrics.totalReadTimeMinutes} min</div>
             </div>
 
-            <div className="rounded-xl border border-border/60 bg-card p-3.5 shadow-sm text-card-foreground">
-              <div className="flex items-center justify-between text-muted-foreground text-xs mb-1">
+            <div className="rounded-xl border border-white/10 bg-[#0B0D14] p-3.5 shadow-lg">
+              <div className="flex items-center justify-between text-neutral-400 text-xs mb-1">
                 <span>Local Storage</span>
-                <HardDrive className="h-3.5 w-3.5 text-amber-600" />
+                <HardDrive className="h-3.5 w-3.5 text-amber-400" />
               </div>
-              <div className="text-xl font-bold font-mono text-foreground">{metrics.formattedSize}</div>
+              <div className="text-xl font-bold font-mono text-white">{metrics.formattedSize}</div>
             </div>
 
-            <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-3.5">
-              <div className="flex items-center justify-between text-emerald-700 text-xs mb-1">
+            <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-3.5 shadow-lg">
+              <div className="flex items-center justify-between text-emerald-400 text-xs mb-1">
                 <span>Privacy Hygiene</span>
-                <Shield className="h-3.5 w-3.5 text-emerald-600" />
+                <Shield className="h-3.5 w-3.5 text-emerald-400" />
               </div>
-              <div className="text-xs font-mono font-medium text-emerald-800 mt-1">
+              <div className="text-xs font-mono font-medium text-emerald-300 mt-1">
                 Zero Server Telemetry
               </div>
             </div>
@@ -321,13 +325,13 @@ export default function BookmarksPage() {
         {/* Search & Filter Bar */}
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-6">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
             <Input
               type="text"
               placeholder="Search saved articles by title, author, tag..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-10 bg-background border-input text-foreground placeholder:text-muted-foreground rounded-xl"
+              className="pl-10 h-10 bg-[#0B0D14] border-white/10 text-white placeholder:text-neutral-500 rounded-xl focus-visible:ring-cyan-500/30 focus-visible:border-cyan-500/50"
             />
           </div>
 
@@ -338,8 +342,8 @@ export default function BookmarksPage() {
               onClick={() => setVerifiedOnly(!verifiedOnly)}
               className={`text-xs h-9 gap-1.5 rounded-lg border transition-all ${
                 verifiedOnly
-                  ? "border-emerald-500 bg-emerald-50 text-emerald-800 font-semibold shadow-sm"
-                  : "border-border bg-muted/40 text-muted-foreground hover:text-foreground"
+                  ? "border-emerald-500/40 bg-emerald-950/40 text-emerald-300 font-semibold shadow-[0_0_15px_rgba(16,185,129,0.15)]"
+                  : "border-white/10 bg-white/[0.03] text-neutral-400 hover:text-white"
               }`}
             >
               <ShieldCheck className="h-3.5 w-3.5" />
@@ -356,8 +360,8 @@ export default function BookmarksPage() {
               onClick={() => setSelectedRail(rail)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
                 selectedRail === rail
-                  ? "bg-emerald-600 text-white shadow-sm font-semibold"
-                  : "bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground border border-border"
+                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 font-semibold shadow-[0_0_15px_rgba(6,182,212,0.15)]"
+                  : "bg-[#0B0D14] hover:bg-white/[0.06] text-neutral-400 hover:text-white border border-white/10"
               }`}
             >
               {rail}
@@ -369,32 +373,32 @@ export default function BookmarksPage() {
         {loading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-28 rounded-2xl bg-muted border border-border/40 animate-pulse" />
+              <div key={i} className="h-28 rounded-2xl bg-white/[0.03] border border-white/5 animate-pulse" />
             ))}
           </div>
         ) : filteredArticles.length === 0 ? (
-          <div className="rounded-2xl border border-border/60 bg-muted/20 p-12 text-center max-w-xl mx-auto my-12">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-muted border border-border text-muted-foreground mb-4">
+          <div className="rounded-2xl border border-white/10 bg-[#0B0D14]/60 p-12 text-center max-w-xl mx-auto my-12 text-white">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white/[0.04] border border-white/10 text-cyan-400 mb-4">
               <BookMarked className="h-6 w-6" />
             </div>
-            <h3 className="text-lg font-serif font-bold text-foreground mb-2">
+            <h3 className="text-lg font-sans font-semibold text-white mb-2">
               {searchQuery || selectedRail !== "All Rails" || verifiedOnly
                 ? "No matching articles in local vault"
                 : "Your offline reading vault is empty"}
             </h3>
-            <p className="text-sm text-muted-foreground mb-6">
+            <p className="text-sm text-zinc-400 mb-6 leading-relaxed">
               {searchQuery || selectedRail !== "All Rails" || verifiedOnly
                 ? "Try clearing filters or search queries to view all saved items."
-                : "Browse the discovery feed or read any article on PressProtocol and click 'Bookmark' to preserve it locally for offline reading."}
+                : "Browse the discovery feed or read any article on PressProtocol and click 'Save Offline' to preserve it locally in your browser storage."}
             </p>
             <div className="flex items-center justify-center gap-3">
               <Link href="/explore">
-                <Button className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs h-9 shadow-sm">
+                <Button className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold text-xs h-9 shadow-sm rounded-md">
                   Explore Discover Feed
                 </Button>
               </Link>
               <Link href="/write">
-                <Button variant="outline" className="text-xs h-9">
+                <Button variant="outline" className="text-xs h-9 border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white rounded-md">
                   Open Sovereign Studio
                 </Button>
               </Link>
@@ -405,7 +409,7 @@ export default function BookmarksPage() {
             {filteredArticles.map((art) => (
               <div
                 key={art.cid}
-                className="group rounded-2xl border border-border/60 bg-card hover:border-emerald-500/40 hover:shadow-md p-5 transition-all text-card-foreground shadow-sm"
+                className="group rounded-xl border border-white/[0.08] bg-[#0D0D12] hover:border-cyan-500/40 p-5 transition-all text-white shadow-lg"
               >
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
@@ -416,49 +420,48 @@ export default function BookmarksPage() {
                       </Badge>
 
                       {art.isVerified ? (
-                        <Badge variant="outline" className="text-[10px] px-2 py-0.5 rounded-md font-mono border-emerald-200 bg-emerald-50 text-emerald-800 flex items-center gap-1">
+                        <Badge variant="outline" className="text-[10px] px-2 py-0.5 rounded-md font-mono border-emerald-500/30 bg-emerald-950/50 text-emerald-300 flex items-center gap-1">
                           <ShieldCheck className="h-3 w-3" />
                           Ed25519 Verified
                         </Badge>
                       ) : (
-                        <Badge variant="outline" className="text-[10px] px-2 py-0.5 rounded-md font-mono border-border bg-muted/40 text-muted-foreground">
+                        <Badge variant="outline" className="text-[10px] px-2 py-0.5 rounded-md font-mono border-white/10 bg-white/[0.04] text-neutral-400">
                           Community Mirror
                         </Badge>
                       )}
 
-                      <span className="text-[11px] font-mono text-muted-foreground">
+                      <span className="text-[11px] font-mono text-zinc-500">
                         {new Date(art.savedAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
                       </span>
                     </div>
 
                     {/* Title */}
                     <Link href={`/read/${art.cid}`}>
-                      <h2 className="text-lg font-serif font-bold text-foreground group-hover:text-emerald-700 transition-colors line-clamp-1">
+                      <h2 className="text-lg font-sans font-bold text-white group-hover:text-cyan-300 transition-colors line-clamp-1">
                         {art.title}
                       </h2>
                     </Link>
 
                     {/* Excerpt */}
                     {art.excerpt && (
-                      <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2 leading-relaxed">
+                      <p className="text-xs text-zinc-400 mt-1.5 line-clamp-2 leading-relaxed">
                         {art.excerpt}
                       </p>
                     )}
 
                     {/* Meta Footer */}
-                    <div className="flex flex-wrap items-center gap-3 mt-3 text-xs text-muted-foreground font-mono">
-                      <span>By {art.author || "Sovereign Author"}</span>
-                      <span>•</span>
-                      <span>{art.wordCount} words</span>
-                      <span>•</span>
-                      <span>{art.readingTimeMinutes} min read</span>
+                    <div className="flex flex-wrap items-center gap-2.5 mt-3 text-xs font-mono">
+                      <CidChip cid={art.cid} truncate prefixLen={6} suffixLen={4} />
+                      <span className="text-zinc-500">By {art.author || "Sovereign Author"}</span>
+                      <span className="text-zinc-500">•</span>
+                      <span className="text-zinc-500">{art.wordCount} words (~{art.readingTimeMinutes} min)</span>
 
                       {art.tags && art.tags.length > 0 && (
                         <>
-                          <span>•</span>
+                          <span className="text-zinc-500">•</span>
                           <div className="flex items-center gap-1.5 flex-wrap">
                             {art.tags.slice(0, 3).map((t) => (
-                              <span key={t} className="text-muted-foreground hover:text-foreground">
+                              <span key={t} className="text-zinc-400 hover:text-cyan-300">
                                 #{t}
                               </span>
                             ))}
@@ -471,7 +474,7 @@ export default function BookmarksPage() {
                   {/* Quick Action Buttons */}
                   <div className="flex items-center sm:flex-col sm:items-end gap-2 flex-shrink-0 pt-2 sm:pt-0">
                     <Link href={`/read/${art.cid}`}>
-                      <Button size="sm" className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs h-8 px-3 gap-1.5 shadow-sm">
+                      <Button size="sm" className="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs h-8 px-3 gap-1.5 shadow-sm rounded-lg">
                         <ExternalLink className="h-3.5 w-3.5" />
                         Read Offline
                       </Button>
@@ -483,7 +486,7 @@ export default function BookmarksPage() {
                         size="sm"
                         onClick={() => handleExportProof(art)}
                         title="Download Cryptographic Proof (.pressproof.json)"
-                        className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg"
+                        className="h-8 w-8 p-0 text-neutral-400 hover:text-white hover:bg-white/[0.06] rounded-lg"
                       >
                         <Download className="h-3.5 w-3.5" />
                       </Button>
@@ -493,9 +496,9 @@ export default function BookmarksPage() {
                         size="sm"
                         onClick={() => copyCid(art.cid)}
                         title="Copy IPFS CID"
-                        className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg"
+                        className="h-8 w-8 p-0 text-neutral-400 hover:text-white hover:bg-white/[0.06] rounded-lg"
                       >
-                        {copiedCid === art.cid ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
+                        {copiedCid === art.cid ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
                       </Button>
 
                       <Button
@@ -503,7 +506,7 @@ export default function BookmarksPage() {
                         size="sm"
                         onClick={() => handleRemove(art.cid, art.title)}
                         title="Remove from Local Vault"
-                        className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg"
+                        className="h-8 w-8 p-0 text-neutral-400 hover:text-red-400 hover:bg-red-950/30 rounded-lg"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>

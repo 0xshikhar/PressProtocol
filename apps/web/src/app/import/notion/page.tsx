@@ -19,19 +19,22 @@ export default function NotionImportPage() {
         </div>
 
         {/* Hero Banner */}
-        <div className="relative rounded-2xl border border-border/60 bg-gradient-to-b from-blue-50/40 via-white to-background p-6 sm:p-10 overflow-hidden shadow-sm">
-          <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative rounded-xl border border-white/[0.08] bg-gradient-to-b from-[#0E111A] to-[#07080C] p-6 sm:p-8 overflow-hidden shadow-2xl">
+          {/* Hairline Horizon Accent */}
+          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-500/40 to-transparent" />
+          
+          {/* Controlled Ambient Glow */}
+          <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/[0.04] rounded-full blur-3xl pointer-events-none" />
 
-          <div className="relative z-10 max-w-3xl space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-500/30 bg-blue-50 text-blue-700 font-mono text-xs">
-              <Sparkles className="w-3.5 h-3.5 text-blue-600 animate-pulse" />
-              <span>NOTION BLOCK SOVEREIGN BRIDGE</span>
+          <div className="relative z-10 max-w-3xl space-y-3">
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 font-mono text-[11px] uppercase tracking-wider">
+              <Sparkles className="w-3 h-3 text-cyan-400" />
+              <span>Notion Block Sovereign Bridge</span>
             </div>
-            <h1 className="text-3xl sm:text-5xl font-serif font-bold tracking-tight text-foreground">
+            <h1 className="text-2xl sm:text-4xl font-sans font-bold tracking-tight text-white">
               Import Notion Documents to IPFS & Tor
             </h1>
-            <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
+            <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed max-w-2xl">
               Preserve research notes, DAO proposals, and security disclosures drafted in Notion.
               Notion Callouts, Quotes, Headings, and Code blocks are transformed into pure semantic HTML5,
               signed with your Ed25519 sovereign burner key, and mirrored globally across decentralized transports.

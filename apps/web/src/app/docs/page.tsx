@@ -77,7 +77,7 @@ export default function DocsPage() {
             </Badge>
             <span className="text-xs text-muted-foreground font-mono">v1.2.0</span>
           </div>
-          <h1 className="font-serif text-4xl sm:text-5xl font-bold tracking-tight">
+          <h1 className="font-sans text-4xl sm:text-5xl font-bold tracking-tight">
             PressProtocol Documentation
           </h1>
           <p className="text-lg text-muted-foreground leading-relaxed max-w-3xl">

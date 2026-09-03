@@ -189,7 +189,7 @@ export function ManifestViewer({ manifestCid }: ManifestViewerProps) {
             <div>
               <div className="text-sm font-medium mb-1">Content CID</div>
               <div className="flex items-center gap-2">
-                <code className="text-xs bg-muted px-2 py-1 rounded flex-1 break-all">
+                <code className="text-xs bg-white/[0.05] border border-white/10 text-cyan-300 px-2 py-1 rounded flex-1 break-all font-mono">
                   {manifest.cid}
                 </code>
                 <Button
@@ -198,9 +198,9 @@ export function ManifestViewer({ manifestCid }: ManifestViewerProps) {
                   onClick={() => copyToClipboard(manifest.cid, "Content CID")}
                 >
                   {copied === "Content CID" ? (
-                    <CheckCircle className="h-3 w-3" />
+                    <CheckCircle className="h-3 w-3 text-emerald-400" />
                   ) : (
-                    <Copy className="h-3 w-3" />
+                    <Copy className="h-3 w-3 text-neutral-400" />
                   )}
                 </Button>
               </div>
@@ -209,7 +209,7 @@ export function ManifestViewer({ manifestCid }: ManifestViewerProps) {
               <div>
                 <div className="text-sm font-medium mb-1">Manifest CID</div>
                 <div className="flex items-center gap-2">
-                  <code className="text-xs bg-muted px-2 py-1 rounded flex-1 break-all">
+                  <code className="text-xs bg-white/[0.05] border border-white/10 text-cyan-300 px-2 py-1 rounded flex-1 break-all font-mono">
                     {manifest.manifestCid}
                   </code>
                   <Button
@@ -218,9 +218,9 @@ export function ManifestViewer({ manifestCid }: ManifestViewerProps) {
                     onClick={() => copyToClipboard(manifest.manifestCid!, "Manifest CID")}
                   >
                     {copied === "Manifest CID" ? (
-                      <CheckCircle className="h-3 w-3" />
+                      <CheckCircle className="h-3 w-3 text-emerald-400" />
                     ) : (
-                      <Copy className="h-3 w-3" />
+                      <Copy className="h-3 w-3 text-neutral-400" />
                     )}
                   </Button>
                 </div>
@@ -235,17 +235,17 @@ export function ManifestViewer({ manifestCid }: ManifestViewerProps) {
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full justify-start"
+                className="w-full justify-start border-white/10 bg-white/[0.03] hover:bg-white/[0.06] text-neutral-200"
                 onClick={() => window.open(manifest.mirrors.ipfs, "_blank")}
               >
-                <ExternalLink className="h-3 w-3 mr-2" />
+                <ExternalLink className="h-3 w-3 mr-2 text-cyan-400" />
                 IPFS Gateway
               </Button>
               {manifest.mirrors.tor && (
                 <Button
                   variant="outline"
                   size="sm"
-                  className="w-full justify-start"
+                  className="w-full justify-start border-white/10 bg-white/[0.03] text-neutral-500"
                   disabled
                 >
                   <ExternalLink className="h-3 w-3 mr-2" />
@@ -256,10 +256,10 @@ export function ManifestViewer({ manifestCid }: ManifestViewerProps) {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="w-full justify-start"
+                  className="w-full justify-start border-white/10 bg-white/[0.03] hover:bg-white/[0.06] text-neutral-200"
                   onClick={() => window.open(manifest.mirrors.gateway, "_blank")}
                 >
-                  <ExternalLink className="h-3 w-3 mr-2" />
+                  <ExternalLink className="h-3 w-3 mr-2 text-cyan-400" />
                   Web Gateway
                 </Button>
               )}
@@ -267,9 +267,9 @@ export function ManifestViewer({ manifestCid }: ManifestViewerProps) {
           </div>
 
           {/* Actions */}
-          <div className="pt-4 border-t">
+          <div className="pt-4 border-t border-white/10">
             <Button
-              className="w-full"
+              className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold"
               onClick={() => window.location.href = `/read/${manifest.cid}`}
             >
               <FileText className="h-4 w-4 mr-2" />
@@ -280,15 +280,15 @@ export function ManifestViewer({ manifestCid }: ManifestViewerProps) {
       </Card>
 
       {/* Technical Details */}
-      <Card>
+      <Card className="border-white/10 bg-[#0B0D14]">
         <CardHeader>
-          <CardTitle className="text-lg">Technical Details</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-lg text-white">Technical Details</CardTitle>
+          <CardDescription className="text-neutral-400">
             Manifest structure and metadata for developers
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <pre className="text-xs bg-muted p-4 rounded overflow-x-auto">
+          <pre className="text-xs bg-black/60 border border-white/10 p-4 rounded-xl overflow-x-auto text-neutral-300 font-mono">
             {JSON.stringify(manifest, null, 2)}
           </pre>
         </CardContent>

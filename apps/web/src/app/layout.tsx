@@ -67,19 +67,16 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
-  ],
+  themeColor: "#050508",
 }
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en" suppressHydrationWarning className="light">
+    <html lang="en" suppressHydrationWarning className="dark">
       <head />
       <body
         className={cn(
-          "min-h-screen bg-background antialiased flex flex-col font-sans",
+          "min-h-screen bg-[#050508] text-foreground antialiased flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200",
           inter.variable,
           instrumentSerif.variable,
           jetbrainsMono.variable,

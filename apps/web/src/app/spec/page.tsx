@@ -31,7 +31,7 @@ export default function SpecPage() {
             </Badge>
             <span className="text-xs text-muted-foreground font-mono">SPEC-2026-09-V1.2</span>
           </div>
-          <h1 className="font-serif text-4xl sm:text-5xl font-bold tracking-tight">
+          <h1 className="font-sans text-4xl sm:text-5xl font-bold tracking-tight">
             PressProtocol Architecture Specification
           </h1>
           <p className="text-lg text-muted-foreground leading-relaxed">
@@ -76,7 +76,7 @@ export default function SpecPage() {
         <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8">
           {/* Section 1 */}
           <section className="space-y-4">
-            <h2 className="text-2xl font-serif font-bold">1. Canonical JSON Schema & Signing Payload</h2>
+            <h2 className="text-2xl font-sans font-bold">1. Canonical JSON Schema & Signing Payload</h2>
             <p className="text-muted-foreground leading-relaxed">
               To prevent signature malleability across different JSON serialization implementations, PressProtocol conforms to <strong>RFC 8785 (JSON Canonicalization Scheme)</strong>. 
               The exact byte sequence signed by the author&apos;s Ed25519 private key is structured as follows:
@@ -96,7 +96,7 @@ export default function SpecPage() {
 
           {/* Section 2 */}
           <section className="space-y-4">
-            <h2 className="text-2xl font-serif font-bold">2. Immutable IPFS Content Envelope</h2>
+            <h2 className="text-2xl font-sans font-bold">2. Immutable IPFS Content Envelope</h2>
             <p className="text-muted-foreground leading-relaxed">
               The full document payload pinned to IPFS constitutes the unalterable source of truth:
             </p>
@@ -118,7 +118,7 @@ export default function SpecPage() {
 
           {/* Section 3 */}
           <section className="space-y-4">
-            <h2 className="text-2xl font-serif font-bold">3. Multi-Transport Resolution Algorithm</h2>
+            <h2 className="text-2xl font-sans font-bold">3. Multi-Transport Resolution Algorithm</h2>
             <p className="text-muted-foreground leading-relaxed">
               When a client or proxy resolves a document by CID, the resolution engine executes a resilient 2-phase failover:
             </p>

@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import { discoveryService, type DiscoveryContent } from "@/lib/discovery";
 import { isBookmarked, toggleBookmark } from "@/lib/bookmarks";
 import { classifySourceRail, saveArticleOffline } from "@/lib/offline-storage";
+import { CidChip, SignatureBadge } from "@/components/protocol";
 
 interface DiscoveryFeedProps {
   initialRail?: string;
@@ -140,19 +141,19 @@ export function DiscoveryFeed({
   const getRailStyle = (rail: string) => {
     switch (rail) {
       case "Notion":
-        return "border-cyan-200 bg-cyan-50 text-cyan-800";
+        return "border-cyan-500/30 bg-cyan-950/40 text-cyan-300";
       case "Substack/RSS":
-        return "border-orange-200 bg-orange-50 text-orange-800";
+        return "border-orange-500/30 bg-orange-950/40 text-orange-300";
       case "WordPress":
-        return "border-blue-200 bg-blue-50 text-blue-800";
+        return "border-blue-500/30 bg-blue-950/40 text-blue-300";
       case "Web Clipper":
-        return "border-emerald-200 bg-emerald-50 text-emerald-800";
+        return "border-emerald-500/30 bg-emerald-950/40 text-emerald-300";
       case "Git SSG":
-        return "border-purple-200 bg-purple-50 text-purple-800";
+        return "border-purple-500/30 bg-purple-950/40 text-purple-300";
       case "Studio":
-        return "border-teal-200 bg-teal-50 text-teal-800";
+        return "border-teal-500/30 bg-teal-950/40 text-teal-300";
       default:
-        return "border-border bg-muted/40 text-muted-foreground";
+        return "border-white/10 bg-white/[0.04] text-neutral-400";
     }
   };
 
@@ -187,8 +188,8 @@ export function DiscoveryFeed({
   return (
     <div className="space-y-6">
       {usingFallback && (
-        <Alert className="border-amber-200 bg-amber-50 text-amber-800">
-          <Server className="h-4 w-4 text-amber-600" />
+        <Alert className="border-amber-500/30 bg-amber-950/30 text-amber-200">
+          <Server className="h-4 w-4 text-amber-400" />
           <AlertDescription className="text-xs">
             Using decentralized discovery (DHT Swarm fallback). Ensuring zero-censorship resolution across multi-node peer networks.
           </AlertDescription>
@@ -198,12 +199,12 @@ export function DiscoveryFeed({
       {/* Filter Header Controls */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
           <Input
             placeholder="Search feed by title, tag, or author..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 h-10 bg-background border-input text-foreground placeholder:text-muted-foreground rounded-xl"
+            className="pl-10 h-10 bg-[#0B0D14] border-white/10 text-white placeholder:text-neutral-500 rounded-xl focus-visible:ring-cyan-500/30 focus-visible:border-cyan-500/50"
           />
         </div>
 
@@ -215,8 +216,8 @@ export function DiscoveryFeed({
             onClick={() => setOnlyVerified(!onlyVerified)}
             className={`text-xs h-9 gap-1.5 rounded-lg border transition-all ${
               onlyVerified
-                ? "border-emerald-500 bg-emerald-50 text-emerald-800 font-semibold shadow-sm"
-                : "border-border bg-muted/40 text-muted-foreground hover:text-foreground"
+                ? "border-emerald-500/40 bg-emerald-950/40 text-emerald-300 font-semibold shadow-[0_0_15px_rgba(16,185,129,0.15)]"
+                : "border-white/10 bg-white/[0.03] text-neutral-400 hover:text-white hover:bg-white/[0.06]"
             }`}
           >
             <ShieldCheck className="h-3.5 w-3.5" />
@@ -224,11 +225,13 @@ export function DiscoveryFeed({
           </Button>
 
           {/* Transport filter toggle */}
-          <div className="flex items-center rounded-lg border bg-muted/40 p-0.5 text-xs font-mono">
+          <div className="flex items-center rounded-lg border border-white/10 bg-[#0B0D14] p-0.5 text-xs font-mono">
             <button
               onClick={() => setSelectedTransport("all")}
               className={`px-2.5 py-1 rounded-md transition-all ${
-                selectedTransport === "all" ? "bg-emerald-600 text-white font-semibold shadow-sm" : "text-muted-foreground hover:text-foreground"
+                selectedTransport === "all"
+                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold shadow-sm"
+                  : "text-neutral-400 hover:text-white"
               }`}
             >
               All Transports
@@ -236,7 +239,9 @@ export function DiscoveryFeed({
             <button
               onClick={() => setSelectedTransport("tor")}
               className={`px-2.5 py-1 rounded-md transition-all flex items-center gap-1 ${
-                selectedTransport === "tor" ? "bg-purple-600 text-white font-semibold shadow-sm" : "text-muted-foreground hover:text-foreground"
+                selectedTransport === "tor"
+                  ? "bg-purple-500/20 text-purple-300 border border-purple-500/40 font-semibold shadow-sm"
+                  : "text-neutral-400 hover:text-white"
               }`}
             >
               <Radio className="h-3 w-3" />
@@ -254,8 +259,8 @@ export function DiscoveryFeed({
             onClick={() => setSelectedRail(rail)}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
               selectedRail === rail
-                ? "bg-emerald-600 text-white font-semibold shadow-sm"
-                : "bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground border border-border"
+                ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 font-semibold shadow-[0_0_15px_rgba(6,182,212,0.15)]"
+                : "bg-[#0B0D14] hover:bg-white/[0.06] text-neutral-400 hover:text-white border border-white/10"
             }`}
           >
             {rail}
@@ -267,16 +272,16 @@ export function DiscoveryFeed({
       {loading ? (
         <div className="space-y-3.5">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-28 rounded-2xl bg-muted animate-pulse border border-border/40" />
+            <div key={i} className="h-28 rounded-2xl bg-white/[0.03] animate-pulse border border-white/5" />
           ))}
         </div>
       ) : filteredItems.length === 0 ? (
-        <div className="rounded-2xl border border-border/60 bg-muted/20 p-12 text-center my-6">
-          <Layers className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-          <h3 className="text-base font-serif font-bold text-foreground mb-1">
+        <div className="rounded-2xl border border-white/10 bg-[#0B0D14]/60 p-12 text-center my-6">
+          <Layers className="h-10 w-10 text-zinc-500 mx-auto mb-3" />
+          <h3 className="text-base font-sans font-semibold text-white mb-1">
             No articles match current filters
           </h3>
-          <p className="text-xs text-muted-foreground max-w-sm mx-auto mb-4">
+          <p className="text-xs text-neutral-400 max-w-sm mx-auto mb-4">
             Try switching to &quot;All Rails&quot; or clearing your search term to see other syndicated publications.
           </p>
 
@@ -289,7 +294,7 @@ export function DiscoveryFeed({
               setSearchQuery("");
             }}
             variant="outline"
-            className="text-xs"
+            className="text-xs border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white"
           >
             Reset Filters
           </Button>
@@ -307,7 +312,7 @@ export function DiscoveryFeed({
                 onClick={() => {
                   window.location.href = `/read/${item.cid}`;
                 }}
-                className="group rounded-2xl border border-border/60 bg-card hover:border-emerald-500/40 hover:shadow-md p-5 transition-all cursor-pointer shadow-sm text-card-foreground"
+                className="group rounded-2xl border border-white/10 bg-[#0B0D14] hover:border-cyan-500/40 hover:shadow-[0_0_25px_rgba(6,182,212,0.1)] p-5 transition-all cursor-pointer shadow-lg text-white"
               >
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
@@ -318,24 +323,24 @@ export function DiscoveryFeed({
                       </Badge>
 
                       {isVerified ? (
-                        <Badge variant="outline" className="text-[10px] px-2 py-0.5 rounded-md font-mono border-emerald-200 bg-emerald-50 text-emerald-800 flex items-center gap-1">
+                        <Badge variant="outline" className="text-[10px] px-2 py-0.5 rounded-md font-mono border-emerald-500/30 bg-emerald-950/50 text-emerald-300 flex items-center gap-1">
                           <ShieldCheck className="h-3 w-3" />
                           Ed25519 Verified
                         </Badge>
                       ) : (
-                        <Badge variant="outline" className="text-[10px] px-2 py-0.5 rounded-md font-mono border-border bg-muted/40 text-muted-foreground">
+                        <Badge variant="outline" className="text-[10px] px-2 py-0.5 rounded-md font-mono border-white/10 bg-white/[0.04] text-neutral-400">
                           Community Mirror
                         </Badge>
                       )}
 
-                      <span className="text-[11px] font-mono text-muted-foreground flex items-center gap-1">
+                      <span className="text-[11px] font-mono text-neutral-400 flex items-center gap-1">
                         <Clock className="h-3 w-3" />
                         {formatTimestamp(item.createdAt)}
                       </span>
                     </div>
 
                     {/* Title */}
-                    <h2 className="text-lg font-serif font-bold text-foreground group-hover:text-emerald-700 transition-colors line-clamp-1">
+                    <h2 className="text-lg font-sans font-bold text-white group-hover:text-cyan-300 transition-colors line-clamp-1">
                       {item.title}
                     </h2>
 
@@ -345,7 +350,7 @@ export function DiscoveryFeed({
                         {item.tags.slice(0, 4).map((tag) => (
                           <span
                             key={tag}
-                            className="text-[11px] font-mono text-muted-foreground bg-muted/50 border border-border px-2 py-0.5 rounded-md"
+                            className="text-[11px] font-mono text-zinc-400 bg-white/[0.03] border border-white/10 px-2 py-0.5 rounded-md"
                           >
                             #{tag}
                           </span>
@@ -354,10 +359,16 @@ export function DiscoveryFeed({
                     )}
 
                     {/* Publisher Meta */}
-                    <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground font-mono">
-                      <span>Publisher: {item.publisher?.username || (item.publisher?.publicKey ? `${item.publisher.publicKey.slice(0, 8)}...` : "Anonymous")}</span>
-                      <span>•</span>
-                      <span className="truncate max-w-[150px]">CID: {item.cid.slice(0, 10)}...</span>
+                    <div className="flex flex-wrap items-center gap-2.5 mt-3 text-xs">
+                      <CidChip cid={item.cid} truncate prefixLen={6} suffixLen={4} />
+                      {item.publisher?.publicKey && (
+                        <SignatureBadge publicKey={item.publisher.publicKey} compact />
+                      )}
+                      {item.publisher?.username && (
+                        <span className="text-zinc-500 font-mono text-[11px]">
+                          by @{item.publisher.username}
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -370,7 +381,7 @@ export function DiscoveryFeed({
                       className={`text-xs h-8 px-3 gap-1.5 rounded-lg ${
                         isSaved
                           ? "bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-sm"
-                          : "border-border bg-muted/30 hover:bg-muted text-foreground"
+                          : "border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-neutral-300 hover:text-white"
                       }`}
                     >
                       <Bookmark className={`h-3.5 w-3.5 ${isSaved ? "fill-current" : ""}`} />
@@ -378,7 +389,7 @@ export function DiscoveryFeed({
                     </Button>
 
                     <Link href={`/read/${item.cid}`} onClick={(e) => e.stopPropagation()}>
-                      <Button variant="ghost" size="sm" className="h-8 text-xs text-muted-foreground hover:text-foreground gap-1 px-2">
+                      <Button variant="ghost" size="sm" className="h-8 text-xs text-neutral-400 hover:text-cyan-300 gap-1 px-2">
                         <span>Read</span>
                         <ExternalLink className="h-3 w-3" />
                       </Button>
@@ -398,9 +409,9 @@ export function DiscoveryFeed({
             variant="outline"
             size="sm"
             onClick={loadDiscoveryFeed}
-            className="text-xs h-9 gap-1.5"
+            className="text-xs h-9 gap-1.5 border-white/10 bg-[#0B0D14] hover:bg-white/[0.06] text-neutral-300 hover:text-white"
           >
-            <Server className="h-3.5 w-3.5 text-emerald-600" />
+            <Server className="h-3.5 w-3.5 text-cyan-400" />
             Refresh Decentralized Feed
           </Button>
         </div>

@@ -145,21 +145,21 @@ export function ReaderTypographyDrawer({
               Reading Theme
             </div>
             <div className="grid grid-cols-2 gap-2">
-              {/* Dark Velvet */}
+              {/* Onyx Dark */}
               <button
                 onClick={() => setTheme("dark")}
                 className={`p-3 rounded-xl border text-left transition-all flex items-center gap-2.5 ${
                   settings.theme === "dark"
-                    ? "border-primary bg-zinc-900 ring-2 ring-primary/40 text-white"
-                    : "border-zinc-800 bg-zinc-950/80 hover:border-zinc-700 text-zinc-300"
+                    ? "border-cyan-500 bg-[#0b0d14] ring-2 ring-cyan-500/40 text-white"
+                    : "border-white/10 bg-[#050508] hover:border-white/20 text-zinc-300"
                 }`}
               >
-                <div className="p-1.5 rounded-lg bg-zinc-800">
-                  <Moon className="h-3.5 w-3.5 text-zinc-200" />
+                <div className="p-1.5 rounded-lg bg-white/10">
+                  <Moon className="h-3.5 w-3.5 text-cyan-400" />
                 </div>
                 <div>
-                  <div className="text-xs font-semibold">Dark Velvet</div>
-                  <div className="text-[10px] text-muted-foreground">Deep contrast</div>
+                  <div className="text-xs font-semibold">Onyx Dark</div>
+                  <div className="text-[10px] text-muted-foreground">Sovereign black</div>
                 </div>
               </button>
 
