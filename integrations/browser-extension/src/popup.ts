@@ -234,6 +234,10 @@ btnClipNow.addEventListener("click", async () => {
       func: extractPageContent,
     });
 
+    if (!result || !result.result || typeof result.result !== "object") {
+      throw new Error("Could not extract readable article content from this tab.");
+    }
+
     clipped = result.result as ClippedArticle;
   } catch (err: any) {
     console.error("Extraction error:", err);
@@ -247,9 +251,9 @@ btnClipNow.addEventListener("click", async () => {
 
   // Step 2: Scrub Surveillance
   updateStep(stepScrub, "active");
-  targetAuthor.textContent = clipped.author ? `By ${clipped.author}` : "By Sovereign Author";
-  targetReadTime.textContent = `~${clipped.readingTimeMinutes} min read (${clipped.wordCount} words)`;
-  targetTitle.textContent = clipped.title || activeTabTitle;
+  targetAuthor.textContent = clipped?.author ? `By ${clipped.author}` : "By Sovereign Author";
+  targetReadTime.textContent = `~${clipped?.readingTimeMinutes || 1} min read (${clipped?.wordCount || 0} words)`;
+  targetTitle.textContent = clipped?.title || activeTabTitle;
 
   await new Promise((r) => setTimeout(r, 450)); // UI feedback pause
   updateStep(stepScrub, "completed");

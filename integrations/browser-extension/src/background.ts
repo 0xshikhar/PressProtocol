@@ -101,18 +101,34 @@ chrome.runtime.onInstalled.addListener(async () => {
 
   // Create context menu for highlighting text -> "Preserve Quote on PressProtocol"
   chrome.contextMenus.removeAll(() => {
-    chrome.contextMenus.create({
-      id: "clip-quote-pressprotocol",
-      title: "Preserve Quote on PressProtocol",
-      contexts: ["selection"],
-    });
+    chrome.contextMenus.create(
+      {
+        id: "clip-quote-pressprotocol",
+        title: "Preserve Quote on PressProtocol",
+        contexts: ["selection"],
+      },
+      () => {
+        if (chrome.runtime.lastError) {
+          // Swallow cleanup race condition
+        }
+      }
+    );
 
-    chrome.contextMenus.create({
-      id: "open-with-pressprotocol",
-      title: "Open with PressProtocol",
-      contexts: ["link"],
-      targetUrlPatterns: ["*://*/*read/*", "pressprotocol://*", "anonpress://*"],
-    });
+    // Note: Chrome match patterns strictly forbid custom schemes (e.g. pressprotocol://).
+    // Using contexts: ["link"] without restricted targetUrlPatterns allows Chrome to display
+    // the menu on any link/URI cleanly without throwing invalid url pattern errors.
+    chrome.contextMenus.create(
+      {
+        id: "open-with-pressprotocol",
+        title: "Open with PressProtocol",
+        contexts: ["link"],
+      },
+      () => {
+        if (chrome.runtime.lastError) {
+          // Swallow cleanup race condition
+        }
+      }
+    );
   });
 });
 
@@ -143,8 +159,14 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     const settings = await getSettings();
     let target = info.linkUrl;
     if (target.startsWith("pressprotocol://") || target.startsWith("anonpress://")) {
-      const cid = target.replace(/^(pressprotocol|anonpress):\/\//, "");
+      const cid = target.replace(/^(pressprotocol|anonpress):\/\//, "").replace(/^\/+/, "");
       target = `${settings.webAppUrl}/read/${cid}`;
+    } else if (target.includes("/ipfs/")) {
+      const parts = target.split("/ipfs/");
+      if (parts[1]) {
+        const cid = parts[1].split("/")[0].split("?")[0];
+        target = `${settings.webAppUrl}/read/${cid}`;
+      }
     }
     chrome.tabs.create({ url: target });
   }
@@ -191,15 +213,38 @@ async function publishArticle(article: ClippedArticle): Promise<any> {
     timestamp,
   };
 
-  const response = await fetch(`${settings.apiUrl}/api/content`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+  const candidateEndpoints = [
+    settings.apiUrl,
+    settings.webAppUrl,
+    "http://localhost:3000",
+    "https://pressprotocol.com",
+  ].filter(Boolean);
 
-  if (!response.ok) {
-    const errText = await response.text();
-    throw new Error(`Gateway returned HTTP ${response.status}: ${errText}`);
+  const uniqueEndpoints = Array.from(new Set(candidateEndpoints));
+  let response: Response | null = null;
+  let lastErr = "";
+
+  for (const ep of uniqueEndpoints) {
+    try {
+      const cleanEp = ep.replace(/\/+$/, "");
+      const res = await fetch(`${cleanEp}/api/content`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        response = res;
+        break;
+      } else {
+        lastErr = `HTTP ${res.status}: ${await res.text()}`;
+      }
+    } catch (err: any) {
+      lastErr = err.message || String(err);
+    }
+  }
+
+  if (!response) {
+    throw new Error(`Gateway returned error: ${lastErr || "Could not connect to any publishing endpoint"}`);
   }
 
   const resJson = await response.json();
@@ -260,6 +305,12 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
         const res = await fetch(`${settings.apiUrl}/api/mirrors/${request.cid}/health`);
         const json = await res.json();
         return json.data || json;
+      }
+
+      case "openProtocolLink": {
+        const settings = await getSettings();
+        const tab = await chrome.tabs.create({ url: `${settings.webAppUrl}/read/${request.cid}` });
+        return { success: true, tabId: tab.id };
       }
 
       default:
