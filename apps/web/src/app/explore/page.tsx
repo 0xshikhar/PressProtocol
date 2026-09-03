@@ -56,24 +56,24 @@ export default function ExplorePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white selection:bg-emerald-500/30 selection:text-emerald-200">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header Banner */}
-      <div className="border-b border-white/10 bg-black/40 backdrop-blur-md">
+      <div className="border-b bg-gradient-to-b from-emerald-50/40 via-white to-background">
         <div className="container mx-auto px-4 py-10 max-w-6xl">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700">
                   <Globe className="h-3.5 w-3.5" />
                 </span>
-                <span className="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold">
+                <span className="text-xs font-mono uppercase tracking-wider text-emerald-700 font-semibold">
                   Decentralized Network Feed
                 </span>
               </div>
-              <h1 className="text-3xl md:text-4xl font-serif font-bold text-white tracking-tight">
+              <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground tracking-tight">
                 Discover Sovereign Publications
               </h1>
-              <p className="text-sm text-zinc-400 mt-1 max-w-xl">
+              <p className="text-sm text-muted-foreground mt-1 max-w-xl">
                 Real-time peer-to-peer index of censorship-resistant articles syndicated across IPFS swarms, Tor hidden services, and developer git rails.
               </p>
             </div>
@@ -82,9 +82,9 @@ export default function ExplorePage() {
             <Link href="/bookmarks">
               <Button
                 variant="outline"
-                className="gap-2 border-emerald-500/30 bg-emerald-950/20 hover:bg-emerald-950/40 text-emerald-300 text-xs h-10 px-4 rounded-xl"
+                className="gap-2 border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs h-10 px-4 rounded-xl shadow-sm"
               >
-                <BookMarked className="h-4 w-4 text-emerald-400" />
+                <BookMarked className="h-4 w-4 text-emerald-700" />
                 <span>My Offline Reading Vault</span>
                 <ArrowRight className="h-3.5 w-3.5 opacity-60" />
               </Button>
@@ -93,15 +93,15 @@ export default function ExplorePage() {
 
           {/* Quick Tag Pills */}
           <div className="flex items-center gap-2 mt-6 flex-wrap">
-            <span className="text-xs font-mono text-zinc-500 flex items-center gap-1">
-              <Sparkles className="h-3 w-3 text-amber-400" />
+            <span className="text-xs font-mono text-muted-foreground flex items-center gap-1">
+              <Sparkles className="h-3 w-3 text-amber-500" />
               Trending Topics:
             </span>
             {trendingTags.map((tag) => (
               <Badge
                 key={tag}
                 variant="outline"
-                className="text-[11px] font-mono border-white/10 bg-white/5 text-zinc-400 hover:text-white hover:border-emerald-500/40 cursor-pointer transition-colors"
+                className="text-[11px] font-mono border-border bg-muted/40 text-muted-foreground hover:text-foreground hover:border-emerald-500/40 cursor-pointer transition-colors"
               >
                 #{tag}
               </Badge>

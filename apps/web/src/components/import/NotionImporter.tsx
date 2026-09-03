@@ -183,31 +183,31 @@ curl -s https://pressprotocol.com/api/content/$CID | pressprotocol resolve --ver
 
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
-      {/* Studio Header Card */}
-      <Card className="border-white/10 bg-zinc-950/80 backdrop-blur-md shadow-2xl">
+      {/* Importer Config Card */}
+      <Card className="border-border/60 bg-card shadow-sm">
         <CardHeader>
-          <CardTitle className="text-lg font-serif flex items-center justify-between text-white">
+          <CardTitle className="text-lg font-serif flex items-center justify-between text-card-foreground">
             <span className="flex items-center gap-2">
-              <Layers className="w-4 h-4 text-cyan-400" /> Notion 1-Click Sovereign Importer
+              <Layers className="w-4 h-4 text-primary" /> Notion 1-Click Sovereign Importer
             </span>
-            <span className="text-xs font-mono text-zinc-500 font-normal">
+            <span className="text-xs font-mono text-muted-foreground font-normal">
               Zero-Token · Callout Preservation · Ed25519 Signed
             </span>
           </CardTitle>
-          <CardDescription className="text-zinc-400">
+          <CardDescription>
             Convert any public Notion page or pasted Markdown export into a censorship-resistant sovereign publication. Notion Callouts, Quotes, Headings, and Code blocks are transformed into semantic HTML5 and mirrored across IPFS & Tor.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Mode Switcher */}
-          <div className="flex rounded-lg border border-white/10 p-1 bg-black/60 w-full sm:w-auto self-start inline-flex">
+          <div className="flex rounded-lg border p-1 bg-muted w-full sm:w-auto self-start inline-flex">
             <button
               type="button"
               onClick={() => setInputMode("url")}
               className={`px-3 py-1.5 rounded text-xs font-medium transition-colors flex items-center gap-1.5 ${
                 inputMode === "url"
-                  ? "bg-cyan-500 text-black font-semibold shadow"
-                  : "text-zinc-400 hover:text-white"
+                  ? "bg-background text-foreground font-semibold shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <Globe className="w-3.5 h-3.5" /> Public Notion Page URL
@@ -217,8 +217,8 @@ curl -s https://pressprotocol.com/api/content/$CID | pressprotocol resolve --ver
               onClick={() => setInputMode("markdown")}
               className={`px-3 py-1.5 rounded text-xs font-medium transition-colors flex items-center gap-1.5 ${
                 inputMode === "markdown"
-                  ? "bg-cyan-500 text-black font-semibold shadow"
-                  : "text-zinc-400 hover:text-white"
+                  ? "bg-background text-foreground font-semibold shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <FileText className="w-3.5 h-3.5" /> Paste Notion Markdown / Export
@@ -227,7 +227,7 @@ curl -s https://pressprotocol.com/api/content/$CID | pressprotocol resolve --ver
 
           {/* Quick presets */}
           <div className="flex flex-wrap items-center gap-2 text-xs">
-            <span className="text-zinc-500 font-mono">Sample Notion templates:</span>
+            <span className="text-muted-foreground font-mono">Sample Notion templates:</span>
             {samplePresets.map((preset, idx) => (
               <button
                 key={idx}
@@ -236,7 +236,7 @@ curl -s https://pressprotocol.com/api/content/$CID | pressprotocol resolve --ver
                   setInputMode("markdown");
                   setPastedMarkdown(preset.markdown);
                 }}
-                className="px-2.5 py-1 rounded border border-white/10 bg-white/5 hover:bg-white/10 hover:border-cyan-500/40 text-zinc-300 transition-colors font-mono text-[11px]"
+                className="px-2.5 py-1 rounded border border-border bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors font-mono text-[11px]"
               >
                 {preset.label}
               </button>
@@ -246,20 +246,20 @@ curl -s https://pressprotocol.com/api/content/$CID | pressprotocol resolve --ver
           {/* Input field based on mode */}
           {inputMode === "url" ? (
             <div className="space-y-2">
-              <label className="text-xs font-mono text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+              <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider flex items-center justify-between">
                 <span>Public Notion Page Link</span>
-                <span className="text-zinc-500 font-normal">Page must have &quot;Share to Web&quot; enabled</span>
+                <span className="text-muted-foreground/70 font-normal">Page must have &quot;Share to Web&quot; enabled</span>
               </label>
               <Input
                 value={notionUrl}
                 onChange={(e) => setNotionUrl(e.target.value)}
                 placeholder="https://workspace.notion.site/My-Essay-3b1a2c3d4e5f6a7b8c9d0e1f2a3b4c5d"
-                className="bg-black/60 border-white/15 text-white placeholder:text-zinc-600 font-mono text-sm h-12 focus-visible:ring-cyan-500"
+                className="bg-background border-input text-foreground font-mono text-sm h-12"
               />
             </div>
           ) : (
             <div className="space-y-2">
-              <label className="text-xs font-mono text-zinc-400 uppercase tracking-wider">
+              <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
                 Paste Notion Markdown or Exported Text
               </label>
               <textarea
@@ -267,30 +267,30 @@ curl -s https://pressprotocol.com/api/content/$CID | pressprotocol resolve --ver
                 onChange={(e) => setPastedMarkdown(e.target.value)}
                 rows={8}
                 placeholder="# Notion Page Title&#10;&#10;> 💡 Callout paragraph...&#10;&#10;Regular paragraphs and research content..."
-                className="w-full rounded-lg bg-black/60 border border-white/15 p-3.5 font-mono text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-cyan-500"
+                className="w-full rounded-lg bg-background border border-input p-3.5 font-mono text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
               />
             </div>
           )}
 
           {/* Syndication Tags */}
           <div className="space-y-2">
-            <label className="text-xs font-mono text-zinc-400 uppercase tracking-wider">
+            <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
               Sovereign DHT Syndication Tags
             </label>
             <Input
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               placeholder="notion, research, sovereign-doc"
-              className="bg-black/60 border-white/15 text-white placeholder:text-zinc-600 text-sm h-10 focus-visible:ring-cyan-500"
+              className="bg-background border-input text-foreground text-sm h-10"
             />
           </div>
 
           {/* Sovereign Identity Badge & Custom Key */}
-          <div className="pt-2 border-t border-white/5 space-y-3">
+          <div className="pt-2 border-t space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
               <div className="flex items-center gap-2 font-mono">
-                <span className="text-zinc-500">Signing Identity:</span>
-                <span className="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-semibold">
+                <span className="text-muted-foreground">Signing Identity:</span>
+                <span className="px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-800 font-semibold">
                   {burnerWallet?.pseudonym || "Anon-Burner..."}
                 </span>
               </div>
@@ -298,7 +298,7 @@ curl -s https://pressprotocol.com/api/content/$CID | pressprotocol resolve --ver
               <button
                 type="button"
                 onClick={() => setShowKeyInput(!showKeyInput)}
-                className="flex items-center gap-1.5 font-mono text-zinc-400 hover:text-cyan-400 transition-colors"
+                className="flex items-center gap-1.5 font-mono text-muted-foreground hover:text-foreground transition-colors"
               >
                 <Key className="w-3.5 h-3.5" />
                 <span>{showKeyInput ? "Hide" : "Use custom"} Ed25519 Private Key</span>
@@ -312,7 +312,7 @@ curl -s https://pressprotocol.com/api/content/$CID | pressprotocol resolve --ver
                   onChange={(e) => setCustomKey(e.target.value)}
                   type="password"
                   placeholder="64-character hex Ed25519 private key (optional)"
-                  className="bg-black/60 border-white/15 text-white font-mono text-xs h-9 focus-visible:ring-cyan-500"
+                  className="bg-background border-input text-foreground font-mono text-xs h-9"
                 />
               </div>
             )}
@@ -320,8 +320,8 @@ curl -s https://pressprotocol.com/api/content/$CID | pressprotocol resolve --ver
 
           {/* Error Message */}
           {error && (
-            <div className="p-4 rounded-lg bg-red-950/40 border border-red-500/30 text-red-200 text-xs flex items-start gap-3">
-              <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+            <div className="p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs flex items-start gap-3">
+              <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
               <div>
                 <strong className="font-semibold block mb-0.5">Notion Import Error</strong>
                 <span>{error}</span>
@@ -334,7 +334,7 @@ curl -s https://pressprotocol.com/api/content/$CID | pressprotocol resolve --ver
             <Button
               onClick={() => handleConvert(true)}
               disabled={loading || publishing}
-              className="bg-emerald-500 hover:bg-emerald-400 text-black font-semibold px-6 h-11 gap-2 shadow-lg shadow-emerald-500/20"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 h-11 gap-2 shadow-sm"
             >
               {publishing ? (
                 <>
@@ -351,7 +351,7 @@ curl -s https://pressprotocol.com/api/content/$CID | pressprotocol resolve --ver
               onClick={() => handleConvert(false)}
               disabled={loading || publishing}
               variant="outline"
-              className="border-white/15 hover:bg-white/5 text-zinc-300 h-11 gap-2 text-xs"
+              className="h-11 gap-2 text-xs"
             >
               {loading ? (
                 <>
@@ -369,26 +369,26 @@ curl -s https://pressprotocol.com/api/content/$CID | pressprotocol resolve --ver
 
       {/* Publication Confirmed Card */}
       {publishedCid && (
-        <Card className="border-emerald-500/40 bg-emerald-950/20 backdrop-blur-md">
+        <Card className="border-emerald-200 bg-emerald-50/50">
           <CardContent className="p-6 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono bg-emerald-100 text-emerald-800 border border-emerald-300 font-semibold">
                   <Check className="w-3.5 h-3.5" /> NOTION PAGE SYNDICATED PERMANENTLY
                 </span>
-                <h3 className="text-xl font-serif font-bold text-white mt-1">
+                <h3 className="text-xl font-serif font-bold text-foreground mt-1">
                   {convertedArticle?.title}
                 </h3>
               </div>
 
               <div className="flex items-center gap-2">
                 <Link href={`/read/${publishedCid}`} target="_blank">
-                  <Button size="sm" className="bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-semibold gap-1.5">
+                  <Button size="sm" className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold gap-1.5">
                     <ExternalLink className="w-3.5 h-3.5" /> Open Sovereign Reader
                   </Button>
                 </Link>
-                <Link href={`/embed/${publishedCid}?theme=cyber`} target="_blank">
-                  <Button size="sm" variant="outline" className="border-white/20 text-xs text-zinc-300 gap-1.5">
+                <Link href={`/embed/${publishedCid}?theme=light`} target="_blank">
+                  <Button size="sm" variant="outline" className="text-xs gap-1.5">
                     <Code2 className="w-3.5 h-3.5" /> View Embed
                   </Button>
                 </Link>
@@ -396,28 +396,28 @@ curl -s https://pressprotocol.com/api/content/$CID | pressprotocol resolve --ver
             </div>
 
             <div className="grid sm:grid-cols-2 gap-3 pt-2 font-mono text-xs">
-              <div className="flex items-center justify-between p-2.5 rounded bg-black/50 border border-white/5">
-                <span className="text-zinc-500">IPFS CID:</span>
+              <div className="flex items-center justify-between p-2.5 rounded bg-background border">
+                <span className="text-muted-foreground">IPFS CID:</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-cyan-400 truncate max-w-[200px]">{publishedCid}</span>
+                  <span className="text-primary truncate max-w-[200px]">{publishedCid}</span>
                   <button
                     onClick={() => copyToClipboard(publishedCid!, setCopiedCid)}
-                    className="text-zinc-400 hover:text-white"
+                    className="text-muted-foreground hover:text-foreground"
                   >
-                    {copiedCid ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiedCid ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between p-2.5 rounded bg-black/50 border border-white/5">
-                <span className="text-zinc-500">Reader Link:</span>
+              <div className="flex items-center justify-between p-2.5 rounded bg-background border">
+                <span className="text-muted-foreground">Reader Link:</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-zinc-300 truncate max-w-[200px]">{shareUrl}</span>
+                  <span className="text-foreground truncate max-w-[200px]">{shareUrl}</span>
                   <button
                     onClick={() => copyToClipboard(shareUrl!, setCopiedShare)}
-                    className="text-zinc-400 hover:text-white"
+                    className="text-muted-foreground hover:text-foreground"
                   >
-                    {copiedShare ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiedShare ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>
                 </div>
               </div>
@@ -431,43 +431,43 @@ curl -s https://pressprotocol.com/api/content/$CID | pressprotocol resolve --ver
         <div className="space-y-6">
           {/* Block Conversion Telemetry Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-            <div className="p-3 rounded-xl border border-white/10 bg-zinc-950/60 font-mono text-xs space-y-1">
-              <span className="text-zinc-500 block text-[10px]">CALLOUTS CONVERTED</span>
-              <span className="text-lg font-bold text-cyan-400">{convertedArticle.stats.calloutsConverted}</span>
+            <div className="p-3 rounded-xl border border-border/60 bg-muted/30 font-mono text-xs space-y-1">
+              <span className="text-muted-foreground block text-[10px]">CALLOUTS CONVERTED</span>
+              <span className="text-lg font-bold text-primary">{convertedArticle.stats.calloutsConverted}</span>
             </div>
-            <div className="p-3 rounded-xl border border-white/10 bg-zinc-950/60 font-mono text-xs space-y-1">
-              <span className="text-zinc-500 block text-[10px]">HEADINGS MAPPED</span>
-              <span className="text-lg font-bold text-emerald-400">{convertedArticle.stats.headingsConverted}</span>
+            <div className="p-3 rounded-xl border border-border/60 bg-muted/30 font-mono text-xs space-y-1">
+              <span className="text-muted-foreground block text-[10px]">HEADINGS MAPPED</span>
+              <span className="text-lg font-bold text-emerald-600">{convertedArticle.stats.headingsConverted}</span>
             </div>
-            <div className="p-3 rounded-xl border border-white/10 bg-zinc-950/60 font-mono text-xs space-y-1">
-              <span className="text-zinc-500 block text-[10px]">QUOTES CONVERTED</span>
-              <span className="text-lg font-bold text-amber-400">{convertedArticle.stats.quotesConverted}</span>
+            <div className="p-3 rounded-xl border border-border/60 bg-muted/30 font-mono text-xs space-y-1">
+              <span className="text-muted-foreground block text-[10px]">QUOTES CONVERTED</span>
+              <span className="text-lg font-bold text-amber-600">{convertedArticle.stats.quotesConverted}</span>
             </div>
-            <div className="p-3 rounded-xl border border-white/10 bg-zinc-950/60 font-mono text-xs space-y-1">
-              <span className="text-zinc-500 block text-[10px]">CODE BLOCKS</span>
-              <span className="text-lg font-bold text-purple-400">{convertedArticle.stats.codeBlocksConverted}</span>
+            <div className="p-3 rounded-xl border border-border/60 bg-muted/30 font-mono text-xs space-y-1">
+              <span className="text-muted-foreground block text-[10px]">CODE BLOCKS</span>
+              <span className="text-lg font-bold text-purple-600">{convertedArticle.stats.codeBlocksConverted}</span>
             </div>
-            <div className="p-3 rounded-xl border border-white/10 bg-zinc-950/60 font-mono text-xs space-y-1">
-              <span className="text-zinc-500 block text-[10px]">TOTAL WORDS</span>
-              <span className="text-lg font-bold text-white">{convertedArticle.wordCount}</span>
+            <div className="p-3 rounded-xl border border-border/60 bg-muted/30 font-mono text-xs space-y-1">
+              <span className="text-muted-foreground block text-[10px]">TOTAL WORDS</span>
+              <span className="text-lg font-bold text-foreground">{convertedArticle.wordCount}</span>
             </div>
           </div>
 
           {/* Prose Preview Card */}
-          <Card className="border-white/10 bg-zinc-950">
-            <CardHeader className="border-b border-white/5">
-              <div className="flex items-center justify-between text-xs font-mono text-zinc-500">
+          <Card className="border-border/60 bg-card">
+            <CardHeader className="border-b">
+              <div className="flex items-center justify-between text-xs font-mono text-muted-foreground">
                 <span>Notion Source: {convertedArticle.title}</span>
                 <span>~{convertedArticle.readingTimeMinutes} min read</span>
               </div>
-              <CardTitle className="text-2xl font-serif text-white pt-2 flex items-center gap-2">
+              <CardTitle className="text-2xl font-serif text-card-foreground pt-2 flex items-center gap-2">
                 {convertedArticle.icon && <span>{convertedArticle.icon}</span>}
                 <span>{convertedArticle.title}</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 sm:p-10">
               <div
-                className="prose prose-invert max-w-none prose-headings:font-serif prose-p:text-zinc-300 prose-p:leading-relaxed prose-a:text-cyan-400 prose-code:text-cyan-300"
+                className="prose prose-neutral max-w-none prose-headings:font-serif prose-p:leading-relaxed prose-a:text-primary prose-code:text-primary"
                 dangerouslySetInnerHTML={{ __html: convertedArticle.cleanHtml }}
               />
             </CardContent>

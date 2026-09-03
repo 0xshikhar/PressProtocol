@@ -292,24 +292,24 @@ export function BulkRssImporter() {
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
       {/* Search and Configuration Card */}
-      <Card className="border-white/10 bg-zinc-950/80 backdrop-blur-md shadow-2xl">
+      <Card className="border-border/60 bg-card shadow-sm">
         <CardHeader>
-          <CardTitle className="text-lg font-serif flex items-center justify-between text-white">
+          <CardTitle className="text-lg font-serif flex items-center justify-between text-card-foreground">
             <span className="flex items-center gap-2">
-              <Rss className="w-4 h-4 text-cyan-400" /> Bulk Publication Archive Importer
+              <Rss className="w-4 h-4 text-primary" /> Bulk Publication Archive Importer
             </span>
-            <span className="text-xs font-mono text-zinc-500 font-normal">
+            <span className="text-xs font-mono text-muted-foreground font-normal">
               Substack · Medium · Ghost · WordPress · Custom RSS
             </span>
           </CardTitle>
-          <CardDescription className="text-zinc-400">
+          <CardDescription>
             Archive entire blogs or newsroom archives in a single batch. All articles are scrubbed of tracking pixels, signed with your Ed25519 sovereign key, and mirrored across IPFS & Tor.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Quick presets */}
           <div className="flex flex-wrap items-center gap-2 text-xs">
-            <span className="text-zinc-500 font-mono">Sample publication feeds:</span>
+            <span className="text-muted-foreground font-mono">Sample publication feeds:</span>
             {samplePresets.map((preset, idx) => (
               <button
                 key={idx}
@@ -318,7 +318,7 @@ export function BulkRssImporter() {
                   setFeedUrl(preset.url);
                   setTags(preset.tags);
                 }}
-                className="px-2.5 py-1 rounded border border-white/10 bg-white/5 hover:bg-white/10 hover:border-cyan-500/40 text-zinc-300 transition-colors font-mono text-[11px]"
+                className="px-2.5 py-1 rounded border border-border bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors font-mono text-[11px]"
               >
                 {preset.label}
               </button>
@@ -327,7 +327,7 @@ export function BulkRssImporter() {
 
           {/* Feed URL input */}
           <div className="space-y-2">
-            <label className="text-xs font-mono text-zinc-400 uppercase tracking-wider">
+            <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
               Publication RSS / Atom Feed URL
             </label>
             <div className="flex gap-2">
@@ -335,13 +335,13 @@ export function BulkRssImporter() {
                 value={feedUrl}
                 onChange={(e) => setFeedUrl(e.target.value)}
                 placeholder="https://myname.substack.com/feed or https://medium.com/feed/@username"
-                className="bg-black/60 border-white/15 text-white placeholder:text-zinc-600 font-mono text-sm h-12 focus-visible:ring-cyan-500"
+                className="bg-background border-input text-foreground font-mono text-sm h-12"
                 disabled={loadingFeed || isBatching}
               />
               <Button
                 onClick={handleFetchFeed}
                 disabled={loadingFeed || isBatching || !feedUrl.trim()}
-                className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold h-12 px-6 gap-2"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12 px-6 gap-2"
               >
                 {loadingFeed ? (
                   <>
@@ -358,24 +358,24 @@ export function BulkRssImporter() {
 
           {/* Syndication Tags */}
           <div className="space-y-2">
-            <label className="text-xs font-mono text-zinc-400 uppercase tracking-wider">
+            <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
               Sovereign Batch Tags
             </label>
             <Input
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               placeholder="archive, publication, sovereign"
-              className="bg-black/60 border-white/15 text-white placeholder:text-zinc-600 text-sm h-10 focus-visible:ring-cyan-500"
+              className="bg-background border-input text-foreground text-sm h-10"
               disabled={isBatching}
             />
           </div>
 
           {/* Sovereign Identity Badge & Custom Key */}
-          <div className="pt-2 border-t border-white/5 space-y-3">
+          <div className="pt-2 border-t space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
               <div className="flex items-center gap-2 font-mono">
-                <span className="text-zinc-500">Signing Identity:</span>
-                <span className="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-semibold">
+                <span className="text-muted-foreground">Signing Identity:</span>
+                <span className="px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-800 font-semibold">
                   {burnerWallet?.pseudonym || "Anon-Burner..."}
                 </span>
               </div>
@@ -383,7 +383,7 @@ export function BulkRssImporter() {
               <button
                 type="button"
                 onClick={() => setShowKeyInput(!showKeyInput)}
-                className="flex items-center gap-1.5 font-mono text-zinc-400 hover:text-cyan-400 transition-colors"
+                className="flex items-center gap-1.5 font-mono text-muted-foreground hover:text-foreground transition-colors"
               >
                 <Key className="w-3.5 h-3.5" />
                 <span>{showKeyInput ? "Hide" : "Use custom"} Ed25519 Private Key</span>
@@ -397,7 +397,7 @@ export function BulkRssImporter() {
                   onChange={(e) => setCustomKey(e.target.value)}
                   type="password"
                   placeholder="64-character hex Ed25519 private key (optional)"
-                  className="bg-black/60 border-white/15 text-white font-mono text-xs h-9 focus-visible:ring-cyan-500"
+                  className="bg-background border-input text-foreground font-mono text-xs h-9"
                   disabled={isBatching}
                 />
               </div>
@@ -406,8 +406,8 @@ export function BulkRssImporter() {
 
           {/* Error Message */}
           {feedError && (
-            <div className="p-4 rounded-lg bg-red-950/40 border border-red-500/30 text-red-200 text-xs flex items-start gap-3">
-              <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+            <div className="p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs flex items-start gap-3">
+              <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
               <div>
                 <strong className="font-semibold block mb-0.5">Feed Parsing Error</strong>
                 <span>{feedError}</span>
@@ -421,32 +421,32 @@ export function BulkRssImporter() {
       {feedData && (
         <div className="space-y-6">
           {/* Publication Overview Banner */}
-          <Card className="border-cyan-500/30 bg-gradient-to-r from-cyan-950/30 via-zinc-950 to-zinc-950">
+          <Card className="border-border/60 bg-muted/20">
             <CardContent className="p-6">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="space-y-2 max-w-2xl">
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-primary/10 text-primary border border-primary/20 font-bold">
                       FEED READY
                     </span>
-                    <span className="text-xs font-mono text-zinc-500">
+                    <span className="text-xs font-mono text-muted-foreground">
                       {feedData.totalItems} Articles Found
                     </span>
                   </div>
-                  <h2 className="text-xl sm:text-2xl font-serif font-bold text-white">
+                  <h2 className="text-xl sm:text-2xl font-serif font-bold text-foreground">
                     {feedData.title}
                   </h2>
                   {feedData.description && (
-                    <p className="text-sm text-zinc-400 leading-relaxed">
+                    <p className="text-sm text-muted-foreground leading-relaxed">
                       {feedData.description}
                     </p>
                   )}
-                  <div className="flex items-center gap-4 text-xs font-mono text-zinc-500 pt-1">
+                  <div className="flex items-center gap-4 text-xs font-mono text-muted-foreground pt-1">
                     <a
                       href={feedData.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-cyan-400 hover:underline flex items-center gap-1"
+                      className="text-primary hover:underline flex items-center gap-1"
                     >
                       <Globe className="w-3.5 h-3.5" /> {feedData.link}
                     </a>
@@ -458,7 +458,7 @@ export function BulkRssImporter() {
                   <Button
                     onClick={handleStartBatchSyndication}
                     disabled={isBatching || selectedArticles.length === 0}
-                    className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-11 px-6 gap-2 shadow-lg shadow-emerald-500/20"
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-11 px-6 gap-2 shadow-sm"
                   >
                     {isBatching ? (
                       <>
@@ -471,10 +471,10 @@ export function BulkRssImporter() {
                     )}
                   </Button>
 
-                  <div className="flex items-center gap-3 text-xs font-mono text-zinc-400">
+                  <div className="flex items-center gap-3 text-xs font-mono text-muted-foreground">
                     <button
                       onClick={() => toggleSelectAll(true)}
-                      className="hover:text-white transition-colors"
+                      className="hover:text-foreground transition-colors"
                       disabled={isBatching}
                     >
                       Select All ({articles.length})
@@ -482,7 +482,7 @@ export function BulkRssImporter() {
                     <span>·</span>
                     <button
                       onClick={() => toggleSelectAll(false)}
-                      className="hover:text-white transition-colors"
+                      className="hover:text-foreground transition-colors"
                       disabled={isBatching}
                     >
                       Deselect All
@@ -493,15 +493,15 @@ export function BulkRssImporter() {
 
               {/* Real-Time Progress Bar */}
               {isBatching && (
-                <div className="mt-6 space-y-2 p-4 rounded-xl bg-black/60 border border-emerald-500/30">
+                <div className="mt-6 space-y-2 p-4 rounded-xl bg-muted/50 border border-emerald-200">
                   <div className="flex items-center justify-between text-xs font-mono">
-                    <span className="text-emerald-400 font-semibold flex items-center gap-2">
+                    <span className="text-emerald-700 font-semibold flex items-center gap-2">
                       <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                       Archiving Article {processedCount + 1} of {selectedArticles.length}...
                     </span>
-                    <span className="text-zinc-400">{progressPercent}%</span>
+                    <span className="text-muted-foreground">{progressPercent}%</span>
                   </div>
-                  <Progress value={progressPercent} className="h-2 bg-zinc-800" />
+                  <Progress value={progressPercent} className="h-2 bg-muted" />
                 </div>
               )}
             </CardContent>
@@ -509,17 +509,17 @@ export function BulkRssImporter() {
 
           {/* Batch Completion & Manifest Download Card */}
           {batchCompleted && archivedArticles.length > 0 && (
-            <Card className="border-emerald-500/40 bg-emerald-950/20 backdrop-blur-md">
+            <Card className="border-emerald-200 bg-emerald-50/50">
               <CardContent className="p-6 space-y-4">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div className="space-y-1">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold">
                       <Check className="w-3.5 h-3.5" /> PUBLICATION ARCHIVE PRESERVED
                     </span>
-                    <h3 className="text-lg font-serif font-bold text-white">
+                    <h3 className="text-lg font-serif font-bold text-foreground">
                       {archivedArticles.length} Articles Successfully Published to PressProtocol
                     </h3>
-                    <p className="text-xs text-zinc-400">
+                    <p className="text-xs text-muted-foreground">
                       Surveillance trackers permanently purged. Pinned to IPFS swarm and registered with Tor onion mirrors.
                     </p>
                   </div>
@@ -527,7 +527,7 @@ export function BulkRssImporter() {
                   <div className="flex flex-wrap items-center gap-3">
                     <Button
                       onClick={handleDownloadMasterManifest}
-                      className="bg-emerald-500 hover:bg-emerald-400 text-black font-semibold text-xs gap-1.5 h-10"
+                      className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs gap-1.5 h-10"
                     >
                       <Download className="w-4 h-4" /> Download Archive Manifest (.pressproof.json)
                     </Button>
@@ -535,9 +535,9 @@ export function BulkRssImporter() {
                     <Button
                       onClick={handleCopyAllLinks}
                       variant="outline"
-                      className="border-white/20 text-xs text-zinc-300 hover:text-white h-10 gap-1.5"
+                      className="text-xs h-10 gap-1.5"
                     >
-                      {copiedLinks ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                      {copiedLinks ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
                       {copiedLinks ? "Copied All Links!" : "Copy All Permalinks"}
                     </Button>
                   </div>
@@ -548,12 +548,12 @@ export function BulkRssImporter() {
 
           {/* Article Checklist Table */}
           <div className="space-y-3">
-            <div className="flex items-center justify-between text-xs font-mono text-zinc-400 px-1">
+            <div className="flex items-center justify-between text-xs font-mono text-muted-foreground px-1">
               <span>ARTICLE CATALOG ({articles.length} ENTRIES)</span>
               <span>{selectedArticles.length} SELECTED FOR ARCHIVAL</span>
             </div>
 
-            <div className="rounded-xl border border-white/10 bg-zinc-950 overflow-hidden divide-y divide-white/5">
+            <div className="rounded-xl border border-border/60 bg-card overflow-hidden divide-y divide-border/40 shadow-sm">
               {articles.map((article, index) => {
                 const isCurrent = currentProcessingIndex === index;
                 return (
@@ -561,9 +561,9 @@ export function BulkRssImporter() {
                     key={article.id}
                     className={`p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-colors ${
                       isCurrent
-                        ? "bg-emerald-500/10"
+                        ? "bg-emerald-50/50"
                         : article.selected
-                        ? "hover:bg-white/[0.02]"
+                        ? "hover:bg-muted/30"
                         : "opacity-50 hover:opacity-80"
                     }`}
                   >
@@ -573,31 +573,31 @@ export function BulkRssImporter() {
                         type="button"
                         onClick={() => toggleSelectArticle(article.id)}
                         disabled={isBatching}
-                        className="mt-1 text-zinc-400 hover:text-white focus:outline-none"
+                        className="mt-1 text-muted-foreground hover:text-foreground focus:outline-none"
                       >
                         {article.selected ? (
-                          <CheckSquare className="w-4 h-4 text-emerald-400" />
+                          <CheckSquare className="w-4 h-4 text-emerald-600" />
                         ) : (
-                          <Square className="w-4 h-4 text-zinc-600" />
+                          <Square className="w-4 h-4 text-muted-foreground/50" />
                         )}
                       </button>
 
                       <div className="space-y-1 min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h4 className="text-sm font-serif font-bold text-white truncate max-w-lg">
+                          <h4 className="text-sm font-serif font-bold text-foreground truncate max-w-lg">
                             {article.title}
                           </h4>
                           <a
                             href={article.link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-zinc-500 hover:text-cyan-400"
+                            className="text-muted-foreground hover:text-primary"
                           >
                             <ExternalLink className="w-3.5 h-3.5" />
                           </a>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-zinc-500">
+                        <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-muted-foreground">
                           <span>By {article.author}</span>
                           <span>•</span>
                           <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
@@ -608,7 +608,7 @@ export function BulkRssImporter() {
                           {article.telemetry.totalPurged > 0 && (
                             <>
                               <span>•</span>
-                              <span className="text-amber-400/80">
+                              <span className="text-amber-600">
                                 {article.telemetry.totalPurged} trackers flagged
                               </span>
                             </>
@@ -616,7 +616,7 @@ export function BulkRssImporter() {
                         </div>
 
                         {article.excerpt && (
-                          <p className="text-xs text-zinc-400 line-clamp-1">
+                          <p className="text-xs text-muted-foreground line-clamp-1">
                             {article.excerpt}
                           </p>
                         )}
@@ -626,32 +626,32 @@ export function BulkRssImporter() {
                     {/* Right: Status Pill & Action */}
                     <div className="flex items-center gap-3 self-end sm:self-center font-mono text-xs">
                       {article.status === "ready" && (
-                        <span className="px-2.5 py-1 rounded bg-zinc-800 text-zinc-400 text-[11px]">
+                        <span className="px-2.5 py-1 rounded bg-muted text-muted-foreground text-[11px]">
                           Ready
                         </span>
                       )}
 
                       {article.status === "scrubbing" && (
-                        <span className="px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1.5 text-[11px]">
+                        <span className="px-2.5 py-1 rounded bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1.5 text-[11px]">
                           <RefreshCw className="w-3 h-3 animate-spin" /> Scrubbing & Signing...
                         </span>
                       )}
 
                       {article.status === "publishing" && (
-                        <span className="px-2.5 py-1 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center gap-1.5 text-[11px]">
+                        <span className="px-2.5 py-1 rounded bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1.5 text-[11px]">
                           <RefreshCw className="w-3 h-3 animate-spin" /> Pining to IPFS Swarm...
                         </span>
                       )}
 
                       {article.status === "archived" && article.cid && (
                         <div className="flex items-center gap-2">
-                          <span className="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 text-[11px] font-semibold">
+                          <span className="px-2.5 py-1 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1 text-[11px] font-semibold">
                             <Check className="w-3 h-3" /> Archived
                           </span>
                           <Link
                             href={`/read/${article.cid}`}
                             target="_blank"
-                            className="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-cyan-400 text-[11px] flex items-center gap-1"
+                            className="px-2.5 py-1 rounded bg-muted hover:bg-muted/80 text-primary text-[11px] flex items-center gap-1"
                           >
                             <ExternalLink className="w-3 h-3" /> Reader View
                           </Link>
@@ -659,7 +659,7 @@ export function BulkRssImporter() {
                       )}
 
                       {article.status === "error" && (
-                        <span className="px-2.5 py-1 rounded bg-red-500/20 text-red-300 border border-red-500/30 text-[11px]">
+                        <span className="px-2.5 py-1 rounded bg-red-50 text-red-700 border border-red-200 text-[11px]">
                           Failed: {article.error}
                         </span>
                       )}
