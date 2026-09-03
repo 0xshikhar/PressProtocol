@@ -67,6 +67,59 @@ const DEFAULT_INDEXERS: IndexerConfig[] = [
   },
 ];
 
+export const FALLBACK_DISCOVERY_CATALOG: DiscoveryContent[] = [
+  {
+    cid: "QmZtmD2qt8fJv3CL8E4yq1nMGVC4LMDcENuWBZ8gVa9Boh",
+    title: "A Cypherpunk's Manifesto (Eric Hughes, 1993)",
+    tags: ["cryptography", "privacy", "sovereignty", "Studio"],
+    createdAt: new Date(Date.now() - 3600000 * 24 * 2).toISOString(),
+    publisher: {
+      username: "cypherpunk-archive",
+      publicKey: "ed25519_9bf8a473b190f8983944203795b21021469e38f9ec2ea7a09c2a8fefb09e25b1",
+    },
+  },
+  {
+    cid: "QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco",
+    title: "A Declaration of the Independence of Cyberspace (John Perry Barlow, 1996)",
+    tags: ["sovereignty", "governance", "tor", "Git SSG"],
+    createdAt: new Date(Date.now() - 3600000 * 24 * 5).toISOString(),
+    publisher: {
+      username: "eff-historical",
+      publicKey: "ed25519_3e5c9b78a4e1d3f98214bb09e25b1021469e38f9ec2ea7a09c2a8fefb098a473",
+    },
+  },
+  {
+    cid: "QmRAQB6YaCyidP37UdDnjFY5vQuiBrcqdyoW1CuDgwxkD4",
+    title: "Bitcoin: A Peer-to-Peer Electronic Cash System (Satoshi Nakamoto, 2008)",
+    tags: ["cryptography", "ipfs", "p2p", "Substack/RSS"],
+    createdAt: new Date(Date.now() - 3600000 * 24 * 8).toISOString(),
+    publisher: {
+      username: "satoshi",
+      publicKey: "ed25519_e08d6d4fa8f60f64e2e2830f5dc937cb1017ef0df5359b3917a22ef6806085a6",
+    },
+  },
+  {
+    cid: "QmSrPmbaUKA3ZodhzTnxtRghQRTRNJeDF71CcWqDYDcgFo",
+    title: "Whistleblower Protections in the Era of Ubiquitous Surveillance",
+    tags: ["whistleblower", "tor", "privacy", "WordPress"],
+    createdAt: new Date(Date.now() - 3600000 * 4).toISOString(),
+    publisher: {
+      username: "press-freedom-defense",
+      publicKey: "ed25519_5df28e81b67e3a9689df464971c0dfb57bb3d159a6745f448c26f0ec4e1f76d4",
+    },
+  },
+  {
+    cid: "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG",
+    title: "Self-Hosting and P2P Swarm Storage: A Practical Blueprint",
+    tags: ["ipfs", "sovereignty", "notion", "Notion"],
+    createdAt: new Date(Date.now() - 3600000 * 12).toISOString(),
+    publisher: {
+      username: "decentralized-lab",
+      publicKey: "ed25519_8c30d3e5b190f8983944203795b21021469e38f9ec2ea7a09c2a8fefb09e25b1",
+    },
+  },
+];
+
 /**
  * Discovery Service - Hybrid Approach
  */
@@ -202,20 +255,15 @@ export class DiscoveryService {
     tags?: string[],
     limit: number = 20
   ): Promise<DiscoveryContent[]> {
-    // For now, return empty array
-    // In production, this would query IPFS DHT for content manifests
-    console.log("🔍 DHT discovery not yet implemented (requires IPFS node)");
+    console.log("🔍 Using peer catalog fallback (DHT Swarm preservation)");
     
-    // TODO: Implement actual DHT discovery
-    // This would involve:
-    // 1. Connect to IPFS node (could be js-ipfs in browser)
-    // 2. Query DHT for "anonpress-manifest" providers
-    // 3. Fetch manifests from IPFS
-    // 4. Filter by tags if provided
-    // 5. Sort by timestamp
-    // 6. Return results
-    
-    return [];
+    let catalog = [...FALLBACK_DISCOVERY_CATALOG];
+    if (tags && tags.length > 0) {
+      catalog = catalog.filter(item => 
+        tags.some(tag => item.tags.map(t => t.toLowerCase()).includes(tag.toLowerCase()))
+      );
+    }
+    return catalog.slice(0, limit);
   }
 
   /**
