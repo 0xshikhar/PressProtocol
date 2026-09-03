@@ -22,9 +22,9 @@ export function getActionInputs(overrides: Partial<ActionInputs> = {}): ActionIn
   const rawTags = overrides.tags !== undefined
     ? overrides.tags
     : getEnv("tags", "git-publish,sovereign-doc")
-        .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean);
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
 
   return {
     contentDir: overrides.contentDir || getEnv("content_dir", "./content/posts"),
@@ -111,7 +111,7 @@ function escapeMarkdown(str: string): string {
  * Main execution orchestration for publish-action.
  */
 export async function run(customInputs?: Partial<ActionInputs>): Promise<ActionOutputs> {
-  console.log("⚡ PressProtocol Sovereign Publish Action v1.0.0");
+  console.log("⚡ PressProtocol Sovereign Publish Action v1.0.6");
   console.log("===============================================");
 
   const inputs = getActionInputs(customInputs);
