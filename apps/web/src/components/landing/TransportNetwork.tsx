@@ -101,25 +101,33 @@ export function TransportNetwork() {
                   <Globe className="w-7 h-7 text-cyan-400" />
                 </div>
                 <span className="font-mono text-xs text-white/90">Reader Client</span>
-                <span className="font-mono text-[10px] text-white/40">Browser / MV3</span>
+                <span className="font-mono text-[10px] text-white/40">Web3 Browser / Agent</span>
               </div>
 
-              {/* Connecting Wave SVG */}
+              {/* Connecting Wave SVG with 3 Parallel Transports */}
               <div className="absolute inset-0 flex items-center pointer-events-none px-20">
-                <svg className="w-full h-40" viewBox="0 0 500 160" fill="none">
-                  {/* Clearnet Route Path */}
+                <svg className="w-full h-44" viewBox="0 0 500 180" fill="none">
+                  {/* Route 1: Clearnet CDN Edge */}
                   <path
-                    d="M 20 80 C 140 20, 260 20, 480 80"
-                    stroke={simulateBlock ? "rgba(239, 68, 68, 0.4)" : "rgba(6, 182, 212, 0.6)"}
+                    d="M 20 90 C 140 15, 260 15, 480 90"
+                    stroke={simulateBlock ? "rgba(239, 68, 68, 0.5)" : "rgba(6, 182, 212, 0.75)"}
                     strokeWidth={simulateBlock ? "1.5" : "2.5"}
                     strokeDasharray={simulateBlock ? "4 4" : "none"}
                   />
 
-                  {/* Tor Onion Fallback Route Path */}
+                  {/* Route 2: Decentralized IPFS DHT (Middle parallel path) */}
                   <path
-                    d="M 20 80 C 140 140, 260 140, 480 80"
-                    stroke={activeRoute === "tor" ? "rgba(16, 185, 129, 0.8)" : "rgba(255, 255, 255, 0.1)"}
-                    strokeWidth={activeRoute === "tor" ? "2.5" : "1"}
+                    d="M 20 90 C 140 90, 260 90, 480 90"
+                    stroke="rgba(16, 185, 129, 0.4)"
+                    strokeWidth="1.5"
+                    strokeDasharray="6 4"
+                  />
+
+                  {/* Route 3: Tor Onion Circuit */}
+                  <path
+                    d="M 20 90 C 140 165, 260 165, 480 90"
+                    stroke={activeRoute === "tor" ? "rgba(168, 85, 247, 0.9)" : "rgba(255, 255, 255, 0.15)"}
+                    strokeWidth={activeRoute === "tor" ? "2.5" : "1.5"}
                   />
                 </svg>
               </div>
@@ -129,26 +137,26 @@ export function TransportNetwork() {
                 <div
                   className={`px-4 py-2 rounded-xl border backdrop-blur-md transition-all duration-500 ${
                     simulateBlock
-                      ? "border-red-500/50 bg-red-950/40 text-red-300"
+                      ? "border-purple-500/50 bg-purple-950/40 text-purple-200 ring-1 ring-purple-500/30"
                       : "border-emerald-500/50 bg-emerald-950/40 text-emerald-300"
                   }`}
                 >
                   <div className="font-mono text-xs font-semibold flex items-center gap-2">
                     {simulateBlock ? (
                       <>
-                        <ShieldAlert className="w-4 h-4 text-red-400" />
-                        <span>ISP BLOCKED · REROUTED</span>
+                        <ShieldAlert className="w-4 h-4 text-purple-400" />
+                        <span>TOR ONION ACTIVE · 420ms</span>
                       </>
                     ) : (
                       <>
                         <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                        <span>CLEARNET ACTIVE</span>
+                        <span>CLEARNET ACTIVE · 88ms</span>
                       </>
                     )}
                   </div>
                 </div>
                 <span className="font-mono text-[10px] text-white/40">
-                  Automatic Client Failover: &lt;35ms
+                  {simulateBlock ? "Automatic Tor Reroute: <35ms" : "3-Way Parallel Transport Racing"}
                 </span>
               </div>
 
@@ -168,8 +176,8 @@ export function TransportNetwork() {
                 <span className="text-cyan-400">STATUS:</span>
                 <span>
                   {simulateBlock
-                    ? "HTTP 451 / DNS Poisoning detected on Primary CDN -> Switched to Tor Onion Service (press7fk2...onion)"
-                    : "Primary Cloudflare/Pinata Gateway healthy · Direct IPFS p2p peer discovery online"}
+                    ? "HTTP 451 / DNS Poisoning detected on Primary CDN — Switched to Tor Onion Service (press7fk2...onion)"
+                    : "Primary gateway healthy — IPFS peer discovery active in the background"}
                 </span>
               </div>
               <div className="text-white/40 text-[11px]">Failover Latency: 28ms</div>
@@ -202,15 +210,15 @@ export function TransportNetwork() {
             </div>
 
             {/* Gateway 2: Tor Hidden Service */}
-            <div className="p-6 rounded-2xl border border-emerald-500/30 bg-emerald-950/10 hover:bg-emerald-950/20 transition-all flex flex-col justify-between shadow-lg">
+            <div className="p-6 rounded-2xl border border-purple-500/30 bg-purple-950/10 hover:bg-purple-950/20 transition-all flex flex-col justify-between shadow-lg">
               <div className="flex items-center justify-between mb-3">
                 <span className="font-display text-xl text-white">Tor Onion Service</span>
-                <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                  ● 100% UNBLOCKABLE
+                <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/30">
+                  ● RESISTANT TO DNS/IP BLOCKS
                 </span>
               </div>
               <p className="text-xs text-white/50 leading-relaxed mb-4">
-                End-to-end encrypted .onion rendezvous circuit immune to DNS seizures, BGP hijacking, and ISP blocking.
+                End-to-end encrypted .onion rendezvous circuit resistant to DNS seizures, BGP hijacking, and ISP blocking.
               </p>
               <div className="flex items-center justify-between font-mono text-xs text-white/40 border-t border-white/5 pt-3">
                 <span>Latency: 420ms (Tor hop)</span>

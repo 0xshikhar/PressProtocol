@@ -27,14 +27,18 @@ const footerLinks: Record<string, FooterLink[]> = {
   Developers: [
     { name: "GitHub Repository", href: "https://github.com/0xshikhar/PressProtocol", external: true },
     { name: "Ed25519 Spec (RFC 8032)", href: "/spec" },
-    { name: "WordPress Plugin", href: "#integrations" },
-    { name: "Chromium Extension", href: "#integrations" },
+    { name: "WordPress Plugin", href: "#ecosystem" },
+    { name: "Chromium Extension", href: "#ecosystem" },
   ],
-  Governance: [
-    { name: "Open Public Goods", href: "/about" },
+  Company: [
     { name: "About PressProtocol", href: "/about" },
+    { name: "Public Goods Mission", href: "/about" },
+    { name: "Architecture Spec", href: "/spec" },
+  ],
+  Legal: [
     { name: "Zero-Log Privacy", href: "/privacy" },
-    { name: "Terms & Legal", href: "/terms" },
+    { name: "Terms & Licensing", href: "/terms" },
+    { name: "Threat Model", href: "#security" },
   ],
 };
 
@@ -112,14 +116,11 @@ export function LandingFooter() {
       {/* Footer Content */}
       <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12">
         <div className="py-16 lg:py-24">
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-12 lg:gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-10 lg:gap-8">
             {/* Brand Column */}
             <div className="col-span-2">
               <Link href="/" className="inline-flex items-center gap-2 mb-6">
                 <span className="text-2xl font-display tracking-tight text-white">PressProtocol</span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-                  MAINNET
-                </span>
               </Link>
 
               <p className="text-white/50 leading-relaxed mb-8 max-w-xs text-sm">
@@ -134,7 +135,7 @@ export function LandingFooter() {
                     href={link.href}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-sm text-white/40 hover:text-cyan-400 transition-colors flex items-center gap-1 group"
+                    className="text-sm text-white/40 hover:text-cyan-400 transition-colors flex items-center gap-1 group font-mono text-xs"
                   >
                     {link.name}
                     <ArrowUpRight className="w-3 h-3 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
@@ -149,14 +150,14 @@ export function LandingFooter() {
                 <h3 className="text-sm font-medium text-white mb-6 font-mono text-xs uppercase tracking-wider text-cyan-400/90">
                   {title}
                 </h3>
-                <ul className="space-y-4">
+                <ul className="space-y-3.5">
                   {links.map((link) => (
                     <li key={link.name}>
                       <a
                         href={link.href}
                         target={link.external ? "_blank" : undefined}
                         rel={link.external ? "noreferrer" : undefined}
-                        className="text-sm text-white/50 hover:text-white transition-colors inline-flex items-center gap-2"
+                        className="text-xs text-white/50 hover:text-white transition-colors inline-flex items-center gap-1.5"
                       >
                         {link.name}
                         {link.badge && (
@@ -181,7 +182,7 @@ export function LandingFooter() {
         {/* Bottom Bar */}
         <div className="py-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs font-mono text-white/40">
-            &copy; 2026 PressProtocol. An open censorship-resistant public good under MIT License.
+            &copy; 2026 PressProtocol. Open censorship-resistant infrastructure under MIT License.
           </p>
 
           <div className="flex flex-wrap items-center gap-6 text-xs font-mono text-white/50">
@@ -190,10 +191,10 @@ export function LandingFooter() {
             <Link href="/spec" className="hover:text-white transition-colors">Spec</Link>
             <Link href="/about" className="hover:text-white transition-colors">About</Link>
             <span className="hidden sm:inline text-white/20">|</span>
-            <span className="flex items-center gap-2 text-emerald-400">
+            <a href="#telemetry" className="flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition-colors">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              All 3 Transports Operational
-            </span>
+              Multi-Transport Mesh Active
+            </a>
           </div>
         </div>
       </div>

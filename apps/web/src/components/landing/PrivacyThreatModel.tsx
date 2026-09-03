@@ -23,7 +23,7 @@ const threatGuarantees = [
   },
   {
     icon: ServerOff,
-    title: "ISP & DNS Poisoning Immunity",
+    title: "ISP & DNS Poisoning Resilience",
     subtitle: "Domain seizures cannot kill articles",
     description:
       "Content is addressed by immutable SHA-256 CID, not DNS names. If `pressprotocol.com` is blocked or revoked by a government registrar, articles remain reachable via IPFS gateways, Tor `.onion`, or the browser extension.",
@@ -125,8 +125,8 @@ export function PrivacyThreatModel() {
                 </div>
 
                 <div className="pt-4 border-t border-white/10 flex items-center justify-between font-mono text-xs">
-                  <span className="text-white/40">Guaranteed Defense:</span>
-                  <span className="text-emerald-400 flex items-center gap-1.5 font-semibold">
+                  <span className="text-white/50 uppercase tracking-wider text-[10px] font-semibold">Primary Defense:</span>
+                  <span className="text-emerald-400 flex items-center gap-1.5 font-bold">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     {item.mitigation}
                   </span>
@@ -147,7 +147,7 @@ export function PrivacyThreatModel() {
               <thead>
                 <tr className="border-b border-white/10 text-white/40 uppercase tracking-wider">
                   <th className="pb-4 font-normal">Threat Dimension</th>
-                  <th className="pb-4 font-normal">Traditional Platforms (Substack, Medium, Ghost)</th>
+                  <th className="pb-4 font-normal">Traditional Centralized Publishing (hosted CMS, blog platforms)</th>
                   <th className="pb-4 font-normal text-cyan-400">PressProtocol Multi-Transport</th>
                 </tr>
               </thead>

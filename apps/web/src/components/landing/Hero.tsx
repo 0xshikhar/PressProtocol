@@ -192,10 +192,10 @@ export function Hero() {
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
               </span>
               <span className="font-mono text-xs text-white/75 tracking-wider uppercase">
-                Multi-Transport Mainnet Active
+                Mainnet Live
               </span>
               <span className="text-white/20 text-xs">|</span>
-              <span className="font-mono text-[11px] text-cyan-400">IPFS + Tor + Mirrors</span>
+              <span className="font-mono text-[11px] text-cyan-400">IPFS + Tor + Clearnet</span>
             </div>
 
             {/* Main Headline */}
@@ -214,17 +214,13 @@ export function Hero() {
               </span>
             </h1>
 
-            {/* Subheadline */}
+            {/* Subheadline: Reader-centric mechanism */}
             <p
-              className={`text-lg sm:text-xl text-white/60 font-light leading-relaxed max-w-xl mb-10 transition-all duration-1000 delay-200 ${
+              className={`text-lg sm:text-xl text-white/70 font-light leading-relaxed max-w-xl mb-10 transition-all duration-1000 delay-200 ${
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
               }`}
             >
-              An open publishing protocol combining{" "}
-              <span className="text-white font-normal">IPFS content addressing</span>,{" "}
-              <span className="text-white font-normal">Tor anonymity circuits</span>, and{" "}
-              <span className="text-white font-normal">client-side Ed25519 cryptographic signatures</span>{" "}
-              with automated multi-transport failover.
+              Every article is content-addressed on IPFS, mirrored to a Tor hidden service, and signed with a key that never leaves your browser. If one path is blocked, readers are rerouted automatically — no VPN, no account, no company that can pull the plug.
             </p>
 
             {/* Primary Action Buttons */}
@@ -236,7 +232,7 @@ export function Hero() {
               <Link href="/write">
                 <Button
                   size="lg"
-                  className="bg-white hover:bg-white/90 text-black font-medium h-14 px-8 rounded-xl text-base shadow-2xl hover:shadow-cyan-500/25 transition-all group"
+                  className="bg-white hover:bg-white/90 text-black font-semibold h-14 px-8 rounded-xl text-base shadow-2xl hover:shadow-cyan-500/25 transition-all group"
                 >
                   Start Publishing Free
                   <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
@@ -249,30 +245,30 @@ export function Hero() {
                   className="h-14 px-7 rounded-xl text-base text-white border-white/15 bg-white/[0.02] hover:bg-white/[0.08] hover:border-white/30 backdrop-blur-md transition-all font-mono text-sm"
                 >
                   <Terminal className="w-4 h-4 mr-2 text-cyan-400" />
-                  Launch Protocol Sandbox
+                  Launch Protocol Sandbox →
                 </Button>
               </a>
             </div>
 
             {/* Trust Markers */}
             <div
-              className={`flex flex-wrap items-center gap-y-2 gap-x-5 text-xs text-white/40 font-mono transition-all duration-1000 delay-400 ${
+              className={`flex flex-wrap items-center gap-y-2 gap-x-5 text-xs text-white/50 font-mono transition-all duration-1000 delay-400 ${
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               }`}
             >
               <span className="flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
-                Zero Cloud Key Custody
+                Zero cloud key custody
               </span>
               <span className="text-white/20">·</span>
               <span className="flex items-center gap-1.5">
                 <Lock className="w-3.5 h-3.5 text-emerald-400" />
-                No Accounts or Emails
+                No accounts or emails
               </span>
               <span className="text-white/20">·</span>
               <span className="flex items-center gap-1.5">
                 <Radio className="w-3.5 h-3.5 text-purple-400" />
-                Tor Onion Routing
+                Automatic Tor failover
               </span>
             </div>
           </div>
@@ -346,8 +342,8 @@ export function Hero() {
                           IMMUTABLE
                         </span>
                       </div>
-                      <span className="font-mono text-xs text-white/90 truncate block">
-                        bafybeic52i4f7626vkyz244q56w7g...
+                      <span className="font-mono text-xs text-white/90 truncate block" title="bafybeic52i4f7626vkyz244q56w7g632d4w754z56o2yvshj6c2k7n5wbe">
+                        bafybeic52i4f...n5wbe
                       </span>
                     </div>
                     <button
@@ -593,26 +589,30 @@ export function Hero() {
             <div className="flex items-center gap-2">
               <span className="font-display text-3xl lg:text-4xl text-white font-semibold">&lt;120ms</span>
               <span className="font-mono text-xs text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
-                P95
+                P95*
               </span>
             </div>
             <span className="text-xs font-mono uppercase tracking-wider text-white/50">
               Global Gateway Read Latency
             </span>
-            <span className="text-[11px] text-white/30">Edge-cached CDN & DHT routing</span>
+            <span className="text-[11px] text-white/40 font-mono">
+              *15s synthetic probe cycle across 6 edge mirrors
+            </span>
           </div>
 
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center gap-2">
               <span className="font-display text-3xl lg:text-4xl text-white font-semibold">100%</span>
               <span className="font-mono text-xs text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 rounded border border-cyan-500/20">
-                VERIFIABLE
+                VERIFIABLE*
               </span>
             </div>
             <span className="text-xs font-mono uppercase tracking-wider text-white/50">
               Tamper Resistance
             </span>
-            <span className="text-[11px] text-white/30">SHA-256 hash verified payload</span>
+            <span className="text-[11px] text-white/40 font-mono">
+              *SHA-256 digest + RFC 8032 client verification
+            </span>
           </div>
         </div>
       </div>

@@ -29,7 +29,7 @@ const cleanEnvelope = sanitizeArticle({
     number: "02",
     tag: "CLIENT CRYPTOGRAPHY",
     title: "Cryptographic Signing",
-    subtitle: "In-memory Ed25519 sovereignty",
+    subtitle: "Client-side Ed25519, key never leaves device",
     description:
       "An Ed25519 keypair is generated in volatile browser memory. The private key signs the canonical SHA-256 hash of the sanitized payload. The private key is discarded immediately after signing; your identity is your public key.",
     bullets: [
@@ -173,7 +173,8 @@ export function ProcessStepper() {
 
         {/* Detailed Active Step Inspector Panel */}
         <div
-          className="relative rounded-2xl border border-white/10 bg-black/60 backdrop-blur-2xl p-6 lg:p-12 overflow-hidden shadow-2xl"
+          key={activeStep}
+          className="relative rounded-2xl border border-white/10 bg-black/60 backdrop-blur-2xl p-6 lg:p-12 overflow-hidden shadow-2xl animate-in fade-in duration-200"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >

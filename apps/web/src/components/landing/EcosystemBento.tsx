@@ -128,9 +128,9 @@ export function EcosystemBento() {
               </p>
             </div>
 
-            <div className="pt-4 border-t border-white/10">
+            <div className="pt-4 border-t border-white/10 space-y-2.5">
               <div className="flex items-center justify-between p-3 rounded-xl bg-black/70 border border-white/10 font-mono text-xs">
-                <span className="text-cyan-300">npm i @pressprotocol/sdk</span>
+                <span className="text-cyan-300">pnpm add @pressprotocol/sdk</span>
                 <button
                   onClick={copySnippet}
                   className="p-1.5 rounded-lg hover:bg-white/10 text-white/70 hover:text-white transition-colors"
@@ -139,6 +139,13 @@ export function EcosystemBento() {
                   {copiedSdk ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                 </button>
               </div>
+              <a
+                href="/developers"
+                className="inline-flex items-center gap-1.5 text-[11px] font-mono text-white/50 hover:text-cyan-400 transition-colors"
+              >
+                <span>Also available: Python · Go · Rust SDKs</span>
+                <ArrowUpRight className="w-3 h-3" />
+              </a>
             </div>
           </div>
 
