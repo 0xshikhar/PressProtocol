@@ -44,8 +44,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
                     config={{
                         loginMethods: ['wallet', 'email', 'google'],
                         appearance: {
-                            theme: 'light',
-                            accentColor: '#3B82F6',
+                            theme: 'dark',
+                            accentColor: '#06B6D4',
                         },
                         embeddedWallets: {
                             createOnLogin: 'users-without-wallets',
