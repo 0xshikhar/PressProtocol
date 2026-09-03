@@ -21,9 +21,14 @@ const config = {
 			fontFamily: {
 				sans: ['var(--font-sans)', 'Inter', 'system-ui', 'sans-serif'],
 				display: ['var(--font-instrument-serif)', 'Instrument Serif', 'Georgia', 'serif'],
+				serif: ['var(--font-instrument-serif)', 'Instrument Serif', 'Georgia', 'serif'],
 				mono: ['var(--font-jetbrains)', 'JetBrains Mono', 'monospace'],
 			},
 			colors: {
+				'bg-base': '#050508',
+				'bg-surface': '#0D0D12',
+				'bg-elevated': '#15151C',
+				'bg-overlay': '#1C1C24',
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
@@ -61,7 +66,11 @@ const config = {
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				sm: 'calc(var(--radius) - 4px)',
+				'radius-sm': '6px',
+				'radius-md': '10px',
+				'radius-lg': '16px',
+				'radius-pill': '9999px',
 			},
 			keyframes: {
 				'accordion-down': {
