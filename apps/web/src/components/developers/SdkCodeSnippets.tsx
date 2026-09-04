@@ -30,7 +30,7 @@ export default function SdkCodeSnippets({ apiKey }: SdkCodeSnippetsProps) {
       git: 'pip install "git+https://github.com/0xshikhar/AnonPress.git#subdirectory=sdks/python"',
     },
     go: {
-      registry: "go get github.com/0xshikhar/AnonPress/sdks/go@v1.0.0",
+      registry: "go get github.com/0xshikhar/AnonPress/sdks/go@v1.0.6",
       git: "go get github.com/0xshikhar/AnonPress/sdks/go@master",
     },
     rust: {
@@ -210,22 +210,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
           <button
             type="button"
             onClick={() => setInstallMethod("registry")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${
-              installMethod === "registry"
+            className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${installMethod === "registry"
                 ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold"
                 : "text-white/60 hover:text-white"
-            }`}
+              }`}
           >
             Public Registry
           </button>
           <button
             type="button"
             onClick={() => setInstallMethod("git")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${
-              installMethod === "git"
+            className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${installMethod === "git"
                 ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold"
                 : "text-white/60 hover:text-white"
-            }`}
+              }`}
           >
             Direct Git Install
           </button>
@@ -242,11 +240,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         </TabsList>
 
         <TabsContent value="typescript">
-          {renderTerminalWindow("typescript", "node — pressprotocol-sdk v1.0.0")}
+          {renderTerminalWindow("typescript", "node — pressprotocol-sdk v1.0.6")}
         </TabsContent>
 
         <TabsContent value="python">
-          {renderTerminalWindow("python", "python3 — pressprotocol v1.0.0")}
+          {renderTerminalWindow("python", "python3 — pressprotocol v1.0.6")}
         </TabsContent>
 
         <TabsContent value="go">
