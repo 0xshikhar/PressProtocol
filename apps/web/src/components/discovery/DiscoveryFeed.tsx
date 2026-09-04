@@ -14,6 +14,8 @@ import {
   Globe,
   Check,
   Radio,
+  LayoutGrid,
+  List,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -55,6 +57,7 @@ export function DiscoveryFeed({
   const [selectedTransport, setSelectedTransport] = useState<"all" | "ipfs" | "tor">(transportFilter);
   const [usingFallback, setUsingFallback] = useState(false);
   const [bookmarkedMap, setBookmarkedMap] = useState<Record<string, boolean>>({});
+  const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
 
   useEffect(() => {
     loadDiscoveryFeed();
@@ -248,6 +251,32 @@ export function DiscoveryFeed({
               Tor v3
             </button>
           </div>
+
+          {/* View Mode Switcher */}
+          <div className="flex items-center rounded-lg border border-white/10 bg-[#0B0D14] p-0.5 text-xs font-mono">
+            <button
+              onClick={() => setViewMode("cards")}
+              className={`p-1.5 rounded-md transition-all ${
+                viewMode === "cards"
+                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
+                  : "text-neutral-400 hover:text-white"
+              }`}
+              title="Card View"
+            >
+              <LayoutGrid className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={() => setViewMode("table")}
+              className={`p-1.5 rounded-md transition-all ${
+                viewMode === "table"
+                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
+                  : "text-neutral-400 hover:text-white"
+              }`}
+              title="High-Density Ledger Table"
+            >
+              <List className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -299,7 +328,84 @@ export function DiscoveryFeed({
             Reset Filters
           </Button>
         </div>
+      ) : viewMode === "table" ? (
+        /* High-Density Ledger Table View */
+        <div className="rounded-2xl border border-white/10 bg-[#0B0D14] overflow-hidden shadow-xl">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs font-mono">
+              <thead>
+                <tr className="border-b border-white/[0.08] bg-black/40 text-zinc-400">
+                  <th className="py-3 px-4 font-semibold">Rail &amp; Status</th>
+                  <th className="py-3 px-4 font-semibold">Title</th>
+                  <th className="py-3 px-4 font-semibold">Content CID</th>
+                  <th className="py-3 px-4 font-semibold">Signer</th>
+                  <th className="py-3 px-4 font-semibold">Age</th>
+                  <th className="py-3 px-4 font-semibold text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/[0.06]">
+                {filteredItems.map((item) => {
+                  const rail = classifySourceRail(item.tags || []);
+                  const isVerified = !!(item.publisher?.publicKey && item.publisher.publicKey.length >= 32);
+                  const isSaved = !!bookmarkedMap[item.cid];
+
+                  return (
+                    <tr 
+                      key={item.cid}
+                      onClick={() => { window.location.href = `/read/${item.cid}`; }}
+                      className="hover:bg-white/[0.03] transition-colors cursor-pointer group"
+                    >
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        <div className="flex items-center gap-1.5">
+                          <span className={`h-2 w-2 rounded-full ${isVerified ? "bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.6)]" : "bg-zinc-500"}`} />
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded border ${getRailStyle(rail)}`}>
+                            {rail}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 font-sans font-medium text-white group-hover:text-cyan-300 transition-colors max-w-[280px] truncate">
+                        {item.title}
+                      </td>
+                      <td className="py-3 px-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                        <CidChip cid={item.cid} prefixLen={6} suffixLen={4} />
+                      </td>
+                      <td className="py-3 px-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                        {item.publisher?.publicKey ? (
+                          <SignatureBadge publicKey={item.publisher.publicKey} compact />
+                        ) : (
+                          <span className="text-zinc-500 text-[10px]">Unsigned</span>
+                        )}
+                      </td>
+                      <td className="py-3 px-4 text-zinc-400 text-[11px] whitespace-nowrap">
+                        {formatTimestamp(item.createdAt)}
+                      </td>
+                      <td className="py-3 px-4 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-end gap-1.5">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => handleToggleBookmark(item, e)}
+                            className="h-7 w-7 p-0 text-zinc-400 hover:text-white"
+                            title={isSaved ? "Saved" : "Save Offline"}
+                          >
+                            <Bookmark className={`h-3.5 w-3.5 ${isSaved ? "fill-emerald-400 text-emerald-400" : ""}`} />
+                          </Button>
+                          <Link href={`/read/${item.cid}`}>
+                            <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-cyan-400 hover:text-cyan-300">
+                              Read
+                            </Button>
+                          </Link>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
       ) : (
+        /* Card Grid View */
         <div className="space-y-3.5">
           {filteredItems.map((item) => {
             const rail = classifySourceRail(item.tags || []);
