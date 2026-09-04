@@ -2,12 +2,13 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ExternalLink, Download, Shield, Clock, BookOpen, ShieldCheck, ShieldAlert, Loader2, FileCheck, Archive, Moon, Sun, Coffee } from "lucide-react";
+import { ExternalLink, Download, Shield, Clock, BookOpen, ShieldCheck, ShieldAlert, Loader2, FileCheck, Archive, Moon, Sun, Coffee, ArrowRight } from "lucide-react";
 import { apiClient, type ResolveContentResponse } from "@/lib/api-client";
 import { toast } from "sonner";
 import { calculateReadingTime } from "@/lib/reading-time";
@@ -19,6 +20,9 @@ import { TorShareSection } from "@/components/tor/TorShareSection";
 import { Separator } from "@/components/ui/separator";
 import { verifyArticleSignature, type VerificationResult } from "@/lib/signature-verifier";
 import { exportPressProof, downloadPressProofFile } from "@pressprotocol/proof";
+import { CidChip } from "@/components/protocol/CidChip";
+import { SignatureBadge } from "@/components/protocol/SignatureBadge";
+import { MirrorHealthDot } from "@/components/protocol/MirrorHealthDot";
 import {
   getOfflineArticle,
   saveArticleOffline,
@@ -45,7 +49,7 @@ export default function ReadPage() {
   const { settings: readerSettings, updateSettings: setReaderSettings } = useReaderSettings();
   const contentRef = useRef<HTMLDivElement>(null);
   
-  const readingStats = content ? calculateReadingTime(content.content) : null;
+  const readingStats = content?.content ? calculateReadingTime(content.content) : calculateReadingTime("");
 
   const handleExportProof = () => {
     if (!content) return;
@@ -390,7 +394,7 @@ export default function ReadPage() {
         </div>
 
         {/* Article Content - Sublime Editorial Reading Canvas */}
-        <article className="mx-auto max-w-[720px] px-6 py-12">
+        <article className="mx-auto max-w-[760px] px-6 py-12">
           {/* Offline Mode Banner */}
           {isOfflineMode && (
             <div className="mb-8 p-4 rounded-2xl border border-amber-500/30 bg-amber-950/20 flex items-center justify-between gap-4 text-amber-200">
@@ -405,7 +409,6 @@ export default function ReadPage() {
                   <p className="text-xs text-amber-300/80 mt-0.5">
                     Reading preserved snapshot directly from your browser&apos;s local sovereign vault.
                   </p>
-
                 </div>
               </div>
               <Badge variant="outline" className="border-amber-500/40 text-amber-300 text-[10px] uppercase font-mono px-2 py-0.5">
@@ -545,325 +548,204 @@ export default function ReadPage() {
                        prose-pre:bg-muted prose-pre:border
                        prose-li:mb-2
                        ${(readerSettings.theme === 'dark' || readerSettings.theme === 'cyber') ? 'prose-invert' : 'prose-headings:text-neutral-900 prose-p:text-neutral-900'}`}
-            dangerouslySetInnerHTML={{ __html: content.content }}
+            dangerouslySetInnerHTML={{
+              __html:
+                content.content ||
+                "<div class='p-8 rounded-xl border border-white/10 bg-white/5 text-zinc-400 font-mono text-xs text-center'><p>Article body is synchronizing across decentralized IPFS swarm mirrors.</p><p class='mt-2 text-zinc-500'>CID: " +
+                  content.cid +
+                  "</p></div>",
+            }}
           />
         </article>
 
-        {/* Mirror Status Card - Move inside container */}
-        <div className="container mx-auto max-w-4xl px-6 space-y-6 pb-12">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Mirror Status</CardTitle>
-          <CardDescription>
-            Content is available across multiple networks for maximum resilience
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {content.mirrors.ipfs && (
-              <div className="flex items-center justify-between rounded-lg border p-4">
-                <div className="flex items-center gap-3">
-                  <div className={`h-3 w-3 rounded-full ${getMirrorStatusColor(content.mirrors.ipfs.available)}`} />
-                  <div>
-                    <div className="font-medium">IPFS</div>
-                    <div className="text-sm text-muted-foreground">
-                      {content.mirrors.ipfs.available ? "Available" : "Unavailable"}
-                      {content.mirrors.ipfs.latency && ` • ${content.mirrors.ipfs.latency}ms`}
-                    </div>
-                  </div>
+        {/* Unified Protocol Verification Block */}
+        <div className="mx-auto max-w-[760px] px-6 pb-16">
+          <div className="rounded-2xl border border-white/[0.08] bg-[#0B0D14]/90 backdrop-blur-xl p-6 sm:p-7 space-y-6 shadow-2xl">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.06] pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                  <ShieldCheck className="h-4 w-4" />
                 </div>
-                {content.mirrors.ipfs.available && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => window.open(content.mirrors.ipfs.url, "_blank")}
-                  >
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    View
-                  </Button>
-                )}
-              </div>
-            )}
-
-            {content.mirrors.tor && (
-              <div className="flex items-center justify-between rounded-lg border p-4">
-                <div className="flex items-center gap-3">
-                  <div className={`h-3 w-3 rounded-full ${getMirrorStatusColor(content.mirrors.tor.available)}`} />
-                  <div>
-                    <div className="font-medium">Tor Network</div>
-                    <div className="text-sm text-muted-foreground">
-                      {content.mirrors.tor.available ? "Available via Tor Browser" : "Unavailable"}
-                      {content.mirrors.tor.latency && ` • ${content.mirrors.tor.latency}ms`}
-                    </div>
-                  </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white tracking-tight">Protocol Verification &amp; Provenance</h3>
+                  <p className="text-[11px] text-zinc-400">Cryptographically anchored to decentralized storage</p>
                 </div>
-                {content.mirrors.tor.available && (
-                  <Badge variant="outline" className="flex items-center gap-1">
-                    <Shield className="h-3 w-3" />
-                    .onion
-                  </Badge>
-                )}
               </div>
-            )}
 
-            {content.mirrors.gateway && (
-              <div className="flex items-center justify-between rounded-lg border p-4">
-                <div className="flex items-center gap-3">
-                  <div className={`h-3 w-3 rounded-full ${getMirrorStatusColor(content.mirrors.gateway.available)}`} />
-                  <div>
-                    <div className="font-medium">Gateway</div>
-                    <div className="text-sm text-muted-foreground">
-                      {content.mirrors.gateway.available ? "Available" : "Unavailable"}
-                      {content.mirrors.gateway.latency && ` • ${content.mirrors.gateway.latency}ms`}
-                    </div>
-                  </div>
-                </div>
-                {content.mirrors.gateway.available && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => window.open(content.mirrors.gateway.url, "_blank")}
-                  >
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    View
-                  </Button>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="mt-4 p-3 rounded-lg bg-muted">
-            <div className="text-sm font-medium mb-1">Recommended Mirror</div>
-            <div className="text-sm text-muted-foreground capitalize">
-              {content.recommended} (fastest available)
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* DEBUG CARD - Temporary */}
-      {/* <Card className="border-yellow-500 bg-yellow-50 dark:bg-yellow-950">
-        <CardHeader>
-          <CardTitle className="text-sm">🔍 DEBUG: Tor Mirror Data</CardTitle>
-        </CardHeader>
-        <CardContent className="text-xs font-mono space-y-2">
-          <div>mirrors.tor exists: {content.mirrors?.tor ? '✅ YES' : '❌ NO'}</div>
-          <div>mirrors.tor.available: {content.mirrors?.tor?.available ? '✅ true' : '❌ false'}</div>
-          <div>mirrors.tor.url: {content.mirrors?.tor?.url || '❌ NOT SET'}</div>
-          <div className="pt-2 border-t">Full mirrors object:</div>
-          <pre className="text-[10px] overflow-auto">
-            {JSON.stringify(content.mirrors, null, 2)}
-          </pre>
-        </CardContent>
-      </Card> */}
-
-      {/* Tor Onion Access Section */}
-      {content.mirrors.tor && content.mirrors.tor.available && content.mirrors.tor.url && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Shield className="h-5 w-5 text-purple-500" />
-              Access via Tor Network
-            </CardTitle>
-            <CardDescription>
-              Maximum privacy and censorship resistance
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <TorShareSection
-              onionUrl={content.mirrors.tor.url}
-              contentTitle={content.title}
-            />
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Publisher Info Card */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Publisher Information</CardTitle>
-            {(!content.publisher.walletAddress || content.publisher.walletAddress === "anonymous" || (content.publisher as any).isAnonymous) ? (
-              <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 gap-1 font-mono text-xs">
-                <Shield className="h-3 w-3" /> Anonymous Sovereign
-              </Badge>
-            ) : (
-              <Badge variant="outline" className="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30 text-xs">
-                Verified Author
-              </Badge>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {(!content.publisher.walletAddress || content.publisher.walletAddress === "anonymous" || (content.publisher as any).isAnonymous) ? (
-            <div>
-              <div className="text-sm font-medium text-muted-foreground">Pseudonym</div>
-              <div className="font-mono text-sm font-semibold mt-1 text-emerald-600 dark:text-emerald-400">
-                {content.publisher.pubkey
-                  ? `Anon-${content.publisher.pubkey.slice(0, 4)}...${content.publisher.pubkey.slice(-4)}`
-                  : "Anonymous Author"}
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Published without account linkage. Identity is cryptographically anchored to an Ed25519 keypair.
-              </p>
-            </div>
-          ) : (
-            <div>
-              <div className="text-sm font-medium text-muted-foreground">Wallet Address</div>
-              <div className="font-mono text-sm mt-1">{content.publisher.walletAddress}</div>
-            </div>
-          )}
-          {content.publisher.username && (
-            <div>
-              <div className="text-sm font-medium text-muted-foreground">Username</div>
-              <div className="mt-1">{content.publisher.username}</div>
-            </div>
-          )}
-          <div>
-            <div className="text-sm font-medium text-muted-foreground flex items-center justify-between">
-              <span>Ed25519 Public Key</span>
-              {content.publisher.pubkey && (
+              <div className="flex items-center gap-2 flex-wrap">
                 <Button
-                  variant="ghost"
+                  onClick={handleExportProof}
                   size="sm"
-                  className="h-6 px-2 text-xs"
-                  onClick={() => {
-                    navigator.clipboard.writeText(content.publisher.pubkey);
-                    toast.success("Public key copied to clipboard");
-                  }}
+                  variant="outline"
+                  className="h-7 text-xs font-mono gap-1.5 border-white/10 bg-black/40 hover:bg-white/[0.08] text-zinc-300"
                 >
-                  Copy
+                  <Download className="h-3 w-3 text-cyan-400" />
+                  <span>.pressproof.json</span>
                 </Button>
-              )}
-            </div>
-            <div className="font-mono text-xs mt-1 break-all bg-muted/40 p-2 rounded border border-border/40 select-all">
-              {content?.publisher?.pubkey || "Unknown"}
-            </div>
-          </div>
-          {/* Cryptographic Provenance Section */}
-          <div className="pt-2 border-t border-border/40 space-y-2">
-            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              Cryptographic Provenance
-            </div>
-            {isVerifying ? (
-              <div className="flex items-center gap-2 text-xs text-muted-foreground p-2.5 rounded-md bg-muted/30">
-                <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
-                <span>Verifying Ed25519 signature in-browser via WebCrypto...</span>
+                <Button
+                  onClick={handleArchiveWayback}
+                  disabled={isArchiving}
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs font-mono gap-1.5 border-white/10 bg-black/40 hover:bg-white/[0.08] text-zinc-300"
+                >
+                  <Archive className={`h-3 w-3 ${isArchiving ? "animate-spin text-cyan-400" : ""}`} />
+                  <span>Wayback</span>
+                </Button>
+                <Button
+                  onClick={() => setIsProvenanceOpen(true)}
+                  size="sm"
+                  className="h-7 text-xs font-mono gap-1.5 bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/25"
+                >
+                  <span>Inspect CLI</span>
+                  <ExternalLink className="h-3 w-3" />
+                </Button>
               </div>
-            ) : verificationResult?.isValid ? (
-              <div className="p-3 rounded-lg border border-emerald-500/30 bg-emerald-500/5 space-y-2">
+            </div>
+
+            {/* Core Provenance Row: Identity + CID */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Identity & Signature */}
+              <div className="p-3.5 rounded-xl border border-white/[0.06] bg-black/40 space-y-2">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-medium text-sm">
-                    <ShieldCheck className="h-4 w-4" />
-                    <span>Ed25519 Signature Verified</span>
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Signer Identity</span>
+                  {isVerifying ? (
+                    <span className="text-[10px] font-mono text-zinc-400 animate-pulse flex items-center gap-1">
+                      <Loader2 className="h-2.5 w-2.5 animate-spin" /> Verifying...
+                    </span>
+                  ) : (
+                    <SignatureBadge
+                      publicKey={content.publisher?.pubkey}
+                      verified={verificationResult?.isValid ?? false}
+                    />
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <div className="font-mono text-xs text-white truncate">
+                    {content.publisher?.pubkey ? `ed25519:${content.publisher.pubkey.slice(0, 10)}...${content.publisher.pubkey.slice(-8)}` : "Unsigned dispatch"}
                   </div>
-                  <Badge variant="outline" className="text-[10px] border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono">
-                    {verificationResult.latencyMs}ms
+                  <div className="text-[11px] text-zinc-400 flex items-center gap-2">
+                    <span>Pseudonym:</span>
+                    <span className="text-zinc-300 font-mono">
+                      {content.publisher?.pubkey
+                        ? `Anon-${content.publisher.pubkey.slice(0, 4)}...${content.publisher.pubkey.slice(-4)}`
+                        : "Anonymous"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Content Multihash */}
+              <div className="p-3.5 rounded-xl border border-white/[0.06] bg-black/40 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Content Addressing</span>
+                  <Badge variant="outline" className="text-[9px] font-mono border-white/10 text-zinc-400 py-0">
+                    CIDv1 SHA-256
                   </Badge>
                 </div>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  Verified in-browser using RFC 8032 / SHA-512. The author&apos;s sovereign private key signed this payload without intermediary authority.
-                </p>
-                {verificationResult.signature && (
-                  <div className="text-[10px] font-mono text-muted-foreground bg-background/50 p-2 rounded border border-border/30 break-all select-all">
-                    <span className="text-foreground/70 font-semibold">SIG:</span> {verificationResult.signature}
+                <div className="flex items-center justify-between gap-2">
+                  <CidChip cid={content.cid} prefixLen={10} suffixLen={8} showExplorerLink />
+                </div>
+                <div className="text-[11px] text-zinc-500 font-mono">
+                  Multi-transport URI: <code className="text-zinc-400 select-all">pressprotocol://{content.cid.slice(0, 16)}...</code>
+                </div>
+              </div>
+            </div>
+
+            {/* Multi-Transport Availability Row */}
+            <div className="border-t border-white/[0.06] pt-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">
+                  Multi-Transport Swarm Health
+                </span>
+                <span className="text-[10px] font-mono text-zinc-500">
+                  Fastest Rail: {content.recommended || "Swarm Gateway"}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <div className="p-2.5 rounded-xl border border-white/[0.06] bg-black/30 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <MirrorHealthDot 
+                      status={content.mirrors?.ipfs?.available ? "healthy" : "syncing"} 
+                      label="IPFS Swarm"
+                    />
                   </div>
-                )}
-              </div>
-            ) : verificationResult?.status === "unsigned" ? (
-              <div className="p-3 rounded-lg border border-amber-500/30 bg-amber-500/5 space-y-1">
-                <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-medium text-sm">
-                  <ShieldAlert className="h-4 w-4" />
-                  <span>Unsigned Article</span>
+                  {content.mirrors?.ipfs?.available && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-6 px-2 text-[10px] font-mono text-zinc-400 hover:text-white"
+                      onClick={() => window.open(content.mirrors.ipfs.url, "_blank")}
+                    >
+                      Open
+                    </Button>
+                  )}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  This document was published without an Ed25519 cryptographic signature.
-                </p>
-              </div>
-            ) : (
-              <div className="p-3 rounded-lg border border-destructive/30 bg-destructive/5 space-y-1">
-                <div className="flex items-center gap-2 text-destructive font-medium text-sm">
-                  <ShieldAlert className="h-4 w-4" />
-                  <span>Signature Mismatch / Untrusted</span>
+
+                <div className="p-2.5 rounded-xl border border-white/[0.06] bg-black/30 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <MirrorHealthDot 
+                      status={content.mirrors?.gateway?.available ? "healthy" : "syncing"} 
+                      latencyMs={content.mirrors?.gateway?.latency}
+                      label="Public Gateway"
+                    />
+                  </div>
+                  {content.mirrors?.gateway?.available && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-6 px-2 text-[10px] font-mono text-zinc-400 hover:text-white"
+                      onClick={() => window.open(content.mirrors.gateway.url, "_blank")}
+                    >
+                      Open
+                    </Button>
+                  )}
                 </div>
-                <p className="text-xs text-destructive/80">
-                  {verificationResult?.error || "The cryptographic signature could not be verified against the content payload."}
-                </p>
+
+                <div className="p-2.5 rounded-xl border border-white/[0.06] bg-black/30 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <MirrorHealthDot 
+                      status={content.mirrors?.tor?.available ? "healthy" : "down"} 
+                      label="Tor v3 Onion"
+                    />
+                  </div>
+                  {content.mirrors?.tor?.available && content.mirrors?.tor?.url && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-6 px-2 text-[10px] font-mono text-purple-400 hover:text-purple-300"
+                      onClick={() => window.open(content.mirrors.tor.url, "_blank")}
+                    >
+                      .onion
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Tor Share Section if available */}
+            {content.mirrors?.tor?.available && content.mirrors?.tor?.url && (
+              <div className="border-t border-white/[0.06] pt-4">
+                <TorShareSection
+                  onionUrl={content.mirrors.tor.url}
+                  contentTitle={content.title}
+                />
               </div>
             )}
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsProvenanceOpen(true)}
-              className="w-full text-xs font-mono gap-1.5 border-primary/30 text-primary hover:bg-primary/10 mt-2"
-            >
-              <ShieldCheck className="h-3.5 w-3.5" />
-              Inspect Full Cryptographic Provenance & CLI
-            </Button>
+            {/* Embed CTA Link */}
+            <div className="border-t border-white/[0.06] pt-4 flex items-center justify-between text-xs text-zinc-400">
+              <span>Want to syndicate this sovereign article?</span>
+              <Link 
+                href={`/embed/builder?cid=${content.cid}`}
+                className="text-cyan-400 hover:text-cyan-300 font-mono text-xs flex items-center gap-1 group"
+              >
+                <span>Open Universal Embed Studio</span>
+                <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </div>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Content ID Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Content Details</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div>
-            <div className="text-sm font-medium text-muted-foreground">Content ID (CID)</div>
-            <div className="font-mono text-sm mt-1 break-all">{content.cid}</div>
-          </div>
-          <div className="mt-4">
-            <div className="text-sm font-medium text-muted-foreground">Share Link</div>
-            <div className="font-mono text-sm mt-1 break-all">pressprotocol://{content.cid}</div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Standalone Proof & Delay-Tolerant Preservation Card */}
-      <Card className="border-cyan-500/20 bg-cyan-950/10">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base flex items-center gap-2 text-cyan-400">
-              <FileCheck className="h-4 w-4" />
-              Air-Gapped Cryptographic Proof
-            </CardTitle>
-            <Badge variant="outline" className="border-cyan-500/30 text-cyan-300 font-mono text-[10px]">
-              .pressproof.json
-            </Badge>
-          </div>
-          <CardDescription className="text-xs">
-            Export a self-contained, air-gapped cryptographic package verifying this article&apos;s SHA-256 multihash and author Ed25519 signature with zero network dependency.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <Button
-              onClick={handleExportProof}
-              size="sm"
-              className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold text-xs gap-2"
-            >
-              <Download className="h-3.5 w-3.5" />
-              Export .pressproof.json
-            </Button>
-            <Button
-              onClick={handleArchiveWayback}
-              disabled={isArchiving}
-              variant="outline"
-              size="sm"
-              className="border-white/20 text-xs gap-2"
-            >
-              <Archive className={`h-3.5 w-3.5 ${isArchiving ? "animate-spin text-cyan-400" : ""}`} />
-              Snapshot to Wayback Machine
-            </Button>
-          </div>
-          <p className="text-[11px] text-muted-foreground font-mono">
-            Standard: RFC-8032 · Base32 CIDv1 · Offline Verifiable Codec
-          </p>
-        </CardContent>
-      </Card>
         </div>
       </div>
 

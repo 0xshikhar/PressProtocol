@@ -155,10 +155,10 @@ export default function ImportPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-[#050508] text-white selection:bg-cyan-500/30 selection:text-cyan-200 font-sans">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
         {/* Hero Banner */}
-        <div className="relative rounded-xl border border-white/[0.08] bg-gradient-to-b from-[#0E111A] to-[#07080C] p-6 sm:p-8 overflow-hidden shadow-2xl">
+        <div className="relative rounded-2xl border border-white/10 bg-gradient-to-b from-[#0E111A] to-[#07080C] p-6 sm:p-8 overflow-hidden shadow-2xl">
           {/* Hairline Horizon Accent */}
           <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-500/40 to-transparent" />
           
@@ -217,24 +217,24 @@ export default function ImportPage() {
           {/* TAB 3: SINGLE ARTICLE / VISUAL SCRUBBER */}
           <TabsContent value="single" className="space-y-8">
             {/* Input Studio Card */}
-            <Card className="border-white/[0.08] bg-[#0D0D12] shadow-sm">
+            <Card className="border-white/10 bg-[#0B0D14] shadow-2xl text-white rounded-2xl">
               <CardHeader>
                 <CardTitle className="text-lg font-sans font-semibold flex items-center justify-between text-white">
                   <span className="flex items-center gap-2">
                     <Radio className="w-4 h-4 text-cyan-400" /> Syndicate Single Article
                   </span>
-                  <span className="text-xs font-mono text-muted-foreground font-normal">
+                  <span className="text-xs font-mono text-zinc-400 font-normal">
                     Supports Substack · Medium · Ghost · RSS 2.0 · Atom · Web
                   </span>
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-zinc-400 text-xs">
                   Provide any public post URL or RSS feed. The sovereign engine will purge spyware and preserve semantic typography.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Quick Sample Presets */}
                 <div className="flex flex-wrap items-center gap-2 text-xs">
-                  <span className="text-muted-foreground font-mono">Quick test presets:</span>
+                  <span className="text-zinc-400 font-mono text-[11px]">Quick test presets:</span>
                   {samplePresets.map((preset, idx) => (
                     <button
                       key={idx}
@@ -243,7 +243,7 @@ export default function ImportPage() {
                         setUrl(preset.url);
                         setTags(preset.tags);
                       }}
-                      className="px-2.5 py-1 rounded border border-border bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors font-mono text-[11px]"
+                      className="px-2.5 py-1 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-zinc-300 hover:text-white transition-colors font-mono text-[11px]"
                     >
                       {preset.label}
                     </button>
@@ -252,7 +252,7 @@ export default function ImportPage() {
 
                 {/* URL Input */}
                 <div className="space-y-2">
-                  <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
+                  <label className="text-xs font-mono text-zinc-400 uppercase tracking-wider">
                     Article URL or RSS Feed
                   </label>
                   <div className="relative">
@@ -260,32 +260,32 @@ export default function ImportPage() {
                       value={url}
                       onChange={(e) => setUrl(e.target.value)}
                       placeholder="https://author.substack.com/p/essay-title or https://blog.com/feed.xml"
-                      className="bg-background border-input text-foreground font-mono text-sm h-12 pr-10"
+                      className="bg-black/60 border-white/10 text-white placeholder:text-zinc-500 font-mono text-xs sm:text-sm h-12 pr-10 rounded-xl focus-visible:ring-cyan-500/30 focus-visible:border-cyan-500/50"
                     />
                   </div>
                 </div>
 
                 {/* Tags Input */}
                 <div className="space-y-2">
-                  <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
+                  <label className="text-xs font-mono text-zinc-400 uppercase tracking-wider">
                     Sovereign DHT Syndication Tags (comma-separated)
                   </label>
                   <Input
                     value={tags}
                     onChange={(e) => setTags(e.target.value)}
                     placeholder="privacy, censorship-resistance, web3"
-                    className="bg-background border-input text-foreground text-sm h-10"
+                    className="bg-black/60 border-white/10 text-white placeholder:text-zinc-500 text-sm h-10 rounded-xl focus-visible:ring-cyan-500/30 focus-visible:border-cyan-500/50"
                   />
                 </div>
 
                 {/* Advanced Sovereign Key Toggle */}
-                <div className="space-y-2 pt-2 border-t">
+                <div className="space-y-2 pt-2 border-t border-white/10">
                   <button
                     type="button"
                     onClick={() => setShowKeyInput(!showKeyInput)}
-                    className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+                    className="flex items-center gap-1.5 text-xs font-mono text-zinc-400 hover:text-white transition-colors"
                   >
-                    <Key className="w-3.5 h-3.5" />
+                    <Key className="w-3.5 h-3.5 text-cyan-400" />
                     <span>{showKeyInput ? "Hide" : "Use custom"} Ed25519 Sovereign Private Key (Optional)</span>
                   </button>
 
@@ -296,9 +296,9 @@ export default function ImportPage() {
                         onChange={(e) => setPrivateKey(e.target.value)}
                         type="password"
                         placeholder="64-character hex Ed25519 private key (leave empty to generate an ephemeral sovereign key)"
-                        className="bg-background border-input text-foreground font-mono text-xs h-10"
+                        className="bg-black/60 border-white/10 text-white font-mono text-xs h-10 rounded-xl focus-visible:ring-cyan-500/30"
                       />
-                      <p className="text-[11px] text-muted-foreground">
+                      <p className="text-[11px] text-zinc-500 font-mono">
                         If left blank, an ephemeral burner keypair will be generated in-memory and signed cryptographically.
                       </p>
                     </div>
@@ -307,10 +307,10 @@ export default function ImportPage() {
 
                 {/* Error Message */}
                 {error && (
-                  <div className="p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs flex items-start gap-3">
-                    <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+                  <div className="p-4 rounded-xl bg-red-950/30 border border-red-500/30 text-red-300 text-xs flex items-start gap-3">
+                    <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
                     <div>
-                      <strong className="font-semibold block mb-0.5">Syndication Error</strong>
+                      <strong className="font-semibold block mb-0.5 text-red-200">Syndication Error</strong>
                       <span>{error}</span>
                     </div>
                   </div>
@@ -321,7 +321,7 @@ export default function ImportPage() {
                   <Button
                     onClick={() => handleImport(true)}
                     disabled={loading}
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 h-11 gap-2 shadow-sm"
+                    className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold px-6 h-11 gap-2 shadow-lg shadow-cyan-500/20 rounded-xl text-xs"
                   >
                     {loading ? (
                       <>
@@ -338,9 +338,9 @@ export default function ImportPage() {
                     onClick={() => handleImport(false)}
                     disabled={loading}
                     variant="outline"
-                    className="h-11 gap-2 text-xs"
+                    className="h-11 gap-2 text-xs border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white rounded-xl"
                   >
-                    <Eye className="w-4 h-4" /> Dry-Run Surveillance Audit Only
+                    <Eye className="w-4 h-4 text-cyan-400" /> Dry-Run Surveillance Audit Only
                   </Button>
                 </div>
               </CardContent>
@@ -351,55 +351,55 @@ export default function ImportPage() {
               <div className="space-y-8 animate-in fade-in duration-500">
                 {/* Live Tracker Purge Telemetry Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  <Card className="border-red-200 bg-red-50/50">
+                  <Card className="border-red-500/30 bg-red-950/20 text-white rounded-2xl">
                     <CardContent className="p-4 space-y-1">
-                      <div className="flex items-center justify-between text-muted-foreground">
+                      <div className="flex items-center justify-between text-zinc-400">
                         <span className="text-xs font-mono">TRACKERS PURGED</span>
-                        <ShieldAlert className="w-4 h-4 text-red-500" />
+                        <ShieldAlert className="w-4 h-4 text-red-400" />
                       </div>
-                      <div className="text-2xl font-bold font-mono text-red-600">
+                      <div className="text-2xl font-bold font-mono text-red-400">
                         {result.telemetry.trackingPixelsPurged + result.telemetry.surveillanceElementsPurged}
                       </div>
-                      <p className="text-[11px] text-muted-foreground">Pixels & surveillance frames removed</p>
+                      <p className="text-[11px] text-zinc-500">Pixels & surveillance frames removed</p>
                     </CardContent>
                   </Card>
 
-                  <Card className="border-amber-200 bg-amber-50/50">
+                  <Card className="border-amber-500/30 bg-amber-950/20 text-white rounded-2xl">
                     <CardContent className="p-4 space-y-1">
-                      <div className="flex items-center justify-between text-muted-foreground">
+                      <div className="flex items-center justify-between text-zinc-400">
                         <span className="text-xs font-mono">SCRIPTS STRIPPED</span>
-                        <Terminal className="w-4 h-4 text-amber-500" />
+                        <Terminal className="w-4 h-4 text-amber-400" />
                       </div>
-                      <div className="text-2xl font-bold font-mono text-amber-600">
+                      <div className="text-2xl font-bold font-mono text-amber-400">
                         {result.telemetry.scriptsPurged}
                       </div>
-                      <p className="text-[11px] text-muted-foreground">Zero executable JS left behind</p>
+                      <p className="text-[11px] text-zinc-500">Zero executable JS left behind</p>
                     </CardContent>
                   </Card>
 
-                  <Card className="border-white/[0.08] bg-[#0D0D12]">
+                  <Card className="border-cyan-500/30 bg-cyan-950/20 text-white rounded-2xl">
                     <CardContent className="p-4 space-y-1">
-                      <div className="flex items-center justify-between text-muted-foreground">
+                      <div className="flex items-center justify-between text-zinc-400">
                         <span className="text-xs font-mono">UTM PARAMS PURGED</span>
                         <Flame className="w-4 h-4 text-cyan-400" />
                       </div>
                       <div className="text-2xl font-bold font-mono text-cyan-400">
                         {result.telemetry.trackingParamsPurged}
                       </div>
-                      <p className="text-[11px] text-muted-foreground">Sanitized hyperlinks & media</p>
+                      <p className="text-[11px] text-zinc-500">Sanitized hyperlinks & media</p>
                     </CardContent>
                   </Card>
 
-                  <Card className="border-white/[0.08] bg-[#0D0D12]">
+                  <Card className="border-emerald-500/30 bg-emerald-950/20 text-white rounded-2xl">
                     <CardContent className="p-4 space-y-1">
-                      <div className="flex items-center justify-between text-muted-foreground">
+                      <div className="flex items-center justify-between text-zinc-400">
                         <span className="text-xs font-mono">DATA REDUCTION</span>
                         <ShieldCheck className="w-4 h-4 text-emerald-400" />
                       </div>
                       <div className="text-2xl font-bold font-mono text-emerald-400">
                         {result.telemetry.reductionPercentage}%
                       </div>
-                      <p className="text-[11px] text-muted-foreground">
+                      <p className="text-[11px] text-zinc-500">
                         {Math.round((result.telemetry.originalByteSize - result.telemetry.cleanedByteSize) / 1024)} KB payload saved
                       </p>
                     </CardContent>
@@ -476,32 +476,32 @@ export default function ImportPage() {
 
                 {/* Main Tabs: Cleaned Preview vs. Sovereign Embed Generator */}
                 <Tabs defaultValue={result.published ? "embed" : "preview"} className="space-y-4">
-                  <TabsList className="bg-muted p-1 border">
-                    <TabsTrigger value="preview" className="text-xs gap-1.5 data-[state=active]:bg-background data-[state=active]:text-foreground">
+                  <TabsList className="bg-[#0B0D14] border border-white/10 p-1 text-zinc-400 rounded-xl">
+                    <TabsTrigger value="preview" className="text-xs gap-1.5 data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300 data-[state=active]:border-cyan-500/40 rounded-lg">
                       <FileText className="w-3.5 h-3.5" /> Cleaned Prose Preview
                     </TabsTrigger>
                     {result.cid && (
-                      <TabsTrigger value="embed" className="text-xs gap-1.5 data-[state=active]:bg-background data-[state=active]:text-foreground">
-                        <Code2 className="w-3.5 h-3.5 text-primary" /> Sovereign Embed Generator
+                      <TabsTrigger value="embed" className="text-xs gap-1.5 data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300 data-[state=active]:border-cyan-500/40 rounded-lg">
+                        <Code2 className="w-3.5 h-3.5 text-cyan-400" /> Sovereign Embed Generator
                       </TabsTrigger>
                     )}
                   </TabsList>
 
                   {/* Cleaned Prose Tab */}
                   <TabsContent value="preview">
-                    <Card className="border-border/60 bg-card">
-                      <CardHeader className="border-b">
-                        <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-muted-foreground">
+                    <Card className="border-white/10 bg-[#0B0D14] text-white rounded-2xl shadow-xl">
+                      <CardHeader className="border-b border-white/10">
+                        <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-zinc-400">
                           <span>Author: {result.article.author || "Sovereign Author"}</span>
                           <span>{result.telemetry.wordCount} words · ~{result.telemetry.readingTimeMinutes} min read</span>
                         </div>
-                        <CardTitle className="text-2xl font-serif text-card-foreground pt-1">
+                        <CardTitle className="text-2xl font-serif text-white pt-1">
                           {result.article.title}
                         </CardTitle>
                         {result.article.tags && result.article.tags.length > 0 && (
                           <div className="flex flex-wrap gap-1.5 pt-2">
                             {result.article.tags.map((tag, idx) => (
-                              <Badge key={idx} variant="outline" className="text-[10px] border-primary/30 text-primary">
+                              <Badge key={idx} variant="outline" className="text-[10px] border-cyan-500/30 text-cyan-300 font-mono">
                                 #{tag}
                               </Badge>
                             ))}
@@ -510,7 +510,7 @@ export default function ImportPage() {
                       </CardHeader>
                       <CardContent className="p-6 sm:p-10">
                         <div
-                          className="prose prose-neutral max-w-none prose-headings:font-serif prose-p:leading-relaxed prose-a:text-primary prose-blockquote:border-primary prose-code:text-primary prose-img:rounded-lg"
+                          className="prose prose-invert max-w-none prose-headings:font-serif prose-p:leading-relaxed prose-a:text-cyan-400 prose-blockquote:border-cyan-500 prose-code:text-cyan-300 prose-img:rounded-xl"
                           dangerouslySetInnerHTML={{ __html: result.article.cleanHtml }}
                         />
                       </CardContent>
@@ -520,33 +520,33 @@ export default function ImportPage() {
                   {/* Sovereign Embed Generator Tab */}
                   {result.cid && (
                     <TabsContent value="embed" className="space-y-6">
-                      <Card className="border-border/60 bg-card">
+                      <Card className="border-white/10 bg-[#0B0D14] text-white rounded-2xl shadow-xl">
                         <CardHeader>
-                          <CardTitle className="text-lg font-sans font-semibold text-card-foreground flex items-center justify-between">
+                          <CardTitle className="text-lg font-sans font-semibold text-white flex items-center justify-between">
                             <span>Universal Iframe Embed Code</span>
-                            <span className="text-xs font-mono text-emerald-600">
+                            <span className="text-xs font-mono text-emerald-400">
                               CSP frame-ancestors * Compliant
                             </span>
                           </CardTitle>
-                          <CardDescription>
+                          <CardDescription className="text-zinc-400 text-xs">
                             Paste this lightweight iframe code into any WordPress, Ghost, Substack, Webflow, or static website.
                           </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
                           {/* Embed Customizers */}
-                          <div className="flex flex-wrap items-center gap-6 p-4 rounded-xl bg-muted/40 border text-xs font-mono">
+                          <div className="flex flex-wrap items-center gap-6 p-4 rounded-xl bg-black/50 border border-white/10 text-xs font-mono">
                             <div className="flex items-center gap-3">
-                              <span className="text-muted-foreground">Theme:</span>
-                              <div className="flex rounded-lg border p-0.5 bg-background">
+                              <span className="text-zinc-400">Theme:</span>
+                              <div className="flex rounded-lg border border-white/10 p-0.5 bg-black/60">
                                 {(["light", "dark", "cyber"] as const).map((t) => (
                                   <button
                                     key={t}
                                     type="button"
                                     onClick={() => setEmbedTheme(t)}
-                                    className={`px-2.5 py-1 rounded text-xs capitalize transition-colors ${
+                                    className={`px-2.5 py-1 rounded-md text-xs capitalize transition-colors ${
                                       embedTheme === t
-                                        ? "bg-primary text-primary-foreground font-semibold"
-                                        : "text-muted-foreground hover:text-foreground"
+                                        ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold"
+                                        : "text-zinc-400 hover:text-white"
                                     }`}
                                   >
                                     {t}
@@ -556,29 +556,29 @@ export default function ImportPage() {
                             </div>
 
                             <div className="flex items-center gap-2">
-                              <label className="flex items-center gap-2 cursor-pointer text-foreground">
+                              <label className="flex items-center gap-2 cursor-pointer text-white">
                                 <input
                                   type="checkbox"
                                   checked={embedCompact}
                                   onChange={(e) => setEmbedCompact(e.target.checked)}
-                                  className="rounded border-input text-primary focus:ring-primary"
+                                  className="rounded border-white/20 bg-black text-cyan-500 focus:ring-cyan-500"
                                 />
-                                <span>Compact Mode (?compact=true)</span>
+                                <span className="text-xs text-zinc-300">Compact Mode (?compact=true)</span>
                               </label>
                             </div>
                           </div>
 
                           {/* Embed Snippet Box */}
                           <div className="space-y-2">
-                            <div className="flex items-center justify-between text-xs font-mono text-muted-foreground">
+                            <div className="flex items-center justify-between text-xs font-mono text-zinc-400">
                               <span>HTML Embed Code:</span>
                               <button
                                 onClick={() => copyToClipboard(getCustomEmbedCode(result.cid!), setCopiedEmbed)}
-                                className="flex items-center gap-1 text-primary hover:underline"
+                                className="flex items-center gap-1 text-cyan-400 hover:underline"
                               >
                                 {copiedEmbed ? (
                                   <>
-                                    <Check className="w-3.5 h-3.5 text-emerald-600" /> Copied!
+                                    <Check className="w-3.5 h-3.5 text-emerald-400" /> Copied!
                                   </>
                                 ) : (
                                   <>
@@ -593,17 +593,17 @@ export default function ImportPage() {
                                 readOnly
                                 value={getCustomEmbedCode(result.cid!)}
                                 rows={3}
-                                className="w-full rounded-lg bg-muted/40 border p-3 font-mono text-xs text-foreground select-all focus:outline-none focus:border-primary"
+                                className="w-full rounded-xl bg-black/60 border border-white/10 p-3 font-mono text-xs text-cyan-300 select-all focus:outline-none focus:border-cyan-500/50"
                               />
                             </div>
                           </div>
 
                           {/* Live Embed Preview */}
                           <div className="space-y-2">
-                            <div className="text-xs font-mono text-muted-foreground">
+                            <div className="text-xs font-mono text-zinc-400">
                               Live Interactive Reader Preview:
                             </div>
-                            <div className="rounded-xl border overflow-hidden bg-background shadow-lg">
+                            <div className="rounded-2xl border border-white/10 overflow-hidden bg-black shadow-2xl">
                               <iframe
                                 src={`/embed/${result.cid}?theme=${embedTheme}${embedCompact ? "&compact=true" : ""}`}
                                 className="w-full h-[520px] border-0"

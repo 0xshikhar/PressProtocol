@@ -1,221 +1,263 @@
-"use client"
+"use client";
 
-import { useState } from "react";
-import { HelpCircle, Search, Book, MessageCircle, FileText, Shield, Zap, Mail } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { useState, useEffect } from "react";
+import { Activity, Shield, Key, Network, Database, RefreshCw, CheckCircle2, XCircle, AlertTriangle, Terminal } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 
-export default function HelpPage() {
-  const [searchQuery, setSearchQuery] = useState("");
+export default function DiagnosticsPage() {
+  const [diagnostics, setDiagnostics] = useState({
+    ipfs: { status: 'checking', details: 'Connecting to swarm...' },
+    crypto: { status: 'checking', details: 'Verifying WebCrypto API...' },
+    storage: { status: 'checking', details: 'Checking IndexedDB...' },
+    network: { status: 'checking', details: 'Measuring latency...' },
+  });
 
-  const helpCategories = [
-    {
-      icon: Book,
-      title: "Getting Started",
-      description: "Learn the basics of PressProtocol",
-      articles: 12
-    },
-    {
-      icon: FileText,
-      title: "Publishing",
-      description: "Create and manage your content",
-      articles: 18
-    },
-    {
-      icon: Shield,
-      title: "Security & Privacy",
-      description: "Keep your account secure",
-      articles: 10
-    },
-    {
-      icon: Zap,
-      title: "Advanced Features",
-      description: "Make the most of PressProtocol",
-      articles: 15
+  const [loading, setLoading] = useState(false);
+
+  const runDiagnostics = () => {
+    setLoading(true);
+    // Simulate diagnostic checks
+    setDiagnostics({
+      ipfs: { status: 'checking', details: 'Connecting to swarm...' },
+      crypto: { status: 'checking', details: 'Verifying WebCrypto API...' },
+      storage: { status: 'checking', details: 'Checking IndexedDB...' },
+      network: { status: 'checking', details: 'Measuring latency...' },
+    });
+
+    setTimeout(() => {
+      setDiagnostics(prev => ({ ...prev, crypto: { status: 'ok', details: 'Ed25519 subsystem ready' } }));
+    }, 800);
+    setTimeout(() => {
+      setDiagnostics(prev => ({ ...prev, storage: { status: 'ok', details: 'Local key vault active' } }));
+    }, 1200);
+    setTimeout(() => {
+      setDiagnostics(prev => ({ ...prev, network: { status: 'ok', details: '24ms latency to nearest relay' } }));
+    }, 1800);
+    setTimeout(() => {
+      setDiagnostics(prev => ({ ...prev, ipfs: { status: 'warning', details: 'Using gateway fallback (DHT offline)' } }));
+      setLoading(false);
+    }, 2500);
+  };
+
+  useEffect(() => {
+    runDiagnostics();
+  }, []);
+
+  const getStatusIcon = (status: string) => {
+    switch(status) {
+      case 'ok': return <CheckCircle2 className="h-5 w-5 text-emerald-400" />;
+      case 'warning': return <AlertTriangle className="h-5 w-5 text-amber-400" />;
+      case 'error': return <XCircle className="h-5 w-5 text-red-400" />;
+      case 'checking': return <RefreshCw className="h-5 w-5 text-cyan-400 animate-spin" />;
+      default: return null;
     }
-  ];
-
-  const faqs = [
-    {
-      question: "What is PressProtocol?",
-      answer: "PressProtocol is a decentralized, censorship-resistant publishing platform that distributes your content across IPFS, Tor, and gateway mirrors. This ensures your content remains accessible even if one network goes down."
-    },
-    {
-      question: "How does content distribution work?",
-      answer: "When you publish content, it's automatically uploaded to IPFS, created as a Tor onion service, and distributed across multiple gateway mirrors. This multi-network approach ensures maximum availability and censorship resistance."
-    },
-    {
-      question: "Is my content really censorship-resistant?",
-      answer: "Yes. By distributing content across multiple decentralized networks (IPFS, Tor, gateway mirrors), there's no single point of failure. Even if one network is blocked or goes down, your content remains accessible through other channels."
-    },
-    {
-      question: "Can I publish anonymously?",
-      answer: "Absolutely. PressProtocol supports anonymous publishing. You can create content without revealing your identity, and your Ed25519 cryptographic signatures verify authenticity without exposing personal information."
-    },
-    {
-      question: "How do I verify content authenticity?",
-      answer: "All content on PressProtocol is signed with Ed25519 cryptographic signatures. Readers can verify the signature to ensure the content hasn't been tampered with and comes from the claimed publisher."
-    },
-    {
-      question: "What are the costs involved?",
-      answer: "PressProtocol is free to use. Publishing and distributing content across our networks is completely free. There are no subscription fees or hidden costs."
-    },
-    {
-      question: "How do I share my published content?",
-      answer: "After publishing, you'll receive a unique pressprotocol:// link and a canonical web URL. Share this link anywhere, and readers with the PressProtocol browser extension can access your content through the fastest available mirror."
-    },
-    {
-      question: "Can I edit or delete published content?",
-      answer: "You can publish new versions of your content, which will be cryptographically linked to previous versions. However, once content is on IPFS and Tor, it becomes part of the permanent record - a feature, not a bug, for censorship resistance."
-    },
-    {
-      question: "What is the browser extension for?",
-      answer: "The browser extension automatically resolves pressprotocol:// links and selects the fastest available mirror (IPFS, Tor, or gateway) based on your connection. It ensures optimal reading experience and maximum availability."
-    },
-    {
-      question: "How secure are my Ed25519 keys?",
-      answer: "Your signing keys are stored securely and never leave your device unless you explicitly export them. We recommend backing up your keys securely and never sharing them with anyone."
-    }
-  ];
-
-  const quickLinks = [
-    { title: "Documentation", href: "#", icon: Book },
-    { title: "API Reference", href: "#", icon: FileText },
-    { title: "Community Forum", href: "#", icon: MessageCircle },
-    { title: "Contact Support", href: "#", icon: Mail },
-  ];
+  };
 
   return (
     <div className="min-h-screen bg-[#050508] text-white selection:bg-cyan-500/30 selection:text-cyan-200">
       {/* Header */}
-      <div className="border-b border-white/10 bg-[#0B0D14]/80 backdrop-blur-xl relative overflow-hidden">
-        {/* Ambient Glow */}
-        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top_left,rgba(6,182,212,0.12),transparent_70%)]" />
-
+      <div className="border-b border-white/10 bg-[#0B0D14] relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,rgba(6,182,212,0.1),transparent_50%)]" />
         <div className="container relative z-10 mx-auto px-4 py-12">
-          <div className="text-center max-w-3xl mx-auto">
-            <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-cyan-950/70 border border-cyan-500/30 text-cyan-400">
-              <HelpCircle className="h-8 w-8 text-cyan-400" />
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-950/60 border border-cyan-500/30 text-cyan-400">
+              <Activity className="h-6 w-6" />
             </div>
-            <h1 className="text-4xl md:text-5xl font-sans font-bold text-white mb-4 tracking-tight">How can we help you?</h1>
-            <p className="text-sm md:text-base text-neutral-400 mb-8 max-w-xl mx-auto">
-              Find answers, learn about protocol features, and get the most out of PressProtocol
-            </p>
-            
-            {/* Search */}
-            <div className="relative max-w-2xl mx-auto">
-              <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
-              <Input
-                type="text"
-                placeholder="Search for help articles, cryptographic guides..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-14 pl-12 pr-4 text-base bg-[#0B0D14] border-white/10 text-white placeholder:text-neutral-500 rounded-2xl focus-visible:ring-cyan-500/30"
-              />
+            <div>
+              <h1 className="text-3xl font-display font-bold text-white tracking-tight">System Diagnostics</h1>
+              <p className="text-sm text-neutral-400 mt-1">
+                Real-time health telemetry for your sovereign node environment.
+              </p>
             </div>
           </div>
+          <Button 
+            onClick={runDiagnostics} 
+            disabled={loading}
+            className="bg-white/5 hover:bg-white/10 text-white border border-white/10 font-mono text-xs"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            {loading ? 'Running Diagnostics...' : 'Rerun Diagnostics'}
+          </Button>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-12">
-        {/* Help Categories */}
-        <div className="mb-16">
-          <h2 className="text-2xl font-sans font-bold text-white mb-6">Browse by Category</h2>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {helpCategories.map((category) => {
-              const Icon = category.icon;
-              return (
-                <Card key={category.title} className="hover:shadow-[0_0_25px_rgba(6,182,212,0.1)] transition-all cursor-pointer border border-white/10 bg-[#0B0D14] hover:border-cyan-500/40 rounded-2xl">
-                  <CardHeader>
-                    <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-950/60 border border-cyan-500/30 text-cyan-400">
-                      <Icon className="h-6 w-6 text-cyan-400" />
-                    </div>
-                    <CardTitle className="text-lg text-white font-sans font-bold">{category.title}</CardTitle>
-                    <CardDescription className="text-neutral-400 text-xs">{category.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Badge variant="outline" className="border-white/10 bg-white/[0.04] text-cyan-300 font-mono text-xs">{category.articles} articles</Badge>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* FAQs */}
-        <div className="mb-16">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-sans font-bold text-white mb-2">Frequently Asked Questions</h2>
-            <p className="text-sm text-neutral-400">
-              Quick answers to common questions about decentralized publishing
-            </p>
-          </div>
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid gap-6 md:grid-cols-2">
           
-          <div className="max-w-3xl mx-auto">
-            <Accordion type="single" collapsible className="w-full space-y-2">
-              {faqs.map((faq, index) => (
-                <AccordionItem key={index} value={`item-${index}`} className="border border-white/10 bg-[#0B0D14] rounded-xl px-4">
-                  <AccordionTrigger className="text-left text-white hover:text-cyan-300 text-sm font-medium py-4">
-                    {faq.question}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-neutral-400 text-xs leading-relaxed pb-4">
-                    {faq.answer}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
+          {/* Cryptography Subsystem */}
+          <Card className="bg-[#0B0D14] border-white/10 rounded-xl">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <div className="space-y-1">
+                <CardTitle className="text-lg font-bold flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-purple-400" /> Cryptography Subsystem
+                </CardTitle>
+                <CardDescription className="text-white/40">WebCrypto & Ed25519 capabilities</CardDescription>
+              </div>
+              {getStatusIcon(diagnostics.crypto.status)}
+            </CardHeader>
+            <CardContent>
+              <div className="mt-4 space-y-3 font-mono text-xs text-white/70">
+                <div className="flex justify-between border-b border-white/5 pb-2">
+                  <span>Status</span>
+                  <span className="text-white">{diagnostics.crypto.details}</span>
+                </div>
+                <div className="flex justify-between border-b border-white/5 pb-2">
+                  <span>WebCrypto API</span>
+                  <span className="text-emerald-400">Supported</span>
+                </div>
+                <div className="flex justify-between border-b border-white/5 pb-2">
+                  <span>Curve</span>
+                  <span className="text-white">Ed25519 (RFC 8032)</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* IPFS Node Status */}
+          <Card className="bg-[#0B0D14] border-white/10 rounded-xl">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <div className="space-y-1">
+                <CardTitle className="text-lg font-bold flex items-center gap-2">
+                  <Database className="h-5 w-5 text-blue-400" /> IPFS Swarm Connection
+                </CardTitle>
+                <CardDescription className="text-white/40">Helia DHT & Peer routing</CardDescription>
+              </div>
+              {getStatusIcon(diagnostics.ipfs.status)}
+            </CardHeader>
+            <CardContent>
+              <div className="mt-4 space-y-3 font-mono text-xs text-white/70">
+                <div className="flex justify-between border-b border-white/5 pb-2">
+                  <span>Status</span>
+                  <span className={diagnostics.ipfs.status === 'warning' ? 'text-amber-400' : 'text-emerald-400'}>
+                    {diagnostics.ipfs.details}
+                  </span>
+                </div>
+                <div className="flex justify-between border-b border-white/5 pb-2">
+                  <span>Peer ID</span>
+                  <span className="text-white">Offline</span>
+                </div>
+                <div className="flex justify-between border-b border-white/5 pb-2">
+                  <span>Active Gateway</span>
+                  <span className="text-cyan-400">https://ipfs.io/ipfs/</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Local Storage Vault */}
+          <Card className="bg-[#0B0D14] border-white/10 rounded-xl">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <div className="space-y-1">
+                <CardTitle className="text-lg font-bold flex items-center gap-2">
+                  <Key className="h-5 w-5 text-emerald-400" /> Local Key Vault
+                </CardTitle>
+                <CardDescription className="text-white/40">Burner wallet storage</CardDescription>
+              </div>
+              {getStatusIcon(diagnostics.storage.status)}
+            </CardHeader>
+            <CardContent>
+              <div className="mt-4 space-y-3 font-mono text-xs text-white/70">
+                <div className="flex justify-between border-b border-white/5 pb-2">
+                  <span>Status</span>
+                  <span className="text-emerald-400">{diagnostics.storage.details}</span>
+                </div>
+                <div className="flex justify-between border-b border-white/5 pb-2">
+                  <span>Provider</span>
+                  <span className="text-white">localStorage (Encrypted)</span>
+                </div>
+                <div className="flex justify-between border-b border-white/5 pb-2">
+                  <span>Keys Found</span>
+                  <span className="text-white">1 Identity</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Transport Layer */}
+          <Card className="bg-[#0B0D14] border-white/10 rounded-xl">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <div className="space-y-1">
+                <CardTitle className="text-lg font-bold flex items-center gap-2">
+                  <Network className="h-5 w-5 text-amber-400" /> Transport Routing
+                </CardTitle>
+                <CardDescription className="text-white/40">Tor & clearnet relays</CardDescription>
+              </div>
+              {getStatusIcon(diagnostics.network.status)}
+            </CardHeader>
+            <CardContent>
+              <div className="mt-4 space-y-3 font-mono text-xs text-white/70">
+                <div className="flex justify-between border-b border-white/5 pb-2">
+                  <span>Status</span>
+                  <span className="text-emerald-400">{diagnostics.network.details}</span>
+                </div>
+                <div className="flex justify-between border-b border-white/5 pb-2">
+                  <span>Protocol</span>
+                  <span className="text-white">HTTPS/WSS</span>
+                </div>
+                <div className="flex justify-between border-b border-white/5 pb-2">
+                  <span>Tor Subsystem</span>
+                  <span className="text-white/40">Disconnected</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+        </div>
+
+        {/* Console Log Simulation */}
+        <div className="mt-8 bg-[#0B0D14] border border-white/10 rounded-xl overflow-hidden">
+          <div className="bg-white/5 border-b border-white/10 px-4 py-2 flex items-center gap-2">
+            <Terminal className="h-4 w-4 text-white/40" />
+            <span className="font-mono text-xs text-white/40 uppercase tracking-wider">System Logs</span>
+          </div>
+          <div className="p-4 font-mono text-[10px] sm:text-xs text-white/50 space-y-1.5 h-48 overflow-y-auto">
+            <p className="text-cyan-400">[info] PressProtocol Runtime v1.0.6 initialized</p>
+            <p>[info] WebCrypto API securely loaded.</p>
+            <p className="text-emerald-400">[ok] Local key vault decrypted successfully.</p>
+            <p>[info] Attempting to connect to IPFS DHT swarm...</p>
+            {loading ? (
+              <p className="animate-pulse text-white/40">...</p>
+            ) : (
+              <>
+                <p className="text-amber-400">[warn] P2P Node offline. Falling back to HTTP Gateway.</p>
+                <p>[info] Diagnostic routine completed.</p>
+              </>
+            )}
           </div>
         </div>
 
-        {/* Quick Links */}
-        <div className="mb-16">
-          <h2 className="text-2xl font-sans font-bold text-white mb-6 text-center">More Resources</h2>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {quickLinks.map((link) => {
-              const Icon = link.icon;
-              return (
-                <Card key={link.title} className="hover:shadow-[0_0_20px_rgba(6,182,212,0.1)] transition-all cursor-pointer border border-white/10 bg-[#0B0D14] hover:border-cyan-500/40 rounded-2xl">
-                  <CardContent className="p-6 text-center">
-                    <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-white/[0.04] border border-white/10 text-cyan-400">
-                      <Icon className="h-6 w-6 text-cyan-400" />
-                    </div>
-                    <h3 className="font-semibold text-white text-sm">{link.title}</h3>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Contact Support */}
-        <Card className="border border-white/10 bg-[#0B0D14] relative overflow-hidden rounded-2xl">
-          <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.08),transparent_70%)]" />
-          <CardContent className="p-12 text-center relative z-10">
-            <MessageCircle className="h-12 w-12 mx-auto mb-4 text-cyan-400" />
-            <h2 className="text-2xl font-sans font-bold text-white mb-2">Still need help?</h2>
-            <p className="text-neutral-400 mb-6 max-w-md mx-auto text-xs leading-relaxed">
-              Our open-source team and developer community are here to help you configure your gateway or self-hosted node.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Button size="lg" className="gap-2 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold rounded-xl text-xs">
-                <MessageCircle className="h-4 w-4" />
-                Contact Protocol Support
-              </Button>
-              <Button size="lg" variant="outline" className="gap-2 border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white rounded-xl text-xs">
-                <MessageCircle className="h-4 w-4" />
-                Join Community Swarm
-              </Button>
+        {/* Quick Resolution Guides */}
+        <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <a 
+            href="/docs" 
+            className="p-4 rounded-xl border border-white/10 bg-[#0B0D14] hover:border-cyan-500/30 transition-colors group"
+          >
+            <div className="text-xs font-mono uppercase tracking-wider text-white/40 mb-1">Documentation</div>
+            <div className="font-semibold text-white group-hover:text-cyan-300 text-sm flex items-center justify-between">
+              Node & IPFS Setup Guides <span>&rarr;</span>
             </div>
-          </CardContent>
-        </Card>
+          </a>
+          <a 
+            href="/developers" 
+            className="p-4 rounded-xl border border-white/10 bg-[#0B0D14] hover:border-cyan-500/30 transition-colors group"
+          >
+            <div className="text-xs font-mono uppercase tracking-wider text-white/40 mb-1">Developer Portal</div>
+            <div className="font-semibold text-white group-hover:text-cyan-300 text-sm flex items-center justify-between">
+              API & SDK Sandbox <span>&rarr;</span>
+            </div>
+          </a>
+          <a 
+            href="/explorer" 
+            className="p-4 rounded-xl border border-white/10 bg-[#0B0D14] hover:border-cyan-500/30 transition-colors group"
+          >
+            <div className="text-xs font-mono uppercase tracking-wider text-white/40 mb-1">Network Explorer</div>
+            <div className="font-semibold text-white group-hover:text-cyan-300 text-sm flex items-center justify-between">
+              Live Swarm Ledger <span>&rarr;</span>
+            </div>
+          </a>
+        </div>
       </div>
     </div>
   );

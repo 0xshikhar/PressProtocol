@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 import { Providers } from "@/app/providers"
 import Navbar from "@/components/navigation/navbar"
 import Footer from "@/components/navigation/footer"
+import { SupportPrompt } from "@/components/navigation/SupportPrompt"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 const instrumentSerif = Instrument_Serif({
@@ -63,6 +64,8 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: "/favicon.ico",
+    shortcut: "/pressprotocol-logo-small.png",
+    apple: "/pressprotocol-logo-small.png",
   },
 }
 
@@ -89,6 +92,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             {children}
           </main>
           <Footer />
+          <SupportPrompt />
         </Providers>
       </body>
     </html>
