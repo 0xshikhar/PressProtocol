@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import { env } from '../config/env.js';
 
 export interface PinataUploadResult {
@@ -90,6 +92,19 @@ export class StorageService {
       console.log(`📦 Size: ${result.PinSize} bytes`);
       console.log(`🔗 Gateway URL: ${this.gatewayUrl}/${result.IpfsHash}`);
 
+      // Persist to local disk cache for instant zero-latency retrieval & offline resilience
+      try {
+        const cacheDir = path.resolve(process.cwd(), '.data/content-cache');
+        if (!fs.existsSync(cacheDir)) {
+          fs.mkdirSync(cacheDir, { recursive: true });
+        }
+        const cacheFile = path.join(cacheDir, `${result.IpfsHash}.json`);
+        fs.writeFileSync(cacheFile, JSON.stringify(contentData, null, 2), 'utf-8');
+        console.log(`💾 Cached article locally at ${cacheFile}`);
+      } catch (cacheErr) {
+        console.warn('Could not write to local disk cache:', cacheErr);
+      }
+
       return {
         cid: result.IpfsHash,
         ipfsUrl: `ipfs://${result.IpfsHash}`,
@@ -106,21 +121,43 @@ export class StorageService {
    * Database is just a cache - always fetch from IPFS for authoritative content
    */
   async getContentFromIPFS(cid: string): Promise<ContentData> {
+    // 1. Check local disk cache first (sub-millisecond instant hit)
+    try {
+      const cacheFile = path.resolve(process.cwd(), `.data/content-cache/${cid}.json`);
+      if (fs.existsSync(cacheFile)) {
+        const raw = fs.readFileSync(cacheFile, 'utf-8');
+        const parsed = JSON.parse(raw);
+        if (parsed && (parsed.content || parsed.title)) {
+          console.log(`⚡ [CACHE HIT] Loaded content locally: ${cid}`);
+          return parsed;
+        }
+      }
+    } catch (cacheErr) {
+      // Continue to network fetch
+    }
+
+    // 2. Fetch from IPFS gateways
     try {
       const response = await fetch(`${this.gatewayUrl}/${cid}`);
       
-      if (!response.ok) {
-        throw new Error(`Failed to fetch content from IPFS: ${response.status}`);
-      }
+      if (response.ok) {
+        const contentData = await response.json() as ContentData;
+        console.log(`✅ Fetched content from IPFS: ${cid}`);
+        
+        // Save to cache for subsequent reads
+        try {
+          const cacheDir = path.resolve(process.cwd(), '.data/content-cache');
+          if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
+          fs.writeFileSync(path.join(cacheDir, `${cid}.json`), JSON.stringify(contentData, null, 2), 'utf-8');
+        } catch {}
 
-      const contentData = await response.json() as ContentData;
-      console.log(`✅ Fetched content from IPFS: ${cid}`);
-      
-      return contentData;
+        return contentData;
+      }
     } catch (error) {
       console.error('Error fetching from IPFS:', error);
-      throw new Error(`Failed to fetch content from IPFS: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
+
+    throw new Error(`Failed to fetch content from IPFS for CID: ${cid}`);
   }
 
   /**
