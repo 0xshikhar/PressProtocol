@@ -12,9 +12,10 @@ export interface ReadingStats {
 /**
  * Calculate reading time from HTML content
  */
-export function calculateReadingTime(htmlContent: string): ReadingStats {
-  // Strip HTML tags
-  const text = htmlContent.replace(/<[^>]*>/g, ' ');
+export function calculateReadingTime(htmlContent?: string | null): ReadingStats {
+  // Strip HTML tags safely
+  const safeContent = htmlContent || '';
+  const text = safeContent.replace(/<[^>]*>/g, ' ');
   
   // Remove extra whitespace
   const cleanText = text.replace(/\s+/g, ' ').trim();
@@ -37,7 +38,7 @@ export function calculateReadingTime(htmlContent: string): ReadingStats {
   }
   
   return {
-    minutes,
+    minutes: Math.max(1, minutes),
     words,
     formattedTime,
   };
@@ -46,8 +47,9 @@ export function calculateReadingTime(htmlContent: string): ReadingStats {
 /**
  * Get word count only
  */
-export function getWordCount(htmlContent: string): number {
-  const text = htmlContent.replace(/<[^>]*>/g, ' ');
+export function getWordCount(htmlContent?: string | null): number {
+  const safeContent = htmlContent || '';
+  const text = safeContent.replace(/<[^>]*>/g, ' ');
   const cleanText = text.replace(/\s+/g, ' ').trim();
   return cleanText.split(/\s+/).filter(word => word.length > 0).length;
 }
