@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Menu, X, ArrowRight, ShieldCheck, Terminal, Layers, Sparkles } from "lucide-react";
 
@@ -41,9 +42,15 @@ export function LandingNavigation() {
         >
           {/* Brand Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 border border-white/15 group-hover:border-cyan-400/50 transition-colors">
-              <span className="text-cyan-400 font-mono text-sm font-bold">¶</span>
-              <div className="absolute -inset-0.5 rounded-lg bg-cyan-500/20 blur opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 border border-white/15 group-hover:border-cyan-400/50 transition-colors overflow-hidden p-1">
+              <Image
+                src="/pressprotocol-logo-small.png"
+                alt="PressProtocol Logo"
+                width={32}
+                height={32}
+                className="w-full h-full object-contain"
+              />
+              <div className="absolute -inset-0.5 rounded-lg bg-cyan-500/20 blur opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
             </div>
             <div className="flex items-baseline gap-2">
               <span className="font-display tracking-tight text-xl lg:text-2xl text-white font-medium">

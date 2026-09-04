@@ -3,6 +3,7 @@
 import { ArrowUpRight } from "lucide-react";
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface FooterLink {
   name: string;
@@ -119,8 +120,18 @@ export function LandingFooter() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-10 lg:gap-8">
             {/* Brand Column */}
             <div className="col-span-2">
-              <Link href="/" className="inline-flex items-center gap-2 mb-6">
-                <span className="text-2xl font-display tracking-tight text-white">PressProtocol</span>
+              <Link href="/" className="inline-flex items-center gap-3 mb-6 group">
+                <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 border border-white/15 group-hover:border-cyan-400/50 transition-colors overflow-hidden p-1">
+                  <Image
+                    src="/pressprotocol-logo-small.png"
+                    alt="PressProtocol Logo"
+                    width={32}
+                    height={32}
+                    className="w-full h-full object-contain"
+                  />
+                  <div className="absolute -inset-0.5 rounded-lg bg-cyan-500/20 blur opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                </div>
+                <span className="text-2xl font-display tracking-tight text-white group-hover:text-cyan-300 transition-colors">PressProtocol</span>
               </Link>
 
               <p className="text-white/50 leading-relaxed mb-8 max-w-xs text-sm">

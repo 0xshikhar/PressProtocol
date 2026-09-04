@@ -183,26 +183,20 @@ export function Hero() {
           <div className="lg:col-span-7">
             {/* Status Pill Badge */}
             <div
-              className={`inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md mb-8 transition-all duration-700 ${
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-              }`}
+              className={`inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md mb-8 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                }`}
             >
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
               </span>
-              <span className="font-mono text-xs text-white/75 tracking-wider uppercase">
-                Mainnet Live
-              </span>
-              <span className="text-white/20 text-xs">|</span>
               <span className="font-mono text-[11px] text-cyan-400">IPFS + Tor + Clearnet</span>
             </div>
 
             {/* Main Headline */}
             <h1
-              className={`font-display text-5xl sm:text-6xl lg:text-[76px] xl:text-[88px] tracking-tight leading-[0.93] text-white mb-8 transition-all duration-1000 ${
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-              }`}
+              className={`font-display text-5xl sm:text-6xl lg:text-[76px] xl:text-[88px] tracking-tight leading-[0.93] text-white mb-8 transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                }`}
             >
               <span className="block">Publish content that</span>
               <span className="block text-white/90">
@@ -216,18 +210,16 @@ export function Hero() {
 
             {/* Subheadline: Reader-centric mechanism */}
             <p
-              className={`text-lg sm:text-xl text-white/70 font-light leading-relaxed max-w-xl mb-10 transition-all duration-1000 delay-200 ${
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-              }`}
+              className={`text-lg sm:text-xl text-white/70 font-light leading-relaxed max-w-xl mb-10 transition-all duration-1000 delay-200 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+                }`}
             >
               Every article is content-addressed on IPFS, mirrored to a Tor hidden service, and signed with a key that never leaves your browser. If one path is blocked, readers are rerouted automatically — no VPN, no account, no company that can pull the plug.
             </p>
 
             {/* Primary Action Buttons */}
             <div
-              className={`flex flex-wrap items-center gap-4 mb-6 transition-all duration-1000 delay-300 ${
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-              }`}
+              className={`flex flex-wrap items-center gap-4 mb-6 transition-all duration-1000 delay-300 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+                }`}
             >
               <Link href="/write">
                 <Button
@@ -252,9 +244,8 @@ export function Hero() {
 
             {/* Trust Markers */}
             <div
-              className={`flex flex-wrap items-center gap-y-2 gap-x-5 text-xs text-white/50 font-mono transition-all duration-1000 delay-400 ${
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-              }`}
+              className={`flex flex-wrap items-center gap-y-2 gap-x-5 text-xs text-white/50 font-mono transition-all duration-1000 delay-400 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                }`}
             >
               <span className="flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
@@ -275,9 +266,8 @@ export function Hero() {
 
           {/* Right Column: Live Protocol Enclave & Interactive Defense Console */}
           <div
-            className={`lg:col-span-5 transition-all duration-1000 delay-300 ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-            }`}
+            className={`lg:col-span-5 transition-all duration-1000 delay-300 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              }`}
           >
             <div className="relative rounded-2xl border border-white/15 bg-zinc-950/85 backdrop-blur-2xl p-5 sm:p-6 shadow-2xl shadow-cyan-950/40 group overflow-hidden">
               {/* Top ambient highlight */}
@@ -307,22 +297,20 @@ export function Hero() {
               <div className="grid grid-cols-2 gap-1 p-1 rounded-lg bg-white/[0.03] border border-white/5 mb-4 text-xs font-mono">
                 <button
                   onClick={() => setActiveTab("telemetry")}
-                  className={`py-1.5 px-3 rounded-md transition-all flex items-center justify-center gap-2 ${
-                    activeTab === "telemetry"
+                  className={`py-1.5 px-3 rounded-md transition-all flex items-center justify-center gap-2 ${activeTab === "telemetry"
                       ? "bg-white/10 text-white font-medium shadow-sm"
                       : "text-white/40 hover:text-white/70"
-                  }`}
+                    }`}
                 >
                   <Activity className="w-3.5 h-3.5 text-cyan-400" />
                   Multi-Transport
                 </button>
                 <button
                   onClick={() => setActiveTab("crypto")}
-                  className={`py-1.5 px-3 rounded-md transition-all flex items-center justify-center gap-2 ${
-                    activeTab === "crypto"
+                  className={`py-1.5 px-3 rounded-md transition-all flex items-center justify-center gap-2 ${activeTab === "crypto"
                       ? "bg-white/10 text-white font-medium shadow-sm"
                       : "text-white/40 hover:text-white/70"
-                  }`}
+                    }`}
                 >
                   <Lock className="w-3.5 h-3.5 text-emerald-400" />
                   Crypto Enclave
@@ -359,17 +347,15 @@ export function Hero() {
                   <div className="space-y-2 mb-3.5 font-mono text-xs">
                     {/* Pinata IPFS Gateway */}
                     <div
-                      className={`flex items-center justify-between p-2.5 rounded-lg transition-all border ${
-                        isCensored
+                      className={`flex items-center justify-between p-2.5 rounded-lg transition-all border ${isCensored
                           ? "bg-red-950/20 border-red-500/30 text-red-300"
                           : "bg-black/40 border-white/5 text-white/80"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-2">
                         <span
-                          className={`w-2 h-2 rounded-full ${
-                            isCensored ? "bg-red-400" : "bg-emerald-400 animate-pulse"
-                          }`}
+                          className={`w-2 h-2 rounded-full ${isCensored ? "bg-red-400" : "bg-emerald-400 animate-pulse"
+                            }`}
                         />
                         <span className="text-white/90">IPFS Gateway (Pinata Edge)</span>
                       </div>
@@ -391,17 +377,15 @@ export function Hero() {
 
                     {/* Cloudflare Anycast Web3 */}
                     <div
-                      className={`flex items-center justify-between p-2.5 rounded-lg transition-all border ${
-                        isCensored
+                      className={`flex items-center justify-between p-2.5 rounded-lg transition-all border ${isCensored
                           ? "bg-red-950/20 border-red-500/30 text-red-300"
                           : "bg-black/40 border-white/5 text-white/80"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-2">
                         <span
-                          className={`w-2 h-2 rounded-full ${
-                            isCensored ? "bg-red-400" : "bg-cyan-400 animate-pulse"
-                          }`}
+                          className={`w-2 h-2 rounded-full ${isCensored ? "bg-red-400" : "bg-cyan-400 animate-pulse"
+                            }`}
                         />
                         <span className="text-white/90">Cloudflare Anycast</span>
                       </div>
@@ -423,11 +407,10 @@ export function Hero() {
 
                     {/* Tor v3 Hidden Service */}
                     <div
-                      className={`flex items-center justify-between p-2.5 rounded-lg transition-all border ${
-                        isCensored
+                      className={`flex items-center justify-between p-2.5 rounded-lg transition-all border ${isCensored
                           ? "bg-purple-950/40 border-purple-500/50 ring-1 ring-purple-500/40"
                           : "bg-black/40 border-white/5"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
@@ -466,11 +449,10 @@ export function Hero() {
                   <div className="grid grid-cols-2 gap-2 font-mono text-xs">
                     <button
                       onClick={() => setIsCensored((prev) => !prev)}
-                      className={`py-2 px-3 rounded-lg border text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-all ${
-                        isCensored
+                      className={`py-2 px-3 rounded-lg border text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-all ${isCensored
                           ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/25"
                           : "bg-red-500/10 border-red-500/20 text-red-400 hover:bg-red-500/20"
-                      }`}
+                        }`}
                     >
                       {isCensored ? (
                         <>
@@ -555,9 +537,8 @@ export function Hero() {
 
         {/* Live Protocol Metric Bar */}
         <div
-          className={`mt-16 lg:mt-20 pt-8 border-t border-white/10 grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-12 transition-all duration-1000 delay-500 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
+          className={`mt-16 lg:mt-20 pt-8 border-t border-white/10 grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-12 transition-all duration-1000 delay-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
         >
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center gap-2">

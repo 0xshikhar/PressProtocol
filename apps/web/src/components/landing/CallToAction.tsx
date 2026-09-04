@@ -34,9 +34,8 @@ export function CallToAction() {
     <section ref={sectionRef} className="relative py-28 lg:py-36 overflow-hidden bg-black text-white">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <div
-          className={`relative border border-white/20 bg-zinc-950/80 overflow-hidden transition-all duration-1000 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
+          className={`relative border border-white/20 bg-zinc-950/80 overflow-hidden transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
           onMouseMove={handleMouseMove}
         >
           {/* Spotlight Effect */}
@@ -105,7 +104,7 @@ export function CallToAction() {
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                     <span className="text-white font-medium">SOVEREIGN PROTOCOL KERNEL</span>
                   </div>
-                  <span className="text-cyan-400 text-[11px]">v1.0.0</span>
+                  <span className="text-cyan-400 text-[11px]">v1.0.6</span>
                 </div>
                 <div className="w-full py-5 text-xs space-y-3.5 text-white/70 relative z-10">
                   <div>
