@@ -296,7 +296,7 @@ export async function contentRoutes(fastify: FastifyInstance) {
           data: {
             cid: cachedContent.cid,
             title: cachedContent.title,
-            content: fullContent?.content, // From IPFS
+            content: fullContent?.content || "", // From IPFS or local cache
             tags: cachedContent.tags,
             createdAt: cachedContent.createdAt,
             publisher: {

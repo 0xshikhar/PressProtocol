@@ -17,9 +17,10 @@ const DEVELOPMENT_BACKEND_URL = "http://localhost:4000";
  * 3. Development URL (default)
  */
 export function getBackendUrl(): string {
-  // Check if environment variable is set
-  if (process.env.NEXT_PUBLIC_BACKEND_API_URL) {
-    return process.env.NEXT_PUBLIC_BACKEND_API_URL;
+  const envUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL;
+  // Ignore deprecated/dead Railway deployment URL
+  if (envUrl && !envUrl.includes("railway.app")) {
+    return envUrl;
   }
 
   // Use production URL in production environment

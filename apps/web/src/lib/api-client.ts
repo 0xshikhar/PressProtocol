@@ -104,21 +104,40 @@ export class ApiClient {
   }
 
   async getContent(cid: string): Promise<ResolveContentResponse> {
-    // 1. Try configured backend with a 3s timeout
-    try {
-      const response = await fetch(`${this.baseUrl}/api/content/${cid}`, {
-        signal: AbortSignal.timeout(3000),
-      });
+    const cleanBaseUrl = this.baseUrl?.includes("railway.app") ? "" : this.baseUrl;
 
-      if (response.ok) {
-        const result = await response.json();
-        if (result.data) return result.data;
+    // 1. Try configured backend if valid
+    if (cleanBaseUrl) {
+      try {
+        const response = await fetch(`${cleanBaseUrl}/api/content/${cid}`, {
+          signal: AbortSignal.timeout(3000),
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.data) return result.data;
+        }
+      } catch (e) {
+        console.warn(`[ApiClient] Failed to fetch from baseUrl ${cleanBaseUrl}, trying resilient edge fallback...`);
       }
-    } catch (e) {
-      console.warn(`[ApiClient] Failed to fetch from baseUrl ${this.baseUrl}, trying resilient edge fallback...`);
     }
 
-    // 2. If running in browser and baseUrl was external/failed, query local Next.js proxy route
+    // 2. Try local daemon (port 4000) if user has local node running
+    if (typeof window !== "undefined" && window.location.hostname === "localhost") {
+      try {
+        const localDaemonRes = await fetch(`http://localhost:4000/api/content/${cid}`, {
+          signal: AbortSignal.timeout(2000),
+        });
+        if (localDaemonRes.ok) {
+          const result = await localDaemonRes.json();
+          if (result.data) return result.data;
+        }
+      } catch (e) {
+        // Continue to Next.js proxy route
+      }
+    }
+
+    // 3. Query local Next.js proxy route
     if (typeof window !== "undefined") {
       try {
         const localResponse = await fetch(`/api/content/${cid}`, {
