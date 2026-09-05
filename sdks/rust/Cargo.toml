@@ -1,15 +1,17 @@
 [package]
 name = "pressprotocol-rs"
-version = "1.0.6"
+version = "1.0.7"
 edition = "2021"
 description = "Official PressProtocol Rust SDK - Sovereign Publishing & Deterministic Multihash"
 license = "MIT"
 authors = ["PressProtocol Architects <hello@pressprotocol.com>"]
 repository = "https://github.com/0xshikhar/AnonPress"
 homepage = "https://pressprotocol.com"
+documentation = "https://docs.rs/pressprotocol-rs"
 readme = "README.md"
 keywords = ["pressprotocol", "sovereign", "publishing", "ipfs", "tor"]
 categories = ["web-programming::http-client", "cryptography"]
+
 
 [dependencies]
 sha2 = "0.10"

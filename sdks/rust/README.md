@@ -1,6 +1,21 @@
 # PressProtocol Rust SDK (`pressprotocol-rs`)
 
-Official Rust SDK for [PressProtocol](https://pressprotocol.com) — Autonomous, censorship-resistant publishing infrastructure. Syndicate cryptographic publications across IPFS swarms, Tor v3 hidden services, and deterministic content-addressed storage.
+[![Crates.io](https://img.shields.io/crates/v/pressprotocol-rs.svg?color=4F46E5&style=flat-square)](https://crates.io/crates/pressprotocol-rs)
+[![Documentation](https://docs.rs/pressprotocol-rs/badge.svg)](https://docs.rs/pressprotocol-rs)
+[![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+
+Official Rust SDK for [PressProtocol](https://pressprotocol.com) — Autonomous, censorship-resistant publishing infrastructure, zero-custody cryptographic signing, and deterministic content-addressed storage across IPFS swarms and Tor v3 hidden services.
+
+---
+
+## Features
+
+- ⚡ **Asynchronous & High-Performance**: Built on `tokio` and `reqwest` with pure Rustls TLS.
+- 🔐 **Zero-Custody Cryptography**: In-memory Ed25519 key generation and deterministic payload verification.
+- 🧮 **Deterministic In-Memory CIDv1**: Compute authentic IPFS base32 multihash strings in pure Rust without daemon overhead.
+- 🌐 **Multi-Transport Resolution**: Automated failover between IPFS gateways and Tor `.onion` relays.
+
+---
 
 ## Installation
 
@@ -8,7 +23,7 @@ Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-pressprotocol-rs = "1.0.0"
+pressprotocol-rs = "1.0.7"
 tokio = { version = "1.0", features = ["full"] }
 ```
 
@@ -18,6 +33,8 @@ Or install via Cargo:
 cargo add pressprotocol-rs
 ```
 
+---
+
 ## Quickstart
 
 ```rust
@@ -25,34 +42,41 @@ use pressprotocol_rs::{Client, PublishRequest};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Initialize client with gateway endpoint & sandbox key
-    let client = Client::new("https://node.pressprotocol.com", "pp_test_sandbox_key")?;
+    // 1. Initialize client
+    let client = Client::new("https://pressprotocol.com");
 
-    // 1-Line Server-Signed Ingest
-    let response = client.publish_raw(PublishRequest {
-        title: "Investigative Transparency Report".to_string(),
-        content: "# Sovereign Dispatch\n\nFull disclosure preserved on IPFS and Tor.".to_string(),
-        format: Some("markdown".to_string()),
-        tags: vec!["whistleblower".to_string(), "sovereignty".to_string()],
-        author: Some("Newsroom Bureau".to_string()),
-    }).await?;
+    // 2. Prepare publication
+    let req = PublishRequest {
+        title: "Sovereign Systems & Cryptographic Authenticity".into(),
+        content: "# Architectural Veracity\n\nPreserved across decentralized swarms.".into(),
+        tags: vec!["cryptography".into(), "sovereignty".into()],
+        format: Some("markdown".into()),
+        author: Some("0xShikhar".into()),
+    };
 
-    println!("✅ Anchored CID: {}", response.cid);
-    println!("🌐 IPFS Gateway: {:?}", response.urls.get("ipfs"));
-    println!("🧅 Tor Mirror: {:?}", response.urls.get("tor"));
+    // 3. Publish to IPFS & Tor
+    let res = client.publish(&req).await?;
+    println!("✅ Published CID: {}", res.cid);
+    println!("📦 IPFS URL: {:?}", res.urls.get("ipfs"));
+    println!("🧅 Tor URL: {:?}", res.urls.get("tor"));
 
     Ok(())
 }
 ```
 
-## Features
+---
 
-- **Deterministic In-Memory CIDv1**: Compute base32 IPFS CIDv1 without contacting an external IPFS daemon via `calculate_deterministic_cidv1`.
-- **Server-Signed Ingest**: Simple 1-line publishing via `client.publish_raw`.
-- **Client-Signed Zero-Custody**: Relay client-signed Ed25519 dispatches via `client.publish_signed`.
-- **Multi-Transport Resolution**: Resolve content and gateway availability via `client.resolve`.
-- **Cryptographic Audit**: Audit signature validity against public keys via `client.verify`.
+## In-Memory Deterministic CIDv1 Calculation
+
+```rust
+use pressprotocol_rs::calculate_deterministic_cidv1;
+
+let cid = calculate_deterministic_cidv1(b"Hello, Sovereign Cyberspace!");
+println!("Deterministic CIDv1: {}", cid);
+```
+
+---
 
 ## License
 
-MIT
+MIT © [0xShikhar](https://github.com/0xShikhar) & [PressProtocol Architects](https://pressprotocol.com)
