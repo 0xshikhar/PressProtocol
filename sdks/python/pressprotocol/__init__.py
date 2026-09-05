@@ -7,4 +7,4 @@ __all__ = [
     "create_canonical_payload",
     "base32_encode",
 ]
-__version__ = "1.0.0"
+__version__ = "1.0.7"

@@ -31,7 +31,7 @@ class PressProtocol:
         req_headers = {
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "User-Agent": "pressprotocol-py/1.0.0"
+            "User-Agent": "pressprotocol-py/1.0.7"
         }
         if self.api_key:
             req_headers["Authorization"] = f"Bearer {self.api_key}"
