@@ -1,5 +1,5 @@
 /**
- * PressProtocol Universal Publishing Widget v1.0.0
+ * PressProtocol Universal Publishing Widget v1.0.6
  * Drop-in Sovereign Web Component (<pressprotocol-publish>)
  * 
  * Usage:
@@ -13,7 +13,7 @@
  *     onpublish="console.log('Published CID:', event.detail.cid)">
  *   </pressprotocol-publish>
  */
-(function() {
+(function () {
   'use strict';
   if (typeof window === 'undefined') return;
 
@@ -131,7 +131,7 @@
       }
       const stored = localStorage.getItem('pressprotocol_burner_id');
       if (stored) {
-        try { return JSON.parse(stored); } catch(e) {}
+        try { return JSON.parse(stored); } catch (e) { }
       }
       // Generate pseudo burner entropy (32 random bytes)
       const privBytes = new Uint8Array(32);
@@ -230,7 +230,7 @@
 
         const onpublish = this.getAttribute('onpublish');
         if (onpublish) {
-          try { new Function('event', onpublish).call(this, evt); } catch(e) {}
+          try { new Function('event', onpublish).call(this, evt); } catch (e) { }
         }
       } catch (err) {
         this.state = 'error';

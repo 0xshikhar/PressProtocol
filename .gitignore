@@ -16,3 +16,10 @@ dist/
 .next/
 *.tsbuildinfo
 coverage/
+
+# SDK artifacts
+__pycache__/
+*.pyc
+target/
+**/target/
+.DS_Store

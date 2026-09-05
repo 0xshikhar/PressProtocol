@@ -1,0 +1,22 @@
+# Rust & build output artifacts
+target/
+**/target/
+dist/
+**/dist/
+
+# Non-web Monorepo packages & daemons
+core/
+sdks/
+integrations/
+
+# Documentation & Specs
+docs/
+*.md
+
+# Testing, Deployments & Dev Scripts
+scripts/
+tests/
+deploy/
+
+# Scratch & temporary workspace files
+scratch*.tsx
