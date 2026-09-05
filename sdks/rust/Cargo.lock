@@ -509,7 +509,7 @@ dependencies = [
 
 [[package]]
 name = "pressprotocol-rs"
-version = "1.0.0"
+version = "1.0.7"
 dependencies = [
  "hex",
  "reqwest",
