@@ -1,0 +1,7 @@
+# Cloudflare Workers Local Development Variables
+PINATA_JWT="your_pinata_jwt_here"
+PINATA_API_KEY="your_pinata_api_key_here"
+PINATA_SECRET_KEY="your_pinata_secret_key_here"
+DATABASE_URL="prisma+postgres://accelerate.prisma-data.net/?api_key=..."
+CORS_ORIGIN="*"
+PUBLIC_APP_URL="https://pressprotocol.com"
