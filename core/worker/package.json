@@ -1,0 +1,29 @@
+{
+  "name": "pressprotocol-worker",
+  "version": "1.0.6",
+  "description": "PressProtocol Serverless Edge Backend on Cloudflare Workers",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "login": "wrangler login",
+    "secret:jwt": "wrangler secret put PINATA_JWT",
+    "secret:db": "wrangler secret put DATABASE_URL",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@noble/ed25519": "^2.1.0",
+    "@noble/hashes": "^2.4.0",
+    "@prisma/client": "^6.4.1",
+    "@prisma/extension-accelerate": "^1.2.2",
+    "hono": "^4.7.2",
+    "zod": "^3.23.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250224.0",
+    "typescript": "^5.8.3",
+    "wrangler": "^4.131.1"
+  }
+}

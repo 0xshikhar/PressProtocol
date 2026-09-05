@@ -1,0 +1,21 @@
+name = "pressprotocol-api"
+main = "src/index.ts"
+compatibility_date = "2024-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+IPFS_GATEWAY_URL = "https://ipfs.filebase.io/ipfs"
+CORS_ORIGIN = "*"
+ENVIRONMENT = "production"
+PUBLIC_APP_URL = "https://pressprotocol.com"
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+persist = true
+
+[observability.traces]
+enabled = true
+head_sampling_rate = 1
+persist = true
