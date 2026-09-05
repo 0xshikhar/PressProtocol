@@ -4,15 +4,29 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pressprotocol-py"
-version = "1.0.6"
+version = "1.0.7"
 description = "Official PressProtocol Python SDK - Sovereign Publishing & Multi-Transport Resolution"
 readme = "README.md"
 requires-python = ">=3.9"
-license = { text = "MIT" }
-authors = [{ name = "PressProtocol Architects" }]
-keywords = ["pressprotocol", "sovereign", "publishing", "ipfs", "tor", "ed25519"]
+license = "MIT"
+authors = [{ name = "PressProtocol Architects", email = "hello@pressprotocol.com" }]
+keywords = ["pressprotocol", "sovereign", "publishing", "ipfs", "tor", "ed25519", "multihash"]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Operating System :: OS Independent",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Security :: Cryptography",
 ]
+
+[project.urls]
+Homepage = "https://pressprotocol.com"
+Documentation = "https://pressprotocol.com/docs"
+Repository = "https://github.com/0xshikhar/AnonPress"
+Issues = "https://github.com/0xshikhar/AnonPress/issues"
+

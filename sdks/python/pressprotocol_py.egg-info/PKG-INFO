@@ -1,3 +1,27 @@
+Metadata-Version: 2.4
+Name: pressprotocol-py
+Version: 1.0.7
+Summary: Official PressProtocol Python SDK - Sovereign Publishing & Multi-Transport Resolution
+Author-email: PressProtocol Architects <hello@pressprotocol.com>
+License-Expression: MIT
+Project-URL: Homepage, https://pressprotocol.com
+Project-URL: Documentation, https://pressprotocol.com/docs
+Project-URL: Repository, https://github.com/0xshikhar/AnonPress
+Project-URL: Issues, https://github.com/0xshikhar/AnonPress/issues
+Keywords: pressprotocol,sovereign,publishing,ipfs,tor,ed25519,multihash
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Internet :: WWW/HTTP
+Classifier: Topic :: Security :: Cryptography
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+
 # PressProtocol Python SDK (`pressprotocol-py`)
 
 [![PyPI version](https://img.shields.io/pypi/v/pressprotocol-py.svg?color=4F46E5&style=flat-square)](https://pypi.org/project/pressprotocol-py/)
