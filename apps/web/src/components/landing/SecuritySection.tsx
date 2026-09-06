@@ -30,7 +30,7 @@ const securityFeatures = [
   },
 ];
 
-const standards = ["Ed25519 RFC 8032", "IPFS CIDv1", "Tor v3 Onion", "Octant Public Goods"];
+const standards = ["Ed25519 RFC 8032", "IPFS CIDv1", "Tor v3 Onion", "Open Public Goods"];
 
 export function SecuritySection() {
   const [isVisible, setIsVisible] = useState(false);

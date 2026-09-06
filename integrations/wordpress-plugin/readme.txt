@@ -57,7 +57,7 @@ PressProtocol enables censorship-resistant publishing by distributing your WordP
 
 * WordPress 6.0 or higher
 * PHP 8.0 or higher
-* PressProtocol Backend API (production: https://anonpress-production.up.railway.app)
+* PressProtocol Backend API (production: https://api.pressprotocol.com)
 * (Optional) Ethereum wallet for authenticated publishing
 
 == Installation ==
@@ -79,7 +79,7 @@ PressProtocol enables censorship-resistant publishing by distributing your WordP
 = Configuration =
 
 1. Go to **PressProtocol > Settings**
-2. **Backend API URL** is pre-configured to `https://anonpress-production.up.railway.app`
+2. **Backend API URL** is pre-configured to `https://api.pressprotocol.com`
 3. Click **Test Connection** to verify
 4. (Optional) Enter your **Ethereum wallet address** for authenticated publishing
 5. Click **Save Settings**

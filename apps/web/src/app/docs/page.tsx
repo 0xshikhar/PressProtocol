@@ -29,7 +29,7 @@ export default function DocsPage() {
     {
       title: "Run a Sovereign Node",
       description: "Deploy your own independent PressProtocol daemon with Docker, Tor SOCKS5, and Libp2p DHT peering in 5 minutes.",
-      href: "https://github.com/0xshikhar/anonpress/tree/main/docs/node-runner",
+      href: "https://github.com/0xshikhar/PressProtocol/tree/main/core/node",
       badge: "Node Operator",
       icon: Terminal,
       external: true,
@@ -50,7 +50,7 @@ export default function DocsPage() {
     },
     {
       title: "Public Goods Mission",
-      description: "Learn about our Octant Epoch grant funding, open-source governance, and censorship-resistant thesis.",
+      description: "Learn about our non-profit open-source governance, public goods stewardship, and censorship-resistant thesis.",
       href: "/about",
       badge: "Governance",
       icon: BookOpen,

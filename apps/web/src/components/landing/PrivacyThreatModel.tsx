@@ -80,7 +80,7 @@ export function PrivacyThreatModel() {
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white/5 border border-white/10 text-xs font-mono text-cyan-400 mb-6">
               <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
-              <span>FORMAL THREAT MODEL & OCTANT CRITERIA</span>
+              <span>FORMAL THREAT MODEL & VERIFIABLE SPECIFICATION</span>
             </div>
             <h2 className="font-display text-4xl sm:text-6xl lg:text-7xl tracking-tight leading-[0.95] text-white">
               Institutional assurance.

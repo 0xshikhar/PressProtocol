@@ -77,7 +77,7 @@ export function CallToAction() {
                     </Button>
                   </Link>
                   <a
-                    href="https://github.com/OxShikhar/anonpress"
+                    href="https://github.com/0xshikhar/PressProtocol"
                     target="_blank"
                     rel="noreferrer"
                   >

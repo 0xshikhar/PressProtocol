@@ -55,11 +55,11 @@ class AnonPress_Settings {
     }
     
     public static function api_url_callback() {
-        $value = get_option('anonpress_api_url', 'https://anonpress-production.up.railway.app');
+        $value = get_option('anonpress_api_url', 'https://api.pressprotocol.com');
         echo '<input type="text" id="anonpress_api_url" name="anonpress_api_url" value="' . esc_attr($value) . '" class="regular-text" />';
         echo ' <button type="button" id="anonpress-test-connection" class="button">Test Connection</button>';
         echo '<div id="connection-status" style="margin-top: 10px;"></div>';
-        echo '<p class="description">URL of your PressProtocol backend API (default: https://anonpress-production.up.railway.app)</p>';
+        echo '<p class="description">URL of your PressProtocol backend API (default: https://api.pressprotocol.com)</p>';
     }
     
     public static function wallet_address_callback() {
@@ -92,7 +92,7 @@ class AnonPress_Settings {
                 'invalid_url',
                 'Please enter a valid URL for the API endpoint'
             );
-            return get_option('anonpress_api_url', 'https://anonpress-production.up.railway.app');
+            return get_option('anonpress_api_url', 'https://api.pressprotocol.com');
         }
         
         return $value;

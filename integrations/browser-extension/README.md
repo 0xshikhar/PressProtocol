@@ -1,60 +1,40 @@
-# AnonPress Browser Extension V2
+# PressProtocol Browser Extension
 
-**Simple, dependency-free browser extension** - No Plasmo, no native modules, just pure TypeScript.
+**Lightweight, dependency-free Chromium MV3 extension** — Pure TypeScript Manifest V3 client for decentralized reader failover and protocol link navigation.
 
 ## Features
 
-- ✅ Protocol handler for `anonpress://` links
-- ✅ Mirror health checking
-- ✅ Extension popup with status
-- ✅ Context menu integration
-- ✅ Zero native dependencies (no build issues!)
+- ✅ Protocol handler for `pressprotocol://` (and legacy `anonpress://`) links
+- ✅ Multi-gateway mirror health checking & failover
+- ✅ Extension popup with gateway status telemetry
+- ✅ Context menu integration for instant decentralized resolution
+- ✅ Zero native dependencies
 
 ## Quick Start
 
 ```bash
-# Install minimal dependencies
-npm install
-
 # Build the extension
-npm run build
+pnpm --filter pressprotocol-extension build
 
-# Load in Chrome
+# Load in Chrome / Brave / Edge
 # 1. Open chrome://extensions
 # 2. Enable "Developer mode"
 # 3. Click "Load unpacked"
-# 4. Select the 'dist' folder
+# 4. Select the 'integrations/browser-extension/dist' folder
 ```
 
 ## Development
 
 ```bash
 # Watch for changes
-npm run watch
-
-# Clean build
-npm run clean && npm run build
+pnpm --filter pressprotocol-extension dev
 ```
 
-## Differences from V1
+## Production Configuration
 
-- ❌ No Plasmo (no native module issues)
-- ✅ Simple TypeScript compilation
-- ✅ Direct manifest.json
-- ✅ Works on all systems without build errors
-- ✅ Faster, lighter, more reliable
-
-## Production URLs
-
-Update these in `src/background.ts` before deploying:
+Configured in `src/background.ts`:
 
 ```typescript
-const API_URL = "https://api.anonpress.io";
-const WEB_APP_URL = "https://anonpress.io";
+const API_URL = "https://api.pressprotocol.com";
+const WEB_APP_URL = "https://pressprotocol.com";
 ```
-
-And update in `popup.html` links.
-
-## Why V2?
-
-The original Plasmo-based extension had issues with `@parcel/watcher` native modules failing to build on some systems. This version uses vanilla TypeScript with zero native dependencies - **it just works**.

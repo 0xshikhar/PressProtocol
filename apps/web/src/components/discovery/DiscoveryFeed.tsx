@@ -277,8 +277,9 @@ export function DiscoveryFeed({
             No articles match current filters
           </h3>
           <p className="text-xs text-zinc-400 max-w-sm mx-auto mb-4">
-            Try switching to "All Rails" or clearing your search term to see other syndicated publications.
+            Try switching to &quot;All Rails&quot; or clearing your search term to see other syndicated publications.
           </p>
+
           <Button
             size="sm"
             onClick={() => {

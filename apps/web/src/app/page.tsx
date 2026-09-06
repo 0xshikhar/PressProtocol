@@ -34,7 +34,7 @@ export default function Home() {
         {/* 6. Universal Distribution Bento Grid: 1-Click Downloads & SDK Snippet */}
         <EcosystemBento />
 
-        {/* 7. Security & Threat Model: Octant Public Goods Comparison Matrix */}
+        {/* 7. Security & Threat Model: Public Goods Threat Matrix */}
         <PrivacyThreatModel />
 
         {/* 8. Spotlight Call to Action: In-Memory Key Sovereign Publishing */}

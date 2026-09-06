@@ -70,7 +70,7 @@ export default function HelpPage() {
     },
     {
       question: "How do I share my published content?",
-      answer: "After publishing, you'll receive a unique anonpress:// link. Share this link anywhere, and readers with the PressProtocol browser extension can access your content through the fastest available mirror."
+      answer: "After publishing, you'll receive a unique pressprotocol:// link and a canonical web URL. Share this link anywhere, and readers with the PressProtocol browser extension can access your content through the fastest available mirror."
     },
     {
       question: "Can I edit or delete published content?",
@@ -78,7 +78,7 @@ export default function HelpPage() {
     },
     {
       question: "What is the browser extension for?",
-      answer: "The browser extension automatically resolves anonpress:// links and selects the fastest available mirror (IPFS, Tor, or gateway) based on your connection. It ensures optimal reading experience and maximum availability."
+      answer: "The browser extension automatically resolves pressprotocol:// links and selects the fastest available mirror (IPFS, Tor, or gateway) based on your connection. It ensures optimal reading experience and maximum availability."
     },
     {
       question: "How secure are my Ed25519 keys?",

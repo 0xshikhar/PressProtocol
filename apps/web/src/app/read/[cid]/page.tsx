@@ -311,8 +311,9 @@ export default function ReadPage() {
                     Offline Mode Active
                   </div>
                   <p className="text-xs text-amber-300/80 mt-0.5">
-                    Reading preserved snapshot directly from your browser's local sovereign vault.
+                    Reading preserved snapshot directly from your browser&apos;s local sovereign vault.
                   </p>
+
                 </div>
               </div>
               <Badge variant="outline" className="border-amber-500/40 text-amber-300 text-[10px] uppercase font-mono px-2 py-0.5">
@@ -724,7 +725,7 @@ export default function ReadPage() {
           </div>
           <div className="mt-4">
             <div className="text-sm font-medium text-muted-foreground">Share Link</div>
-            <div className="font-mono text-sm mt-1 break-all">anonpress://{content.cid}</div>
+            <div className="font-mono text-sm mt-1 break-all">pressprotocol://{content.cid}</div>
           </div>
         </CardContent>
       </Card>

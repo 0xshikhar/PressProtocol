@@ -20,7 +20,7 @@ export default function Footer() {
       { name: "Documentation", href: "/docs" },
       { name: "Developer Portal", href: "/developers" },
       { name: "OpenAPI Spec", href: "/api/v1/openapi.json" },
-      { name: "GitHub", href: "https://github.com/0xshikhar/anonpress" },
+      { name: "GitHub", href: "https://github.com/0xshikhar/PressProtocol" },
       { name: "IPFS Guide", href: "/docs/ipfs" },
       { name: "Tor Setup", href: "/docs/tor" },
     ],
@@ -33,7 +33,7 @@ export default function Footer() {
   };
 
   const socialLinks = [
-    { name: "GitHub", icon: Github, href: "https://github.com/0xshikhar/pressprotocol" },
+    { name: "GitHub", icon: Github, href: "https://github.com/0xshikhar/PressProtocol" },
     { name: "Twitter", icon: Twitter, href: "https://twitter.com/0xshikhar" },
     { name: "Website", icon: Globe, href: "https://pressprotocol.com" },
   ];

@@ -73,7 +73,7 @@ export default function DashboardPage() {
   };
 
   const copyToClipboard = (cid: string) => {
-    navigator.clipboard.writeText(`anonpress://${cid}`);
+    navigator.clipboard.writeText(`pressprotocol://${cid}`);
     setCopiedCid(cid);
     toast.success("Link copied to clipboard!");
     setTimeout(() => setCopiedCid(null), 2000);

@@ -3,8 +3,8 @@
  * Automatically switches between production and development URLs
  */
 
-// Production backend URL (Railway deployment)
-const PRODUCTION_BACKEND_URL = "https://anonpress-production.up.railway.app";
+// Production backend URL
+const PRODUCTION_BACKEND_URL = "https://api.pressprotocol.com";
 
 // Development backend URL (local)
 const DEVELOPMENT_BACKEND_URL = "http://localhost:4000";

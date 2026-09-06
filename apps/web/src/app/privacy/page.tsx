@@ -119,7 +119,7 @@ export default function PrivacyPage() {
         {/* Contact / Verification Footer */}
         <div className="border-t pt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground font-mono">
-            Audited & Open Source under MIT License. Verified on Octant Epoch Grants.
+            Audited & Open Source under MIT License. Verifiable Cryptographic Sovereign Publishing.
           </p>
           <div className="flex gap-3">
             <Link href="/terms">

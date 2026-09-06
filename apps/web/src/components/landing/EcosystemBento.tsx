@@ -72,7 +72,7 @@ export function EcosystemBento() {
                 </Button>
               </a>
               <a
-                href="https://github.com/0xshikhar/anonpress/tree/main/integrations/wordpress-plugin"
+                href="https://github.com/0xshikhar/PressProtocol/tree/main/integrations/wordpress-plugin"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs font-mono text-white/60 hover:text-white flex items-center gap-1.5 transition-colors"
@@ -96,7 +96,7 @@ export function EcosystemBento() {
                 Chromium Reader & Router
               </h3>
               <p className="text-xs lg:text-sm text-white/60 leading-relaxed mb-6 font-light">
-                Resolves `pressprotocol://` and `anonpress://` deep links natively. Automatically probes fastest available IPFS mirrors and Tor relays with instant fallback.
+                Resolves `pressprotocol://` deep links natively with instant multi-transport fallback. Automatically probes fastest available IPFS mirrors and Tor relays.
               </p>
             </div>
 

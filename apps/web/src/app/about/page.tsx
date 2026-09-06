@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "About PressProtocol — Decentralized Public Good",
-  description: "PressProtocol mission, Octant Epoch public goods funding, and open-source censorship-resistant publishing architecture.",
+  description: "PressProtocol mission, open-source public goods stewardship, and censorship-resistant publishing architecture.",
 };
 
 export default function AboutPage() {
@@ -29,7 +29,7 @@ export default function AboutPage() {
             <Badge variant="outline" className="border-cyan-500/30 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 font-mono text-xs">
               <Heart className="h-3 w-3 mr-1 text-red-400" /> PUBLIC GOOD INITIATIVE
             </Badge>
-            <span className="text-xs text-muted-foreground font-mono">OCTANT RECIPIENT</span>
+            <span className="text-xs text-muted-foreground font-mono">OPEN INFRASTRUCTURE</span>
           </div>
           <h1 className="font-serif text-4xl sm:text-5xl font-bold tracking-tight">
             Free Expression as an Unstoppable Public Good
@@ -58,9 +58,9 @@ export default function AboutPage() {
               <div className="h-10 w-10 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-600 dark:text-cyan-400 mb-2">
                 <Award className="h-5 w-5" />
               </div>
-              <h3 className="font-semibold text-base">Octant Grantee</h3>
+              <h3 className="font-semibold text-base">Public Good Stewardship</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Developed as a regenerative public good through the Octant ecosystem, aligning technological development with open-source ethical stewardship.
+                Developed as a regenerative digital public good, aligning technological advancement with open-source ethical stewardship.
               </p>
             </CardContent>
           </Card>
@@ -72,7 +72,7 @@ export default function AboutPage() {
               </div>
               <h3 className="font-semibold text-base">Dual-Identity Model</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Empowers both the anonymous dissident (ephemeral Ed25519 burner keys) and the institutional journalist (verified Privy profiles).
+                Empowers both the anonymous dissident (ephemeral Ed25519 burner keys) and the institutional journalist (verified profiles).
               </p>
             </CardContent>
           </Card>
@@ -105,10 +105,10 @@ export default function AboutPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-serif font-bold">Octant Governance & Public Goods Trust</h2>
+            <h2 className="text-2xl font-serif font-bold">Open-Source Governance & Public Goods Trust</h2>
             <p className="text-muted-foreground leading-relaxed">
               We believe critical democratic infrastructure must never be beholden to venture-capital extraction or advertising surveillance models. 
-              With the support of the <strong>Octant community</strong>, PressProtocol remains 100% open-source, non-custodial, and free to all citizens of the world.
+              Built under the MIT license, PressProtocol remains 100% open-source, non-custodial, and free to all citizens of the world.
             </p>
           </section>
         </div>

@@ -26,10 +26,10 @@ export default function TrendingPage() {
   ];
 
   const weeklyStats = [
-    { label: "Total Views", value: "2.4M", change: "+12%", icon: Eye },
-    { label: "New Publishers", value: "1.2K", change: "+8%", icon: TrendingUp },
-    { label: "Articles Published", value: "3.5K", change: "+15%", icon: Flame },
-    { label: "Shares", value: "45K", change: "+23%", icon: Share2 },
+    { label: "Verification Suites", value: "14", change: "100% Pass", icon: Eye },
+    { label: "Automated Assertions", value: "413+", change: "Passing", icon: TrendingUp },
+    { label: "Native Client SDKs", value: "4", change: "Active", icon: Flame },
+    { label: "Server Private Keys", value: "0", change: "Zero-Custody", icon: Share2 },
   ];
 
   return (

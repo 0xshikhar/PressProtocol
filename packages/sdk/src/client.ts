@@ -21,7 +21,7 @@ import type {
 import { verifyWebhookSignature } from "./webhooks.js";
 
 
-const DEFAULT_PRODUCTION_ENDPOINT = "https://anonpress-production.up.railway.app";
+const DEFAULT_PRODUCTION_ENDPOINT = "https://api.pressprotocol.com";
 const DEFAULT_LOCAL_ENDPOINT = "http://localhost:4000";
 
 const DEFAULT_PUBLIC_GATEWAYS = [

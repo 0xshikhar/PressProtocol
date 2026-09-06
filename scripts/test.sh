@@ -34,6 +34,13 @@ test_service() {
     fi
 }
 
+CHECK_LIVE=false
+for arg in "$@"; do
+    if [ "$arg" == "--live" ]; then
+        CHECK_LIVE=true
+    fi
+done
+
 echo "1️⃣  TypeScript Verification"
 echo "--------------------------"
 
@@ -53,16 +60,16 @@ else
     echo -e "${YELLOW}⚠️ WARNING (Type warnings detected)${NC}"
 fi
 
+if [ "$CHECK_LIVE" = true ]; then
+    echo ""
+    echo "2️⃣  Live Network Health Probes"
+    echo "-----------------------------"
+    test_service "Node Health Endpoint" "http://localhost:4000/health" || true
+    test_service "Web Portal Landing" "http://localhost:3000" || true
+fi
+
 echo ""
-
-echo "2️⃣  Running Live Health Endpoints (if running)"
-echo "-------------------------------------------"
-
-test_service "Node Health Endpoint" "http://localhost:4000/health" || true
-test_service "Web Portal Landing" "http://localhost:3000" || true
-
-echo ""
-echo "3️⃣  Subsystem Automated Verification Suites"
+echo "2️⃣  Subsystem Automated Verification Suites"
 echo "------------------------------------------"
 
 echo -n "Running Surveillance Stripper & CMS Cleaner... "

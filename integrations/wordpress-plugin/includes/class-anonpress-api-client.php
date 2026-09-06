@@ -6,7 +6,7 @@ class AnonPress_API_Client {
     private $timeout_publish = 60;
     
     public function __construct() {
-        $this->api_url = rtrim(get_option('anonpress_api_url', 'https://anonpress-production.up.railway.app'), '/');
+        $this->api_url = rtrim(get_option('anonpress_api_url', 'https://api.pressprotocol.com'), '/');
     }
     
     /**

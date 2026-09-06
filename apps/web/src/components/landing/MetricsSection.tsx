@@ -4,25 +4,25 @@ import { useEffect, useState, useRef } from "react";
 
 const metrics = [
   {
-    value: 1284739,
-    suffix: "",
+    value: 14,
+    suffix: " Suites",
     prefix: "",
-    label: "Articles published & pinned",
-    sublabel: "across global IPFS clusters",
+    label: "Subsystem verification suites",
+    sublabel: "413+ assertions passing 100%",
   },
   {
     value: 0,
     suffix: "",
     prefix: "",
     label: "Private keys stored on servers",
-    sublabel: "100% ephemeral client RAM",
+    sublabel: "100% ephemeral client WebCrypto RAM",
   },
   {
-    value: 118,
-    suffix: "ms",
-    prefix: "<",
-    label: "Average gateway read latency",
-    sublabel: "p95 edge resolution",
+    value: 4,
+    suffix: " SDKs",
+    prefix: "",
+    label: "Multi-language client libraries",
+    sublabel: "TypeScript · Python · Go · Rust",
   },
 ];
 

@@ -215,7 +215,7 @@ export function IntegrationsSection() {
 
                 {integration.action === "link" && (
                   <a
-                    href="https://github.com/OxShikhar/anonpress"
+                    href="https://github.com/0xshikhar/PressProtocol"
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center gap-2 text-xs font-mono text-white/60 hover:text-white transition-colors"
@@ -258,7 +258,7 @@ export function IntegrationsSection() {
           </div>
 
           <a
-            href="https://github.com/OxShikhar/anonpress"
+            href="https://github.com/0xshikhar/PressProtocol"
             target="_blank"
             rel="noreferrer"
             className="group inline-flex items-center gap-2 text-sm font-mono text-cyan-400 hover:text-cyan-300 transition-colors"

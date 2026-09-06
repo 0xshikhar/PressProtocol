@@ -43,8 +43,8 @@ PressProtocol is organized as a `pnpm` monorepo:
 ### Installation
 
 ```bash
-git clone https://github.com/0xshikhar/pressprotocol.git
-cd pressprotocol
+git clone https://github.com/0xshikhar/PressProtocol.git
+cd PressProtocol
 pnpm install
 ```
 

@@ -22,16 +22,16 @@ const footerLinks: Record<string, FooterLink[]> = {
     { name: "Pinata IPFS Gateway", href: "https://gateway.pinata.cloud", external: true },
     { name: "Cloudflare Web3", href: "https://cloudflare-ipfs.com", external: true },
     { name: "IPFS DHT Node", href: "https://ipfs.io", external: true },
-    { name: "Tor v3 Onion Mirror", href: "http://anonpress.onion", external: true },
+    { name: "Tor v3 Onion Mirror", href: "http://pressprotocol.onion", external: true },
   ],
   Developers: [
-    { name: "GitHub Repository", href: "https://github.com/0xshikhar/anonpress", external: true },
+    { name: "GitHub Repository", href: "https://github.com/0xshikhar/PressProtocol", external: true },
     { name: "Ed25519 Spec (RFC 8032)", href: "/spec" },
     { name: "WordPress Plugin", href: "#integrations" },
     { name: "Chromium Extension", href: "#integrations" },
   ],
   Governance: [
-    { name: "Octant Epoch Grants", href: "https://octant.build", external: true, badge: "Grantee" },
+    { name: "Open Public Goods", href: "/about" },
     { name: "About PressProtocol", href: "/about" },
     { name: "Zero-Log Privacy", href: "/privacy" },
     { name: "Terms & Legal", href: "/terms" },
@@ -39,9 +39,9 @@ const footerLinks: Record<string, FooterLink[]> = {
 };
 
 const socialLinks = [
-  { name: "GitHub", href: "https://github.com/OxShikhar/anonpress" },
-  { name: "Twitter", href: "https://twitter.com" },
-  { name: "Octant", href: "https://octant.build" },
+  { name: "GitHub", href: "https://github.com/0xshikhar/PressProtocol" },
+  { name: "Twitter", href: "https://twitter.com/pressprotocol" },
+  { name: "Documentation", href: "/docs" },
 ];
 
 function AnimatedWaveCanvas() {

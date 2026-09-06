@@ -24,9 +24,9 @@ export const siteConfig: SiteConfig = {
     author: "https://0xshikhar.xyz",
   },
   links: {
-    github: "https://github.com/0xShikhar/anonpress",
-    twitter: "https://twitter.com/anonpress",
-    docs: "https://docs.anonpress.xyz",
+    github: "https://github.com/0xshikhar/PressProtocol",
+    twitter: "https://twitter.com/pressprotocol",
+    docs: "https://pressprotocol.com/docs",
   },
   ogImage: `${env.NEXT_PUBLIC_APP_URL}/og.jpg`,
 }

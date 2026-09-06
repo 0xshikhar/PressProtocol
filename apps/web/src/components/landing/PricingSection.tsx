@@ -40,18 +40,18 @@ const tiers = [
   },
   {
     name: "Protocol Node Sponsor",
-    description: "Fund global pinning capacity as an Octant public good",
+    description: "Support global pinning capacity and open infrastructure",
     price: "Public Good",
-    period: "Epoch-funded",
+    period: "Open Grants",
     features: [
       "Dedicated high-bandwidth IPFS cluster pinners",
       "High-availability Tor v3 hidden onion bridges",
       "Real-time DHT routing telemetry dashboards",
       "Custom gateway domain integration",
-      "Octant Epoch governance allocation",
+      "Community-driven public goods stewardship",
     ],
-    cta: "Review Octant Proposal",
-    href: "https://octant.build",
+    cta: "View Documentation",
+    href: "/docs",
     highlight: false,
   },
 ];
@@ -92,7 +92,7 @@ export function PricingSection() {
               <span className="text-stroke">speak truth.</span>
             </h2>
             <p className="mt-8 text-xl text-white/60 leading-relaxed max-w-lg">
-              PressProtocol is a public good supported by community grants like Octant. Publishing and reading are free forever.
+              PressProtocol is a digital public good supported by open-source community grants. Publishing and reading are free forever.
             </p>
           </div>
 

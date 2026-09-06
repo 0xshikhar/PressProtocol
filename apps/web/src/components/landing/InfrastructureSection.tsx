@@ -175,7 +175,7 @@ export function InfrastructureSection() {
 
                 <div className="text-xs font-mono text-white/50 flex items-center gap-2">
                   <span className={`w-2 h-2 rounded-full ${isIspBlocked ? "bg-purple-400 animate-ping" : "bg-emerald-400"}`} />
-                  Route: {isIspBlocked ? "tor://anonpress...onion (Failover active)" : "https://gateway.pinata.cloud/ipfs/ (Direct)"}
+                  Route: {isIspBlocked ? "tor://pressprotocol...onion (Failover active)" : "https://gateway.pinata.cloud/ipfs/ (Direct)"}
                 </div>
               </div>
             </div>
@@ -188,9 +188,9 @@ export function InfrastructureSection() {
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               }`}
             >
-              <span className="text-5xl lg:text-6xl font-display text-white">99.99%</span>
-              <span className="block text-sm text-cyan-400 font-mono mt-2 uppercase tracking-wider">Multi-Transport Uptime</span>
-              <span className="block text-xs text-white/40 mt-1">Zero single point of DNS or host failure</span>
+              <span className="text-5xl lg:text-6xl font-display text-white">2-Way</span>
+              <span className="block text-sm text-cyan-400 font-mono mt-2 uppercase tracking-wider">Automated Failover Mesh</span>
+              <span className="block text-xs text-white/40 mt-1">Instant fallback from clearnet IPFS to Tor v3 circuits</span>
             </div>
 
             <div

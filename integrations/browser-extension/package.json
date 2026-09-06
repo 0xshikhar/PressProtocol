@@ -1,5 +1,5 @@
 {
-  "name": "anonpress-extension",
+  "name": "pressprotocol-extension",
   "version": "2.0.0",
   "description": "Browser extension for censorship-resistant content access and sovereign web clipping",
   "scripts": {

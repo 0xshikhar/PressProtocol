@@ -27,7 +27,7 @@ PressProtocol is architected to eliminate technical friction. Rather than forcin
 
 ## 2. Drop-In Universal Web Component (`<pressprotocol-publish>`)
 
-**Package**: [`@pressprotocol/widget`](https://github.com/0xshikhar/pressprotocol/tree/main/packages/widget)  
+**Package**: [`@pressprotocol/widget`](https://github.com/0xshikhar/PressProtocol/tree/main/packages/widget)  
 
 **Distribution**: Standalone Zero-Dependency Web Component (ES Module & CDN)
 
@@ -41,7 +41,7 @@ The universal widget allows any website developer to add sovereign archival and 
 <pressprotocol-publish 
   target-editor="#article-body" 
   target-title="#article-title"
-  node-url="https://anonpress-production.up.railway.app"
+  node-url="https://api.pressprotocol.com"
   badge="compact"
   theme="auto"
   onpublish="console.log('Published to IPFS/Tor:', event.detail.cid)">
@@ -75,7 +75,7 @@ The widget automatically detects and seamlessly extracts content and markup from
 
 ## 3. WordPress Plugin (`pressprotocol-wordpress`)
 
-**Location**: [`integrations/wordpress-plugin`](https://github.com/0xshikhar/pressprotocol/tree/main/integrations/wordpress-plugin)  
+**Location**: [`integrations/wordpress-plugin`](https://github.com/0xshikhar/PressProtocol/tree/main/integrations/wordpress-plugin)  
 **Target Market**: 43% of the internet (180M+ active WordPress websites)
 
 The PressProtocol WordPress plugin brings sovereign, un-cancellable publishing to newsrooms, independent bloggers, and digital publications without changing their editorial workflow.
@@ -90,7 +90,7 @@ The PressProtocol WordPress plugin brings sovereign, un-cancellable publishing t
 
 ## 4. Sovereign Web Clipper & Protocol Handler (Chromium MV3 Extension)
 
-**Location**: [`integrations/browser-extension`](https://github.com/0xshikhar/pressprotocol/tree/main/integrations/browser-extension)  
+**Location**: [`integrations/browser-extension`](https://github.com/0xshikhar/PressProtocol/tree/main/integrations/browser-extension)  
 **Platform**: Manifest V3 for Chromium (Google Chrome, Brave, Arc, Edge, Opera)
 
 The browser extension bridges the clearnet web with decentralized protocol rails:
@@ -110,7 +110,7 @@ The browser extension bridges the clearnet web with decentralized protocol rails
 
 ## 5. Official GitHub Action (`pressprotocol/publish-action`)
 
-**Location**: [`integrations/publish-action`](https://github.com/0xshikhar/pressprotocol/tree/main/integrations/publish-action)  
+**Location**: [`integrations/publish-action`](https://github.com/0xshikhar/PressProtocol/tree/main/integrations/publish-action)  
 **Use Case**: Continuous Deployment for developer blogs, technical documentation, GitBook archives, and civic transparency repositories.
 
 Publish any Markdown directory, Hugo site, Astro blog, or documentation site to IPFS and Tor automatically on every `git push`:
@@ -147,7 +147,7 @@ jobs:
 
 ## 6. Obsidian Vault Plugin (`pressprotocol-obsidian`)
 
-**Location**: [`integrations/obsidian-plugin`](https://github.com/0xshikhar/pressprotocol/tree/main/integrations/obsidian-plugin)  
+**Location**: [`integrations/obsidian-plugin`](https://github.com/0xshikhar/PressProtocol/tree/main/integrations/obsidian-plugin)  
 **Use Case**: Sovereign publishing directly from local personal knowledge management vaults.
 
 Allows researchers, investigative journalists, and writers using Obsidian to publish any note to PressProtocol directly from their local Markdown files. Frontmatter tags, backlinks, and mathematical citations are preserved and anchored to decentralized storage.
@@ -156,7 +156,7 @@ Allows researchers, investigative journalists, and writers using Obsidian to pub
 
 ## 7. Multi-Language SDK Ecosystem
 
-In addition to the primary TypeScript SDK ([`@pressprotocol/sdk`](https://github.com/0xshikhar/pressprotocol/tree/main/packages/sdk)), PressProtocol provides native client libraries for high-performance backend pipelines:
+In addition to the primary TypeScript SDK ([`@pressprotocol/sdk`](https://github.com/0xshikhar/PressProtocol/tree/main/packages/sdk)), PressProtocol provides native client libraries for high-performance backend pipelines:
 
 
 ### 7.1 Python SDK (`sdks/python`)
@@ -183,7 +183,7 @@ package main
 import (
     "context"
     "fmt"
-    "github.com/0xshikhar/pressprotocol/sdks/go"
+    "github.com/0xshikhar/PressProtocol/sdks/go"
 )
 
 func main() {
@@ -229,7 +229,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 PressProtocol provides built-in migration tools to import existing clearnet publications in bulk:
 
 1. **Substack & Medium Importers**: Cleans proprietary tracking tags and re-publishes articles with cryptographic provenance.
-2. **Notion 1-Click Sovereign Importer** ([`apps/web/src/app/import/notion`](https://github.com/0xshikhar/pressprotocol/tree/main/apps/web/src/app/import/notion)): Directly connects to Notion workspaces and exports databases into decentralized Markdown archives.
-3. **Bulk RSS Importer** ([`apps/web/src/app/import/rss`](https://github.com/0xshikhar/pressprotocol/tree/main/apps/web/src/app/import/rss)): Ingests entire publication archives from any standard RSS or Atom feed, creating cryptographically signed snapshots of every historical post.
+2. **Notion 1-Click Sovereign Importer** ([`apps/web/src/app/import/notion`](https://github.com/0xshikhar/PressProtocol/tree/main/apps/web/src/app/import/notion)): Directly connects to Notion workspaces and exports databases into decentralized Markdown archives.
+3. **Bulk RSS Importer** ([`apps/web/src/app/import/rss`](https://github.com/0xshikhar/PressProtocol/tree/main/apps/web/src/app/import/rss)): Ingests entire publication archives from any standard RSS or Atom feed, creating cryptographically signed snapshots of every historical post.
 4. **Commercial Surveillance Stripper**: Automatically runs on all imports to strip tracking pixels (Google Analytics, Meta Pixel, Hotjar), tracking query strings (`utm_*`, `fbclid`, `gclid`), and malicious redirection links.
 

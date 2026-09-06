@@ -17,7 +17,7 @@ export async function GET() {
     },
     servers: [
       { url: "http://127.0.0.1:4000", description: "Local Headless Micro-Daemon" },
-      { url: "https://anonpress-production.up.railway.app", description: "Global Community Gateway" },
+      { url: "https://api.pressprotocol.com", description: "Global Gateway" },
       { url: "https://pressprotocol.com", description: "Production Web Gateway" },
     ],
     paths: {

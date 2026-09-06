@@ -1,37 +1,37 @@
 # PressProtocol
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/0xshikhar/pressprotocol/main/apps/web/public/pressprotocol-logo.svg" alt="PressProtocol Logo" width="120" height="120" onerror="this.style.display='none'"/>
+  <img src="https://raw.githubusercontent.com/0xshikhar/PressProtocol/main/apps/web/public/pressprotocol-logo.svg" alt="PressProtocol Logo" width="120" height="120" onerror="this.style.display='none'"/>
 </p>
 
 <h1 align="center">PressProtocol</h1>
 
 <p align="center">
   <strong>Universal Sovereign Publishing Rails & Multi-Transport Resolution for the Decentralized Web</strong><br>
-  <em>Censorship-Resistant, Zero-Custody, Multi-Transport (IPFS + Tor v3 + Clearnet), and Zero-Crypto-Barrier</em>
+  <em>Censorship-Resistant, Zero-Custody, Multi-Transport (IPFS + Tor v3 + Clearnet), and Non-Custodial Cryptographic Identity</em>
 </p>
 
 <p align="center">
-  <a href="#-the-pressprotocol-manifesto-sovereign-privacy--anti-censorship"><img src="https://img.shields.io/badge/Public%20Good-Zero--Custody%20Privacy-6366f1.svg?style=flat-square" alt="Zero-Custody Privacy"/></a>
-  <a href="https://github.com/0xshikhar/pressprotocol/blob/main/scripts/test.sh"><img src="https://img.shields.io/badge/Tests-16%2F16%20Passing%20(100%25)-10b981.svg?style=flat-square" alt="Tests Passing"/></a>
-  <a href="https://github.com/0xshikhar/pressprotocol/blob/main/ARCHITECTURE.md"><img src="https://img.shields.io/badge/Spec-RFC--8032%20%7C%20OpenAPI%203.1-3b82f6.svg?style=flat-square" alt="Specifications"/></a>
-  <a href="https://github.com/0xshikhar/pressprotocol/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-amber.svg?style=flat-square" alt="License: MIT"/></a>
-  <a href="https://github.com/0xshikhar/pressprotocol/blob/main/pnpm-workspace.yaml"><img src="https://img.shields.io/badge/Monorepo-pnpm%20workspace-f59e0b.svg?style=flat-square" alt="pnpm workspace"/></a>
-  <a href="https://github.com/0xshikhar/pressprotocol/tree/main/packages/sdk"><img src="https://img.shields.io/badge/TypeScript-100%25%20Strict-blue.svg?style=flat-square" alt="TypeScript"/></a>
+  <a href="#-protocol-philosophy--architectural-thesis"><img src="https://img.shields.io/badge/Public%20Good-Zero--Custody%20Privacy-6366f1.svg?style=flat-square" alt="Zero-Custody Privacy"/></a>
+  <a href="https://github.com/0xshikhar/PressProtocol/blob/main/scripts/test.sh"><img src="https://img.shields.io/badge/Tests-16%2F16%20Passing%20(100%25)-10b981.svg?style=flat-square" alt="Tests Passing"/></a>
+  <a href="https://github.com/0xshikhar/PressProtocol/blob/main/ARCHITECTURE.md"><img src="https://img.shields.io/badge/Spec-RFC--8032%20%7C%20OpenAPI%203.1-3b82f6.svg?style=flat-square" alt="Specifications"/></a>
+  <a href="https://github.com/0xshikhar/PressProtocol/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-amber.svg?style=flat-square" alt="License: MIT"/></a>
+  <a href="https://github.com/0xshikhar/PressProtocol/blob/main/pnpm-workspace.yaml"><img src="https://img.shields.io/badge/Monorepo-pnpm%20workspace-f59e0b.svg?style=flat-square" alt="pnpm workspace"/></a>
+  <a href="https://github.com/0xshikhar/PressProtocol/tree/main/packages/sdk"><img src="https://img.shields.io/badge/TypeScript-100%25%20Strict-blue.svg?style=flat-square" alt="TypeScript"/></a>
 </p>
 
 ---
 
 ## 🧭 Table of Contents
 
-- [The PressProtocol Manifesto: Sovereign Privacy & Anti-Censorship](#-the-pressprotocol-manifesto-sovereign-privacy--anti-censorship)
+- [Protocol Philosophy & Architectural Thesis](#-protocol-philosophy--architectural-thesis)
 - [Distribution Rails Overview: Everything We Have Built](#-distribution-rails-overview-everything-we-have-built)
 - [Ecosystem Matrix: Production Monorepo Overview](#-ecosystem-matrix-production-monorepo-overview)
 - [System Architecture & Multi-Transport Resolution Flow](#-system-architecture--multi-transport-resolution-flow)
-- [The 7 Core Protocol Innovations](#-the-7-core-protocol-innovations)
+- [Core Protocol Subsystems & Specifications](#-core-protocol-subsystems--specifications)
   - [1. Multi-Transport Resolution & Parallel Racing Engine](#1-multi-transport-resolution--parallel-racing-engine)
   - [2. Zero-Custody Client-Side Ed25519 Cryptographic Identity](#2-zero-custody-client-side-ed25519-cryptographic-identity)
-  - [3. Enterprise Gateway ("Stripe for Publishing") & OpenAPI 3.1.0](#3-enterprise-gateway-stripe-for-publishing--openapi-310)
+  - [3. Open Infrastructure Gateway & OpenAPI 3.1.0 REST API](#3-open-infrastructure-gateway--openapi-310-rest-api)
   - [4. Outbound Real-Time Webhooks & HMAC-SHA256 Event Bus](#4-outbound-real-time-webhooks--hmac-sha256-event-bus)
   - [5. Drop-In `<pressprotocol-publish>` Universal Widget & 7 Editor Connectors](#5-drop-in-pressprotocol-publish-universal-widget--7-editor-connectors)
   - [6. Air-Gapped Sovereign Proof (`.pressproof.json`) & Optical QR Codec (`PPQR:1:*`)](#6-air-gapped-sovereign-proof-pressproofjson--optical-qr-codec-ppqr1)
@@ -52,28 +52,28 @@
 
 ---
 
-## 🌟 The PressProtocol Manifesto: Sovereign Privacy & Anti-Censorship
+## 🌐 Protocol Philosophy & Architectural Thesis
 
 ### The Problem: The Fragility of Digital Free Expression
 
-Centralized publishing infrastructure (Medium, Substack, WordPress.com, conventional web hosting) has catastrophic architectural single points of failure: **DNS takedowns, ISP-level IP blacklisting, cloud hosting deplatforming, payment processor blacklisting, and server seizures**. When authoritarian regimes, corporate cartels, or litigious oligarchs target independent reporting, journalists and whistleblowers have no practical way to publish without risking personal exposure or having their work permanently erased from history.
+Centralized publishing platforms (Medium, Substack, WordPress.com, standard shared web hosts) suffer from critical single points of failure: **DNS takedowns, ISP-level domain filtering, cloud hosting deplatforming, payment processor account freezing, and physical server seizures**. When independent journalists, whistleblowers, or researchers report on sensitive civic issues, they frequently encounter domain blacklisting, denial-of-service, or unilateral platform censorship.
 
-Existing decentralized publishing platforms failed to solve this in practice:
+First-generation decentralized publishing attempts introduced other practical obstacles:
 
-1. **The Cryptocurrency Barrier**: Systems requiring cryptocurrency wallets (Arweave, Mirror) impose gas fees, wallet extensions, and seed phrases on non-technical journalists and newsrooms.
-2. **On-Chain Deanonymization**: Public blockchain transactions leave a permanent financial ledger trail, enabling state intelligence agencies and chain analysis firms to trace and unmask whistleblowers through transaction graph analysis.
-3. **Single-Gateway Fragility**: Most IPFS tools depend on a single clearnet gateway domain (e.g. `ipfs.io`). When national firewalls block that gateway, the entire publication goes dark.
-4. **Tor Performance Friction**: Pure Tor `.onion` websites take 3 to 10 seconds to load and are completely inaccessible to 99% of web readers who do not possess the Tor Browser.
+1. **Cryptocurrency Barrier**: Systems requiring on-chain gas fees (Arweave, Mirror) impose browser wallet extensions, seed phrases, and token purchases on non-technical journalists and newsroom editors.
+2. **On-Chain Deanonymization**: Public blockchain transactions create an immutable financial ledger trail, allowing adversaries to correlate publishing identity with exchange KYC records via transaction graph analysis.
+3. **Single-Gateway Dependency**: Many decentralized tools rely on a single public HTTP gateway (e.g. `ipfs.io`). When state firewalls block that specific domain, access to the entire publication is severed.
+4. **Tor Performance Friction**: Standalone Tor `.onion` websites experience significant latency (3 to 10 seconds) and cannot be reached by standard web readers without the Tor Browser.
 
-### The PressProtocol Breakthrough: Privacy-Preserving Sovereign Rails
+### The Architectural Design: Resilient Sovereign Publishing Rails
 
-PressProtocol inverts this paradigm by providing **neutral, un-cancellable publishing rails that combine the sub-150ms speed of clearnet CDNs, the immutability of IPFS, and the uncancellability of Tor v3 onion services—with zero crypto barrier**:
+PressProtocol resolves these challenges by providing **neutral, un-cancellable publishing rails combining the sub-150ms speed of clearnet CDNs, content addressing via IPFS, and privacy routing via Tor v3 onion services—without requiring cryptocurrency or financial transactions**:
 
-* **Zero Wallets, Zero Gas, Zero KYC**: Writers generate RFC 8032 Ed25519 keypairs entirely in volatile device memory. The public key acts as an immutable cryptographic pseudonym; the private key mathematically signs the content hash.
-* **Zero Financial & Ledger Footprint**: By eliminating blockchain transaction fees, publishers leave zero financial breadcrumbs. There are no wallet addresses to deanonymize, no tokens to buy, and no gas spikes to navigate.
-* **Multi-Transport Racing with Automatic Failover**: When resolving an article, the protocol queries IPFS gateways, P2P swarms, and Tor v3 `.onion` hidden services simultaneously. If an ISP blocks IPFS gateways, content falls back to Tor in real time with zero human intervention.
-* **Zero Telemetry & Surveillance Stripping**: Built-in ingest scrubbers strip Google Analytics, Meta Pixels, tracking beacons, UTM query strings, and fingerprinting tags before content is hashed, ensuring readers can never be tracked.
-* **Universal Adoption for 43% of the Web**: Instead of asking the world to move to a niche decentralized app, PressProtocol brings sovereign distribution directly to existing tools via a native **WordPress Plugin** (powering 43% of the internet), an **Obsidian Plugin**, a **Chromium MV3 Extension**, a **GitHub Action**, a **Drop-In 2-Line Web Component**, and native **SDKs in TypeScript, Python, Go, and Rust**.
+* **Zero Wallets, Zero Gas, Zero KYC**: Publishers generate RFC 8032 Ed25519 keypairs in ephemeral client memory. The public key provides a permanent cryptographic pseudonym; the private key signs the canonical content payload in browser RAM.
+* **Zero Financial Footprint**: Without on-chain transaction fees, publishing leaves zero ledger trails. There are no wallets to trace, no token purchases, and no gas volatility.
+* **Multi-Transport Racing with Automatic Failover**: When resolving an article, the protocol queries IPFS gateways, P2P DHT swarms, and Tor v3 `.onion` hidden services concurrently. If an ISP blocks clearnet IPFS gateways, content automatically resolves over Tor with zero manual intervention.
+* **Zero Telemetry & Surveillance Stripping**: Built-in ingest pipelines scrub Google Analytics, Meta Pixels, tracking beacons, UTM query strings, and fingerprinting scripts before content hashing occurs.
+* **Extensible Distribution Rails Across Existing Platforms**: Rather than requiring publishers to migrate to a proprietary interface, PressProtocol provides native integrations for widely adopted workflows: a **WordPress Plugin**, an **Obsidian Plugin**, a **Chromium MV3 Extension**, a **GitHub Action**, a **Universal Web Component**, and native **SDKs in TypeScript, Python, Go, and Rust**.
 
 ---
 
@@ -98,22 +98,22 @@ PressProtocol inverts this paradigm by providing **neutral, un-cancellable publi
 
 | Distribution Surface | Direct Repository Link | Description | Target Users |
 | :--- | :--- | :--- | :--- |
-| **WordPress Plugin** | [**`integrations/wordpress-plugin`**](https://github.com/0xshikhar/pressprotocol/tree/main/integrations/wordpress-plugin) | Native WordPress plugin for Gutenberg & Classic editors. 1-click sovereign publishing to IPFS & Tor. | 43% of all web publishers (180M+ sites) |
-| **Universal Web Component** | [**`packages/widget`**](https://github.com/0xshikhar/pressprotocol/tree/main/packages/widget) | 2-line drop-in `<pressprotocol-publish>` widget. Connectors for TipTap, Lexical, Quill, TinyMCE, ProseMirror, Markdown, and HTML. | Any web developer, blog, or CMS |
-| **Chromium Extension** | [**`integrations/browser-extension`**](https://github.com/0xshikhar/pressprotocol/tree/main/integrations/browser-extension) | Manifest V3 extension. Intercepts `pressprotocol://` URIs, clips web articles into sovereign Markdown, and verifies signatures. | Readers, researchers, whistleblowers |
-| **Official GitHub Action** | [**`integrations/publish-action`**](https://github.com/0xshikhar/pressprotocol/tree/main/integrations/publish-action) | CI/CD GitHub Action (`pressprotocol/publish-action`) for continuous sovereign archival on `git push`. | Developers, docs sites, civic archives |
-| **Obsidian Plugin** | [**`integrations/obsidian-plugin`**](https://github.com/0xshikhar/pressprotocol/tree/main/integrations/obsidian-plugin) | Personal knowledge management plugin. Publishes local Markdown notes and investigative dossiers to IPFS/Tor. | Journalists, researchers, analysts |
-| **TypeScript / Node SDK** | [**`packages/sdk`**](https://github.com/0xshikhar/pressprotocol/tree/main/packages/sdk) | `@pressprotocol/sdk` with Ed25519 signing, deterministic in-memory CIDv1 multihashes, parallel resolver, and CLI. | Node.js, Next.js, Bun, Edge runtime |
-| **Python SDK** | [**`sdks/python`**](https://github.com/0xshikhar/pressprotocol/tree/main/sdks/python) | Native Python library for automated archival scripts, newsroom scrapers, and data pipelines. | Data scientists, backend engineers |
-| **Go SDK** | [**`sdks/go`**](https://github.com/0xshikhar/pressprotocol/tree/main/sdks/go) | High-concurrency Go client for enterprise microservices and backend ingest nodes. | Infrastructure engineers, DevOps |
-| **Rust SDK** | [**`sdks/rust`**](https://github.com/0xshikhar/pressprotocol/tree/main/sdks/rust) | Memory-safe, zero-allocation asynchronous client for decentralized network daemons. | Systems programmers, node operators |
-| **Enterprise REST Gateway** | [**`core/node/src/routes/v1.ts`**](https://github.com/0xshikhar/pressprotocol/blob/main/core/node/src/routes/v1.ts) | "Stripe for Publishing": OpenAPI 3.1.0 endpoints, token-bucket rate limiting, and SHA-256 API key security. | Enterprise newsrooms, bots, platforms |
-| **Outbound Webhooks Bus** | [**`core/node/src/services/WebhookSubscriptionService.ts`**](https://github.com/0xshikhar/pressprotocol/blob/main/core/node/src/services/WebhookSubscriptionService.ts) | Real-time event bus with HMAC-SHA256 signatures, replay protection, and exponential retry delivery. | Ghost, Strapi, WordPress webhooks |
-| **Air-Gap Proof & QR Mesh**| [**`packages/proof`**](https://github.com/0xshikhar/pressprotocol/tree/main/packages/proof) | Standalone `.pressproof.json` specification & `PPQR:1:*` high-density animated QR streaming codec. | Internet blackouts, air-gapped devices |
-| **Offline-First Local Vault** | [**`apps/web/src/app/vault`**](https://github.com/0xshikhar/pressprotocol/tree/main/apps/web/src/app/vault) | Zero-telemetry client-side IndexedDB vault for encrypted local reading and offline verification. | Privacy-conscious readers, field reporters |
-| **Web Portal & Dev Hub** | [**`apps/web`**](https://github.com/0xshikhar/pressprotocol/tree/main/apps/web) | Next.js 15 web application with 1-click sandbox keys (`pp_test_*`) and in-browser cryptographic simulator. | General public, developers |
-| **Sovereign Node Daemon** | [**`core/node`**](https://github.com/0xshikhar/pressprotocol/tree/main/core/node) | Self-sovereign private micro-daemon with Tor v3 hidden services, in-memory IPFS blockstore, and P2P federation. | Node runners, self-hosters |
-| **Content Ingestion Rails** | [**`apps/web/src/app/import`**](https://github.com/0xshikhar/pressprotocol/tree/main/apps/web/src/app/import) | Migration importers for Notion, Substack, Medium, and bulk RSS/Atom feeds with surveillance scrubbing. | Migrating publishers, media outlets |
+| **WordPress Plugin** | [**`integrations/wordpress-plugin`**](https://github.com/0xshikhar/PressProtocol/tree/main/integrations/wordpress-plugin) | Native WordPress plugin for Gutenberg & Classic editors. 1-click sovereign publishing to IPFS & Tor. | WordPress web publishers (Gutenberg & Classic) |
+| **Universal Web Component** | [**`packages/widget`**](https://github.com/0xshikhar/PressProtocol/tree/main/packages/widget) | 2-line drop-in `<pressprotocol-publish>` widget. Connectors for TipTap, Lexical, Quill, TinyMCE, ProseMirror, Markdown, and HTML. | Any web developer, blog, or CMS |
+| **Chromium Extension** | [**`integrations/browser-extension`**](https://github.com/0xshikhar/PressProtocol/tree/main/integrations/browser-extension) | Manifest V3 extension. Intercepts `pressprotocol://` URIs, clips web articles into sovereign Markdown, and verifies signatures. | Readers, researchers, whistleblowers |
+| **Official GitHub Action** | [**`integrations/publish-action`**](https://github.com/0xshikhar/PressProtocol/tree/main/integrations/publish-action) | CI/CD GitHub Action (`pressprotocol/publish-action`) for continuous sovereign archival on `git push`. | Developers, docs sites, civic archives |
+| **Obsidian Plugin** | [**`integrations/obsidian-plugin`**](https://github.com/0xshikhar/PressProtocol/tree/main/integrations/obsidian-plugin) | Personal knowledge management plugin. Publishes local Markdown notes and investigative dossiers to IPFS/Tor. | Journalists, researchers, analysts |
+| **TypeScript / Node SDK** | [**`packages/sdk`**](https://github.com/0xshikhar/PressProtocol/tree/main/packages/sdk) | `@pressprotocol/sdk` with Ed25519 signing, deterministic in-memory CIDv1 multihashes, parallel resolver, and CLI. | Node.js, Next.js, Bun, Edge runtime |
+| **Python SDK** | [**`sdks/python`**](https://github.com/0xshikhar/PressProtocol/tree/main/sdks/python) | Native Python library for automated archival scripts, newsroom scrapers, and data pipelines. | Data scientists, backend engineers |
+| **Go SDK** | [**`sdks/go`**](https://github.com/0xshikhar/PressProtocol/tree/main/sdks/go) | High-concurrency Go client for enterprise microservices and backend ingest nodes. | Infrastructure engineers, DevOps |
+| **Rust SDK** | [**`sdks/rust`**](https://github.com/0xshikhar/PressProtocol/tree/main/sdks/rust) | Memory-safe, zero-allocation asynchronous client for decentralized network daemons. | Systems programmers, node operators |
+| **Enterprise REST Gateway** | [**`core/node/src/routes/v1.ts`**](https://github.com/0xshikhar/PressProtocol/blob/main/core/node/src/routes/v1.ts) | OpenAPI 3.1.0 gateway endpoints, token-bucket rate limiting, and SHA-256 API key security. | Enterprise newsrooms, bots, platforms |
+| **Outbound Webhooks Bus** | [**`core/node/src/services/WebhookSubscriptionService.ts`**](https://github.com/0xshikhar/PressProtocol/blob/main/core/node/src/services/WebhookSubscriptionService.ts) | Real-time event bus with HMAC-SHA256 signatures, replay protection, and exponential retry delivery. | Ghost, Strapi, WordPress webhooks |
+| **Air-Gap Proof & QR Mesh**| [**`packages/proof`**](https://github.com/0xshikhar/PressProtocol/tree/main/packages/proof) | Standalone `.pressproof.json` specification & `PPQR:1:*` high-density animated QR streaming codec. | Internet blackouts, air-gapped devices |
+| **Offline-First Local Vault** | [**`apps/web/src/app/vault`**](https://github.com/0xshikhar/PressProtocol/tree/main/apps/web/src/app/vault) | Zero-telemetry client-side IndexedDB vault for encrypted local reading and offline verification. | Privacy-conscious readers, field reporters |
+| **Web Portal & Dev Hub** | [**`apps/web`**](https://github.com/0xshikhar/PressProtocol/tree/main/apps/web) | Next.js 15 web application with 1-click sandbox keys (`pp_test_*`) and in-browser cryptographic simulator. | General public, developers |
+| **Sovereign Node Daemon** | [**`core/node`**](https://github.com/0xshikhar/PressProtocol/tree/main/core/node) | Self-sovereign private micro-daemon with Tor v3 hidden services, in-memory IPFS blockstore, and P2P federation. | Node runners, self-hosters |
+| **Content Ingestion Rails** | [**`apps/web/src/app/import`**](https://github.com/0xshikhar/PressProtocol/tree/main/apps/web/src/app/import) | Migration importers for Notion, Substack, Medium, and bulk RSS/Atom feeds with surveillance scrubbing. | Migrating publishers, media outlets |
 
 ---
 
@@ -236,7 +236,7 @@ PressProtocol separates publishing into distinct, sovereign layers: content addr
 
 ---
 
-## ⚡ The 7 Core Protocol Innovations
+## ⚡ Core Protocol Subsystems & Specifications
 
 ### 1. Multi-Transport Resolution & Parallel Racing Engine
 Rather than relying on a single centralized gateway or single network protocol, PressProtocol clients execute an adaptive parallel race across independent transports:
@@ -251,7 +251,7 @@ Rather than relying on a single centralized gateway or single network protocol, 
 - The author's private key signs the canonical JSON payload (`title`, `tags`, `timestamp`).
 - In the zero-custody flow (`POST /api/v1/publish/signed`), the gateway receives only the public key and signature. **The private key never leaves the author's device.**
 
-### 3. Enterprise Gateway ("Stripe for Publishing") & OpenAPI 3.1.0
+### 3. Open Infrastructure Gateway & OpenAPI 3.1.0 REST API
 High-performance REST API built on Fastify serving an authentic OpenAPI 3.1.0 specification:
 - `POST /api/v1/publish/signed`: Zero-custody ingest for client-signed articles.
 - `POST /api/v1/publish/raw`: Custodial ingest with deterministic in-memory CIDv1 generation and node-level signing.
@@ -300,7 +300,7 @@ Ingestion pipeline scans and neutralizes surveillance vectors before cryptograph
 ## 🗺️ Monorepo Repository Map
 
 ```
-realfi/anonpress/
+PressProtocol/
 ├── apps/
 │   └── web/                         # Next.js 15 Web Portal & Interactive Dev Hub
 │       ├── src/app/developers/      # /developers Interactive Playground & Sandbox Keys
@@ -317,7 +317,7 @@ realfi/anonpress/
 │   ├── widget/                      # @pressprotocol/widget (Universal Web Component)
 │   └── proof/                       # @pressprotocol/proof (.pressproof.json & QR Codec)
 ├── integrations/
-│   ├── wordpress-plugin/            # Native WordPress Plugin (43% of Web)
+│   ├── wordpress-plugin/            # Native WordPress Plugin (Gutenberg & Classic)
 │   ├── browser-extension/           # Chromium MV3 Sovereign Web Clipper & Handler
 │   ├── publish-action/              # Official GitHub Action for CI/CD Archival
 │   └── obsidian-plugin/             # Native Obsidian Vault Plugin
@@ -343,8 +343,8 @@ realfi/anonpress/
 
 ### 1. Clone & Install
 ```bash
-git clone https://github.com/0xshikhar/pressprotocol.git
-cd pressprotocol
+git clone https://github.com/0xshikhar/PressProtocol.git
+cd PressProtocol
 pnpm install
 ```
 
@@ -379,7 +379,7 @@ import { PressProtocolClient, verifyWebhookSignature } from "@pressprotocol/sdk"
 
 const client = new PressProtocolClient({
   apiKey: "pp_live_...",
-  endpoint: "https://anonpress-production.up.railway.app",
+  endpoint: "https://api.pressprotocol.com", // or "http://localhost:4000" for local node
 });
 
 // 1. Publish Article with Client-Side Ed25519 Signing
@@ -433,7 +433,7 @@ package main
 import (
     "context"
     "fmt"
-    "github.com/0xshikhar/pressprotocol/sdks/go"
+    "github.com/0xshikhar/PressProtocol/sdks/go"
 )
 
 func main() {
@@ -503,7 +503,7 @@ pressprotocol resolve bafkreifg43jdwfgeebl6fkt6ntem6xsw5pp54ttnuzb6rffil36jtjukq
 
 ## 🧪 Verification Test Harness (100% Pass)
 
-Every commit is verified through the master test harness ([`scripts/test.sh`](https://github.com/0xshikhar/pressprotocol/blob/main/scripts/test.sh)), executing **14 automated subsystem test suites** and **413+ assertions**:
+Every commit is verified through the master test harness ([`scripts/test.sh`](https://github.com/0xshikhar/PressProtocol/blob/main/scripts/test.sh)), executing **14 automated subsystem test suites** and **413+ assertions**:
 
 ```text
 🧪 PressProtocol Verification Harness
@@ -514,12 +514,7 @@ Every commit is verified through the master test harness ([`scripts/test.sh`](ht
 Typechecking apps/web... ✅ PASS
 Typechecking core/node... ✅ PASS
 
-2️⃣  Running Live Health Endpoints (if running)
--------------------------------------------
-Testing Node Health Endpoint (http://localhost:4000/health)... ⚪ SKIPPED (Server offline)
-Testing Web Portal Landing (http://localhost:3000)... ⚪ SKIPPED (Server offline)
-
-3️⃣  Subsystem Automated Verification Suites
+2️⃣  Subsystem Automated Verification Suites
 ------------------------------------------
 Running Surveillance Stripper & CMS Cleaner... ✅ PASS (28/28 tests)
 Running Multi-Transport Telemetry & Live Gateway Probes... ✅ PASS (40/40 tests)
@@ -542,6 +537,8 @@ Passed: 16 (14/14 Subsystem Test Suites + 2 Typechecks)
 Failed: 0
 ```
 
+> **Verification Scope**: The 14 subsystem verification suites execute 100% in-memory with zero cloud or network dependencies, validating all cryptographic primitives (RFC 8032 Ed25519, SHA-256 HMAC), deterministic content addressing (CIDv1 multihashes), delay-tolerant optical QR codecs, CMS sanitizers, and SDK client logic. Live daemon probes (`core/node`) can optionally be executed against a running local instance via `bash scripts/test.sh --live`.
+
 ---
 
 ## 🛡️ Threat Model & Adversarial Defense
@@ -560,12 +557,12 @@ Failed: 0
 
 ## 📚 Reference Documents
 
-- **[ARCHITECTURE.md](https://github.com/0xshikhar/pressprotocol/blob/main/ARCHITECTURE.md)**: Comprehensive protocol architecture, cryptographic specifications, multi-transport failover algorithms, and wire schemas.
-- **[INTEGRATIONS.md](https://github.com/0xshikhar/pressprotocol/blob/main/INTEGRATIONS.md)**: Complete guide to the WordPress plugin, Chromium MV3 extension, GitHub Action, Obsidian plugin, and Universal Widget.
-- **[CONTRIBUTING.md](https://github.com/0xshikhar/pressprotocol/blob/main/CONTRIBUTING.md)**: Monorepo contribution guidelines, code standards, and PR workflows.
+- **[ARCHITECTURE.md](https://github.com/0xshikhar/PressProtocol/blob/main/ARCHITECTURE.md)**: Comprehensive protocol architecture, cryptographic specifications, multi-transport failover algorithms, and wire schemas.
+- **[INTEGRATIONS.md](https://github.com/0xshikhar/PressProtocol/blob/main/INTEGRATIONS.md)**: Complete guide to the WordPress plugin, Chromium MV3 extension, GitHub Action, Obsidian plugin, and Universal Widget.
+- **[CONTRIBUTING.md](https://github.com/0xshikhar/PressProtocol/blob/main/CONTRIBUTING.md)**: Monorepo contribution guidelines, code standards, and PR workflows.
 
 ---
 
 ## 📄 License & Open Source Commitment
 
-PressProtocol is 100% free, open-source software released under the **[MIT License](https://github.com/0xshikhar/pressprotocol/blob/main/LICENSE)**. It is built as a neutral public good for journalists, whistleblowers, researchers, and citizens worldwide.
+PressProtocol is 100% free, open-source software released under the **[MIT License](https://github.com/0xshikhar/PressProtocol/blob/main/LICENSE)**. It is built as a neutral public good for journalists, whistleblowers, researchers, and citizens worldwide.

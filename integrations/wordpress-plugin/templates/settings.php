@@ -60,7 +60,7 @@
 <script>
 jQuery(document).ready(function($) {
     // Check system status
-    $.get('<?php echo get_option('anonpress_api_url', 'https://anonpress-production.up.railway.app'); ?>/health')
+    $.get('<?php echo get_option('anonpress_api_url', 'https://api.pressprotocol.com'); ?>/health')
         .done(function(data) {
             $('#anonpress-system-status').html(
                 '<p class="status-ok">✅ Backend API: Connected</p>' +

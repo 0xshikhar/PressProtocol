@@ -11,7 +11,7 @@ mkdir -p "$OUTPUT_DIR"
 
 # 1. Build extension with pnpm
 echo "🔨 Building extension TypeScript & copying assets..."
-pnpm --filter anonpress-extension build
+pnpm --filter pressprotocol-extension build
 
 # 2. Package into zip
 echo "🗜️  Creating release zip bundles..."

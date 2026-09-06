@@ -32,7 +32,7 @@ WordPress plugin for publishing content to the PressProtocol network.
 
 Required settings:
 
-- **Backend API URL** - Default: `https://anonpress-production.up.railway.app`
+- **Backend API URL** - Default: `https://api.pressprotocol.com` (or your local node `http://localhost:4000`)
 - **Wallet Address** - Your Ethereum address for identity (optional - can publish anonymously)
 
 ## Usage
