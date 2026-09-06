@@ -80,8 +80,7 @@ export async function GET() {
     : backendContentList?.items?.length || 0;
 
   const manifestCount = backendManifestStats?.manifestCount ?? Math.max(12, totalPublishedFromBackend);
-  const tagCount = backendManifestStats?.tagCount ?? (backendManifestStats?.tags?.length || 8);
-  const tags = backendManifestStats?.tags || [
+  const defaultTags = [
     "privacy",
     "decentralization",
     "censorship-resistance",
@@ -91,6 +90,12 @@ export async function GET() {
     "tor",
     "ipfs",
   ];
+  const tags = (backendManifestStats?.tags && backendManifestStats.tags.length > 0)
+    ? backendManifestStats.tags
+    : defaultTags;
+  const tagCount = backendManifestStats?.tagCount && backendManifestStats.tagCount > 0
+    ? backendManifestStats.tagCount
+    : tags.length;
 
   const heliaReady = Boolean(backendManifestStats?.heliaNode?.ready);
   const peerCount = backendManifestStats?.heliaNode?.peers ?? 312;

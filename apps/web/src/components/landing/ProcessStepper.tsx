@@ -33,7 +33,7 @@ const cleanEnvelope = sanitizeArticle({
     description:
       "An Ed25519 keypair is generated in volatile browser memory. The private key signs the canonical SHA-256 hash of the sanitized payload. The private key is discarded immediately after signing; your identity is your public key.",
     bullets: [
-      "Volatile memory only — never touches disk or server",
+      "Volatile memory only - never touches disk or server",
       "Ed25519 high-speed elliptic curve signatures",
       "Verifiable by any reader without trusted intermediaries",
     ],
@@ -133,11 +133,10 @@ export function ProcessStepper() {
                 onClick={() => handleStepClick(idx)}
                 onMouseEnter={() => setIsPaused(true)}
                 onMouseLeave={() => setIsPaused(false)}
-                className={`relative p-6 lg:p-8 rounded-2xl border cursor-pointer transition-all duration-300 ${
-                  isActive
+                className={`relative p-6 lg:p-8 rounded-2xl border cursor-pointer transition-all duration-300 ${isActive
                     ? "bg-white/[0.05] border-cyan-500/50 shadow-lg shadow-cyan-950/30"
                     : "bg-white/[0.015] border-white/10 hover:border-white/20 hover:bg-white/[0.03]"
-                }`}
+                  }`}
               >
                 {/* Progress bar line for active step */}
                 <div className="absolute top-0 left-0 right-0 h-1 overflow-hidden rounded-t-2xl bg-white/5">
@@ -151,9 +150,8 @@ export function ProcessStepper() {
 
                 <div className="flex items-center justify-between mb-4">
                   <span
-                    className={`font-mono text-2xl lg:text-3xl font-bold ${
-                      isActive ? "text-cyan-400" : "text-white/30"
-                    }`}
+                    className={`font-mono text-2xl lg:text-3xl font-bold ${isActive ? "text-cyan-400" : "text-white/30"
+                      }`}
                   >
                     {step.number}
                   </span>

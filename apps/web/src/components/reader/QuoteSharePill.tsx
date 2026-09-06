@@ -70,7 +70,7 @@ export function QuoteSharePill({
   if (!selectedText || !position) return null;
 
   const articleUrl = typeof window !== "undefined" ? window.location.href : `https://pressprotocol.com/read/${cid}`;
-  const citation = `"${selectedText}"\n\n— From "${articleTitle}"${authorName ? ` by ${authorName}` : ""}\nVerified via PressProtocol (${cid.slice(0, 8)}...)\n${articleUrl}`;
+  const citation = `"${selectedText}"\n\n- From "${articleTitle}"${authorName ? ` by ${authorName}` : ""}\nVerified via PressProtocol (${cid.slice(0, 8)}...)\n${articleUrl}`;
 
   const handleCopyQuote = () => {
     navigator.clipboard.writeText(citation);

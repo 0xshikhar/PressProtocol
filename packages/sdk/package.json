@@ -1,7 +1,7 @@
 {
   "name": "@pressprotocol/sdk",
-  "version": "1.0.6",
-  "description": "PressProtocol Headless Developer SDK and Terminal CLI - Censorship-Resistant Publishing & Multi-Transport Resolution",
+  "version": "1.0.7",
+  "description": "Official PressProtocol Developer SDK and Terminal CLI - Censorship-Resistant Publishing & Multi-Transport Resolution",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -10,12 +10,23 @@
     "pressprotocol": "dist/bin/cli.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc && chmod +x dist/bin/cli.js 2>/dev/null || true",
     "cli": "tsx src/bin/cli.ts",
     "typecheck": "tsc --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0xshikhar/AnonPress.git",
+    "directory": "packages/sdk"
+  },
+  "homepage": "https://pressprotocol.com",
+  "bugs": {
+    "url": "https://github.com/0xshikhar/AnonPress/issues"
   },
   "keywords": [
     "pressprotocol",
@@ -25,9 +36,11 @@
     "ed25519",
     "cryptography",
     "sovereign-publishing",
-    "censorship-resistance"
+    "censorship-resistance",
+    "cli",
+    "multihash"
   ],
-  "author": "0xShikhar",
+  "author": "0xShikhar <hello@pressprotocol.com>",
   "license": "MIT",
   "dependencies": {
     "@noble/ed25519": "^2.1.0",
@@ -39,3 +52,4 @@
     "typescript": "^5.4.5"
   }
 }
+

@@ -97,14 +97,13 @@ export function ProcessSection() {
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-cyan-500/[0.03] blur-[120px] pointer-events-none" />
 
       <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12">
-        {/* Header — Title + Monolith Image */}
+        {/* Header - Title + Monolith Image */}
         <div className="relative mb-0 lg:mb-4 grid lg:grid-cols-2 gap-4 lg:gap-12 items-end">
           {/* Left Title Column */}
           <div className="overflow-hidden pb-8 lg:pb-24">
             <div
-              className={`transition-all duration-1000 ${
-                isVisible ? "translate-x-0 opacity-100" : "-translate-x-12 opacity-0"
-              }`}
+              className={`transition-all duration-1000 ${isVisible ? "translate-x-0 opacity-100" : "-translate-x-12 opacity-0"
+                }`}
             >
               <span className="inline-flex items-center gap-3 text-sm font-mono text-cyan-400 mb-8">
                 <span className="w-12 h-px bg-cyan-500/40" />
@@ -113,9 +112,8 @@ export function ProcessSection() {
             </div>
 
             <h2
-              className={`text-6xl md:text-7xl lg:text-[120px] font-display tracking-tight leading-[0.88] transition-all duration-1000 delay-100 ${
-                isVisible ? "translate-y-0 opacity-100" : "translate-y-16 opacity-0"
-              }`}
+              className={`text-6xl md:text-7xl lg:text-[120px] font-display tracking-tight leading-[0.88] transition-all duration-1000 delay-100 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-16 opacity-0"
+                }`}
             >
               <span className="block text-white">Write.</span>
               <span className="block text-cyan-400/80">Sign.</span>
@@ -125,9 +123,8 @@ export function ProcessSection() {
 
           {/* Right Column: High-Res Monolith Architectural Artwork */}
           <div
-            className={`relative h-[320px] lg:h-[580px] overflow-hidden transition-all duration-1000 delay-200 ${
-              isVisible ? "opacity-100" : "opacity-0"
-            }`}
+            className={`relative h-[320px] lg:h-[580px] overflow-hidden transition-all duration-1000 delay-200 ${isVisible ? "opacity-100" : "opacity-0"
+              }`}
           >
             <img
               src="/images/monolith.png"
@@ -151,18 +148,16 @@ export function ProcessSection() {
                 key={step.number}
                 type="button"
                 onClick={() => setActiveStep(index)}
-                className={`relative text-left p-8 lg:p-10 border transition-all duration-500 ${
-                  isActive
+                className={`relative text-left p-8 lg:p-10 border transition-all duration-500 ${isActive
                     ? "bg-black border-cyan-400/80 shadow-lg shadow-cyan-950/40"
                     : "bg-black/60 border-white/10 hover:border-white/30"
-                }`}
+                  }`}
               >
                 {/* Step number with animated line */}
                 <div className="flex items-center gap-4 mb-6">
                   <span
-                    className={`text-4xl font-display transition-colors duration-300 ${
-                      isActive ? "text-cyan-400" : "text-white/20"
-                    }`}
+                    className={`text-4xl font-display transition-colors duration-300 ${isActive ? "text-cyan-400" : "text-white/20"
+                      }`}
                   >
                     {step.number}
                   </span>
@@ -172,9 +167,8 @@ export function ProcessSection() {
                     )}
                   </div>
                   <Icon
-                    className={`w-5 h-5 transition-colors ${
-                      isActive ? "text-cyan-400" : "text-white/30"
-                    }`}
+                    className={`w-5 h-5 transition-colors ${isActive ? "text-cyan-400" : "text-white/30"
+                      }`}
                   />
                 </div>
 
@@ -188,18 +182,16 @@ export function ProcessSection() {
 
                 {/* Description */}
                 <p
-                  className={`text-sm text-white/60 leading-relaxed transition-opacity duration-300 ${
-                    isActive ? "opacity-100" : "opacity-60"
-                  }`}
+                  className={`text-sm text-white/60 leading-relaxed transition-opacity duration-300 ${isActive ? "opacity-100" : "opacity-60"
+                    }`}
                 >
                   {step.description}
                 </p>
 
                 {/* Bottom Active indicator line */}
                 <div
-                  className={`absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-400 transition-transform duration-500 origin-left ${
-                    isActive ? "scale-x-100" : "scale-x-0"
-                  }`}
+                  className={`absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-400 transition-transform duration-500 origin-left ${isActive ? "scale-x-100" : "scale-x-0"
+                    }`}
                 />
               </button>
             );

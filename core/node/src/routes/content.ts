@@ -181,7 +181,7 @@ export async function contentRoutes(fastify: FastifyInstance) {
         success: true,
         data: {
           cid: ipfsResult.cid,
-          shareUrl: `anonpress://${ipfsResult.cid}`,
+          shareUrl: `pressprotocol://${ipfsResult.cid}`,
           mirrors: {
             ipfs: mirrors.find((m) => m.type === 'ipfs')?.url,
             tor: mirrors.find((m) => m.type === 'tor')?.url,
@@ -403,7 +403,7 @@ export async function contentRoutes(fastify: FastifyInstance) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${cachedContent.title} - AnonPress (Tor)</title>
+    <title>${cachedContent.title} - PressProtocol (Tor)</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -496,7 +496,7 @@ export async function contentRoutes(fastify: FastifyInstance) {
         </div>
         <div class="footer">
             <p>🔐 This content is censorship-resistant and accessible via Tor</p>
-            <p>Powered by <strong>AnonPress</strong> - Decentralized Publishing Platform</p>
+            <p>Powered by <strong>PressProtocol</strong> - Decentralized Publishing Platform</p>
         </div>
     </div>
 </body>

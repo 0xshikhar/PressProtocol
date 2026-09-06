@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Terminal, ShieldCheck, ShieldX, Play, RotateCcw, Check, Sparkles, Server, Zap, Globe, Lock } from "lucide-react";
+import Link from "next/link";
+import { Terminal, ShieldCheck, ShieldX, Play, RotateCcw, Check, Sparkles, Server, Zap, Globe, Lock, UploadCloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -48,7 +49,7 @@ export function ProtocolSandbox() {
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white/5 border border-white/10 text-xs font-mono text-cyan-400 mb-6">
               <Terminal className="w-3.5 h-3.5" />
-              <span>INTERACTIVE PROTOCOL SANDBOX</span>
+              <span>UNIVERSAL INGESTION & CRYPTOGRAPHIC VERIFICATION</span>
             </div>
             <h2 className="font-display text-4xl sm:text-6xl lg:text-7xl tracking-tight leading-[0.95] text-white">
               Verify in-browser.
@@ -57,7 +58,7 @@ export function ProtocolSandbox() {
             </h2>
           </div>
           <p className="max-w-md text-sm lg:text-base text-white/60 font-light leading-relaxed">
-            Test any content CID. Watch the multi-transport race resolve across IPFS and Tor, and verify the author&apos;s Ed25519 signature directly inside your client memory.
+            Whether imported from Substack or drafted in our sovereign studio, every dispatch is sealed with a client-side Ed25519 signature and content-addressed on IPFS and Tor. Test any CID multihash or launch the URL scrubber directly.
           </p>
         </div>
 
@@ -78,11 +79,11 @@ export function ProtocolSandbox() {
                 />
               </div>
               <p className="text-[11px] font-mono text-white/40 mt-1.5 ml-1">
-                Try tampering with the demo, or paste your own CID.
+                Try tampering with the demo, paste your own CID, or import an external URL.
               </p>
             </div>
 
-            <div className="flex items-center gap-3 shrink-0">
+            <div className="flex flex-wrap items-center gap-3 shrink-0">
               <Button
                 onClick={handleResolve}
                 disabled={isResolving}
@@ -112,6 +113,16 @@ export function ProtocolSandbox() {
               >
                 {isTampered ? "Reset Tamper State" : "Simulate Rogue MITM Tamper"}
               </Button>
+
+              <Link href="/import">
+                <Button
+                  variant="outline"
+                  className="font-mono text-xs h-11 px-4 rounded-xl border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20"
+                >
+                  <UploadCloud className="w-3.5 h-3.5 mr-1.5" />
+                  Import Any URL →
+                </Button>
+              </Link>
             </div>
           </div>
 

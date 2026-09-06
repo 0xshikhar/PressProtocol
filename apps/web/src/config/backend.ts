@@ -3,7 +3,7 @@
  * Automatically switches between production and development URLs
  */
 
-// Production backend URL
+// Production backend URL (Canonical Cloudflare Edge Gateway)
 const PRODUCTION_BACKEND_URL = "https://api.pressprotocol.com";
 
 // Development backend URL (local)

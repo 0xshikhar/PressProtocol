@@ -73,11 +73,10 @@ export function TransportNetwork() {
               <Button
                 size="sm"
                 onClick={() => setSimulateBlock(!simulateBlock)}
-                className={`font-mono text-xs h-9 px-4 transition-all ${
-                  simulateBlock
+                className={`font-mono text-xs h-9 px-4 transition-all ${simulateBlock
                     ? "bg-red-500/20 text-red-300 border border-red-500/40 hover:bg-red-500/30"
                     : "bg-white/10 text-white border border-white/20 hover:bg-white/20"
-                }`}
+                  }`}
               >
                 {simulateBlock ? (
                   <>
@@ -135,11 +134,10 @@ export function TransportNetwork() {
               {/* Central Dynamic Switch Indicator */}
               <div className="hidden sm:flex flex-col items-center gap-2 z-10">
                 <div
-                  className={`px-4 py-2 rounded-xl border backdrop-blur-md transition-all duration-500 ${
-                    simulateBlock
+                  className={`px-4 py-2 rounded-xl border backdrop-blur-md transition-all duration-500 ${simulateBlock
                       ? "border-purple-500/50 bg-purple-950/40 text-purple-200 ring-1 ring-purple-500/30"
                       : "border-emerald-500/50 bg-emerald-950/40 text-emerald-300"
-                  }`}
+                    }`}
                 >
                   <div className="font-mono text-xs font-semibold flex items-center gap-2">
                     {simulateBlock ? (
@@ -176,8 +174,8 @@ export function TransportNetwork() {
                 <span className="text-cyan-400">STATUS:</span>
                 <span>
                   {simulateBlock
-                    ? "HTTP 451 / DNS Poisoning detected on Primary CDN — Switched to Tor Onion Service (press7fk2...onion)"
-                    : "Primary gateway healthy — IPFS peer discovery active in the background"}
+                    ? "HTTP 451 / DNS Poisoning detected on Primary CDN - Switched to Tor Onion Service (press7fk2...onion)"
+                    : "Primary gateway healthy - IPFS peer discovery active in the background"}
                 </span>
               </div>
               <div className="text-white/40 text-[11px]">Failover Latency: 28ms</div>
@@ -191,11 +189,10 @@ export function TransportNetwork() {
               <div className="flex items-center justify-between mb-3">
                 <span className="font-display text-xl text-white">IPFS Gateway (Pinata)</span>
                 <span
-                  className={`font-mono text-[11px] px-2 py-0.5 rounded ${
-                    simulateBlock
+                  className={`font-mono text-[11px] px-2 py-0.5 rounded ${simulateBlock
                       ? "bg-red-500/10 text-red-400 border border-red-500/20"
                       : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                  }`}
+                    }`}
                 >
                   {simulateBlock ? "BLOCKED / DNS POISONED" : "● OPERATIONAL"}
                 </span>

@@ -87,12 +87,11 @@ export function IntegrationsSection() {
 
   return (
     <section id="integrations" ref={sectionRef} className="relative overflow-hidden bg-black text-white">
-      {/* Header — Centered over connection image */}
+      {/* Header - Centered over connection image */}
       <div className="relative z-10 pt-28 lg:pt-36 text-center max-w-[1400px] mx-auto px-6 lg:px-12">
         <span
-          className={`inline-flex items-center gap-4 text-sm font-mono text-cyan-400 mb-8 transition-all duration-700 justify-center ${
-            isVisible ? "opacity-100" : "opacity-0"
-          }`}
+          className={`inline-flex items-center gap-4 text-sm font-mono text-cyan-400 mb-8 transition-all duration-700 justify-center ${isVisible ? "opacity-100" : "opacity-0"
+            }`}
         >
           <span className="w-12 h-px bg-cyan-500/40" />
           Universal Distribution & Ecosystem
@@ -100,9 +99,8 @@ export function IntegrationsSection() {
         </span>
 
         <h2
-          className={`text-6xl md:text-7xl lg:text-[128px] font-display tracking-tight leading-[0.9] transition-all duration-1000 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
+          className={`text-6xl md:text-7xl lg:text-[128px] font-display tracking-tight leading-[0.9] transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
         >
           Publish to
           <br />
@@ -110,9 +108,8 @@ export function IntegrationsSection() {
         </h2>
 
         <p
-          className={`mt-8 text-xl text-white/60 leading-relaxed max-w-xl mx-auto transition-all duration-1000 delay-100 ${
-            isVisible ? "opacity-100" : "opacity-0"
-          }`}
+          className={`mt-8 text-xl text-white/60 leading-relaxed max-w-xl mx-auto transition-all duration-1000 delay-100 ${isVisible ? "opacity-100" : "opacity-0"
+            }`}
         >
           Connect PressProtocol to your existing writing and publishing pipelines.
           Dual-publish to IPFS, Tor, and decentralized gateways without changing your CMS.
@@ -121,9 +118,8 @@ export function IntegrationsSection() {
 
       {/* Full-width Neural Connection Image */}
       <div
-        className={`relative left-1/2 -translate-x-1/2 w-screen -mt-12 transition-all duration-1000 delay-200 pointer-events-none ${
-          isVisible ? "opacity-100" : "opacity-0"
-        }`}
+        className={`relative left-1/2 -translate-x-1/2 w-screen -mt-12 transition-all duration-1000 delay-200 pointer-events-none ${isVisible ? "opacity-100" : "opacity-0"
+          }`}
       >
         <img
           src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/connection-KeJwWPQvn6l0a7C48tCARYtNEdC92H.png"
@@ -134,17 +130,16 @@ export function IntegrationsSection() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black pointer-events-none" />
       </div>
 
-      {/* Integration Grid — Overlaps bottom of image */}
+      {/* Integration Grid - Overlaps bottom of image */}
       <div className="relative z-10 -mt-16 lg:-mt-28 max-w-[1400px] mx-auto px-6 lg:px-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
           {integrations.map((integration, index) => (
             <div
               key={integration.name}
-              className={`group relative overflow-hidden p-8 border bg-zinc-950/80 backdrop-blur-md transition-all duration-500 cursor-default ${
-                hoveredIndex === index
+              className={`group relative overflow-hidden p-8 border bg-zinc-950/80 backdrop-blur-md transition-all duration-500 cursor-default ${hoveredIndex === index
                   ? "border-cyan-400/80 bg-zinc-900/90 scale-[1.02] shadow-xl shadow-cyan-950/30"
                   : "border-white/10 hover:border-white/25"
-              } ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+                } ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
               style={{ transitionDelay: `${index * 50 + 250}ms` }}
               onMouseEnter={(e) => {
                 setHoveredIndex(index);
@@ -229,9 +224,8 @@ export function IntegrationsSection() {
               {/* Animated underline */}
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/10 overflow-hidden">
                 <div
-                  className={`h-full bg-cyan-400 transition-all duration-500 ${
-                    hoveredIndex === index ? "w-full" : "w-0"
-                  }`}
+                  className={`h-full bg-cyan-400 transition-all duration-500 ${hoveredIndex === index ? "w-full" : "w-0"
+                    }`}
                 />
               </div>
             </div>
@@ -240,9 +234,8 @@ export function IntegrationsSection() {
 
         {/* Bottom Stats Row */}
         <div
-          className={`flex flex-wrap items-center justify-between gap-8 pt-10 border-t border-white/10 transition-all duration-1000 delay-500 pb-28 lg:pb-36 ${
-            isVisible ? "opacity-100" : "opacity-0"
-          }`}
+          className={`flex flex-wrap items-center justify-between gap-8 pt-10 border-t border-white/10 transition-all duration-1000 delay-500 pb-28 lg:pb-36 ${isVisible ? "opacity-100" : "opacity-0"
+            }`}
         >
           <div className="flex flex-wrap gap-12">
             {[

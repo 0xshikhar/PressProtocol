@@ -21,6 +21,11 @@ import {
   AlertTriangle,
   CheckCircle2,
   Cpu,
+  UploadCloud,
+  Heart,
+  FileText,
+  Code2,
+  Puzzle,
 } from "lucide-react";
 
 const cycleWords = ["silenced", "censored", "tampered", "seized", "altered"];
@@ -181,17 +186,26 @@ export function Hero() {
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-10 xl:gap-14 items-center">
           {/* Left Column: Editorial Typography & Protocol Actions */}
           <div className="lg:col-span-7">
-            {/* Status Pill Badge */}
-            <div
-              className={`inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md mb-8 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            {/* Status Pill Badge with Solo Builder Mission */}
+            <Link href="/support" className="group inline-block mb-8">
+              <div
+                className={`inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 hover:border-rose-500/40 hover:bg-white/[0.07] backdrop-blur-md transition-all duration-700 shadow-sm group-hover:shadow-[0_0_20px_rgba(244,63,94,0.15)] ${
+                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
                 }`}
-            >
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-              </span>
-              <span className="font-mono text-[11px] text-cyan-400">IPFS + Tor + Clearnet</span>
-            </div>
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                </span>
+                <span className="font-mono text-[11px] text-zinc-300">Sovereign Infrastructure</span>
+                <span className="text-zinc-600 font-mono text-[11px]">&bull;</span>
+                <span className="font-mono text-[11px] text-rose-300 flex items-center gap-1 group-hover:text-rose-200 transition-colors">
+                  <Heart className="w-3 h-3 text-rose-400 fill-rose-400 group-hover:scale-110 transition-transform" />
+                  <span>100% Solo-Built Public Good</span>
+                  <span className="text-rose-400/60 group-hover:translate-x-0.5 transition-transform">&rarr;</span>
+                </span>
+              </div>
+            </Link>
 
             {/* Main Headline */}
             <h1
@@ -210,10 +224,10 @@ export function Hero() {
 
             {/* Subheadline: Reader-centric mechanism */}
             <p
-              className={`text-lg sm:text-xl text-white/70 font-light leading-relaxed max-w-xl mb-10 transition-all duration-1000 delay-200 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+              className={`text-lg sm:text-xl text-white/70 font-light leading-relaxed max-w-xl mb-8 transition-all duration-1000 delay-200 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
                 }`}
             >
-              Every article is content-addressed on IPFS, mirrored to a Tor hidden service, and signed with a key that never leaves your browser. If one path is blocked, readers are rerouted automatically — no VPN, no account, no company that can pull the plug.
+              The open, censorship-resistant infrastructure for investigative journalists, whistleblowers, and independent writers. Ingest content from Substack, Medium, Ghost, Notion, or RSS in 1 click. Attest with in-browser Ed25519 cryptography. Distribute permanently across IPFS and Tor — zero cloud custody, no accounts, and nothing for anyone to seize.
             </p>
 
             {/* Primary Action Buttons */}
@@ -230,16 +244,104 @@ export function Hero() {
                   <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
                 </Button>
               </Link>
-              <a href="#sandbox">
+              <Link href="/import">
                 <Button
                   size="lg"
                   variant="outline"
-                  className="h-14 px-7 rounded-xl text-base text-white border-white/15 bg-white/[0.02] hover:bg-white/[0.08] hover:border-white/30 backdrop-blur-md transition-all font-mono text-sm"
+                  className="h-14 px-7 rounded-xl text-base text-white border-white/15 bg-white/[0.02] hover:bg-white/[0.08] hover:border-cyan-500/40 backdrop-blur-md transition-all font-mono text-sm group"
                 >
-                  <Terminal className="w-4 h-4 mr-2 text-cyan-400" />
-                  Launch Protocol Sandbox →
+                  <UploadCloud className="w-4 h-4 mr-2 text-cyan-400 group-hover:scale-110 transition-transform" />
+                  Import Any Article / URL →
                 </Button>
-              </a>
+              </Link>
+            </div>
+
+            {/* Categorized Dual-Tier Ecosystem Strip */}
+            <div
+              className={`space-y-2.5 mb-8 transition-all duration-1000 delay-350 ${
+                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+              }`}
+            >
+              {/* Row 1: Publish From Anywhere */}
+              <div className="flex flex-wrap items-center gap-1.5 text-xs font-mono">
+                <span className="text-zinc-500 text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1.5 mr-1">
+                  <FileText className="w-3 h-3 text-cyan-400" />
+                  Publish From Anywhere:
+                </span>
+
+                {/* Highlighted WordPress */}
+                <Link href="/downloads" className="group">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-cyan-500/15 border border-cyan-500/40 text-cyan-200 group-hover:bg-cyan-500/25 group-hover:border-cyan-400 text-[11px] font-semibold transition-all shadow-[0_0_15px_rgba(6,182,212,0.18)]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                    WordPress Plugin
+                  </span>
+                </Link>
+
+                <Link href="/import" className="group">
+                  <span className="px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/10 text-[11px] text-zinc-300 group-hover:text-white group-hover:border-white/25 transition-all">
+                    Substack
+                  </span>
+                </Link>
+                <Link href="/import" className="group">
+                  <span className="px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/10 text-[11px] text-zinc-300 group-hover:text-white group-hover:border-white/25 transition-all">
+                    Medium
+                  </span>
+                </Link>
+                <Link href="/import" className="group">
+                  <span className="px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/10 text-[11px] text-zinc-300 group-hover:text-white group-hover:border-white/25 transition-all">
+                    Ghost
+                  </span>
+                </Link>
+                <Link href="/import/notion" className="group">
+                  <span className="px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/10 text-[11px] text-zinc-300 group-hover:text-white group-hover:border-white/25 transition-all">
+                    Notion
+                  </span>
+                </Link>
+                <Link href="/import/rss" className="group">
+                  <span className="px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/10 text-[11px] text-zinc-300 group-hover:text-white group-hover:border-white/25 transition-all">
+                    RSS Feeds
+                  </span>
+                </Link>
+              </div>
+
+              {/* Row 2: Plugins & Tooling */}
+              <div className="flex flex-wrap items-center gap-1.5 text-xs font-mono">
+                <span className="text-zinc-500 text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1.5 mr-1">
+                  <Code2 className="w-3 h-3 text-purple-400" />
+                  Plugins & Tooling:
+                </span>
+
+                <Link href="/downloads" className="group">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-500/10 border border-purple-500/30 text-[11px] text-purple-300 group-hover:bg-purple-500/20 group-hover:border-purple-400 transition-all">
+                    <Puzzle className="w-2.5 h-2.5 text-purple-400" />
+                    Browser Extension
+                  </span>
+                </Link>
+
+                <Link href="/downloads" className="group">
+                  <span className="px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/10 text-[11px] text-zinc-300 group-hover:text-white group-hover:border-white/25 transition-all">
+                    Obsidian Plugin
+                  </span>
+                </Link>
+
+                <Link href="/developers" className="group">
+                  <span className="px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/10 text-[11px] text-zinc-300 group-hover:text-white group-hover:border-white/25 transition-all">
+                    TypeScript SDK
+                  </span>
+                </Link>
+
+                <Link href="/developers" className="group">
+                  <span className="px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/10 text-[11px] text-zinc-300 group-hover:text-white group-hover:border-white/25 transition-all">
+                    Python SDK
+                  </span>
+                </Link>
+
+                <Link href="/developers" className="group">
+                  <span className="px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/10 text-[11px] text-cyan-300/90 group-hover:text-cyan-200 group-hover:border-cyan-500/40 transition-all">
+                    Headless API
+                  </span>
+                </Link>
+              </div>
             </div>
 
             {/* Trust Markers */}
@@ -260,6 +362,11 @@ export function Hero() {
               <span className="flex items-center gap-1.5">
                 <Radio className="w-3.5 h-3.5 text-purple-400" />
                 Automatic Tor failover
+              </span>
+              <span className="text-white/20">·</span>
+              <span className="flex items-center gap-1.5">
+                <UploadCloud className="w-3.5 h-3.5 text-amber-400" />
+                Anti-surveillance scrubber
               </span>
             </div>
           </div>
@@ -298,8 +405,8 @@ export function Hero() {
                 <button
                   onClick={() => setActiveTab("telemetry")}
                   className={`py-1.5 px-3 rounded-md transition-all flex items-center justify-center gap-2 ${activeTab === "telemetry"
-                      ? "bg-white/10 text-white font-medium shadow-sm"
-                      : "text-white/40 hover:text-white/70"
+                    ? "bg-white/10 text-white font-medium shadow-sm"
+                    : "text-white/40 hover:text-white/70"
                     }`}
                 >
                   <Activity className="w-3.5 h-3.5 text-cyan-400" />
@@ -308,8 +415,8 @@ export function Hero() {
                 <button
                   onClick={() => setActiveTab("crypto")}
                   className={`py-1.5 px-3 rounded-md transition-all flex items-center justify-center gap-2 ${activeTab === "crypto"
-                      ? "bg-white/10 text-white font-medium shadow-sm"
-                      : "text-white/40 hover:text-white/70"
+                    ? "bg-white/10 text-white font-medium shadow-sm"
+                    : "text-white/40 hover:text-white/70"
                     }`}
                 >
                   <Lock className="w-3.5 h-3.5 text-emerald-400" />
@@ -348,8 +455,8 @@ export function Hero() {
                     {/* Pinata IPFS Gateway */}
                     <div
                       className={`flex items-center justify-between p-2.5 rounded-lg transition-all border ${isCensored
-                          ? "bg-red-950/20 border-red-500/30 text-red-300"
-                          : "bg-black/40 border-white/5 text-white/80"
+                        ? "bg-red-950/20 border-red-500/30 text-red-300"
+                        : "bg-black/40 border-white/5 text-white/80"
                         }`}
                     >
                       <div className="flex items-center gap-2">
@@ -378,8 +485,8 @@ export function Hero() {
                     {/* Cloudflare Anycast Web3 */}
                     <div
                       className={`flex items-center justify-between p-2.5 rounded-lg transition-all border ${isCensored
-                          ? "bg-red-950/20 border-red-500/30 text-red-300"
-                          : "bg-black/40 border-white/5 text-white/80"
+                        ? "bg-red-950/20 border-red-500/30 text-red-300"
+                        : "bg-black/40 border-white/5 text-white/80"
                         }`}
                     >
                       <div className="flex items-center gap-2">
@@ -408,8 +515,8 @@ export function Hero() {
                     {/* Tor v3 Hidden Service */}
                     <div
                       className={`flex items-center justify-between p-2.5 rounded-lg transition-all border ${isCensored
-                          ? "bg-purple-950/40 border-purple-500/50 ring-1 ring-purple-500/40"
-                          : "bg-black/40 border-white/5"
+                        ? "bg-purple-950/40 border-purple-500/50 ring-1 ring-purple-500/40"
+                        : "bg-black/40 border-white/5"
                         }`}
                     >
                       <div className="flex items-center gap-2">
@@ -450,8 +557,8 @@ export function Hero() {
                     <button
                       onClick={() => setIsCensored((prev) => !prev)}
                       className={`py-2 px-3 rounded-lg border text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-all ${isCensored
-                          ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/25"
-                          : "bg-red-500/10 border-red-500/20 text-red-400 hover:bg-red-500/20"
+                        ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/25"
+                        : "bg-red-500/10 border-red-500/20 text-red-400 hover:bg-red-500/20"
                         }`}
                     >
                       {isCensored ? (

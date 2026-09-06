@@ -91,7 +91,7 @@ const getSampleResponseForEndpoint = (ep: string): ApiResponseResult | null => {
           mirrors: {
             ipfs: "ipfs://bafkreifg43jdwfgeebl6fkt6ntem6xsw5pp54ttnuzb6rffil36jtjukq4",
             gateway: "https://ipfs.io/ipfs/bafkreifg43jdwfgeebl6fkt6ntem6xsw5pp54ttnuzb6rffil36jtjukq4",
-            tor: "http://anonpress7x2q...onion/content/bafkreifg43jdwfgeebl6fkt6ntem6xsw5pp54ttnuzb6rffil36jtjukq4"
+            tor: "http://pressprotocol7x2q...onion/content/bafkreifg43jdwfgeebl6fkt6ntem6xsw5pp54ttnuzb6rffil36jtjukq4"
           },
           verification: {
             verified: true,

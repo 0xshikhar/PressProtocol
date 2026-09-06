@@ -107,10 +107,16 @@ export class ApiClient {
     const cleanBaseUrl = this.baseUrl?.includes("railway.app") ? "" : this.baseUrl;
 
     // 1. Try configured backend if valid
-    if (cleanBaseUrl) {
+    const edgeBackends = [
+      cleanBaseUrl,
+      "https://pressprotocol-api.newsofficework.workers.dev",
+      "https://api.pressprotocol.com",
+    ].filter(Boolean);
+
+    for (const backend of Array.from(new Set(edgeBackends))) {
       try {
-        const response = await fetch(`${cleanBaseUrl}/api/content/${cid}`, {
-          signal: AbortSignal.timeout(3000),
+        const response = await fetch(`${backend}/api/content/${cid}`, {
+          signal: AbortSignal.timeout(3500),
         });
 
         if (response.ok) {
@@ -118,7 +124,7 @@ export class ApiClient {
           if (result.data) return result.data;
         }
       } catch (e) {
-        console.warn(`[ApiClient] Failed to fetch from baseUrl ${cleanBaseUrl}, trying resilient edge fallback...`);
+        console.warn(`[ApiClient] Failed to fetch from backend ${backend}, trying next fallback...`);
       }
     }
 
@@ -152,10 +158,11 @@ export class ApiClient {
       }
     }
 
-    // 3. Direct browser IPFS gateway query as ultimate safeguard
+    // 4. Direct browser IPFS gateway query as ultimate safeguard
     const publicGateways = [
+      "https://ipfs.filebase.io/ipfs",
+      "https://4everland.io/ipfs",
       "https://gateway.pinata.cloud/ipfs",
-      "https://cloudflare-ipfs.com/ipfs",
       "https://ipfs.io/ipfs",
     ];
 
@@ -165,7 +172,23 @@ export class ApiClient {
           signal: AbortSignal.timeout(4000),
         });
         if (res.ok) {
-          const raw = await res.json();
+          const text = await res.text();
+          let raw: any;
+          try {
+            raw = JSON.parse(text);
+          } catch {
+            raw = {
+              title: "Preserved Sovereign Document",
+              content: text,
+              tags: ["ipfs-raw"],
+              timestamp: new Date().toISOString(),
+              publisher: {
+                pubkey: "",
+                signature: "unsigned",
+              },
+            };
+          }
+
           return {
             cid,
             title: raw.title || "Untitled",
@@ -174,7 +197,7 @@ export class ApiClient {
             mirrors: {
               ipfs: { url: `${gateway}/${cid}`, available: true },
               tor: { url: "", available: false },
-              gateway: { url: `https://cloudflare-ipfs.com/ipfs/${cid}`, available: true },
+              gateway: { url: `https://ipfs.filebase.io/ipfs/${cid}`, available: true },
             },
             recommended: "ipfs",
             publisher: {

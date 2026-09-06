@@ -71,7 +71,7 @@ export function BookmarkButton({
 
         toggleBookmark({ cid, title, tags, excerpt, content, author });
         setBookmarked(true);
-        toast.success("Preserved in offline vault — read anytime without internet!");
+        toast.success("Preserved in offline vault - read anytime without internet!");
       }
     } catch (error: any) {
       console.error("Bookmark error:", error);
@@ -88,11 +88,10 @@ export function BookmarkButton({
       variant={bookmarked ? "default" : "outline"}
       size="sm"
       onClick={handleToggle}
-      className={`gap-2 ${
-        bookmarked
+      className={`gap-2 ${bookmarked
           ? "bg-emerald-500 hover:bg-emerald-400 text-black border-emerald-500 font-semibold shadow-sm"
           : "border-white/10 bg-white/5 hover:bg-white/10 text-zinc-300"
-      } ${className || ""}`}
+        } ${className || ""}`}
     >
       <Bookmark className={`h-4 w-4 ${bookmarked ? "fill-current" : ""}`} />
       <span>{bookmarked ? "Saved for Offline" : "Save for Offline"}</span>

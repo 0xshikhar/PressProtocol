@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Github, Twitter, Globe, Shield, Terminal, Activity, ArrowUpRight } from "lucide-react";
+import { Github, Twitter, Globe, Shield, Terminal, Activity, ArrowUpRight, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Footer() {
@@ -38,10 +38,10 @@ export default function Footer() {
       title: "Information",
       links: [
         { name: "About PressProtocol", href: "/about" },
+        { name: "Support & Public Goods", href: "/support" },
         { name: "How It Works", href: "/#features" },
         { name: "Threat Model", href: "/privacy" },
         { name: "Public Goods Mission", href: "/about" },
-        { name: "Octant Evaluation", href: "/about" },
         { name: "Contact & Security", href: "/contact" },
       ],
     },
@@ -78,7 +78,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-white/[0.08] bg-[#050508] text-white">
       <div className="container mx-auto px-4 py-12 max-w-7xl">
-        {/* Top Tier: Brand Identity & Telemetry */}
+        {/* Top Tier: Brand Identity, Telemetry & Sleek Support Callout */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-10 border-b border-white/[0.08]">
           <div className="max-w-xl">
             <Link href="/" className="mb-3 flex items-center gap-2.5 group">
@@ -101,38 +101,49 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Live Protocol Health Status & Social Badges */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-950/30 border border-emerald-500/20 text-emerald-400 font-mono text-xs">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Mainnet Swarm Active</span>
-              <span className="text-emerald-500/50">|</span>
-              <span className="text-zinc-400">18ms SLA</span>
+          {/* Live Protocol Health Status, Social Badges & Support Public Good Pill */}
+          <div className="flex flex-col sm:items-end gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-950/30 border border-emerald-500/20 text-emerald-400 font-mono text-xs">
+                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Mainnet Swarm Active</span>
+                <span className="text-emerald-500/50">|</span>
+                <span className="text-zinc-400">18ms SLA</span>
+              </div>
+
+              <div className="flex gap-2">
+                {socialLinks.map((social) => {
+                  const Icon = social.icon;
+                  return (
+                    <Button
+                      key={social.name}
+                      variant="outline"
+                      size="icon"
+                      className="h-8 w-8 bg-white/5 border-white/10 text-zinc-400 hover:text-white hover:bg-white/10 hover:border-cyan-500/30 transition-colors"
+                      asChild
+                    >
+                      <a
+                        href={social.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={social.name}
+                      >
+                        <Icon className="h-4 w-4" />
+                      </a>
+                    </Button>
+                  );
+                })}
+              </div>
             </div>
 
-            <div className="flex gap-2">
-              {socialLinks.map((social) => {
-                const Icon = social.icon;
-                return (
-                  <Button
-                    key={social.name}
-                    variant="outline"
-                    size="icon"
-                    className="h-8 w-8 bg-white/5 border-white/10 text-zinc-400 hover:text-white hover:bg-white/10 hover:border-cyan-500/30 transition-colors"
-                    asChild
-                  >
-                    <a
-                      href={social.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={social.name}
-                    >
-                      <Icon className="h-4 w-4" />
-                    </a>
-                  </Button>
-                );
-              })}
-            </div>
+            {/* Refined Support Public Good Pill in the empty right space */}
+            <Link href="/support" className="group">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-rose-500/30 bg-rose-500/[0.08] hover:bg-rose-500/[0.18] hover:border-rose-500/50 text-rose-300 hover:text-white font-mono text-xs transition-all shadow-[0_0_20px_rgba(244,63,94,0.12)]">
+                <Heart className="h-3.5 w-3.5 fill-rose-400 text-rose-400 group-hover:scale-110 transition-transform" />
+                <span>Support Public Good</span>
+                <span className="text-rose-400/60 group-hover:translate-x-0.5 transition-transform">&rarr;</span>
+              </div>
+            </Link>
           </div>
         </div>
 
@@ -144,7 +155,7 @@ export default function Footer() {
                 {section.title}
               </h3>
               <ul className="space-y-2 text-xs font-mono">
-                {section.links.map((link) => (
+                {section.links.map((link: any) => (
                   <li key={link.name}>
                     <Link
                       href={link.href}

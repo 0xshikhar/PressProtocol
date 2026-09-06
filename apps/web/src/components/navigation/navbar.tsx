@@ -137,13 +137,14 @@ const Navbar = () => {
   const dispatchesLinks = [
     { href: "/explore", label: "Explore Feed", icon: Search, desc: "Browse the live decentralized publication feed" },
     { href: "/trending", label: "Trending", icon: TrendingUp, desc: "Real-time propagation velocity, top authors" },
-    { href: "/import", label: "Import & Scrub", icon: UploadCloud, desc: "Bring in RSS, Substack, or any URL — trackers stripped automatically" },
+    { href: "/import", label: "Import & Scrub", icon: UploadCloud, desc: "Bring in RSS, Substack, or any URL - trackers stripped automatically" },
     { href: "/embed/builder", label: "Embed Builder", icon: Share2, desc: "Syndicate verified articles on any external site" },
   ];
 
-  // 2. Protocol Header Cluster (Public Goods & Mission is placed FIRST per evaluation priorities)
+  // 2. Protocol Header Cluster (Public Goods & Support placed FIRST)
   const protocolLinks = [
-    { href: "/about", label: "Public Goods & Mission", icon: Heart, desc: "Our mission, grant roadmap, and public good charter" },
+    { href: "/support", label: "Support Our Mission ♥", icon: Heart, desc: "100% solo-built public good - support sovereign infrastructure" },
+    { href: "/about", label: "Public Goods Manifesto", icon: Heart, desc: "Our mission, architecture, and public good charter" },
     { href: "/explorer", label: "Network Explorer", icon: Globe, desc: "Live DHT peers, swarm health, real-time ledger" },
     { href: "/privacy", label: "Threat Model", icon: Shield, desc: "Formal security guarantees, attack-by-attack" },
     { href: "/spec", label: "Spec (RFC)", icon: FileText, desc: "RFC 8785 canonical JSON, Ed25519, DAG-PB chunking" },
@@ -167,9 +168,9 @@ const Navbar = () => {
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-white/[0.08] bg-[#050508]/90 backdrop-blur-2xl text-white shadow-2xl transition-colors">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 max-w-7xl relative">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4 max-w-7xl">
         {/* Left: Brand Identity & Network Badge */}
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-5 shrink-0">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-white/5 border border-white/15 group-hover:border-cyan-400/50 transition-colors overflow-hidden p-1 shadow-lg">
               <Image
@@ -188,156 +189,159 @@ const Navbar = () => {
         </div>
 
         {/* Center: Desktop Navigation: 3 Toggle-Based Category Headers */}
-        <div className="hidden items-center space-x-1 lg:flex absolute left-1/2 -translate-x-1/2">
-            {/* 1. Dispatches Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn(
-                    "gap-1 text-xs font-mono tracking-wide transition-all h-8 px-2.5 rounded-lg border",
-                    isDispatchesActive
-                      ? "border-cyan-500/40 bg-cyan-500/15 text-cyan-300 shadow-[0_0_12px_rgba(34,211,238,0.15)]"
-                      : "border-transparent text-zinc-400 hover:text-white hover:bg-white/5 hover:border-white/10"
-                  )}
-                >
-                  <span>Discovery & Editorial</span>
-                  <ChevronDown className="h-3 w-3 opacity-60" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="start"
-                className="w-80 bg-[#0B0D14]/95 backdrop-blur-2xl border-white/10 p-2 shadow-2xl text-white"
+        <div className="hidden lg:flex items-center justify-center space-x-1 flex-1 min-w-0 px-4">
+          {/* 1. Dispatches Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "gap-1 text-xs font-mono tracking-wide transition-all h-8 px-2.5 rounded-lg border",
+                  isDispatchesActive
+                    ? "border-cyan-500/40 bg-cyan-500/15 text-cyan-300 shadow-[0_0_12px_rgba(34,211,238,0.15)]"
+                    : "border-transparent text-zinc-400 hover:text-white hover:bg-white/5 hover:border-white/10"
+                )}
               >
-                <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-zinc-500">
-                  Discovery & Editorial
-                </div>
-                {dispatchesLinks.map((link) => {
-                  const Icon = link.icon;
-                  const isActive = pathname === link.href;
-                  return (
-                    <DropdownMenuItem
-                      key={link.href}
-                      onClick={() => router.push(link.href)}
-                      className={cn(
-                        "flex items-start gap-2.5 p-2 rounded-lg cursor-pointer transition-colors",
-                        isActive ? "bg-cyan-500/15 text-cyan-300" : "hover:bg-white/5 text-zinc-300 hover:text-white"
-                      )}
-                    >
-                      <Icon className={cn("h-4 w-4 mt-0.5 shrink-0", isActive ? "text-cyan-400" : "text-zinc-400")} />
-                      <div>
-                        <div className="text-xs font-mono font-medium leading-none mb-1">{link.label}</div>
-                        <div className="text-[11px] text-zinc-500 leading-snug">{link.desc}</div>
-                      </div>
-                    </DropdownMenuItem>
-                  );
-                })}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                <span>Discovery & Editorial</span>
+                <ChevronDown className="h-3 w-3 opacity-60" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="start"
+              className="w-80 bg-[#0B0D14]/95 backdrop-blur-2xl border-white/10 p-2 shadow-2xl text-white"
+            >
+              <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-zinc-500">
+                Discovery & Editorial
+              </div>
+              {dispatchesLinks.map((link) => {
+                const Icon = link.icon;
+                const isActive = pathname === link.href;
+                return (
+                  <DropdownMenuItem
+                    key={link.href}
+                    onClick={() => router.push(link.href)}
+                    className={cn(
+                      "flex items-start gap-2.5 p-2 rounded-lg cursor-pointer transition-colors",
+                      isActive ? "bg-cyan-500/15 text-cyan-300" : "hover:bg-white/5 text-zinc-300 hover:text-white"
+                    )}
+                  >
+                    <Icon className={cn("h-4 w-4 mt-0.5 shrink-0", isActive ? "text-cyan-400" : "text-zinc-400")} />
+                    <div>
+                      <div className="text-xs font-mono font-medium leading-none mb-1">{link.label}</div>
+                      <div className="text-[11px] text-zinc-500 leading-snug">{link.desc}</div>
+                    </div>
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-            {/* 2. Protocol Dropdown (Public Goods & Mission first) */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn(
-                    "gap-1 text-xs font-mono tracking-wide transition-all h-8 px-2.5 rounded-lg border",
-                    isProtocolActive
-                      ? "border-cyan-500/40 bg-cyan-500/15 text-cyan-300 shadow-[0_0_12px_rgba(34,211,238,0.15)]"
-                      : "border-transparent text-zinc-400 hover:text-white hover:bg-white/5 hover:border-white/10"
-                  )}
-                >
-                  <span>Protocol</span>
-                  <ChevronDown className="h-3 w-3 opacity-60" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="start"
-                className="w-80 bg-[#0B0D14]/95 backdrop-blur-2xl border-white/10 p-2 shadow-2xl text-white"
+          {/* 2. Protocol Dropdown (Public Goods & Mission first) */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "gap-1 text-xs font-mono tracking-wide transition-all h-8 px-2.5 rounded-lg border",
+                  isProtocolActive
+                    ? "border-cyan-500/40 bg-cyan-500/15 text-cyan-300 shadow-[0_0_12px_rgba(34,211,238,0.15)]"
+                    : "border-transparent text-zinc-400 hover:text-white hover:bg-white/5 hover:border-white/10"
+                )}
               >
-                <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-zinc-500">
-                  Network & Governance
-                </div>
-                {protocolLinks.map((link) => {
-                  const Icon = link.icon;
-                  const isActive = pathname === link.href;
-                  return (
-                    <DropdownMenuItem
-                      key={link.href}
-                      onClick={() => router.push(link.href)}
-                      className={cn(
-                        "flex items-start gap-2.5 p-2 rounded-lg cursor-pointer transition-colors",
-                        isActive ? "bg-cyan-500/15 text-cyan-300" : "hover:bg-white/5 text-zinc-300 hover:text-white"
-                      )}
-                    >
-                      <Icon className={cn("h-4 w-4 mt-0.5 shrink-0", isActive ? "text-cyan-400" : "text-zinc-400")} />
-                      <div>
-                        <div className="text-xs font-mono font-medium leading-none mb-1 flex items-center gap-1.5">
-                          <span>{link.label}</span>
-                          {link.href === "/about" && (
-                            <span className="px-1.5 py-0.2 rounded text-[9px] bg-red-500/20 text-red-300 font-mono">Mission</span>
-                          )}
-                        </div>
-                        <div className="text-[11px] text-zinc-500 leading-snug">{link.desc}</div>
+                <span>Protocol</span>
+                <ChevronDown className="h-3 w-3 opacity-60" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="start"
+              className="w-80 bg-[#0B0D14]/95 backdrop-blur-2xl border-white/10 p-2 shadow-2xl text-white"
+            >
+              <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-zinc-500">
+                Network & Governance
+              </div>
+              {protocolLinks.map((link) => {
+                const Icon = link.icon;
+                const isActive = pathname === link.href;
+                return (
+                  <DropdownMenuItem
+                    key={link.href}
+                    onClick={() => router.push(link.href)}
+                    className={cn(
+                      "flex items-start gap-2.5 p-2 rounded-lg cursor-pointer transition-colors",
+                      isActive ? "bg-cyan-500/15 text-cyan-300" : "hover:bg-white/5 text-zinc-300 hover:text-white"
+                    )}
+                  >
+                    <Icon className={cn("h-4 w-4 mt-0.5 shrink-0", isActive ? "text-cyan-400" : "text-zinc-400")} />
+                    <div>
+                      <div className="text-xs font-mono font-medium leading-none mb-1 flex items-center gap-1.5">
+                        <span>{link.label}</span>
+                        {link.href === "/support" && (
+                          <span className="px-1.5 py-0.2 rounded text-[9px] bg-rose-500/25 text-rose-300 font-mono border border-rose-500/40">Solo Built</span>
+                        )}
+                        {link.href === "/about" && (
+                          <span className="px-1.5 py-0.2 rounded text-[9px] bg-cyan-500/20 text-cyan-300 font-mono">Manifesto</span>
+                        )}
                       </div>
-                    </DropdownMenuItem>
-                  );
-                })}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                      <div className="text-[11px] text-zinc-500 leading-snug">{link.desc}</div>
+                    </div>
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-            {/* 3. Developers Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn(
-                    "gap-1 text-xs font-mono tracking-wide transition-all h-8 px-2.5 rounded-lg border",
-                    isDevelopersActive
-                      ? "border-cyan-500/40 bg-cyan-500/15 text-cyan-300 shadow-[0_0_12px_rgba(34,211,238,0.15)]"
-                      : "border-transparent text-zinc-400 hover:text-white hover:bg-white/5 hover:border-white/10"
-                  )}
-                >
-                  <span>Developers</span>
-                  <ChevronDown className="h-3 w-3 opacity-60" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="start"
-                className="w-80 bg-[#0B0D14]/95 backdrop-blur-2xl border-white/10 p-2 shadow-2xl text-white"
+          {/* 3. Developers Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "gap-1 text-xs font-mono tracking-wide transition-all h-8 px-2.5 rounded-lg border",
+                  isDevelopersActive
+                    ? "border-cyan-500/40 bg-cyan-500/15 text-cyan-300 shadow-[0_0_12px_rgba(34,211,238,0.15)]"
+                    : "border-transparent text-zinc-400 hover:text-white hover:bg-white/5 hover:border-white/10"
+                )}
               >
-                <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-zinc-500">
-                  SDKs & Infrastructure
-                </div>
-                {developerLinks.map((link) => {
-                  const Icon = link.icon;
-                  const isActive = pathname === link.href;
-                  return (
-                    <DropdownMenuItem
-                      key={link.href}
-                      onClick={() => router.push(link.href)}
-                      className={cn(
-                        "flex items-start gap-2.5 p-2 rounded-lg cursor-pointer transition-colors",
-                        isActive ? "bg-cyan-500/15 text-cyan-300" : "hover:bg-white/5 text-zinc-300 hover:text-white"
-                      )}
-                    >
-                      <Icon className={cn("h-4 w-4 mt-0.5 shrink-0", isActive ? "text-cyan-400" : "text-zinc-400")} />
-                      <div>
-                        <div className="text-xs font-mono font-medium leading-none mb-1">{link.label}</div>
-                        <div className="text-[11px] text-zinc-500 leading-snug">{link.desc}</div>
-                      </div>
-                    </DropdownMenuItem>
-                  );
-                })}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+                <span>Developers</span>
+                <ChevronDown className="h-3 w-3 opacity-60" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="start"
+              className="w-80 bg-[#0B0D14]/95 backdrop-blur-2xl border-white/10 p-2 shadow-2xl text-white"
+            >
+              <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-zinc-500">
+                SDKs & Infrastructure
+              </div>
+              {developerLinks.map((link) => {
+                const Icon = link.icon;
+                const isActive = pathname === link.href;
+                return (
+                  <DropdownMenuItem
+                    key={link.href}
+                    onClick={() => router.push(link.href)}
+                    className={cn(
+                      "flex items-start gap-2.5 p-2 rounded-lg cursor-pointer transition-colors",
+                      isActive ? "bg-cyan-500/15 text-cyan-300" : "hover:bg-white/5 text-zinc-300 hover:text-white"
+                    )}
+                  >
+                    <Icon className={cn("h-4 w-4 mt-0.5 shrink-0", isActive ? "text-cyan-400" : "text-zinc-400")} />
+                    <div>
+                      <div className="text-xs font-mono font-medium leading-none mb-1">{link.label}</div>
+                      <div className="text-[11px] text-zinc-500 leading-snug">{link.desc}</div>
+                    </div>
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
         {/* Right: Search, Publish CTA, Consolidated Sovereign Account Menu */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 shrink-0">
           {/* Quick Search Trigger (⌘K) */}
           <Sheet open={isSearchOpen} onOpenChange={setIsSearchOpen}>
             <SheetTrigger asChild>

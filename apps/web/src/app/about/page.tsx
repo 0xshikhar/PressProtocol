@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 export const metadata: Metadata = {
-  title: "About PressProtocol — Decentralized Public Good",
+  title: "About PressProtocol - Decentralized Public Good",
   description: "PressProtocol mission, open-source public goods stewardship, and censorship-resistant publishing architecture.",
 };
 
@@ -83,7 +83,7 @@ export default function AboutPage() {
           <section className="space-y-3">
             <h2 className="text-2xl font-sans font-bold text-white">The Core Thesis</h2>
             <p className="text-neutral-400 leading-relaxed">
-              When truth is dangerous, identity should be sovereign. When platforms can be coerced, publishing must be peer-to-peer. 
+              When truth is dangerous, identity should be sovereign. When platforms can be coerced, publishing must be peer-to-peer.
               Traditional media platforms force writers into Faustian bargains: sacrifice your anonymity, submit your IP address, or risk having your life&apos;s work erased at the whim of an administrative subpoena or denial-of-service attack.
             </p>
             <p className="text-neutral-400 leading-relaxed">
@@ -107,7 +107,7 @@ export default function AboutPage() {
           <section className="space-y-3">
             <h2 className="text-2xl font-sans font-bold text-white">Open-Source Governance & Public Goods Trust</h2>
             <p className="text-neutral-400 leading-relaxed">
-              We believe critical democratic infrastructure must never be beholden to venture-capital extraction or advertising surveillance models. 
+              We believe critical democratic infrastructure must never be beholden to venture-capital extraction or advertising surveillance models.
               Built under the MIT license, PressProtocol remains 100% open-source, non-custodial, and free to all citizens of the world.
             </p>
           </section>

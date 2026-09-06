@@ -7,15 +7,20 @@ const BACKEND_TIMEOUT_MS = 2500;
 const GATEWAY_TIMEOUT_MS = 4000;
 
 const PUBLIC_IPFS_GATEWAYS = [
+  "https://ipfs.filebase.io/ipfs",
+  "https://tan-awake-wombat-832.mypinata.cloud/ipfs",
+  "https://4everland.io/ipfs",
+  "https://nftstorage.link/ipfs",
   "https://gateway.pinata.cloud/ipfs",
-  "https://cloudflare-ipfs.com/ipfs",
   "https://ipfs.io/ipfs",
   "https://dweb.link/ipfs",
 ];
 
+const PINATA_GATEWAY_TOKEN = "4yPfAllkWi5DUEGZ_qbPGI1faHfyQlq9oNqCt3_jL75CTXseiykewlMr6jGFgOFR";
+
 /**
  * Dispatches concurrent requests across public IPFS gateways.
- * Resolves with the fastest HTTP 200 JSON payload, aborting slower peers.
+ * Resolves with the fastest HTTP 200 payload, aborting slower peers.
  */
 async function fetchFastestFromIPFSGateways(
   cid: string
@@ -24,18 +29,43 @@ async function fetchFastestFromIPFSGateways(
   const timeoutId = setTimeout(() => abortController.abort(), GATEWAY_TIMEOUT_MS);
 
   const fetchPromises = PUBLIC_IPFS_GATEWAYS.map(async (gateway) => {
-    const response = await fetch(`${gateway}/${cid}`, {
+    let targetUrl = `${gateway}/${cid}`;
+    const headers: Record<string, string> = {
+      Accept: "application/json, text/html, text/plain, */*",
+      "User-Agent": "PressProtocol-Edge/1.0.6 (Decentralized Publishing Gateway; +https://pressprotocol.com)",
+    };
+
+    if (gateway.includes("mypinata.cloud")) {
+      targetUrl = `${gateway}/${cid}?pinataGatewayToken=${PINATA_GATEWAY_TOKEN}`;
+      headers["x-pinata-gateway-token"] = PINATA_GATEWAY_TOKEN;
+    }
+
+    const response = await fetch(targetUrl, {
       signal: abortController.signal,
-      headers: {
-        Accept: "application/json",
-      },
+      headers,
     });
 
     if (!response.ok) {
       throw new Error(`Gateway ${gateway} responded with status ${response.status}`);
     }
 
-    const raw = await response.json();
+    const text = await response.text();
+    let raw: any;
+    try {
+      raw = JSON.parse(text);
+    } catch {
+      raw = {
+        title: "Preserved Sovereign Document",
+        content: text,
+        tags: ["ipfs-raw"],
+        timestamp: new Date().toISOString(),
+        publisher: {
+          pubkey: "",
+          signature: "unsigned",
+        },
+      };
+    }
+
     return { raw, gateway };
   });
 

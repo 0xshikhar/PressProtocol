@@ -261,13 +261,20 @@ export default function ReadPage() {
     switch (readerSettings.typeface) {
       case "sans":
         return "font-sans";
+      case "editorial":
+        return "font-editorial";
       case "mono":
         return "font-mono";
+      case "charter":
       case "serif":
       default:
-        return "font-serif";
+        return "font-charter";
     }
   };
+
+  const isSepia = readerSettings.theme === "sepia";
+  const isPaper = readerSettings.theme === "paper";
+  const isLight = isSepia || isPaper;
 
   return (
     <>
@@ -319,6 +326,8 @@ export default function ReadPage() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${
                   readerSettings.theme === "sepia"
                     ? "bg-[#f4ece1] text-[#2d2b28] shadow-sm border border-amber-700/40 ring-1 ring-amber-700/30 font-semibold"
+                    : isLight
+                    ? "text-[#57534e] hover:text-[#1c1917] font-medium"
                     : "text-muted-foreground hover:text-foreground opacity-70 hover:opacity-100"
                 }`}
                 title="Warm Sepia (Low Eyestrain)"
@@ -333,6 +342,8 @@ export default function ReadPage() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${
                   readerSettings.theme === "paper"
                     ? "bg-white text-neutral-900 shadow-sm border border-neutral-400 ring-1 ring-neutral-400/30 font-semibold"
+                    : isLight
+                    ? "text-neutral-600 hover:text-neutral-950 font-medium"
                     : "text-muted-foreground hover:text-foreground opacity-70 hover:opacity-100"
                 }`}
                 title="Clean Paper (Daylight Editorial)"
@@ -344,7 +355,13 @@ export default function ReadPage() {
 
             {/* Quick Font Size Controls & Typeface Indicator */}
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 px-1.5 py-1 rounded-lg border border-black/5 dark:border-white/10 bg-black/5 dark:bg-white/5 text-xs font-mono">
+              <div className={`flex items-center gap-1 px-1.5 py-1 rounded-lg border text-xs font-mono ${
+                isSepia
+                  ? 'border-amber-900/15 bg-amber-900/5 text-[#2d2b28]'
+                  : isPaper
+                  ? 'border-neutral-200 bg-neutral-100 text-neutral-900'
+                  : 'border-white/10 bg-white/5 text-white'
+              }`}>
                 <button
                   type="button"
                   onClick={() => setReaderSettings({ ...readerSettings, fontSize: Math.max(15, readerSettings.fontSize - 1) })}
@@ -353,7 +370,7 @@ export default function ReadPage() {
                 >
                   A-
                 </button>
-                <span className="text-[11px] opacity-70 px-1">{readerSettings.fontSize}px</span>
+                <span className="text-[11px] font-semibold px-1">{readerSettings.fontSize}px</span>
                 <button
                   type="button"
                   onClick={() => setReaderSettings({ ...readerSettings, fontSize: Math.min(26, readerSettings.fontSize + 1) })}
@@ -374,57 +391,93 @@ export default function ReadPage() {
 
         {/* Extension Install Banner */}
         <div className={`border-b transition-colors ${
-          readerSettings.theme === 'sepia'
-            ? 'bg-amber-100/40 border-amber-900/10 text-[#5c4a38]'
-            : readerSettings.theme === 'paper'
-            ? 'bg-neutral-50 border-neutral-200 text-neutral-700'
+          isSepia
+            ? 'bg-[#f5ecdd] border-amber-900/15 text-[#451a03]'
+            : isPaper
+            ? 'bg-neutral-100 border-neutral-200 text-neutral-800'
+            : readerSettings.theme === 'cyber'
+            ? 'bg-[#051109]/90 border-emerald-900/30 text-emerald-300'
             : 'bg-white/[0.02] border-white/10 text-white/70'
         }`}>
           <div className="container mx-auto max-w-4xl px-4 py-2.5">
-            <Alert className="border-0 bg-transparent py-0">
-              <Download className="h-4 w-4 text-cyan-500" />
-              <AlertDescription className="text-xs font-mono">
+            <div className="flex items-center gap-2 text-xs font-mono">
+              <Download className={`h-4 w-4 shrink-0 ${isSepia ? 'text-amber-800' : isPaper ? 'text-neutral-700' : 'text-cyan-400'}`} />
+              <span className={isSepia ? 'text-[#451a03]' : isPaper ? 'text-neutral-800' : 'text-white/80'}>
                 Install the PressProtocol browser extension for automatic multi-network failover routing.
-                <Button variant="link" className="ml-2 h-auto p-0 text-xs font-mono text-cyan-400 hover:text-cyan-300">
-                  Install Extension
-                </Button>
-              </AlertDescription>
-            </Alert>
+              </span>
+              <Button
+                variant="link"
+                asChild
+                className={`ml-1 h-auto p-0 text-xs font-mono font-semibold underline underline-offset-2 ${
+                  isSepia ? 'text-[#78350f] hover:text-[#451a03]' : isPaper ? 'text-blue-700 hover:text-blue-900' : 'text-cyan-400 hover:text-cyan-300'
+                }`}
+              >
+                <Link href="/downloads">Install Extension</Link>
+              </Button>
+            </div>
           </div>
         </div>
 
         {/* Article Content - Sublime Editorial Reading Canvas */}
-        <article className="mx-auto max-w-[760px] px-6 py-12">
+        <article className={`mx-auto max-w-[760px] px-6 py-12 ${
+          isSepia ? 'reader-sepia' : isPaper ? 'reader-paper' : 'reader-onyx'
+        }`}>
           {/* Offline Mode Banner */}
           {isOfflineMode && (
-            <div className="mb-8 p-4 rounded-2xl border border-amber-500/30 bg-amber-950/20 flex items-center justify-between gap-4 text-amber-200">
+            <div className={`mb-8 p-4 rounded-2xl border flex items-center justify-between gap-4 transition-all ${
+              isSepia
+                ? 'border-amber-700/30 bg-[#f4ece1] text-[#451a03] shadow-sm'
+                : isPaper
+                ? 'border-neutral-300 bg-neutral-100 text-neutral-900 shadow-sm'
+                : 'border-amber-500/30 bg-amber-950/20 text-amber-200'
+            }`}>
               <div className="flex items-center gap-3">
-                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/20 text-amber-400 font-bold text-xs">
+                <span className={`flex h-7 w-7 items-center justify-center rounded-lg font-bold text-xs ${
+                  isSepia
+                    ? 'bg-amber-700/20 text-amber-900'
+                    : isPaper
+                    ? 'bg-amber-200 text-amber-900'
+                    : 'bg-amber-500/20 text-amber-400'
+                }`}>
                   ⚡
                 </span>
                 <div>
-                  <div className="font-semibold text-xs tracking-wide uppercase font-mono text-amber-300">
+                  <div className={`font-semibold text-xs tracking-wide uppercase font-mono ${
+                    isSepia ? 'text-[#5a2e0e]' : isPaper ? 'text-neutral-900' : 'text-amber-300'
+                  }`}>
                     Offline Mode Active
                   </div>
-                  <p className="text-xs text-amber-300/80 mt-0.5">
+                  <p className={`text-xs mt-0.5 ${
+                    isSepia ? 'text-[#78350f]' : isPaper ? 'text-neutral-600' : 'text-amber-300/80'
+                  }`}>
                     Reading preserved snapshot directly from your browser&apos;s local sovereign vault.
                   </p>
                 </div>
               </div>
-              <Badge variant="outline" className="border-amber-500/40 text-amber-300 text-[10px] uppercase font-mono px-2 py-0.5">
+              <Badge variant="outline" className={`text-[10px] uppercase font-mono px-2 py-0.5 ${
+                isSepia
+                  ? 'border-amber-700/40 text-amber-900 bg-amber-200/50 font-semibold'
+                  : isPaper
+                  ? 'border-neutral-400 text-neutral-800 bg-neutral-200/50 font-semibold'
+                  : 'border-amber-500/40 text-amber-300'
+              }`}>
                 Local Cache
               </Badge>
             </div>
           )}
 
-          {/* Title */}
-          <h1 className={`${getTypefaceClass()} text-4xl sm:text-5xl font-bold leading-tight mb-6`}>
+          {/* Title - Clean Bold Sans-Serif (Medium Headline Standard) */}
+          <h1 className={`font-sans text-4xl sm:text-5xl font-bold tracking-tight leading-[1.18] mb-6 ${
+            isSepia ? 'text-[#1c1917]' : isPaper ? 'text-neutral-950' : ''
+          }`}>
             {content.title}
           </h1>
           
           {/* Meta Information */}
           <div className="flex items-center justify-between mb-8 flex-wrap gap-3">
-            <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
+            <div className={`flex items-center gap-4 text-sm flex-wrap ${
+              isSepia ? 'text-[#57534e]' : isPaper ? 'text-neutral-600' : 'text-muted-foreground'
+            }`}>
               {readingStats && (
                 <span className="flex items-center gap-1">
                   <BookOpen className="h-4 w-4" />
@@ -445,21 +498,29 @@ export default function ReadPage() {
                 title="Click to inspect zero-trust cryptographic provenance"
               >
                 {isVerifying ? (
-                  <span className="flex items-center gap-1 text-xs text-muted-foreground animate-pulse">
+                  <span className={`flex items-center gap-1 text-xs animate-pulse ${
+                    isSepia ? 'text-[#78716c]' : isPaper ? 'text-neutral-500' : 'text-muted-foreground'
+                  }`}>
                     <Loader2 className="h-3 w-3 animate-spin" /> Verifying...
                   </span>
                 ) : verificationResult?.isValid ? (
-                  <span className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-medium group-hover:underline">
-                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
+                  <span className={`flex items-center gap-1 text-xs font-medium group-hover:underline ${
+                    isLight ? 'text-emerald-700 font-semibold' : 'text-emerald-400'
+                  }`}>
+                    <ShieldCheck className={`h-3.5 w-3.5 ${isLight ? 'text-emerald-700' : 'text-emerald-500'}`} />
                     Ed25519 Verified ({verificationResult.latencyMs}ms)
                   </span>
                 ) : verificationResult?.status === "unsigned" ? (
-                  <span className="flex items-center gap-1 text-xs text-muted-foreground group-hover:underline">
-                    <Shield className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className={`flex items-center gap-1 text-xs group-hover:underline ${
+                    isSepia ? 'text-[#78716c]' : isPaper ? 'text-neutral-500' : 'text-muted-foreground'
+                  }`}>
+                    <Shield className="h-3.5 w-3.5" />
                     Unsigned
                   </span>
                 ) : (
-                  <span className="flex items-center gap-1 text-xs text-amber-500 font-medium group-hover:underline">
+                  <span className={`flex items-center gap-1 text-xs font-medium group-hover:underline ${
+                    isLight ? 'text-amber-800 font-semibold' : 'text-amber-500'
+                  }`}>
                     <ShieldAlert className="h-3.5 w-3.5" />
                     Unverified
                   </span>
@@ -490,7 +551,13 @@ export default function ReadPage() {
                 size="sm"
                 onClick={handleArchiveWayback}
                 disabled={isArchiving}
-                className="h-8 gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+                className={`h-8 gap-1.5 text-xs ${
+                  isSepia
+                    ? 'border-amber-900/15 text-[#57534e] hover:text-[#1c1917] hover:bg-amber-900/5'
+                    : isPaper
+                    ? 'border-neutral-200 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
                 title="Preserve snapshot on Internet Archive / Wayback Machine"
               >
                 <Archive className={`h-3.5 w-3.5 ${isArchiving ? "animate-spin text-cyan-500" : ""}`} />
@@ -515,7 +582,17 @@ export default function ReadPage() {
           {content.tags && content.tags.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-10">
               {content.tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="text-xs">
+                <Badge
+                  key={tag}
+                  variant="outline"
+                  className={`text-xs px-2.5 py-1 transition-colors ${
+                    isSepia
+                      ? 'border-amber-900/15 bg-[#efe5d5] text-[#451a03] hover:bg-[#e4d7c3]'
+                      : isPaper
+                      ? 'border-neutral-300 bg-neutral-100 text-neutral-800 hover:bg-neutral-200'
+                      : 'border-white/10 bg-white/5 text-zinc-300 hover:bg-white/10'
+                  }`}
+                >
                   #{tag}
                 </Badge>
               ))}
@@ -533,27 +610,37 @@ export default function ReadPage() {
                        prose prose-lg max-w-none
                        ${getTypefaceClass()}
                        prose-headings:font-sans prose-headings:font-bold
-                       prose-h1:text-4xl prose-h1:mb-4 prose-h1:mt-12
-                       prose-h2:text-3xl prose-h2:mb-3 prose-h2:mt-10
-                       prose-h3:text-2xl prose-h3:mb-2 prose-h3:mt-8
-                       prose-p:mb-8
+                       prose-h1:text-4xl sm:prose-h1:text-5xl prose-h1:mb-6 prose-h1:mt-16
+                       prose-h2:text-2xl sm:prose-h2:text-3xl prose-h2:mb-5 prose-h2:mt-16
+                       prose-h3:text-xl sm:prose-h3:text-2xl prose-h3:mb-4 prose-h3:mt-12
+                       prose-p:mb-7
                        prose-a:text-primary prose-a:no-underline hover:prose-a:underline
                        prose-strong:font-semibold
                        prose-blockquote:border-l-4 prose-blockquote:border-primary
                        prose-blockquote:pl-6 prose-blockquote:italic
-                       prose-blockquote:text-muted-foreground
                        prose-img:rounded-lg prose-img:my-8
-                       prose-code:bg-muted prose-code:px-2 prose-code:py-1
-                       prose-code:rounded prose-code:text-sm
-                       prose-pre:bg-muted prose-pre:border
+                       prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-sm
+                       prose-pre:border
                        prose-li:mb-2
-                       ${(readerSettings.theme === 'dark' || readerSettings.theme === 'cyber') ? 'prose-invert' : 'prose-headings:text-neutral-900 prose-p:text-neutral-900'}`}
+                       ${
+                         readerSettings.theme === 'dark' || readerSettings.theme === 'cyber'
+                           ? 'prose-invert prose-blockquote:text-muted-foreground prose-code:bg-muted prose-pre:bg-muted'
+                           : isSepia
+                           ? 'prose-headings:text-[#1c1917] prose-p:text-[#2d2b28] prose-strong:text-[#1c1917] prose-blockquote:text-[#57534e] prose-blockquote:border-amber-700/60 prose-code:text-[#1c1917] prose-code:bg-[#ede3d2] prose-pre:bg-[#ede3d2] prose-pre:text-[#1c1917]'
+                           : 'prose-headings:text-neutral-950 prose-p:text-neutral-900 prose-strong:text-neutral-950 prose-blockquote:text-neutral-600 prose-blockquote:border-neutral-400 prose-code:text-neutral-900 prose-code:bg-neutral-100 prose-pre:bg-neutral-100 prose-pre:text-neutral-900'
+                       }`}
             dangerouslySetInnerHTML={{
               __html:
                 content.content ||
-                "<div class='p-8 rounded-xl border border-white/10 bg-white/5 text-zinc-400 font-mono text-xs text-center'><p>Article body is synchronizing across decentralized IPFS swarm mirrors.</p><p class='mt-2 text-zinc-500'>CID: " +
-                  content.cid +
-                  "</p></div>",
+                `<div class='p-8 rounded-xl border font-mono text-xs text-center ${
+                  isSepia
+                    ? 'border-amber-800/20 bg-[#f4ece1] text-[#451a03]'
+                    : isPaper
+                    ? 'border-neutral-300 bg-neutral-100 text-neutral-800'
+                    : 'border-white/10 bg-white/5 text-zinc-400'
+                }'><p class='font-medium'>Article body is synchronizing across decentralized IPFS swarm mirrors.</p><p class='mt-2 ${
+                  isSepia ? 'text-[#78350f]' : isPaper ? 'text-neutral-500' : 'text-zinc-500'
+                }'>CID: ${content.cid}</p></div>`,
             }}
           />
         </article>

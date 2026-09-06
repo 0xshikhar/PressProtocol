@@ -71,7 +71,7 @@ A quantitative framework for autonomous treasury syndication and quad-curve voti
 Decentralized autonomous organizations require verifiable publication rails that cannot be censored by centralized domain registrars.
 
 > "A protocol that relies on DNS has an existential architectural single point of failure."
-> — Protocol Security Council
+> - Protocol Security Council
 
 ### Key Architecture Components
 - **Volatile Ed25519 Signing**: In-memory ephemeral key derivation
@@ -205,22 +205,20 @@ curl -s https://pressprotocol.com/api/content/$CID | pressprotocol resolve --ver
             <button
               type="button"
               onClick={() => setInputMode("url")}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
-                inputMode === "url"
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${inputMode === "url"
                   ? "bg-[#15151C] text-white font-semibold shadow-sm border border-white/10"
                   : "text-zinc-400 hover:text-white"
-              }`}
+                }`}
             >
               <Globe className="w-3.5 h-3.5 text-cyan-400" /> Public Notion Page URL
             </button>
             <button
               type="button"
               onClick={() => setInputMode("markdown")}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
-                inputMode === "markdown"
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${inputMode === "markdown"
                   ? "bg-[#15151C] text-white font-semibold shadow-sm border border-white/10"
                   : "text-zinc-400 hover:text-white"
-              }`}
+                }`}
             >
               <FileText className="w-3.5 h-3.5 text-cyan-400" /> Paste Notion Markdown / Export
             </button>

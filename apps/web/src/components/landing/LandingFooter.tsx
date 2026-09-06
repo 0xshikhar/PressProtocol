@@ -32,6 +32,7 @@ const footerLinks: Record<string, FooterLink[]> = {
     { name: "Chromium Extension", href: "#ecosystem" },
   ],
   Company: [
+    { name: "Support (100% Solo-Built Public Good) ♥", href: "/support" },
     { name: "About PressProtocol", href: "/about" },
     { name: "Public Goods Mission", href: "/about" },
     { name: "Architecture Spec", href: "/spec" },

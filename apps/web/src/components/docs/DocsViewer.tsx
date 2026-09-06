@@ -2,23 +2,23 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { 
-  Search, 
-  ChevronRight, 
-  BookOpen, 
-  Zap, 
-  Terminal, 
-  Layout, 
-  Shield, 
-  Globe, 
-  Key, 
-  Code, 
-  CheckCircle2, 
-  Copy, 
-  Check, 
-  ExternalLink, 
-  Github, 
-  Activity, 
+import {
+  Search,
+  ChevronRight,
+  BookOpen,
+  Zap,
+  Terminal,
+  Layout,
+  Shield,
+  Globe,
+  Key,
+  Code,
+  CheckCircle2,
+  Copy,
+  Check,
+  ExternalLink,
+  Github,
+  Activity,
   ArrowRight,
   ArrowLeft,
   FileCode2,
@@ -110,7 +110,7 @@ export function DocsViewer() {
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    
+
     // Check initial hash on load
     if (typeof window !== "undefined" && window.location.hash) {
       const hashId = window.location.hash.replace("#", "");
@@ -133,7 +133,7 @@ export function DocsViewer() {
     const q = searchQuery.toLowerCase();
     return NAV_GROUPS.map(group => ({
       ...group,
-      items: group.items.filter(item => 
+      items: group.items.filter(item =>
         item.title.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q) || item.id.toLowerCase().includes(q)
       )
     })).filter(group => group.items.length > 0);
@@ -148,10 +148,10 @@ export function DocsViewer() {
           <div className="p-4 border-b border-white/5 sticky top-0 bg-[#0B0D14]/95 backdrop-blur-md z-10">
             <div className="relative">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-white/40" />
-              <Input 
+              <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search documentation..." 
+                placeholder="Search documentation..."
                 className="pl-9 bg-white/5 border-white/10 text-xs h-9 focus-visible:ring-cyan-500/50 font-mono text-white placeholder:text-zinc-500 rounded-lg"
               />
             </div>
@@ -170,13 +170,12 @@ export function DocsViewer() {
                     const isActive = activeSection === item.id;
                     return (
                       <li key={item.id}>
-                        <button 
+                        <button
                           onClick={() => scrollToSection(item.id)}
-                          className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 text-xs rounded-lg transition-all text-left font-mono ${
-                            isActive 
-                              ? "bg-cyan-500/15 text-cyan-300 font-medium border border-cyan-500/30 shadow-[0_0_12px_rgba(34,211,238,0.1)]" 
+                          className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 text-xs rounded-lg transition-all text-left font-mono ${isActive
+                              ? "bg-cyan-500/15 text-cyan-300 font-medium border border-cyan-500/30 shadow-[0_0_12px_rgba(34,211,238,0.1)]"
                               : "text-zinc-400 hover:text-white hover:bg-white/5 border border-transparent"
-                          }`}
+                            }`}
                         >
                           <Icon className={`h-3.5 w-3.5 shrink-0 ${isActive ? "text-cyan-400" : "text-zinc-500"}`} />
                           <span className="truncate">{item.title}</span>
@@ -209,7 +208,7 @@ export function DocsViewer() {
         {/* Main Content Pane */}
         <main className="flex-1 min-w-0">
           <div className="max-w-4xl mx-auto px-6 lg:px-12 py-10 lg:py-14 space-y-16">
-            
+
             {/* 1. Introduction Section */}
             <section id="introduction" className="scroll-mt-24 space-y-6">
               <div>
@@ -232,12 +231,12 @@ export function DocsViewer() {
                 <Sparkles className="h-4 w-4 text-cyan-400 shrink-0 mt-0.5" />
                 <div>
                   <strong className="text-cyan-300 block mb-1">Core Principle: Zero-Custody, Pure Math</strong>
-                  PressProtocol guarantees censorship resistance, provenance, and data durability through decentralized consensus and cryptographic proofs—never relying on centralized servers or gatekeepers.
+                  PressProtocol guarantees censorship resistance, provenance, and data durability through decentralized consensus and cryptographic proofs-never relying on centralized servers or gatekeepers.
                 </div>
               </div>
 
               <div className="grid sm:grid-cols-2 gap-4 not-prose">
-                <div 
+                <div
                   onClick={() => scrollToSection("quickstart")}
                   className="p-5 rounded-xl border border-white/10 bg-[#0B0D14] hover:border-cyan-500/30 transition-all group cursor-pointer"
                 >
@@ -252,7 +251,7 @@ export function DocsViewer() {
                   </p>
                 </div>
 
-                <Link 
+                <Link
                   href="/developers/api-reference"
                   className="p-5 rounded-xl border border-white/10 bg-[#0B0D14] hover:border-cyan-500/30 transition-all group block"
                 >
@@ -288,7 +287,7 @@ export function DocsViewer() {
                   <span className="text-zinc-300 flex items-center gap-2">
                     <Terminal className="h-3.5 w-3.5 text-cyan-400" /> Terminal cURL
                   </span>
-                  <button 
+                  <button
                     onClick={() => handleCopy(`curl -X POST https://api.pressprotocol.com/api/v1/publish/raw \\\n  -H "Content-Type: application/json" \\\n  -d '{\n    "title": "Decentralized Dispatches in Hostile Regimes",\n    "content": "# Sovereign Publishing\\n\\nZero custody, pure math.",\n    "tags": ["cryptography", "freedom-of-speech"]\n  }'`, "quickstart-curl")}
                     className="text-[11px] text-zinc-400 hover:text-white flex items-center gap-1 transition-colors"
                   >
@@ -297,7 +296,7 @@ export function DocsViewer() {
                   </button>
                 </div>
                 <pre className="p-4 text-cyan-300 overflow-x-auto leading-relaxed text-xs">
-{`curl -X POST https://api.pressprotocol.com/api/v1/publish/raw \\
+                  {`curl -X POST https://api.pressprotocol.com/api/v1/publish/raw \\
   -H "Content-Type: application/json" \\
   -d '{
     "title": "Decentralized Dispatches in Hostile Regimes",
@@ -310,7 +309,7 @@ export function DocsViewer() {
               <p className="text-xs text-zinc-400">Response payload with generated multihash CID and gateway resolver:</p>
               <div className="rounded-xl border border-white/10 bg-[#08090E] p-4 font-mono text-xs text-zinc-300">
                 <pre className="text-emerald-300 overflow-x-auto">
-{`{
+                  {`{
   "success": true,
   "cid": "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi",
   "gatewayUrl": "https://ipfs.io/ipfs/bafybeigdyrzt5sfp...",
@@ -439,7 +438,7 @@ export function DocsViewer() {
                 </h2>
               </div>
               <p className="text-sm text-zinc-300 leading-relaxed">
-                In PressProtocol, an account is not a database row—it is an Ed25519 keypair held exclusively in local browser WebCrypto or cold-storage hardware. No emails, no phone numbers, and no passwords:
+                In PressProtocol, an account is not a database row-it is an Ed25519 keypair held exclusively in local browser WebCrypto or cold-storage hardware. No emails, no phone numbers, and no passwords:
               </p>
 
               <div className="rounded-xl border border-white/10 bg-[#0B0D14] overflow-hidden font-mono text-xs">
@@ -447,7 +446,7 @@ export function DocsViewer() {
                   <span className="text-zinc-300 flex items-center gap-2">
                     <Key className="h-3.5 w-3.5 text-amber-400" /> TypeScript WebCrypto Example
                   </span>
-                  <button 
+                  <button
                     onClick={() => handleCopy(`import { SovereignSigner } from "@pressprotocol/sdk";\n\n// Generate ephemeral burner keypair in WebCrypto\nconst signer = await SovereignSigner.generate();\nconst signature = await signer.signEnvelope({\n  cid: "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi",\n  timestamp: Date.now()\n});\n\nconsole.log("Author Fingerprint:", signer.publicKeyHex);`, "identity-code")}
                     className="text-[11px] text-zinc-400 hover:text-white flex items-center gap-1 transition-colors"
                   >
@@ -456,7 +455,7 @@ export function DocsViewer() {
                   </button>
                 </div>
                 <pre className="p-4 text-amber-300 overflow-x-auto leading-relaxed">
-{`import { SovereignSigner } from "@pressprotocol/sdk";
+                  {`import { SovereignSigner } from "@pressprotocol/sdk";
 
 // Generate ephemeral burner keypair in WebCrypto
 const signer = await SovereignSigner.generate();
@@ -510,7 +509,7 @@ console.log("Author Fingerprint:", signer.publicKeyHex);`}
               <div className="rounded-xl border border-white/10 bg-[#0B0D14] p-4 font-mono text-xs text-zinc-300 space-y-3">
                 <div className="text-zinc-400">Authentication Headers Format:</div>
                 <pre className="text-cyan-300 overflow-x-auto">
-{`X-Press-Public-Key: <ed25519_hex_public_key>
+                  {`X-Press-Public-Key: <ed25519_hex_public_key>
 X-Press-Signature: <64_byte_hex_signature>
 X-Press-Timestamp: <unix_epoch_ms>`}
                 </pre>
@@ -598,7 +597,7 @@ X-Press-Timestamp: <unix_epoch_ms>`}
             <div className="pt-12 border-t border-white/10 space-y-8 pb-16">
               {/* Pagination Next / Prev */}
               <div className="grid sm:grid-cols-2 gap-4">
-                <button 
+                <button
                   onClick={() => scrollToSection("architecture")}
                   className="p-4 rounded-xl border border-white/10 bg-[#0B0D14] hover:border-cyan-500/30 text-left transition-colors group"
                 >
@@ -610,7 +609,7 @@ X-Press-Timestamp: <unix_epoch_ms>`}
                   </div>
                 </button>
 
-                <Link 
+                <Link
                   href="/developers/api-reference"
                   className="p-4 rounded-xl border border-white/10 bg-[#0B0D14] hover:border-cyan-500/30 text-right transition-colors group block"
                 >
@@ -627,17 +626,17 @@ X-Press-Timestamp: <unix_epoch_ms>`}
               <div className="p-4 rounded-xl border border-white/5 bg-[#0B0D14] flex flex-col sm:flex-row items-center justify-between gap-4">
                 <span className="text-xs text-zinc-400">Was this documentation page helpful?</span>
                 <div className="flex items-center gap-2">
-                  <Button 
+                  <Button
                     onClick={() => { setHelpfulFeedback(true); toast.success("Thank you for your feedback!"); }}
-                    variant="outline" 
+                    variant="outline"
                     size="sm"
                     className={`h-7 px-3 text-xs rounded-lg border-white/10 ${helpfulFeedback === true ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/40" : "bg-white/5 text-zinc-400 hover:text-white"}`}
                   >
                     Yes, helpful
                   </Button>
-                  <Button 
+                  <Button
                     onClick={() => { setHelpfulFeedback(false); toast.info("Feedback noted. We are actively refining these guides."); }}
-                    variant="outline" 
+                    variant="outline"
                     size="sm"
                     className={`h-7 px-3 text-xs rounded-lg border-white/10 ${helpfulFeedback === false ? "bg-red-500/20 text-red-300 border-red-500/40" : "bg-white/5 text-zinc-400 hover:text-white"}`}
                   >
@@ -649,9 +648,9 @@ X-Press-Timestamp: <unix_epoch_ms>`}
               {/* Meta & Links */}
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-zinc-500">
                 <div className="flex items-center gap-4">
-                  <a 
-                    href="https://github.com/0xshikhar/PressProtocol" 
-                    target="_blank" 
+                  <a
+                    href="https://github.com/0xshikhar/PressProtocol"
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-white transition-colors flex items-center gap-1.5"
                   >
@@ -684,13 +683,12 @@ X-Press-Timestamp: <unix_epoch_ms>`}
               const isActive = activeSection === item.id;
               return (
                 <li key={item.id}>
-                  <button 
+                  <button
                     onClick={() => scrollToSection(item.id)}
-                    className={`text-left block w-full truncate transition-colors py-0.5 ${
-                      isActive 
-                        ? "text-cyan-400 font-medium translate-x-1" 
+                    className={`text-left block w-full truncate transition-colors py-0.5 ${isActive
+                        ? "text-cyan-400 font-medium translate-x-1"
                         : "text-zinc-500 hover:text-zinc-300"
-                    }`}
+                      }`}
                   >
                     {item.title}
                   </button>
@@ -703,7 +701,7 @@ X-Press-Timestamp: <unix_epoch_ms>`}
             <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">
               Need Help?
             </div>
-            <Link 
+            <Link
               href="/help"
               className="p-3 rounded-lg border border-white/5 bg-[#0B0D14] block hover:border-cyan-500/30 transition-colors group"
             >

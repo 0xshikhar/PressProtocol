@@ -1,6 +1,6 @@
 import "./globals.css"
 import type { Metadata, Viewport } from "next"
-import { Inter, Instrument_Serif, JetBrains_Mono } from "next/font/google"
+import { Inter, Instrument_Serif, JetBrains_Mono, Source_Serif_4 } from "next/font/google"
 import { siteConfig } from "@/config/site"
 import { cn } from "@/lib/utils"
 import { Providers } from "@/app/providers"
@@ -9,6 +9,12 @@ import Footer from "@/components/navigation/footer"
 import { SupportPrompt } from "@/components/navigation/SupportPrompt"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
+const sourceSerif = Source_Serif_4({
+  subsets: ["latin"],
+  variable: "--font-source-serif",
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+})
 const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
   weight: "400",
@@ -81,6 +87,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         className={cn(
           "min-h-screen bg-[#050508] text-foreground antialiased flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200",
           inter.variable,
+          sourceSerif.variable,
           instrumentSerif.variable,
           jetbrainsMono.variable,
           inter.className

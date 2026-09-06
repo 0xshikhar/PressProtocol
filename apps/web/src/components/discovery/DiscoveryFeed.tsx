@@ -83,7 +83,7 @@ export function DiscoveryFeed({
     } catch (error) {
       console.error("Error loading discovery feed:", error);
       setUsingFallback(true);
-      toast.error("Discovery indexers unreachable — trying decentralized fallback");
+      toast.error("Discovery indexers unreachable - trying decentralized fallback");
       setItems([]);
     } finally {
       setLoading(false);
@@ -217,11 +217,10 @@ export function DiscoveryFeed({
             variant="outline"
             size="sm"
             onClick={() => setOnlyVerified(!onlyVerified)}
-            className={`text-xs h-9 gap-1.5 rounded-lg border transition-all ${
-              onlyVerified
+            className={`text-xs h-9 gap-1.5 rounded-lg border transition-all ${onlyVerified
                 ? "border-emerald-500/40 bg-emerald-950/40 text-emerald-300 font-semibold shadow-[0_0_15px_rgba(16,185,129,0.15)]"
                 : "border-white/10 bg-white/[0.03] text-neutral-400 hover:text-white hover:bg-white/[0.06]"
-            }`}
+              }`}
           >
             <ShieldCheck className="h-3.5 w-3.5" />
             Verified Ed25519
@@ -231,21 +230,19 @@ export function DiscoveryFeed({
           <div className="flex items-center rounded-lg border border-white/10 bg-[#0B0D14] p-0.5 text-xs font-mono">
             <button
               onClick={() => setSelectedTransport("all")}
-              className={`px-2.5 py-1 rounded-md transition-all ${
-                selectedTransport === "all"
+              className={`px-2.5 py-1 rounded-md transition-all ${selectedTransport === "all"
                   ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold shadow-sm"
                   : "text-neutral-400 hover:text-white"
-              }`}
+                }`}
             >
               All Transports
             </button>
             <button
               onClick={() => setSelectedTransport("tor")}
-              className={`px-2.5 py-1 rounded-md transition-all flex items-center gap-1 ${
-                selectedTransport === "tor"
+              className={`px-2.5 py-1 rounded-md transition-all flex items-center gap-1 ${selectedTransport === "tor"
                   ? "bg-purple-500/20 text-purple-300 border border-purple-500/40 font-semibold shadow-sm"
                   : "text-neutral-400 hover:text-white"
-              }`}
+                }`}
             >
               <Radio className="h-3 w-3" />
               Tor v3
@@ -256,22 +253,20 @@ export function DiscoveryFeed({
           <div className="flex items-center rounded-lg border border-white/10 bg-[#0B0D14] p-0.5 text-xs font-mono">
             <button
               onClick={() => setViewMode("cards")}
-              className={`p-1.5 rounded-md transition-all ${
-                viewMode === "cards"
+              className={`p-1.5 rounded-md transition-all ${viewMode === "cards"
                   ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
                   : "text-neutral-400 hover:text-white"
-              }`}
+                }`}
               title="Card View"
             >
               <LayoutGrid className="h-3.5 w-3.5" />
             </button>
             <button
               onClick={() => setViewMode("table")}
-              className={`p-1.5 rounded-md transition-all ${
-                viewMode === "table"
+              className={`p-1.5 rounded-md transition-all ${viewMode === "table"
                   ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
                   : "text-neutral-400 hover:text-white"
-              }`}
+                }`}
               title="High-Density Ledger Table"
             >
               <List className="h-3.5 w-3.5" />
@@ -286,11 +281,10 @@ export function DiscoveryFeed({
           <button
             key={rail}
             onClick={() => setSelectedRail(rail)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
-              selectedRail === rail
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${selectedRail === rail
                 ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 font-semibold shadow-[0_0_15px_rgba(6,182,212,0.15)]"
                 : "bg-[#0B0D14] hover:bg-white/[0.06] text-neutral-400 hover:text-white border border-white/10"
-            }`}
+              }`}
           >
             {rail}
           </button>
@@ -350,7 +344,7 @@ export function DiscoveryFeed({
                   const isSaved = !!bookmarkedMap[item.cid];
 
                   return (
-                    <tr 
+                    <tr
                       key={item.cid}
                       onClick={() => { window.location.href = `/read/${item.cid}`; }}
                       className="hover:bg-white/[0.03] transition-colors cursor-pointer group"
@@ -484,11 +478,10 @@ export function DiscoveryFeed({
                       variant={isSaved ? "default" : "outline"}
                       size="sm"
                       onClick={(e) => handleToggleBookmark(item, e)}
-                      className={`text-xs h-8 px-3 gap-1.5 rounded-lg ${
-                        isSaved
+                      className={`text-xs h-8 px-3 gap-1.5 rounded-lg ${isSaved
                           ? "bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-sm"
                           : "border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-neutral-300 hover:text-white"
-                      }`}
+                        }`}
                     >
                       <Bookmark className={`h-3.5 w-3.5 ${isSaved ? "fill-current" : ""}`} />
                       <span>{isSaved ? "Saved Offline" : "Save Offline"}</span>

@@ -23,19 +23,19 @@ export default function SdkCodeSnippets({ apiKey }: SdkCodeSnippetsProps) {
   const installCommands = {
     typescript: {
       registry: "pnpm add @pressprotocol/sdk",
-      git: "pnpm add git+https://github.com/0xshikhar/AnonPress.git#packages/sdk",
+      git: "pnpm add git+https://github.com/0xshikhar/PressProtocol.git#packages/sdk",
     },
     python: {
       registry: "pip install pressprotocol-py",
-      git: 'pip install "git+https://github.com/0xshikhar/AnonPress.git#subdirectory=sdks/python"',
+      git: 'pip install "git+https://github.com/0xshikhar/PressProtocol.git#subdirectory=sdks/python"',
     },
     go: {
-      registry: "go get github.com/0xshikhar/AnonPress/sdks/go@v1.0.6",
-      git: "go get github.com/0xshikhar/AnonPress/sdks/go@master",
+      registry: "go get github.com/0xshikhar/PressProtocol/sdks/go@v1.0.6",
+      git: "go get github.com/0xshikhar/PressProtocol/sdks/go@master",
     },
     rust: {
       registry: "cargo add pressprotocol-rs",
-      git: 'pressprotocol-rs = { git = "https://github.com/0xshikhar/AnonPress.git", branch = "master" }',
+      git: 'pressprotocol-rs = { git = "https://github.com/0xshikhar/PressProtocol.git", branch = "master" }',
     },
   };
 
@@ -83,7 +83,7 @@ print(f"🧅 Tor Mirror: {post.get('urls', {}).get('tor')}")`,
 
 import (
     "fmt"
-    "github.com/0xshikhar/AnonPress/sdks/go"
+    "github.com/0xshikhar/PressProtocol/sdks/go"
 )
 
 func main() {
@@ -211,8 +211,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             type="button"
             onClick={() => setInstallMethod("registry")}
             className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${installMethod === "registry"
-                ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold"
-                : "text-white/60 hover:text-white"
+              ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold"
+              : "text-white/60 hover:text-white"
               }`}
           >
             Public Registry
@@ -221,8 +221,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             type="button"
             onClick={() => setInstallMethod("git")}
             className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${installMethod === "git"
-                ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold"
-                : "text-white/60 hover:text-white"
+              ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold"
+              : "text-white/60 hover:text-white"
               }`}
           >
             Direct Git Install
@@ -240,23 +240,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         </TabsList>
 
         <TabsContent value="typescript">
-          {renderTerminalWindow("typescript", "node — pressprotocol-sdk v1.0.6")}
+          {renderTerminalWindow("typescript", "node - pressprotocol-sdk v1.0.6")}
         </TabsContent>
 
         <TabsContent value="python">
-          {renderTerminalWindow("python", "python3 — pressprotocol v1.0.6")}
+          {renderTerminalWindow("python", "python3 - pressprotocol v1.0.6")}
         </TabsContent>
 
         <TabsContent value="go">
-          {renderTerminalWindow("go", "go run — main.go")}
+          {renderTerminalWindow("go", "go run - main.go")}
         </TabsContent>
 
         <TabsContent value="rust">
-          {renderTerminalWindow("rust", "cargo run — main.rs")}
+          {renderTerminalWindow("rust", "cargo run - main.rs")}
         </TabsContent>
 
         <TabsContent value="curl">
-          {renderTerminalWindow("curl", "bash — curl rest gateway")}
+          {renderTerminalWindow("curl", "bash - curl rest gateway")}
         </TabsContent>
       </Tabs>
     </section>

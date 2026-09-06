@@ -6,7 +6,7 @@ export const siteConfig: SiteConfig = {
   name: "PressProtocol",
   author: "0xShikhar",
   description:
-    "An open censorship-resistant publishing platform. Publish content across IPFS, Tor, and gateway mirrors with cryptographic verification and intelligent routing.",
+    "The open, censorship-resistant infrastructure for sovereign publishing. Ingest content from Substack, Medium, Ghost, Notion, or RSS in 1 click. Cryptographically signed with Ed25519 and distributed permanently across IPFS and Tor.",
   keywords: [
     "Decentralized Publishing",
     "IPFS",

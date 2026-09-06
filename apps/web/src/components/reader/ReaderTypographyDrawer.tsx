@@ -22,7 +22,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 
-export type ReaderTypeface = "serif" | "sans" | "mono";
+export type ReaderTypeface = "charter" | "sans" | "editorial" | "mono" | "serif";
 export type ReaderTheme = "dark" | "sepia" | "paper" | "cyber";
 
 export interface ReaderSettings {
@@ -32,12 +32,12 @@ export interface ReaderSettings {
 }
 
 const DEFAULT_SETTINGS: ReaderSettings = {
-  typeface: "serif",
+  typeface: "charter",
   fontSize: 19,
   theme: "dark",
 };
 
-const STORAGE_KEY = "pressprotocol_reader_prefs_v1";
+const STORAGE_KEY = "pressprotocol_reader_prefs_v2";
 
 interface ReaderTypographyDrawerProps {
   settings: ReaderSettings;
@@ -49,9 +49,14 @@ export function useReaderSettings() {
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem("pressprotocol_reader_prefs_v1");
       if (saved) {
-        setSettings(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        // Migrate legacy "serif" setting to Medium-standard "charter"
+        if (parsed.typeface === "serif") {
+          parsed.typeface = "charter";
+        }
+        setSettings({ ...DEFAULT_SETTINGS, ...parsed });
       }
     } catch {
       // Ignore fallback
@@ -224,39 +229,66 @@ export function ReaderTypographyDrawer({
             <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Typeface Family
             </div>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2">
+              {/* Charter Serif - Medium Standard Default */}
               <button
-                onClick={() => setTypeface("serif")}
-                className={`py-2 px-3 rounded-xl border text-xs font-serif transition-all flex flex-col items-center gap-1 ${
-                  settings.typeface === "serif"
+                onClick={() => setTypeface("charter")}
+                className={`py-2.5 px-3 rounded-xl border text-left transition-all flex flex-col gap-0.5 ${
+                  settings.typeface === "charter" || settings.typeface === "serif"
                     ? "bg-primary text-primary-foreground border-primary font-bold shadow-sm"
                     : "bg-muted/40 hover:bg-muted border-border/50 text-foreground"
                 }`}
               >
-                <span className="text-sm font-bold">Ag</span>
-                <span>Editorial Serif</span>
+                <div className="flex items-center justify-between w-full">
+                  <span className="font-charter text-sm font-bold">Charter</span>
+                  <span className="text-[10px] uppercase font-mono tracking-wider opacity-70">Default</span>
+                </div>
+                <span className="text-[10px] opacity-80">Medium standard</span>
               </button>
+
+              {/* Modern Sans - Inter */}
               <button
                 onClick={() => setTypeface("sans")}
-                className={`py-2 px-3 rounded-xl border text-xs font-sans transition-all flex flex-col items-center gap-1 ${
+                className={`py-2.5 px-3 rounded-xl border text-left transition-all flex flex-col gap-0.5 ${
                   settings.typeface === "sans"
                     ? "bg-primary text-primary-foreground border-primary font-bold shadow-sm"
                     : "bg-muted/40 hover:bg-muted border-border/50 text-foreground"
                 }`}
               >
-                <span className="text-sm font-bold">Ag</span>
-                <span>Modern Sans</span>
+                <div className="flex items-center justify-between w-full">
+                  <span className="font-sans text-sm font-bold">Inter Sans</span>
+                </div>
+                <span className="text-[10px] opacity-80">Clean & neutral</span>
               </button>
+
+              {/* Editorial Serif - Instrument Serif */}
+              <button
+                onClick={() => setTypeface("editorial")}
+                className={`py-2.5 px-3 rounded-xl border text-left transition-all flex flex-col gap-0.5 ${
+                  settings.typeface === "editorial"
+                    ? "bg-primary text-primary-foreground border-primary font-bold shadow-sm"
+                    : "bg-muted/40 hover:bg-muted border-border/50 text-foreground"
+                }`}
+              >
+                <div className="flex items-center justify-between w-full">
+                  <span className="font-editorial text-sm font-bold">Display Serif</span>
+                </div>
+                <span className="text-[10px] opacity-80">Instrument Serif</span>
+              </button>
+
+              {/* Code Monospace - JetBrains / Menlo */}
               <button
                 onClick={() => setTypeface("mono")}
-                className={`py-2 px-3 rounded-xl border text-xs font-mono transition-all flex flex-col items-center gap-1 ${
+                className={`py-2.5 px-3 rounded-xl border text-left transition-all flex flex-col gap-0.5 ${
                   settings.typeface === "mono"
                     ? "bg-primary text-primary-foreground border-primary font-bold shadow-sm"
                     : "bg-muted/40 hover:bg-muted border-border/50 text-foreground"
                 }`}
               >
-                <span className="text-sm font-bold">&gt;_</span>
-                <span>Cypher Mono</span>
+                <div className="flex items-center justify-between w-full">
+                  <span className="font-mono text-sm font-bold">Code Mono</span>
+                </div>
+                <span className="text-[10px] opacity-80">Menlo / JetBrains</span>
               </button>
             </div>
           </div>

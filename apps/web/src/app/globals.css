@@ -265,4 +265,195 @@
   .press-callout p {
     margin: 0.25rem 0;
   }
+
+  /* =========================================================================
+     Sovereign Reader Editorial Typography & Section Spacing
+     Applies publication-grade vertical rhythm to raw IPFS HTML dispatches
+     ========================================================================= */
+
+  .font-charter {
+    font-family: 'Charter', 'Bitstream Charter', var(--font-source-serif), 'Sitka Text', 'Cambria', 'Georgia', 'Times New Roman', serif;
+  }
+
+  .font-editorial {
+    font-family: var(--font-instrument-serif), 'Instrument Serif', 'Georgia', serif;
+  }
+
+  .article-content {
+    font-family: 'Charter', 'Bitstream Charter', var(--font-source-serif), 'Sitka Text', 'Cambria', 'Georgia', 'Times New Roman', serif;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    word-break: break-word;
+  }
+
+  /* Headings: Medium Standard - Inter or Clean System Sans-Serif */
+  .article-content h1,
+  .article-content h2,
+  .article-content h3,
+  .article-content h4,
+  .article-content h5,
+  .article-content h6 {
+    font-family: var(--font-sans), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+  }
+
+  /* Code Snippets: Monospace Stacks (Menlo, Monaco, Consolas, JetBrains) */
+  .article-content code,
+  .article-content pre {
+    font-family: var(--font-jetbrains), Menlo, Monaco, Consolas, 'Courier New', monospace !important;
+  }
+
+  /* Typeface Overrides from Aa Drawer */
+  .font-sans.article-content,
+  .font-sans .article-content {
+    font-family: var(--font-sans), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+  }
+
+  .font-editorial.article-content,
+  .font-editorial .article-content {
+    font-family: var(--font-instrument-serif), 'Instrument Serif', 'Georgia', serif !important;
+  }
+
+  .font-mono.article-content,
+  .font-mono .article-content {
+    font-family: var(--font-jetbrains), Menlo, Monaco, Consolas, monospace !important;
+  }
+
+  /* Headings: Generous breathing room and distinct hierarchical rhythm */
+  .article-content h1 {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    line-height: 1.18;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    margin-top: 4.5rem !important;
+    margin-bottom: 1.75rem !important;
+  }
+
+  .article-content h2 {
+    font-size: clamp(1.6rem, 3vw, 2.15rem);
+    line-height: 1.25;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-top: 4rem !important;
+    margin-bottom: 1.5rem !important;
+    padding-bottom: 0.625rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* In light/sepia/paper themes, border should harmonize */
+  .reader-sepia .article-content h2 {
+    border-bottom-color: rgba(69, 26, 3, 0.12);
+  }
+  .reader-paper .article-content h2 {
+    border-bottom-color: rgba(0, 0, 0, 0.08);
+  }
+
+  .article-content h3 {
+    font-size: clamp(1.3rem, 2.2vw, 1.6rem);
+    line-height: 1.35;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    margin-top: 3rem !important;
+    margin-bottom: 1.125rem !important;
+  }
+
+  .article-content h4 {
+    font-size: clamp(1.15rem, 1.8vw, 1.35rem);
+    line-height: 1.4;
+    font-weight: 600;
+    margin-top: 2.25rem !important;
+    margin-bottom: 0.875rem !important;
+  }
+
+  .article-content h5,
+  .article-content h6 {
+    font-size: 1.05rem;
+    line-height: 1.45;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 1.875rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  /* First heading in the article body should not have excessive top margin */
+  .article-content > :first-child h1,
+  .article-content > :first-child h2,
+  .article-content > :first-child h3,
+  .article-content > h1:first-child,
+  .article-content > h2:first-child,
+  .article-content > h3:first-child {
+    margin-top: 1rem !important;
+  }
+
+  /* Paragraphs: Fluid, comfortable reading distance */
+  .article-content p {
+    margin-top: 0;
+    margin-bottom: 1.75rem !important;
+    line-height: 1.75;
+  }
+
+  /* Blockquotes: Distinct editorial callout styling */
+  .article-content blockquote {
+    margin: 2.75rem 0 !important;
+    padding: 1.25rem 1.75rem !important;
+    border-left-width: 4px !important;
+    border-radius: 0 0.75rem 0.75rem 0;
+    font-style: italic;
+  }
+
+  .article-content blockquote p:last-child {
+    margin-bottom: 0 !important;
+  }
+
+  /* Figures & Images: Generous vertical separation and centered captions */
+  .article-content figure {
+    margin: 3.25rem 0 !important;
+  }
+
+  .article-content img {
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 0.75rem;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .article-content figcaption {
+    margin-top: 0.875rem !important;
+    font-size: 0.875rem;
+    text-align: center;
+    opacity: 0.75;
+    font-style: italic;
+  }
+
+  /* Lists: Clean indentation and element spacing */
+  .article-content ul,
+  .article-content ol {
+    margin-top: 1.25rem !important;
+    margin-bottom: 2rem !important;
+    padding-left: 1.75rem !important;
+  }
+
+  .article-content li {
+    margin-bottom: 0.625rem !important;
+    line-height: 1.7;
+  }
+
+  /* Code & Pre */
+  .article-content pre {
+    margin: 2.25rem 0 !important;
+    padding: 1.25rem 1.5rem !important;
+    border-radius: 0.75rem;
+    overflow-x: auto;
+  }
+
+  /* Separators & Dividers */
+  .article-content hr,
+  .article-content [role="separator"] {
+    margin: 4rem auto !important;
+    border: none !important;
+    border-top: 1px solid currentColor !important;
+    opacity: 0.12 !important;
+    width: 50% !important;
+  }
 }
