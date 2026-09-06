@@ -1,41 +1,75 @@
 # PressProtocol
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/0xshikhar/PressProtocol/main/apps/web/public/pressprotocol-logo.svg" alt="PressProtocol Logo" width="120" height="120" onerror="this.style.display='none'"/>
+  <img src="apps/web/public/pressprotocol-logo-1.png" alt="PressProtocol Logo" width="120" height="120" style="border-radius: 20px;" onerror="this.src='https://raw.githubusercontent.com/0xshikhar/PressProtocol/main/apps/web/public/pressprotocol-logo-1.png'"/>
 </p>
 
 <h1 align="center">PressProtocol</h1>
 
 <p align="center">
-  <strong>Universal Sovereign Publishing Rails & Multi-Transport Resolution for the Decentralized Web</strong><br>
-  <em>Censorship-Resistant, Zero-Custody, Multi-Transport (IPFS + Tor v3 + Clearnet), and Non-Custodial Cryptographic Identity</em>
+  <strong>Universal Sovereign Publishing Infrastructure & Multi-Transport Resolution Rails</strong><br>
+  <em>Not a walled-garden platform — neutral infrastructure extending uncensored publishing across WordPress, Ghost, Substack, Medium, Obsidian, and any web application.</em><br>
+  <strong>Zero-Custody &bull; Multi-Transport (IPFS + Tor v3 + Clearnet) &bull; Zero Accounts &bull; In-Browser Cryptography</strong>
 </p>
 
 <p align="center">
   <a href="https://pressprotocol.com"><img src="https://img.shields.io/badge/Web%20App-pressprotocol.com-000000.svg?style=flat-square&logo=vercel" alt="Vercel Live"/></a>
-  <a href="https://api.pressprotocol.com/health"><img src="https://img.shields.io/badge/Edge%20API-api.pressprotocol.com-f38020.svg?style=flat-square&logo=cloudflare" alt="Cloudflare Edge Live"/></a>
-  <a href="https://github.com/0xshikhar/PressProtocol/blob/main/scripts/test.sh"><img src="https://img.shields.io/badge/Tests-16%2F16%20Passing%20(100%25)-10b981.svg?style=flat-square" alt="Tests Passing"/></a>
-  <a href="#-octant--public-goods-alignment"><img src="https://img.shields.io/badge/Octant-Epoch%2013%20Privacy%20Round-6366f1.svg?style=flat-square" alt="Octant Epoch 13"/></a>
-  <a href="https://github.com/0xshikhar/PressProtocol/blob/main/ARCHITECTURE.md"><img src="https://img.shields.io/badge/Spec-RFC--8032%20%7C%20OpenAPI%203.1-3b82f6.svg?style=flat-square" alt="Specifications"/></a>
+  <a href="https://github.com/0xshikhar/PressProtocol/blob/main/scripts/test.sh"><img src="https://img.shields.io/badge/Tests-419%2F419%20Passing%20(100%25)-10b981.svg?style=flat-square" alt="Tests Passing"/></a>
+  <a href="https://www.npmjs.com/search?q=pressprotocol"><img src="https://img.shields.io/badge/npm-@pressprotocol-cb3837.svg?style=flat-square&logo=npm" alt="NPM Packages"/></a>
+  <a href="https://pypi.org/project/pressprotocol-py/"><img src="https://img.shields.io/pypi/v/pressprotocol-py.svg?color=3775A9&style=flat-square&logo=pypi&label=pypi" alt="PyPI Package"/></a>
+  <a href="https://crates.io/crates/pressprotocol-rs/1.0.7"><img src="https://img.shields.io/crates/v/pressprotocol-rs.svg?color=DEA584&style=flat-square&logo=rust&label=crates.io" alt="Crates.io Package"/></a>
+  <a href="https://pkg.go.dev/github.com/0xshikhar/PressProtocol/sdks/go"><img src="https://pkg.go.dev/badge/github.com/0xshikhar/PressProtocol/sdks/go.svg" alt="Go Reference"/></a>
+  <a href="https://pressprotocol.com/support"><img src="https://img.shields.io/badge/Support-Donate%20%26%20Underwrite-rose.svg?style=flat-square&logo=heart" alt="Support PressProtocol"/></a>
   <a href="https://github.com/0xshikhar/PressProtocol/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-amber.svg?style=flat-square" alt="License: MIT"/></a>
-  <a href="https://github.com/0xshikhar/PressProtocol/blob/main/pnpm-workspace.yaml"><img src="https://img.shields.io/badge/Monorepo-pnpm%20workspace-f59e0b.svg?style=flat-square" alt="pnpm workspace"/></a>
-  <a href="https://github.com/0xshikhar/PressProtocol/tree/main/packages/sdk"><img src="https://img.shields.io/badge/TypeScript-100%25%20Strict-blue.svg?style=flat-square" alt="TypeScript"/></a>
 </p>
 
-> ### 🌐 Live Production Infrastructure & Public Goods Rail
-> - **Production Web Application**: [`https://pressprotocol.com`](https://pressprotocol.com) *(Next.js 15 on Vercel)*
-> - **Canonical Edge API Gateway**: [`https://api.pressprotocol.com`](https://api.pressprotocol.com) *(Cloudflare Workers across 300+ Edge PoPs)*
-> - **Public Goods Alignment**: Engineered for **Octant Epoch 13 (Privacy & Censorship Resistance Round)**
-> - **Zero-Custody Guarantee**: Zero gas, zero seed phrases, no wallets, no KYC. Authors sign content in-browser with RFC 8032 Ed25519 keys.
+> ### 🌐 Sovereign Digital Infrastructure — Not a Closed Platform
+> - **Pure Infrastructure Layer**: PressProtocol is not a closed blogging platform or proprietary app. It is a universal, open protocol layer that extends unstoppable publishing capabilities to existing content management systems across the web.
+> - **Universal Reach & Compatibility**: Natively integrates into **WordPress** (powering 43% of the internet), **Medium**, **Substack**, **Ghost**, **Obsidian**, and static site pipelines, or any custom CMS via a 2-line Web Component.
+> - **Zero-Custody Architecture**: Zero gas, zero seed phrases, no wallets, no KYC. Authors sign content in-browser with RFC 8032 Ed25519 keys before transmission.
 > - **Multi-Transport Racing**: Sub-100ms clearnet IPFS resolution + automatic failover to Tor v3 `.onion` hidden services.
+> - **Self-Sovereign Node Stack**: Deploy a dedicated node with 1-click Docker Compose (`core/node`) including embedded Tor v3 hidden services and IPFS DHT.
+> - **Sovereign Support**: 100% free and open-source public good. Underwrite infrastructure at [`pressprotocol.com/support`](https://pressprotocol.com/support).
 
 ---
+
+## 📦 Official Packages, Extensions & Distribution Downloads
+
+All core developer libraries, client SDKs, and offline browser/CMS integrations are verified and ready to install or download:
+
+### 1. Published Language Registries & SDKs
+
+| Language / Target | Published Registry Link | Package Identifier | Installation Command |
+| :--- | :--- | :--- | :--- |
+| **Python** | [**PyPI Registry**](https://pypi.org/project/pressprotocol-py/) | `pressprotocol-py` | `pip install pressprotocol-py` |
+| **NPM (TypeScript)** | [**NPM Packages (View All 3)**](https://www.npmjs.com/search?q=pressprotocol) | [`@pressprotocol/sdk`](https://www.npmjs.com/package/@pressprotocol/sdk) | `pnpm add @pressprotocol/sdk` |
+| **NPM (Proof Codec)** | [**NPM Packages (View All 3)**](https://www.npmjs.com/search?q=pressprotocol) | [`@pressprotocol/proof`](https://www.npmjs.com/package/@pressprotocol/proof) | `pnpm add @pressprotocol/proof` |
+| **NPM (Web Widget)** | [**NPM Packages (View All 3)**](https://www.npmjs.com/search?q=pressprotocol) | [`@pressprotocol/widget`](https://www.npmjs.com/package/@pressprotocol/widget) | `pnpm add @pressprotocol/widget` |
+| **Rust** | [**Crates.io Registry**](https://crates.io/crates/pressprotocol-rs/1.0.7) | `pressprotocol-rs` (v1.0.7) | `cargo add pressprotocol-rs` |
+| **Go** | [**Go Packages (pkg.go.dev)**](https://pkg.go.dev/github.com/0xshikhar/PressProtocol/sdks/go) | `github.com/0xshikhar/PressProtocol/sdks/go` | `go get github.com/0xshikhar/PressProtocol/sdks/go@v1.0.7` |
+
+### 2. Ready-to-Use Native Extensions & Standalone Downloads
+
+Download and install client extensions and publishing plugins directly without compiling:
+
+| Integration | Distribution Artifact | Download / Source Link | Description |
+| :--- | :--- | :--- | :--- |
+| **Chromium Extension** | Zip Package | [**Download Extension Zip**](https://pressprotocol.com/downloads/PressProtocol_Browser_Extension.zip) | Manifest V3 clipper. Intercepts `pressprotocol://` URIs and clips articles directly to IPFS/Tor. |
+| **WordPress Plugin** | Zip Package | [**Download WordPress Zip**](https://pressprotocol.com/downloads/PressProtocol_Wordpress_Plugin.zip) | 1-click sovereign publishing directly from Gutenberg and Classic editors to decentralized swarms. |
+| **Obsidian Plugin** | Zip Package | [**Download Obsidian Zip**](https://pressprotocol.com/downloads/PressProtocol_Obsidian_Plugin.zip) | Publish investigative notes, research vaults, and dossiers directly to IPFS and Tor from Obsidian. |
+| **Sovereign Node Stack** | Docker Compose | [**Download docker-compose.yml**](https://pressprotocol.com/downloads/docker-compose.yml) | 1-click self-hosted node daemon with embedded Tor v3 hidden service and IPFS DHT. |
+| **GitHub Action** | Marketplace Action | [**`pressprotocol/publish-action`**](https://github.com/0xshikhar/PressProtocol/tree/main/integrations/publish-action) | CI/CD automation action for continuous documentation archival and repository sync on git push. |
+
+> 💡 **Interactive Portal**: You can also inspect setup guides, SHA-256 checksums, and release notes at [**pressprotocol.com/downloads**](https://pressprotocol.com/downloads).
+
+---
+
+
 
 ## 🧭 Table of Contents
 
 - [Protocol Philosophy & Architectural Thesis](#-protocol-philosophy--architectural-thesis)
 - [Distribution Rails Overview: Everything We Have Built](#-distribution-rails-overview-everything-we-have-built)
-- [Ecosystem Matrix: Production Monorepo Overview](#-ecosystem-matrix-production-monorepo-overview)
 - [System Architecture & Multi-Transport Resolution Flow](#-system-architecture--multi-transport-resolution-flow)
 - [Core Protocol Subsystems & Specifications](#-core-protocol-subsystems--specifications)
   - [1. Multi-Transport Resolution & Parallel Racing Engine](#1-multi-transport-resolution--parallel-racing-engine)
@@ -45,7 +79,6 @@
   - [5. Drop-In `<pressprotocol-publish>` Universal Widget & 7 Editor Connectors](#5-drop-in-pressprotocol-publish-universal-widget--7-editor-connectors)
   - [6. Air-Gapped Sovereign Proof (`.pressproof.json`) & Optical QR Codec (`PPQR:1:*`)](#6-air-gapped-sovereign-proof-pressproofjson--optical-qr-codec-ppqr1)
   - [7. Commercial Surveillance Stripper & CMS Sanitizer](#7-commercial-surveillance-stripper--cms-sanitizer)
-- [Monorepo Repository Map](#-monorepo-repository-map)
 - [Quick Start Guide](#-quick-start-guide)
 - [SDK Ecosystem & Usage Examples](#-sdk-ecosystem--usage-examples)
   - [TypeScript / Node.js SDK](#typescript--nodejs-sdk)
@@ -56,9 +89,10 @@
   - [Terminal CLI (`pressprotocol`)](#terminal-cli-pressprotocol)
 - [Verification Test Harness (100% Pass)](#-verification-test-harness-100-pass)
 - [Threat Model & Adversarial Defense](#-threat-model--adversarial-defense)
-- [Octant & Public Goods Alignment](#-octant--public-goods-alignment)
+- [Sovereign Public Good & Community Support](#-sovereign-public-good--community-support)
 - [Reference Documents](#-reference-documents)
 - [License & Open Source Commitment](#-license--open-source-commitment)
+
 
 ---
 
@@ -75,15 +109,16 @@ First-generation decentralized publishing attempts introduced other practical ob
 3. **Single-Gateway Dependency**: Many decentralized tools rely on a single public HTTP gateway (e.g. `ipfs.io`). When state firewalls block that specific domain, access to the entire publication is severed.
 4. **Tor Performance Friction**: Standalone Tor `.onion` websites experience significant latency (3 to 10 seconds) and cannot be reached by standard web readers without the Tor Browser.
 
-### The Architectural Design: Resilient Sovereign Publishing Rails
+### The Architectural Design: Privacy Infrastructure for the Open Web
 
-PressProtocol resolves these challenges by providing **neutral, un-cancellable publishing rails combining the sub-150ms speed of clearnet CDNs, content addressing via IPFS, and privacy routing via Tor v3 onion services—without requiring cryptocurrency or financial transactions**:
+PressProtocol is architected from first principles as **pure, neutral infrastructure rather than an isolated consumer blogging platform**. Instead of asking content creators and newsrooms to abandon their established audiences and CMS workflows, PressProtocol serves as the **universal substrate and decentralized transport rail that attaches directly into the tools the web already runs on**:
 
+* **Universal CMS & Web Extensibility**: Rather than forcing migration, PressProtocol brings sovereign capabilities to existing systems. With a **native WordPress Plugin** (empowering 43% of the world's web), **Obsidian Plugin**, **Chromium MV3 Extension**, **bulk Notion/Substack/Medium/RSS migration pipelines**, and a **2-line drop-in `<pressprotocol-publish>` universal widget**, any website, blog, or CMS can inherit censorship-resistant IPFS/Tor distribution instantly.
 * **Zero Wallets, Zero Gas, Zero KYC**: Publishers generate RFC 8032 Ed25519 keypairs in ephemeral client memory. The public key provides a permanent cryptographic pseudonym; the private key signs the canonical content payload in browser RAM.
 * **Zero Financial Footprint**: Without on-chain transaction fees, publishing leaves zero ledger trails. There are no wallets to trace, no token purchases, and no gas volatility.
 * **Multi-Transport Racing with Automatic Failover**: When resolving an article, the protocol queries IPFS gateways, P2P DHT swarms, and Tor v3 `.onion` hidden services concurrently. If an ISP blocks clearnet IPFS gateways, content automatically resolves over Tor with zero manual intervention.
 * **Zero Telemetry & Surveillance Stripping**: Built-in ingest pipelines scrub Google Analytics, Meta Pixels, tracking beacons, UTM query strings, and fingerprinting scripts before content hashing occurs.
-* **Extensible Distribution Rails Across Existing Platforms**: Rather than requiring publishers to migrate to a proprietary interface, PressProtocol provides native integrations for widely adopted workflows: a **WordPress Plugin**, an **Obsidian Plugin**, a **Chromium MV3 Extension**, a **GitHub Action**, a **Universal Web Component**, and native **SDKs in TypeScript, Python, Go, and Rust**.
+* **Multi-Language Developer Foundation**: Production-grade SDKs in **TypeScript, Python, Go, and Rust**, backed by an OpenAPI 3.1.0 gateway and real-time HMAC-SHA256 webhook event bus.
 
 ---
 
@@ -121,53 +156,9 @@ PressProtocol resolves these challenges by providing **neutral, un-cancellable p
 | **Outbound Webhooks Bus** | [**`core/node/src/services/WebhookSubscriptionService.ts`**](https://github.com/0xshikhar/PressProtocol/blob/main/core/node/src/services/WebhookSubscriptionService.ts) | Real-time event bus with HMAC-SHA256 signatures, replay protection, and exponential retry delivery. | Ghost, Strapi, WordPress webhooks |
 | **Air-Gap Proof & QR Mesh**| [**`packages/proof`**](https://github.com/0xshikhar/PressProtocol/tree/main/packages/proof) | Standalone `.pressproof.json` specification & `PPQR:1:*` high-density animated QR streaming codec. | Internet blackouts, air-gapped devices |
 | **Offline-First Local Vault** | [**`apps/web/src/app/vault`**](https://github.com/0xshikhar/PressProtocol/tree/main/apps/web/src/app/vault) | Zero-telemetry client-side IndexedDB vault for encrypted local reading and offline verification. | Privacy-conscious readers, field reporters |
-| **Web Portal & Dev Hub** | [**`apps/web`**](https://github.com/0xshikhar/PressProtocol/tree/main/apps/web) | Next.js 15 web application with 1-click sandbox keys (`pp_test_*`) and in-browser cryptographic simulator. | General public, developers |
+| **Web Portal & Dev Hub** | [**`apps/web`**](https://github.com/0xshikhar/PressProtocol/tree/main/apps/web) | Next.js 15 web application with interactive developer documentation and in-browser cryptographic simulator. | General public, developers |
 | **Sovereign Node Daemon** | [**`core/node`**](https://github.com/0xshikhar/PressProtocol/tree/main/core/node) | Self-sovereign private micro-daemon with Tor v3 hidden services, in-memory IPFS blockstore, and P2P federation. | Node runners, self-hosters |
 | **Content Ingestion Rails** | [**`apps/web/src/app/import`**](https://github.com/0xshikhar/PressProtocol/tree/main/apps/web/src/app/import) | Migration importers for Notion, Substack, Medium, and bulk RSS/Atom feeds with surveillance scrubbing. | Migrating publishers, media outlets |
-
----
-
-## 📦 Ecosystem Matrix: Production Monorepo Overview
-
-The PressProtocol monorepo is organized cleanly using `pnpm` workspaces:
-
-```
-pressprotocol/
-├── apps/
-│   └── web/                         # Next.js 15 Web Portal & Interactive Dev Hub
-│       ├── src/app/developers/      # /developers Interactive Playground & Sandbox Keys
-│       ├── src/app/import/          # Notion & RSS Bulk Migration Rails
-│       ├── src/app/vault/           # Offline-First Encrypted Reading Vault
-│       └── src/components/          # UI Component Suite & Live Widget Sandbox
-├── core/
-│   ├── worker/                      # High-Availability Cloudflare Edge API (api.pressprotocol.com)
-│   │   ├── src/index.ts             # Hono Edge Router & Multi-Gateway Race Resolver
-│   │   ├── src/services/pinata.ts   # Edge IPFS Pinning Engine
-│   │   └── wrangler.toml            # Edge Routing & Observability Config
-│   └── node/                        # Self-Sovereign Private Node Daemon
-│       ├── src/routes/v1.ts         # OpenAPI 3.1.0 Enterprise Gateway ("Stripe for Publishing")
-│       ├── src/services/            # ApiKey, Identity, Storage, Tor, Webhook Services
-│       └── src/lib/                 # Deterministic CIDv1, Webhook Crypto, Proof Engine
-├── packages/
-│   ├── sdk/                         # @pressprotocol/sdk (Headless TS SDK & CLI)
-│   ├── widget/                      # @pressprotocol/widget (Universal Web Component)
-│   └── proof/                       # @pressprotocol/proof (.pressproof.json & QR Codec)
-├── integrations/
-│   ├── wordpress-plugin/            # Native WordPress Plugin (43% of the Web)
-│   ├── browser-extension/           # Chromium MV3 Sovereign Web Clipper & Handler
-│   ├── publish-action/              # Official GitHub Action for CI/CD Archival
-│   └── obsidian-plugin/             # Native Obsidian Vault Plugin
-├── sdks/
-│   ├── python/                      # Official Python Client Library
-│   ├── go/                          # Official Go Client Library
-│   └── rust/                        # Official Rust Client Library
-├── scripts/
-│   ├── test.sh                      # Master Verification Test Harness (14 Suites / 100% Pass)
-│   └── install-node.sh              # 1-Command Sovereign Node Installer
-├── ARCHITECTURE.md                  # Comprehensive Protocol Architecture Specification
-├── INTEGRATIONS.md                  # Distribution Rails & Integrations Reference Guide
-└── CONTRIBUTING.md                  # Open Source Contribution Guidelines & Code of Conduct
-```
 
 ---
 
@@ -254,7 +245,7 @@ PressProtocol separates publishing into distinct, sovereign layers: content addr
 
 ### 1. Multi-Transport Resolution & Parallel Racing Engine
 Rather than relying on a single centralized gateway or single network protocol, PressProtocol clients execute an adaptive parallel race across independent transports:
-- **Transport 1 (Local Node)**: `http://127.0.0.1:4000/api/content/:cid` (sub-20ms latency).
+- **Transport 1 (Node Daemon & Edge Gateway)**: Query local sovereign daemon at `http://127.0.0.1:4000` (sub-20ms) or public edge gateway at `https://api.pressprotocol.com`.
 - **Transport 2 (Clearnet IPFS Gateway Swarm)**: Races Pinata, Cloudflare, IPFS.io, and dweb.link (typical latency ~120ms).
 - **Transport 3 (Tor v3 Onion Services)**: Directly queries `.onion` hidden services via SOCKS5 proxy (~1800ms).
 - **Automatic Failover**: If an ISP deep-packet inspection (DPI) filter blocks IPFS gateways, the request seamlessly resolves via Tor. In-memory Ed25519 verification guarantees that no intermediary gateway can tamper with article content.
@@ -266,14 +257,22 @@ Rather than relying on a single centralized gateway or single network protocol, 
 - In the zero-custody flow (`POST /api/v1/publish/signed`), the gateway receives only the public key and signature. **The private key never leaves the author's device.**
 
 ### 3. Open Infrastructure Gateway & OpenAPI 3.1.0 REST API
-High-performance REST API served globally via Cloudflare Workers (`https://api.pressprotocol.com`) and autonomous private daemons (`core/node` on `http://127.0.0.1:4000` / `.onion`):
+PressProtocol provides identical RESTful publishing, verification, and swarm resolution endpoints across both **public edge infrastructure** and **self-hosted sovereign nodes**:
+- **Public Edge Gateway**: `https://api.pressprotocol.com` — Zero setup, globally distributed edge endpoints.
+- **Self-Hosted Private Daemon**: `http://127.0.0.1:4000` (or local Tor `.onion` service) — 100% autonomous, sovereign private daemon (`core/node`).
 
 ```bash
-# 1. Probe Edge Health & Global PoP Connectivity
-curl -s https://api.pressprotocol.com/health | jq
+# Choose your gateway target:
+# Option A: Public Edge Gateway (Zero Setup)
+GATEWAY="https://api.pressprotocol.com"
+# Option B: Self-Hosted Sovereign Node (Local / Air-Gapped)
+# GATEWAY="http://127.0.0.1:4000"
 
-# 2. Publish Article (Custodial Node-Signed or Edge Ingest)
-curl -X POST https://api.pressprotocol.com/api/v1/publish/raw \
+# 1. Probe Gateway / Node Health & Multi-Transport Circuit Status
+curl -s "$GATEWAY/health" | jq
+
+# 2. Publish Article (Direct Ingest to Swarms)
+curl -X POST "$GATEWAY/api/v1/publish/raw" \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Investigative Leak 2026",
@@ -281,11 +280,11 @@ curl -X POST https://api.pressprotocol.com/api/v1/publish/raw \
     "tags": ["whistleblower", "transparency"]
   }'
 
-# 3. Resolve & Stream Article across IPFS Gateways
-curl -s https://api.pressprotocol.com/api/v1/resolve/bafkreifg43jdwfgeebl6fkt6ntem6xsw5pp54ttnuzb6rffil36jtjukq4 | jq
+# 3. Resolve & Stream Article across IPFS & Tor Swarms
+curl -s "$GATEWAY/api/v1/resolve/bafkreifg43jdwfgeebl6fkt6ntem6xsw5pp54ttnuzb6rffil36jtjukq4" | jq
 
 # 4. Instant Cryptographic Verification (RFC 8032 Ed25519)
-curl -X POST https://api.pressprotocol.com/api/v1/verify \
+curl -X POST "$GATEWAY/api/v1/verify" \
   -H "Content-Type: application/json" \
   -d '{
     "publicKey": "d4a5b6...",
@@ -337,48 +336,6 @@ Ingestion pipeline scans and neutralizes surveillance vectors before cryptograph
 
 ---
 
-## 🗺️ Monorepo Repository Map
-
-```
-PressProtocol/
-├── apps/
-│   └── web/                         # Next.js 15 Web Portal & Interactive Dev Hub
-│       ├── src/app/developers/      # /developers Interactive Playground & Sandbox Keys
-│       ├── src/app/import/          # Notion & RSS Bulk Importers
-│       ├── src/app/vault/           # Offline-First Encrypted Vault
-│       └── src/components/          # UI Component Suite & Widgets
-├── core/
-│   ├── worker/                      # High-Availability Cloudflare Edge API (api.pressprotocol.com)
-│   │   ├── src/index.ts             # Hono Edge Router & Multi-Gateway Race Resolver
-│   │   ├── src/services/pinata.ts   # Edge IPFS Pinning Engine
-│   │   └── wrangler.toml            # Edge Routing & Observability Config
-│   └── node/                        # Self-Sovereign Private Node Daemon
-│       ├── src/routes/v1.ts         # OpenAPI 3.1.0 Gateway & Ingest Pipeline
-│       ├── src/services/            # ApiKey, Identity, Storage, Tor, Webhook Services
-│       └── src/lib/                 # Deterministic CID, Webhook Crypto, Proof Engine
-├── packages/
-│   ├── sdk/                         # @pressprotocol/sdk (Headless TS SDK & CLI)
-│   ├── widget/                      # @pressprotocol/widget (Universal Web Component)
-│   └── proof/                       # @pressprotocol/proof (.pressproof.json & QR Codec)
-├── integrations/
-│   ├── wordpress-plugin/            # Native WordPress Plugin (Gutenberg & Classic)
-│   ├── browser-extension/           # Chromium MV3 Sovereign Web Clipper & Handler
-│   ├── publish-action/              # Official GitHub Action for CI/CD Archival
-│   └── obsidian-plugin/             # Native Obsidian Vault Plugin
-├── sdks/
-│   ├── python/                      # Official Python Client Library
-│   ├── go/                          # Official Go Client Library
-│   └── rust/                        # Official Rust Client Library
-├── scripts/
-│   ├── test.sh                      # Master Verification Test Harness (14 Suites)
-│   └── install-node.sh              # 1-Command Sovereign Node Installer
-├── ARCHITECTURE.md                  # Comprehensive Protocol Architecture Specification
-├── INTEGRATIONS.md                  # Distribution Rails & Integrations Reference
-└── CONTRIBUTING.md                  # Contribution Guidelines & Monorepo Rules
-```
-
----
-
 ## 🚀 Quick Start Guide
 
 ### Prerequisites
@@ -416,106 +373,167 @@ pnpm --dir apps/web dev
 
 ## 💻 SDK Ecosystem & Usage Examples
 
-### TypeScript / Node.js SDK
+### TypeScript / Node.js SDK (`@pressprotocol/sdk`)
+
+[![npm version](https://img.shields.io/npm/v/@pressprotocol/sdk.svg?color=4F46E5&style=flat-square)](https://www.npmjs.com/package/@pressprotocol/sdk)
+
+Install via [NPM](https://www.npmjs.com/package/@pressprotocol/sdk):
+```bash
+pnpm add @pressprotocol/sdk
+```
 
 ```typescript
-import { PressProtocolClient, verifyWebhookSignature } from "@pressprotocol/sdk";
+import { PressProtocol, generateKeypair, createCanonicalPayload, signPayload } from "@pressprotocol/sdk";
 
-const client = new PressProtocolClient({
-  apiKey: "pp_live_...",
-  endpoint: "https://api.pressprotocol.com", // or "http://localhost:4000" for local node
+// 1. Initialize client (Use public edge or local sovereign node: "http://127.0.0.1:4000")
+const client = new PressProtocol({
+  endpoint: "https://pressprotocol.com",
 });
 
-// 1. Publish Article with Client-Side Ed25519 Signing
-const result = await client.publish({
-  title: "Investigative Disclosure 2026",
-  content: "# Findings\n\nFull whistleblowing document...",
-  tags: ["investigation", "whistleblower"],
+// 2. Generate sovereign Ed25519 keypair locally
+const keypair = await generateKeypair();
+
+// 3. Prepare article & sign in-browser (Zero-Custody)
+const title = "Investigative Disclosure 2026";
+const content = "# Classified Dossier\n\nPreserved across decentralized swarms.";
+const tags = ["investigation", "whistleblower"];
+const timestamp = new Date().toISOString();
+
+const canonical = createCanonicalPayload(title, tags, timestamp);
+const signature = await signPayload(canonical, keypair.privateKey);
+
+// 4. Publish to IPFS & Tor
+const result = await client.publishSigned({
+  title,
+  content,
+  tags,
+  timestamp,
+  publicKey: keypair.publicKey,
+  signature,
 });
 
-console.log("Immutable CID:", result.cid);
-console.log("IPFS Clearnet:", result.mirrors.ipfs);
-console.log("Tor v3 Onion:", result.mirrors.tor);
-
-// 2. Resolve with Multi-Transport Racing & In-Memory Verification
-const article = await client.resolve(result.cid, { verify: true });
-console.log("Cryptographically Verified:", article.verified);
-
-// 3. Register Outbound Webhook Subscription
-const webhook = await client.createWebhookSubscription({
-  url: "https://newsroom.example.com/api/webhooks/pressprotocol",
-  events: ["article.published", "article.verified"],
-  description: "Ghost CMS Newsroom Auto-Sync",
-});
-console.log("Shared Secret:", webhook.subscription.secret);
+console.log("Published CID:", result.cid);
+console.log("IPFS Gateway:", result.urls.ipfs);
+console.log("Tor Mirror:", result.urls.tor);
 ```
 
-### Python SDK
+---
+
+### Python SDK (`pressprotocol-py`)
+
+[![PyPI version](https://img.shields.io/pypi/v/pressprotocol-py.svg?color=3775A9&style=flat-square)](https://pypi.org/project/pressprotocol-py/)
+
+Install via [PyPI](https://pypi.org/project/pressprotocol-py/):
+```bash
+pip install pressprotocol-py
+```
 
 ```python
-from pressprotocol import PressProtocolClient
+from pressprotocol import PressProtocol
+from pressprotocol.crypto import calculate_deterministic_cidv1
 
-client = PressProtocolClient(api_key="pp_live_...")
+# Initialize client (Use public edge or local sovereign node: "http://127.0.0.1:4000")
+client = PressProtocol(endpoint="https://pressprotocol.com")
 
-# Sovereign publish
-result = client.publish(
-    title="Environmental Transparency Report",
-    content="# Findings\n\nPreserved across decentralized swarms...",
-    tags=["climate", "transparency"]
+# 1. Publish article directly to decentralized swarms
+post = client.publish_raw(
+    title="Data Science Transparency Audit",
+    content="# Methodology & Findings\n\nVerifiable cryptographic dataset preserved across swarms.",
+    tags=["science", "reproducibility", "whistleblower"]
 )
 
-print("CID:", result.cid)
-print("IPFS URL:", result.mirrors.ipfs)
-print("Tor Onion:", result.mirrors.tor)
+print(f"✅ Published CID: {post['cid']}")
+print(f"📦 IPFS Gateway: {post.get('urls', {}).get('ipfs')}")
+print(f"🧅 Tor Mirror: {post.get('urls', {}).get('tor')}")
+
+# 2. In-Memory Deterministic CIDv1 calculation
+cid = calculate_deterministic_cidv1("Hello, Sovereign Cyberspace!")
+print("Deterministic CID:", cid)
 ```
 
-### Go SDK
+---
+
+### Go SDK (`github.com/0xshikhar/PressProtocol/sdks/go`)
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/0xshikhar/PressProtocol/sdks/go.svg)](https://pkg.go.dev/github.com/0xshikhar/PressProtocol/sdks/go)
+
+Install via [Go Modules](https://pkg.go.dev/github.com/0xshikhar/PressProtocol/sdks/go):
+```bash
+go get github.com/0xshikhar/PressProtocol/sdks/go@v1.0.7
+```
 
 ```go
 package main
 
 import (
-    "context"
-    "fmt"
-    "github.com/0xshikhar/PressProtocol/sdks/go"
+	"fmt"
+	"log"
+
+	pressprotocol "github.com/0xshikhar/PressProtocol/sdks/go"
 )
 
 func main() {
-    client := pressprotocol.NewClient(&pressprotocol.Config{
-        ApiKey: "pp_live_...",
-    })
+	// 1. Initialize client (Use public edge or local sovereign node: "http://127.0.0.1:4000")
+	client := pressprotocol.NewClient("https://pressprotocol.com", "")
 
-    result, err := client.Publish(context.Background(), pressprotocol.PublishOptions{
-        Title:   "Public Financial Audit 2026",
-        Content: "Immutable disclosure records...",
-        Tags:    []string{"transparency", "audit"},
-    })
-    if err != nil {
-        panic(err)
-    }
-    fmt.Printf("Anchored CID: %s\n", result.CID)
+	// 1. Publish article
+	res, err := client.PublishRaw(&pressprotocol.PublishRawRequest{
+		Title:   "Public Financial Audit 2026",
+		Content: "Immutable disclosure records preserved across swarms.",
+		Tags:    []string{"transparency", "audit"},
+	})
+	if err != nil {
+		log.Fatalf("Publish error: %v", err)
+	}
+
+	fmt.Printf("✅ Published CID: %s\n", res.CID)
+	fmt.Printf("📦 URLs: %+v\n", res.URLs)
+
+	// 2. In-Memory CIDv1 without IPFS daemon
+	cid := pressprotocol.CalculateDeterministicCIDv1([]byte("Immutable Content"))
+	fmt.Printf("🧮 Computed CID: %s\n", cid)
 }
 ```
 
-### Rust SDK
+---
+
+### Rust SDK (`pressprotocol-rs`)
+
+[![Crates.io](https://img.shields.io/crates/v/pressprotocol-rs.svg?color=DEA584&style=flat-square)](https://crates.io/crates/pressprotocol-rs/1.0.7)
+
+Add via [Cargo / Crates.io](https://crates.io/crates/pressprotocol-rs/1.0.7):
+```bash
+cargo add pressprotocol-rs
+```
 
 ```rust
-use pressprotocol::{Client, PublishOptions};
+use pressprotocol_rs::{Client, PublishRequest, calculate_deterministic_cidv1};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = Client::new(Some("pp_live_..."));
+    // Initialize client (Use public edge or local sovereign node: "http://127.0.0.1:4000")
+    let client = Client::new("https://pressprotocol.com");
 
-    let result = client.publish(PublishOptions {
-        title: "Immutable Dispatch".into(),
-        content: "# Sovereign Log\n\nPreserved forever.".into(),
-        tags: vec!["sovereign".into()],
-    }).await?;
+    let req = PublishRequest {
+        title: "Sovereign Dispatch 2026".into(),
+        content: "# Immutable Log\n\nPreserved forever across decentralized swarms.".into(),
+        tags: vec!["sovereign".into(), "cryptography".into()],
+        format: Some("markdown".into()),
+        author: Some("0xShikhar".into()),
+    };
 
-    println!("CID: {}", result.cid);
+    let res = client.publish(&req).await?;
+    println!("✅ Published CID: {}", res.cid);
+    println!("📦 IPFS URL: {:?}", res.urls.get("ipfs"));
+    println!("🧅 Tor URL: {:?}", res.urls.get("tor"));
+
+    let cid = calculate_deterministic_cidv1(b"Hello, Sovereign Cyberspace!");
+    println!("In-Memory CID: {}", cid);
+
     Ok(())
 }
 ```
+
 
 ### Universal HTML Widget (2 Lines)
 
@@ -547,7 +565,7 @@ pressprotocol resolve bafkreifg43jdwfgeebl6fkt6ntem6xsw5pp54ttnuzb6rffil36jtjukq
 
 ## 🧪 Verification Test Harness (100% Pass)
 
-Every commit is verified through the master test harness ([`scripts/test.sh`](https://github.com/0xshikhar/PressProtocol/blob/main/scripts/test.sh)), executing **14 automated subsystem test suites** and **413+ assertions**:
+Every commit is verified through the master test harness ([`scripts/test.sh`](https://github.com/0xshikhar/PressProtocol/blob/main/scripts/test.sh)), executing **14 automated subsystem test suites** and **419 individual tests**:
 
 ```text
 🧪 PressProtocol Verification Harness
@@ -577,7 +595,7 @@ Running Outbound Real-Time Webhook Subscriptions & Event Bus... ✅ PASS (17/17 
 
 📊 Verification Summary
 =======================
-Passed: 16 (14/14 Subsystem Test Suites + 2 Typechecks)
+Passed: 419 (Across 14 Subsystem Test Suites + 2 Typechecks)
 Failed: 0
 ```
 
@@ -599,24 +617,40 @@ Failed: 0
 
 ---
 
+## 🏛️ Sovereign Public Good & Community Support
+
+PressProtocol is engineered from first principles as an autonomous, non-extractive digital public good for the open web.
+
+### Core Public Good Commitments
+- **Pure Infrastructure, Not a Walled Garden**: We do not force writers or organizations onto an isolated blogging network. PressProtocol is neutral, permissionless plumbing extending unstoppable cryptographic distribution to WordPress, Ghost, Substack, Medium, Obsidian, and any web application.
+- **Zero Venture Capital & Zero Token Gates**: No tokens to buy, no gas fees, and no speculative tokenomics.
+- **Zero Commercial Surveillance**: Strict zero-telemetry policy. Built-in ingest pipelines scrub Google Analytics, Meta Pixels, tracking beacons, UTM query strings, and fingerprinting scripts before content hashing occurs.
+- **Permanent Open Source**: Released under the permissive MIT license for worldwide public benefit.
+- **Autonomous & Censorship-Immune**: Built for independent newsrooms, human rights defenders, whistleblowers, and civic researchers facing state censorship, ISP firewalls, and hosting deplatforming.
+
 ---
 
-## 🏛️ Octant & Public Goods Alignment
+### Support & Underwrite the Infrastructure
 
-PressProtocol is engineered from first principles as a sovereign, non-extractive digital public good designed for the **Octant Epoch 13 Privacy & Censorship Resistance Round**:
+PressProtocol operates with **zero ads, zero tracking, and zero subscription paywalls**. 
 
-1. **Zero Financial Friction & Anti-Sybil Without KYC**: Unlike platforms that require gas tokens or wallets (which create financial surveillance trails and exclusion), PressProtocol uses client-side Ed25519 cryptography. Anyone with internet access can publish without spending a cent.
-2. **Zero Commercial Surveillance**: True to the Cypherpunk and Octant ethos, the protocol enforces a strict zero-telemetry policy. The built-in ingestion pipeline strips tracking beacons, Meta Pixels, Google Analytics, and UTM parameters prior to cryptographic hashing.
-3. **Public Infrastructure Redundancy**: By pairing Cloudflare Workers global edge nodes (`https://api.pressprotocol.com`) with the decentralized IPFS swarm and Tor v3 hidden services, PressProtocol guarantees that no single infrastructure provider, ISP, or authoritarian regime can extinguish published dispatches.
-4. **100% Free & Open-Source**: All code is released under the permissive MIT license for open-source auditability and global community stewardship.
+100% of community contributions and public good sponsorships directly fund:
+1. **Operational Infrastructure**: Maintaining redundant global IPFS pinning nodes, Tor v3 onion relays, and high-availability edge compute across 300+ PoPs.
+2. **Cryptographic Audits**: Underwriting independent third-party security audits of our WebCrypto signing engine and payload canonicalization.
+3. **Sustainable Maintenance**: Supporting core open-source maintainers across WordPress, Obsidian, Chromium extension, and multi-language SDK surfaces.
+
+**Contribute & Underwrite Operations**:  
+👉 [**Support PressProtocol on `pressprotocol.com/support`**](https://pressprotocol.com/support)
+
+We accept sovereign community underwriting via multiple networks:
+- **Ethereum & Layer 2s**: Ethereum, Arbitrum, Optimism, Base
+- **Privacy & Sovereign Assets**: Monero (XMR), Bitcoin (BTC), Solana (SOL)
+- **Traditional Methods**: GitHub Sponsors, Open Collective, and Fiat Sponsorships
 
 ---
 
 ## 📚 Reference Documents
 
-- **[`octant improvements.md`](https://github.com/0xshikhar/PressProtocol/blob/main/octant%20improvements.md)**: Comprehensive ecosystem roadmap, UI/UX opportunities, technical parity audit, and Octant evaluator readiness matrix.
-- **[`status.md`](https://github.com/0xshikhar/PressProtocol/blob/main/status.md)**: Live system status, production deployment registry, and component completion matrix.
-- **[`PUBLISHING_GUIDE.md`](https://github.com/0xshikhar/PressProtocol/blob/main/PUBLISHING_GUIDE.md)**: Step-by-step registry publishing guide for NPM, PyPI, Crates.io, Chrome Web Store, and WordPress.org.
 - **[`ARCHITECTURE.md`](https://github.com/0xshikhar/PressProtocol/blob/main/ARCHITECTURE.md)**: Comprehensive protocol architecture, cryptographic specifications, multi-transport failover algorithms, and wire schemas.
 - **[`INTEGRATIONS.md`](https://github.com/0xshikhar/PressProtocol/blob/main/INTEGRATIONS.md)**: Complete guide to the WordPress plugin, Chromium MV3 extension, GitHub Action, Obsidian plugin, and Universal Widget.
 - **[`CONTRIBUTING.md`](https://github.com/0xshikhar/PressProtocol/blob/main/CONTRIBUTING.md)**: Monorepo contribution guidelines, code standards, and PR workflows.
@@ -626,4 +660,5 @@ PressProtocol is engineered from first principles as a sovereign, non-extractive
 ## 📄 License & Open Source Commitment
 
 PressProtocol is 100% free, open-source software released under the **[MIT License](https://github.com/0xshikhar/PressProtocol/blob/main/LICENSE)**. It is built as a neutral public good for journalists, whistleblowers, researchers, and citizens worldwide.
+
 

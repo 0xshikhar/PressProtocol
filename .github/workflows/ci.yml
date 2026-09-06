@@ -37,6 +37,8 @@ jobs:
         run: pnpm --dir apps/web build
         env:
           NEXT_PUBLIC_BACKEND_API_URL: "https://api.pressprotocol.com"
+          NEXT_PUBLIC_APP_URL: "https://pressprotocol.com"
+
 
   validate-node:
     name: Validate P2P Core Node (core/node)

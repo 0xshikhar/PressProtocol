@@ -1,8 +1,8 @@
 # PressProtocol Go SDK
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/0xshikhar/AnonPress/sdks/go.svg)](https://pkg.go.dev/github.com/0xshikhar/AnonPress/sdks/go)
+[![Go Reference](https://pkg.go.dev/badge/github.com/0xshikhar/PressProtocol/sdks/go.svg)](https://pkg.go.dev/github.com/0xshikhar/PressProtocol/sdks/go)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-[![Go Report Card](https://goreportcard.com/badge/github.com/0xshikhar/AnonPress/sdks/go)](https://goreportcard.com/report/github.com/0xshikhar/AnonPress/sdks/go)
+[![Go Report Card](https://goreportcard.com/badge/github.com/0xshikhar/PressProtocol/sdks/go)](https://goreportcard.com/report/github.com/0xshikhar/PressProtocol/sdks/go)
 
 Official Go SDK for [PressProtocol](https://pressprotocol.com) — Autonomous, censorship-resistant publishing infrastructure, zero-custody cryptographic signing, and multi-transport content resolution across IPFS and Tor.
 
@@ -20,7 +20,7 @@ Official Go SDK for [PressProtocol](https://pressprotocol.com) — Autonomous, c
 ## Installation
 
 ```bash
-go get github.com/0xshikhar/AnonPress/sdks/go@sdks/go/v1.0.7
+go get github.com/0xshikhar/PressProtocol/sdks/go@v1.0.7
 ```
 
 ---
@@ -35,8 +35,9 @@ import (
 	"log"
 	"time"
 
-	pressprotocol "github.com/0xshikhar/AnonPress/sdks/go"
+	pressprotocol "github.com/0xshikhar/PressProtocol/sdks/go"
 )
+
 
 func main() {
 	// 1. Initialize client

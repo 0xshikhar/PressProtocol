@@ -12,7 +12,7 @@ This guide details how to publish all **10 packages and integrations** across th
 | **Proof Codec** | [`packages/proof`](file:///Users/shikharsingh/Downloads/code/realfi/anonpress/packages/proof) | [NPM](https://npmjs.com) | `npm login` / `NPM_TOKEN` | `pnpm --filter @pressprotocol/proof publish --access public` |
 | **Web Component** | [`packages/widget`](file:///Users/shikharsingh/Downloads/code/realfi/anonpress/packages/widget) | [NPM](https://npmjs.com) + CDN | `npm login` / `NPM_TOKEN` | `pnpm --filter @pressprotocol/widget publish --access public` |
 | **Python SDK** | [`sdks/python`](file:///Users/shikharsingh/Downloads/code/realfi/anonpress/sdks/python) | [PyPI](https://pypi.org) | PyPI API Token | `python3 -m twine upload sdks/python/dist/*` |
-| **Go SDK** | [`sdks/go`](file:///Users/shikharsingh/Downloads/code/realfi/anonpress/sdks/go) | GitHub / Go Proxy | Git Tag & Push | `git tag sdks/go/v1.0.6 && git push origin sdks/go/v1.0.6` |
+| **Go SDK** | [`sdks/go`](file:///Users/shikharsingh/Downloads/code/realfi/anonpress/sdks/go) | GitHub / Go Proxy | Git Tag & Push | `git tag sdks/go/v1.0.7 && git push origin sdks/go/v1.0.7` |
 | **Rust SDK** | [`sdks/rust`](file:///Users/shikharsingh/Downloads/code/realfi/anonpress/sdks/rust) | [Crates.io](https://crates.io) | `cargo login` token | `cargo publish --manifest-path sdks/rust/Cargo.toml` |
 | **Chrome Extension** | [`integrations/browser-extension`](file:///Users/shikharsingh/Downloads/code/realfi/anonpress/integrations/browser-extension) | [Chrome Web Store](https://chrome.google.com/webstore/devconsole) | $5 Developer Account | Upload `PressProtocol_Browser_Extension.zip` |
 | **WordPress Plugin**| [`integrations/wordpress-plugin`](file:///Users/shikharsingh/Downloads/code/realfi/anonpress/integrations/wordpress-plugin) | [WordPress.org](https://wordpress.org/plugins/) | WordPress.org account | Upload via plugin submission portal |
@@ -50,9 +50,9 @@ pnpm --filter @pressprotocol/widget publish --access public --no-git-checks
 
 ### Verification:
 ```bash
-npm info @pressprotocol/sdk
-npm info @pressprotocol/proof
-npm info @pressprotocol/widget
+pnpm view @pressprotocol/sdk version
+pnpm view @pressprotocol/proof version
+pnpm view @pressprotocol/widget version
 ```
 
 ---
@@ -70,14 +70,14 @@ npm info @pressprotocol/widget
 
 ### Build & Publish:
 ```bash
-# 1. Install build and upload utilities
-pip install --upgrade build twine
+# 1. Build wheel and source distribution using uv
+uv build sdks/python
 
-# 2. Build wheel and source distribution
-python3 -m build sdks/python
+# 2. Upload to PyPI
+uv publish --token <YOUR_PYPI_TOKEN> sdks/python/dist/*
 
-# 3. Upload to PyPI
-python3 -m twine upload sdks/python/dist/* -u __token__ -p <YOUR_PYPI_TOKEN>
+# (Alternative with twine)
+# python3 -m twine upload sdks/python/dist/* -u __token__ -p <YOUR_PYPI_TOKEN>
 ```
 
 ### Verification:
@@ -120,7 +120,7 @@ cargo search pressprotocol-rs
 ## 4. Go SDK (Go Modules / GitHub)
 
 ### Package:
-`github.com/0xshikhar/AnonPress/sdks/go` ([`sdks/go`](file:///Users/shikharsingh/Downloads/code/realfi/anonpress/sdks/go))
+`github.com/0xshikhar/PressProtocol/sdks/go` ([`sdks/go`](file:///Users/shikharsingh/Downloads/code/realfi/anonpress/sdks/go))
 
 ### How Go Distribution Works:
 Go does not require binary registry uploads; it uses Git tags directly:
@@ -132,21 +132,15 @@ git add sdks/go
 git commit -m "feat(sdk): finalize Go SDK with client-signed and resolve methods"
 
 # 2. Create version tag matching module path
-git tag sdks/go/v1.0.6
-git push origin sdks/go/v1.0.6
+git tag sdks/go/v1.0.7
+git push origin sdks/go/v1.0.7
 ```
-
-### Clean Dedicated Mirror Option (Optional):
-If you want developers to run `go get github.com/0xshikhar/pressprotocol-go@v1.0.6`:
-1. Create a repository `0xshikhar/pressprotocol-go` on GitHub.
-2. Copy `sdks/go/*` to that repository root.
-3. Update `go.mod` to `module github.com/0xshikhar/pressprotocol-go`.
-4. Tag `v1.0.6` and push.
 
 ### Verification:
 ```bash
-go get github.com/0xshikhar/AnonPress/sdks/go@sdks/go/v1.0.6
+go get github.com/0xshikhar/PressProtocol/sdks/go@v1.0.7
 ```
+
 
 ---
 

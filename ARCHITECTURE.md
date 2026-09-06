@@ -278,3 +278,49 @@ The PressProtocol Gateway (`core/node`) provides an HTTP RESTful interface under
 - `POST /api/v1/webhooks/subscriptions/:id/test`: Trigger immediate live test ping.
 - **Event Bus Topics**: `article.published`, `article.verified`, `mirror.health_changed`, `*`.
 - **Delivery Engine**: 6s timeout, exponential backoff retry on 5xx or network drops, delivery statistics tracking (`deliveredCount`, `failureCount`, `lastLatencyMs`).
+
+---
+
+## 8. Monorepo Architecture & Package Structure
+
+The PressProtocol monorepo is organized using `pnpm` workspaces, maintaining strict modular boundaries between core daemons, client packages, native CMS integrations, and multi-language SDKs:
+
+```
+PressProtocol/
+├── apps/
+│   └── web/                         # Next.js 15 Web Application & Developer Portal
+│       ├── src/app/developers/      # /developers Interactive Playground & Sandbox Keys
+│       ├── src/app/downloads/       # One-click client package downloads & checksums
+│       ├── src/app/import/          # Notion, Substack, Medium & RSS Ingestion Rails
+│       ├── src/app/vault/           # Offline-First Encrypted IndexedDB Reading Vault
+│       └── src/components/          # UI Component Suite & Live Widget Sandbox
+├── core/
+│   ├── node/                        # Self-Sovereign Private Node Daemon (Fastify)
+│   │   ├── src/routes/v1.ts         # OpenAPI 3.1.0 Enterprise Gateway ("Stripe for Publishing")
+│   │   ├── src/services/            # ApiKey, Identity, Storage, Tor, Webhook Services
+│   │   └── src/lib/                 # Deterministic CIDv1, Webhook Crypto, Proof Engine
+│   └── worker/                      # Cloudflare Edge Gateway (api.pressprotocol.com)
+│       ├── src/index.ts             # Hono Edge Router & Multi-Gateway Race Resolver
+│       ├── src/services/pinata.ts   # Edge IPFS Pinning Engine
+│       └── wrangler.toml            # Edge Routing & Observability Config
+├── packages/
+│   ├── sdk/                         # @pressprotocol/sdk (Headless TS SDK & CLI)
+│   ├── widget/                      # @pressprotocol/widget (Universal Web Component)
+│   └── proof/                       # @pressprotocol/proof (.pressproof.json & QR Codec)
+├── integrations/
+│   ├── wordpress-plugin/            # Native WordPress Plugin (Gutenberg & Classic)
+│   ├── browser-extension/           # Chromium MV3 Sovereign Web Clipper & URI Handler
+│   ├── obsidian-plugin/             # Native Obsidian Vault Plugin
+│   └── publish-action/              # Official GitHub Action for CI/CD Archival
+├── sdks/
+│   ├── python/                      # Official Python Client Library (pressprotocol-py)
+│   ├── go/                          # Official Go Client Library (PressProtocol/sdks/go)
+│   └── rust/                        # Official Rust Client Library (pressprotocol-rs)
+├── scripts/
+│   ├── test.sh                      # Master Verification Test Harness (14/14 Suites)
+│   └── install-node.sh              # 1-Command Sovereign Node Installer
+├── ARCHITECTURE.md                  # Comprehensive Protocol Architecture Specification
+├── INTEGRATIONS.md                  # Distribution Rails & Integrations Reference Guide
+└── CONTRIBUTING.md                  # Open Source Contribution Guidelines & PR Workflow
+```
+

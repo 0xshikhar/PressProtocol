@@ -27,6 +27,7 @@ classifiers = [
 [project.urls]
 Homepage = "https://pressprotocol.com"
 Documentation = "https://pressprotocol.com/docs"
-Repository = "https://github.com/0xshikhar/AnonPress"
-Issues = "https://github.com/0xshikhar/AnonPress/issues"
+Repository = "https://github.com/0xshikhar/PressProtocol"
+Issues = "https://github.com/0xshikhar/PressProtocol/issues"
+
 

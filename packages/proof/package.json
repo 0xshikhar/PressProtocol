@@ -35,13 +35,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/0xshikhar/AnonPress.git",
+    "url": "git+https://github.com/0xshikhar/PressProtocol.git",
     "directory": "packages/proof"
   },
   "homepage": "https://pressprotocol.com",
   "bugs": {
-    "url": "https://github.com/0xshikhar/AnonPress/issues"
+    "url": "https://github.com/0xshikhar/PressProtocol/issues"
   },
+
   "keywords": [
     "pressprotocol",
     "proof",
