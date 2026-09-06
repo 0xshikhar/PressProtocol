@@ -138,6 +138,8 @@ async function loadIdentity() {
   settingsPubKey.textContent = `${currentIdentity.publicKey.slice(0, 14)}...${currentIdentity.publicKey.slice(-10)}`;
 }
 
+let preloadedArticle: ClippedArticle | null = null;
+
 /**
  * Inspect Active Browser Tab
  */
@@ -165,6 +167,25 @@ async function inspectActiveTab() {
     displayReaderDiagnostics(cid);
   } else {
     readerBanner.classList.add("hidden");
+  }
+
+  // Preload article preview on tab inspect so author, read time, and word count are instantly visible
+  try {
+    const [result] = await chrome.scripting.executeScript({
+      target: { tabId: activeTabId },
+      func: extractPageContent,
+    });
+
+    if (result?.result && typeof result.result === "object") {
+      preloadedArticle = result.result as ClippedArticle;
+      if (preloadedArticle.title) {
+        targetTitle.textContent = preloadedArticle.title;
+      }
+      targetAuthor.textContent = preloadedArticle.author ? `By ${preloadedArticle.author}` : "By Sovereign Author";
+      targetReadTime.textContent = `~${preloadedArticle.readingTimeMinutes || 1} min read (${preloadedArticle.wordCount || 0} words)`;
+    }
+  } catch (inspectErr) {
+    // Restricted internal page (e.g. chrome://)
   }
 }
 
@@ -228,25 +249,33 @@ btnClipNow.addEventListener("click", async () => {
   updateStep(stepBroadcast, "pending");
 
   let clipped: ClippedArticle;
-  try {
-    const [result] = await chrome.scripting.executeScript({
-      target: { tabId: activeTabId },
-      func: extractPageContent,
-    });
+  if (preloadedArticle && preloadedArticle.textContent) {
+    clipped = preloadedArticle;
+  } else {
+    try {
+      const [result] = await chrome.scripting.executeScript({
+        target: { tabId: activeTabId },
+        func: extractPageContent,
+      });
 
-    if (!result || !result.result || typeof result.result !== "object") {
-      throw new Error("Could not extract readable article content from this tab.");
+      if (!result || !result.result || typeof result.result !== "object") {
+        throw new Error("Could not extract readable article content from this tab.");
+      }
+
+      clipped = result.result as ClippedArticle;
+    } catch (err: any) {
+      console.error("Extraction error:", err);
+      alert(`Could not extract article from this page: ${err.message || String(err)}`);
+      btnClipNow.disabled = false;
+      clipProgressCard.classList.add("hidden");
+      return;
     }
-
-    clipped = result.result as ClippedArticle;
-  } catch (err: any) {
-    console.error("Extraction error:", err);
-    alert(`Could not extract article from this page: ${err.message || String(err)}`);
-    btnClipNow.disabled = false;
-    clipProgressCard.classList.add("hidden");
-    return;
   }
 
+  const stepExtractText = stepExtract.querySelector(".step-text");
+  if (stepExtractText) {
+    stepExtractText.textContent = `Extracted ${clipped.wordCount} words (${Math.round(clipped.telemetry.cleanedByteSize / 1024)} KB)`;
+  }
   updateStep(stepExtract, "completed");
 
   // Step 2: Scrub Surveillance
@@ -255,12 +284,20 @@ btnClipNow.addEventListener("click", async () => {
   targetReadTime.textContent = `~${clipped?.readingTimeMinutes || 1} min read (${clipped?.wordCount || 0} words)`;
   targetTitle.textContent = clipped?.title || activeTabTitle;
 
-  await new Promise((r) => setTimeout(r, 450)); // UI feedback pause
+  const stepScrubText = stepScrub.querySelector(".step-text");
+  if (stepScrubText) {
+    stepScrubText.textContent = `Purged ${clipped.telemetry.totalPurged} surveillance beacons & modals`;
+  }
+  await new Promise((r) => setTimeout(r, 200));
   updateStep(stepScrub, "completed");
 
   // Step 3: Ed25519 Sign
   updateStep(stepSign, "active");
-  await new Promise((r) => setTimeout(r, 400));
+  const stepSignText = stepSign.querySelector(".step-text");
+  if (stepSignText) {
+    stepSignText.textContent = `Signed with Ed25519 key (${currentIdentity?.pseudonym || "Anon"})`;
+  }
+  await new Promise((r) => setTimeout(r, 200));
   updateStep(stepSign, "completed");
 
   // Step 4: Broadcast to Swarm
@@ -301,7 +338,7 @@ btnClipNow.addEventListener("click", async () => {
           btnCopyEmbedCode.textContent = "</> Copy Embed Code";
         }, 2000);
       };
-    }, 500);
+    }, 400);
   } catch (err: any) {
     console.error("Publishing error:", err);
     alert(`Failed to syndicate article to PressProtocol gateway: ${err.message}`);

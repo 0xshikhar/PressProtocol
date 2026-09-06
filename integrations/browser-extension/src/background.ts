@@ -21,7 +21,7 @@ export interface ExtensionSettings {
 }
 
 const DEFAULT_SETTINGS: ExtensionSettings = {
-  apiUrl: "http://localhost:4000",
+  apiUrl: "https://api.pressprotocol.com",
   webAppUrl: "https://pressprotocol.com",
   autoCopyPermalink: true,
   signWithBurnerKey: true,
@@ -215,9 +215,12 @@ async function publishArticle(article: ClippedArticle): Promise<any> {
 
   const candidateEndpoints = [
     settings.apiUrl,
+    "https://api.pressprotocol.com",
+    "https://pressprotocol-api.newsofficework.workers.dev",
+    "https://pressprotocol.com",
     settings.webAppUrl,
     "http://localhost:3000",
-    "https://pressprotocol.com",
+    "http://localhost:4000",
   ].filter(Boolean);
 
   const uniqueEndpoints = Array.from(new Set(candidateEndpoints));
