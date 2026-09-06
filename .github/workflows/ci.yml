@@ -23,12 +23,14 @@ jobs:
         with:
           node-version: 20
           cache: 'pnpm'
-          cache-dependency-path: apps/web/pnpm-lock.yaml
 
-      - name: Install Dependencies
-        run: pnpm --dir apps/web install --frozen-lockfile
+      - name: Install Monorepo Dependencies
+        run: pnpm install --frozen-lockfile
 
-      - name: Typecheck
+      - name: Build Workspace Packages
+        run: pnpm --filter "@pressprotocol/*" run build
+
+      - name: Typecheck Web Portal
         run: pnpm --dir apps/web exec tsc --noEmit
 
       - name: Build Web Portal
@@ -52,10 +54,38 @@ jobs:
         with:
           node-version: 20
           cache: 'pnpm'
-          cache-dependency-path: core/node/pnpm-lock.yaml
 
-      - name: Install Dependencies
-        run: pnpm --dir core/node install --frozen-lockfile
+      - name: Install Monorepo Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Workspace Packages
+        run: pnpm --filter "@pressprotocol/*" run build
 
       - name: Typecheck & Build Node
         run: pnpm --dir core/node build
+
+  subsystem-tests:
+    name: Run Automated Subsystem Verification (14 Suites)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install Monorepo Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Workspace Packages
+        run: pnpm --filter "@pressprotocol/*" run build
+
+      - name: Run Test Harness
+        run: bash scripts/test.sh
