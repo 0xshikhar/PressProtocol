@@ -11,6 +11,11 @@
     "package:extension": "./scripts/package-extension.sh",
     "package:wordpress": "./scripts/package-wordpress.sh",
     "package:all": "./scripts/package-extension.sh && ./scripts/package-wordpress.sh",
+    "worker:login": "pnpm --filter pressprotocol-worker run login",
+    "worker:secret:jwt": "pnpm --filter pressprotocol-worker run secret:jwt",
+    "worker:secret:db": "pnpm --filter pressprotocol-worker run secret:db",
+    "worker:dev": "pnpm --filter pressprotocol-worker run dev",
+    "worker:deploy": "pnpm --filter pressprotocol-worker run deploy",
     "pressprotocol": "pnpm --filter @pressprotocol/sdk run cli"
   }
 }
