@@ -19,10 +19,12 @@ const config = {
 		},
 		extend: {
 			fontFamily: {
-				sans: ['var(--font-sans)', 'Inter', 'system-ui', 'sans-serif'],
+				sans: ['var(--font-sans)', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+				charter: ['Charter', 'Bitstream Charter', 'var(--font-source-serif)', 'Sitka Text', 'Cambria', 'Georgia', 'Times New Roman', 'serif'],
+				serif: ['Charter', 'Bitstream Charter', 'var(--font-source-serif)', 'Sitka Text', 'Cambria', 'Georgia', 'Times New Roman', 'serif'],
+				editorial: ['var(--font-instrument-serif)', 'Instrument Serif', 'Georgia', 'serif'],
 				display: ['var(--font-instrument-serif)', 'Instrument Serif', 'Georgia', 'serif'],
-				serif: ['var(--font-instrument-serif)', 'Instrument Serif', 'Georgia', 'serif'],
-				mono: ['var(--font-jetbrains)', 'JetBrains Mono', 'monospace'],
+				mono: ['var(--font-jetbrains)', 'Menlo', 'Monaco', 'Consolas', 'Courier New', 'monospace'],
 			},
 			colors: {
 				'bg-base': '#050508',
