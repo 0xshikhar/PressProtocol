@@ -12,13 +12,22 @@
 </p>
 
 <p align="center">
-  <a href="#-protocol-philosophy--architectural-thesis"><img src="https://img.shields.io/badge/Public%20Good-Zero--Custody%20Privacy-6366f1.svg?style=flat-square" alt="Zero-Custody Privacy"/></a>
+  <a href="https://pressprotocol.com"><img src="https://img.shields.io/badge/Web%20App-pressprotocol.com-000000.svg?style=flat-square&logo=vercel" alt="Vercel Live"/></a>
+  <a href="https://api.pressprotocol.com/health"><img src="https://img.shields.io/badge/Edge%20API-api.pressprotocol.com-f38020.svg?style=flat-square&logo=cloudflare" alt="Cloudflare Edge Live"/></a>
   <a href="https://github.com/0xshikhar/PressProtocol/blob/main/scripts/test.sh"><img src="https://img.shields.io/badge/Tests-16%2F16%20Passing%20(100%25)-10b981.svg?style=flat-square" alt="Tests Passing"/></a>
+  <a href="#-octant--public-goods-alignment"><img src="https://img.shields.io/badge/Octant-Epoch%2013%20Privacy%20Round-6366f1.svg?style=flat-square" alt="Octant Epoch 13"/></a>
   <a href="https://github.com/0xshikhar/PressProtocol/blob/main/ARCHITECTURE.md"><img src="https://img.shields.io/badge/Spec-RFC--8032%20%7C%20OpenAPI%203.1-3b82f6.svg?style=flat-square" alt="Specifications"/></a>
   <a href="https://github.com/0xshikhar/PressProtocol/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-amber.svg?style=flat-square" alt="License: MIT"/></a>
   <a href="https://github.com/0xshikhar/PressProtocol/blob/main/pnpm-workspace.yaml"><img src="https://img.shields.io/badge/Monorepo-pnpm%20workspace-f59e0b.svg?style=flat-square" alt="pnpm workspace"/></a>
   <a href="https://github.com/0xshikhar/PressProtocol/tree/main/packages/sdk"><img src="https://img.shields.io/badge/TypeScript-100%25%20Strict-blue.svg?style=flat-square" alt="TypeScript"/></a>
 </p>
+
+> ### 🌐 Live Production Infrastructure & Public Goods Rail
+> - **Production Web Application**: [`https://pressprotocol.com`](https://pressprotocol.com) *(Next.js 15 on Vercel)*
+> - **Canonical Edge API Gateway**: [`https://api.pressprotocol.com`](https://api.pressprotocol.com) *(Cloudflare Workers across 300+ Edge PoPs)*
+> - **Public Goods Alignment**: Engineered for **Octant Epoch 13 (Privacy & Censorship Resistance Round)**
+> - **Zero-Custody Guarantee**: Zero gas, zero seed phrases, no wallets, no KYC. Authors sign content in-browser with RFC 8032 Ed25519 keys.
+> - **Multi-Transport Racing**: Sub-100ms clearnet IPFS resolution + automatic failover to Tor v3 `.onion` hidden services.
 
 ---
 
@@ -47,6 +56,7 @@
   - [Terminal CLI (`pressprotocol`)](#terminal-cli-pressprotocol)
 - [Verification Test Harness (100% Pass)](#-verification-test-harness-100-pass)
 - [Threat Model & Adversarial Defense](#-threat-model--adversarial-defense)
+- [Octant & Public Goods Alignment](#-octant--public-goods-alignment)
 - [Reference Documents](#-reference-documents)
 - [License & Open Source Commitment](#-license--open-source-commitment)
 
@@ -130,6 +140,10 @@ pressprotocol/
 │       ├── src/app/vault/           # Offline-First Encrypted Reading Vault
 │       └── src/components/          # UI Component Suite & Live Widget Sandbox
 ├── core/
+│   ├── worker/                      # High-Availability Cloudflare Edge API (api.pressprotocol.com)
+│   │   ├── src/index.ts             # Hono Edge Router & Multi-Gateway Race Resolver
+│   │   ├── src/services/pinata.ts   # Edge IPFS Pinning Engine
+│   │   └── wrangler.toml            # Edge Routing & Observability Config
 │   └── node/                        # Self-Sovereign Private Node Daemon
 │       ├── src/routes/v1.ts         # OpenAPI 3.1.0 Enterprise Gateway ("Stripe for Publishing")
 │       ├── src/services/            # ApiKey, Identity, Storage, Tor, Webhook Services
@@ -252,12 +266,38 @@ Rather than relying on a single centralized gateway or single network protocol, 
 - In the zero-custody flow (`POST /api/v1/publish/signed`), the gateway receives only the public key and signature. **The private key never leaves the author's device.**
 
 ### 3. Open Infrastructure Gateway & OpenAPI 3.1.0 REST API
-High-performance REST API built on Fastify serving an authentic OpenAPI 3.1.0 specification:
+High-performance REST API served globally via Cloudflare Workers (`https://api.pressprotocol.com`) and autonomous private daemons (`core/node` on `http://127.0.0.1:4000` / `.onion`):
+
+```bash
+# 1. Probe Edge Health & Global PoP Connectivity
+curl -s https://api.pressprotocol.com/health | jq
+
+# 2. Publish Article (Custodial Node-Signed or Edge Ingest)
+curl -X POST https://api.pressprotocol.com/api/v1/publish/raw \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Investigative Leak 2026",
+    "content": "# Classified Memo\n\nPreserved across decentralized swarms.",
+    "tags": ["whistleblower", "transparency"]
+  }'
+
+# 3. Resolve & Stream Article across IPFS Gateways
+curl -s https://api.pressprotocol.com/api/v1/resolve/bafkreifg43jdwfgeebl6fkt6ntem6xsw5pp54ttnuzb6rffil36jtjukq4 | jq
+
+# 4. Instant Cryptographic Verification (RFC 8032 Ed25519)
+curl -X POST https://api.pressprotocol.com/api/v1/verify \
+  -H "Content-Type: application/json" \
+  -d '{
+    "publicKey": "d4a5b6...",
+    "signature": "e8f9a0..."
+  }'
+```
+
 - `POST /api/v1/publish/signed`: Zero-custody ingest for client-signed articles.
-- `POST /api/v1/publish/raw`: Custodial ingest with deterministic in-memory CIDv1 generation and node-level signing.
+- `POST /api/v1/publish/raw`: Custodial ingest with deterministic CIDv1 generation.
 - `GET /api/v1/resolve/:cid`: Swarm resolver with active mirror latency telemetry.
 - `POST /api/v1/verify`: Instant mathematical cryptographic audit under RFC 8032.
-- `GET /api/v1/metrics`: Node health, circuit count, and bandwidth telemetry.
+- `GET /api/v1/metrics`: Node health, gateway latency, and bandwidth telemetry.
 - **Enterprise Rate Limiting**: In-memory token-bucket rate limiter with configurable quotas and SHA-256 API key hashing (`pp_live_*`, `pp_test_*`).
 
 ### 4. Outbound Real-Time Webhooks & HMAC-SHA256 Event Bus
@@ -308,6 +348,10 @@ PressProtocol/
 │       ├── src/app/vault/           # Offline-First Encrypted Vault
 │       └── src/components/          # UI Component Suite & Widgets
 ├── core/
+│   ├── worker/                      # High-Availability Cloudflare Edge API (api.pressprotocol.com)
+│   │   ├── src/index.ts             # Hono Edge Router & Multi-Gateway Race Resolver
+│   │   ├── src/services/pinata.ts   # Edge IPFS Pinning Engine
+│   │   └── wrangler.toml            # Edge Routing & Observability Config
 │   └── node/                        # Self-Sovereign Private Node Daemon
 │       ├── src/routes/v1.ts         # OpenAPI 3.1.0 Gateway & Ingest Pipeline
 │       ├── src/services/            # ApiKey, Identity, Storage, Tor, Webhook Services
@@ -555,14 +599,31 @@ Failed: 0
 
 ---
 
+---
+
+## 🏛️ Octant & Public Goods Alignment
+
+PressProtocol is engineered from first principles as a sovereign, non-extractive digital public good designed for the **Octant Epoch 13 Privacy & Censorship Resistance Round**:
+
+1. **Zero Financial Friction & Anti-Sybil Without KYC**: Unlike platforms that require gas tokens or wallets (which create financial surveillance trails and exclusion), PressProtocol uses client-side Ed25519 cryptography. Anyone with internet access can publish without spending a cent.
+2. **Zero Commercial Surveillance**: True to the Cypherpunk and Octant ethos, the protocol enforces a strict zero-telemetry policy. The built-in ingestion pipeline strips tracking beacons, Meta Pixels, Google Analytics, and UTM parameters prior to cryptographic hashing.
+3. **Public Infrastructure Redundancy**: By pairing Cloudflare Workers global edge nodes (`https://api.pressprotocol.com`) with the decentralized IPFS swarm and Tor v3 hidden services, PressProtocol guarantees that no single infrastructure provider, ISP, or authoritarian regime can extinguish published dispatches.
+4. **100% Free & Open-Source**: All code is released under the permissive MIT license for open-source auditability and global community stewardship.
+
+---
+
 ## 📚 Reference Documents
 
-- **[ARCHITECTURE.md](https://github.com/0xshikhar/PressProtocol/blob/main/ARCHITECTURE.md)**: Comprehensive protocol architecture, cryptographic specifications, multi-transport failover algorithms, and wire schemas.
-- **[INTEGRATIONS.md](https://github.com/0xshikhar/PressProtocol/blob/main/INTEGRATIONS.md)**: Complete guide to the WordPress plugin, Chromium MV3 extension, GitHub Action, Obsidian plugin, and Universal Widget.
-- **[CONTRIBUTING.md](https://github.com/0xshikhar/PressProtocol/blob/main/CONTRIBUTING.md)**: Monorepo contribution guidelines, code standards, and PR workflows.
+- **[`octant improvements.md`](https://github.com/0xshikhar/PressProtocol/blob/main/octant%20improvements.md)**: Comprehensive ecosystem roadmap, UI/UX opportunities, technical parity audit, and Octant evaluator readiness matrix.
+- **[`status.md`](https://github.com/0xshikhar/PressProtocol/blob/main/status.md)**: Live system status, production deployment registry, and component completion matrix.
+- **[`PUBLISHING_GUIDE.md`](https://github.com/0xshikhar/PressProtocol/blob/main/PUBLISHING_GUIDE.md)**: Step-by-step registry publishing guide for NPM, PyPI, Crates.io, Chrome Web Store, and WordPress.org.
+- **[`ARCHITECTURE.md`](https://github.com/0xshikhar/PressProtocol/blob/main/ARCHITECTURE.md)**: Comprehensive protocol architecture, cryptographic specifications, multi-transport failover algorithms, and wire schemas.
+- **[`INTEGRATIONS.md`](https://github.com/0xshikhar/PressProtocol/blob/main/INTEGRATIONS.md)**: Complete guide to the WordPress plugin, Chromium MV3 extension, GitHub Action, Obsidian plugin, and Universal Widget.
+- **[`CONTRIBUTING.md`](https://github.com/0xshikhar/PressProtocol/blob/main/CONTRIBUTING.md)**: Monorepo contribution guidelines, code standards, and PR workflows.
 
 ---
 
 ## 📄 License & Open Source Commitment
 
 PressProtocol is 100% free, open-source software released under the **[MIT License](https://github.com/0xshikhar/PressProtocol/blob/main/LICENSE)**. It is built as a neutral public good for journalists, whistleblowers, researchers, and citizens worldwide.
+
