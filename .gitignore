@@ -23,3 +23,14 @@ __pycache__/
 target/
 **/target/
 .DS_Store
+
+# Cloudflare Worker secrets & test outputs
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+dist-test/
+**/dist-test/
+.wrangler/
+core/worker/.dev.vars*
+!core/worker/.dev.vars.example
+core/worker/dist-test/
