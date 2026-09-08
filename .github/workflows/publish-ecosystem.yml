@@ -33,6 +33,10 @@ jobs:
 
       - name: Publish to NPM
         run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "⚠️ NPM_TOKEN secret not configured; skipping NPM publishing."
+            exit 0
+          fi
           pnpm --filter @pressprotocol/sdk publish --access public --no-git-checks
           pnpm --filter @pressprotocol/proof publish --access public --no-git-checks
           pnpm --filter @pressprotocol/widget publish --access public --no-git-checks
@@ -60,7 +64,14 @@ jobs:
         run: python -m build sdks/python
 
       - name: Publish to PyPI
-        run: python -m twine upload sdks/python/dist/* -u __token__ -p ${{ secrets.PYPI_TOKEN }} --skip-existing
+        run: |
+          if [ -z "$PYPI_TOKEN" ]; then
+            echo "⚠️ PYPI_TOKEN secret not configured in repository secrets; skipping PyPI publishing."
+            exit 0
+          fi
+          python -m twine upload sdks/python/dist/* -u __token__ -p "$PYPI_TOKEN" --skip-existing
+        env:
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
 
   publish-crates-io:
     name: Publish Rust SDK to Crates.io
@@ -73,12 +84,20 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Publish to Crates.io
-        run: cargo publish --manifest-path sdks/rust/Cargo.toml --token ${{ secrets.CRATES_IO_TOKEN }}
+        run: |
+          if [ -z "$CRATES_IO_TOKEN" ]; then
+            echo "⚠️ CRATES_IO_TOKEN secret not configured in repository secrets; skipping Crates.io publishing."
+            exit 0
+          fi
+          cargo publish --manifest-path sdks/rust/Cargo.toml --token "$CRATES_IO_TOKEN"
+        env:
+          CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
 
   package-and-release:
     name: Create GitHub Release & Package Integrations
     runs-on: ubuntu-latest
     needs: [publish-npm, publish-pypi, publish-crates-io]
+    if: always() && !cancelled()
     permissions:
       contents: write
     steps:
