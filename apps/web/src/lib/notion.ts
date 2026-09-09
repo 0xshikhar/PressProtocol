@@ -117,10 +117,10 @@ export function renderNotionRichText(richText: any[]): string {
         } else if (type === "s") {
           escaped = `<s>${escaped}</s>`;
         } else if (type === "c") {
-          escaped = `<code class="bg-white/10 px-1.5 py-0.5 rounded font-mono text-cyan-300 text-xs">${escaped}</code>`;
+          escaped = `<code class="bg-surface-elevated px-1.5 py-0.5 rounded-[4px] font-mono text-foreground text-xs border border-border/50">${escaped}</code>`;
         } else if (type === "a" && mod[1]) {
           const href = escapeHtml(String(mod[1]));
-          escaped = `<a href="${href}" target="_blank" rel="noopener noreferrer" class="text-cyan-400 underline decoration-cyan-400/50 hover:decoration-cyan-400">${escaped}</a>`;
+          escaped = `<a href="${href}" target="_blank" rel="noopener noreferrer" class="text-primary underline decoration-primary/50 hover:decoration-primary">${escaped}</a>`;
         }
       }
 
@@ -221,7 +221,7 @@ export function convertNotionBlocksToHtml(recordMap: any, rootPageId: string): C
     if (type === "bulleted_list") {
       if (currentListType !== "ul") {
         closeListIfOpen();
-        htmlParts.push(`<ul class="list-disc list-inside space-y-1 my-3 text-zinc-300">`);
+        htmlParts.push(`<ul class="list-disc list-inside space-y-1 my-3 text-secondary">`);
         currentListType = "ul";
       }
       htmlParts.push(`<li>${textHtml}</li>`);
@@ -230,7 +230,7 @@ export function convertNotionBlocksToHtml(recordMap: any, rootPageId: string): C
     } else if (type === "numbered_list") {
       if (currentListType !== "ol") {
         closeListIfOpen();
-        htmlParts.push(`<ol class="list-decimal list-inside space-y-1 my-3 text-zinc-300">`);
+        htmlParts.push(`<ol class="list-decimal list-inside space-y-1 my-3 text-secondary">`);
         currentListType = "ol";
       }
       htmlParts.push(`<li>${textHtml}</li>`);
@@ -243,22 +243,22 @@ export function convertNotionBlocksToHtml(recordMap: any, rootPageId: string): C
     switch (type) {
       case "header":
         stats.headingsConverted++;
-        htmlParts.push(`<h1 class="text-3xl font-serif font-bold text-white mt-8 mb-4">${textHtml}</h1>`);
+        htmlParts.push(`<h1 class="text-3xl font-serif font-bold text-primary mt-8 mb-4">${textHtml}</h1>`);
         break;
 
       case "sub_header":
         stats.headingsConverted++;
-        htmlParts.push(`<h2 class="text-2xl font-serif font-bold text-white mt-6 mb-3">${textHtml}</h2>`);
+        htmlParts.push(`<h2 class="text-2xl font-serif font-bold text-primary mt-6 mb-3">${textHtml}</h2>`);
         break;
 
       case "sub_sub_header":
         stats.headingsConverted++;
-        htmlParts.push(`<h3 class="text-xl font-serif font-semibold text-zinc-200 mt-5 mb-2">${textHtml}</h3>`);
+        htmlParts.push(`<h3 class="text-xl font-serif font-semibold text-primary mt-5 mb-2">${textHtml}</h3>`);
         break;
 
       case "text":
         if (textHtml.trim()) {
-          htmlParts.push(`<p class="my-3 leading-relaxed text-zinc-300">${textHtml}</p>`);
+          htmlParts.push(`<p class="my-3 leading-relaxed text-secondary">${textHtml}</p>`);
         }
         break;
 
@@ -273,7 +273,7 @@ export function convertNotionBlocksToHtml(recordMap: any, rootPageId: string): C
         }
 
         htmlParts.push(`
-          <div data-type="callout" data-callout-type="${calloutType}" class="my-5 p-4 rounded-xl border border-cyan-500/30 bg-cyan-950/20 flex items-start gap-3 text-zinc-200">
+          <div data-type="callout" data-callout-type="${calloutType}" class="my-5 p-4 rounded-[6px] border border-border/70 bg-surface-subtle flex items-start gap-3 text-foreground">
             <span class="text-xl flex-shrink-0 select-none">${icon}</span>
             <div class="leading-relaxed text-sm">${textHtml}</div>
           </div>
@@ -284,7 +284,7 @@ export function convertNotionBlocksToHtml(recordMap: any, rootPageId: string): C
       case "quote":
         stats.quotesConverted++;
         htmlParts.push(`
-          <blockquote class="my-5 pl-4 border-l-4 border-cyan-400 italic text-zinc-300 font-serif">
+          <blockquote class="my-5 pl-4 border-l-2 border-primary italic text-foreground/90 font-serif">
             ${textHtml}
           </blockquote>
         `);
@@ -294,9 +294,9 @@ export function convertNotionBlocksToHtml(recordMap: any, rootPageId: string): C
         stats.listsConverted++;
         const checked = properties.checked?.[0]?.[0] === "Yes";
         htmlParts.push(`
-          <div class="flex items-center gap-2 my-1.5 text-zinc-300 text-sm">
-            <input type="checkbox" ${checked ? "checked" : ""} disabled class="rounded border-white/20 bg-zinc-900 text-cyan-500" />
-            <span class="${checked ? "line-through text-zinc-500" : ""}">${textHtml}</span>
+          <div class="flex items-center gap-2 my-1.5 text-foreground/90 text-sm">
+            <input type="checkbox" ${checked ? "checked" : ""} disabled class="rounded-[4px] border-border bg-surface accent-primary" />
+            <span class="${checked ? "line-through text-muted-foreground" : ""}">${textHtml}</span>
           </div>
         `);
         break;
@@ -307,11 +307,11 @@ export function convertNotionBlocksToHtml(recordMap: any, rootPageId: string): C
         const language = properties.language?.[0]?.[0] || "text";
         const codeText = properties.title?.[0]?.[0] || "";
         htmlParts.push(`
-          <div class="my-5 rounded-xl border border-white/10 bg-black/80 overflow-hidden">
-            <div class="px-4 py-1.5 bg-white/5 border-b border-white/5 text-[11px] font-mono text-zinc-400 uppercase tracking-wider">
+          <div class="my-5 rounded-[6px] border border-border/70 bg-surface overflow-hidden">
+            <div class="px-4 py-1.5 bg-surface-subtle border-b border-border/60 text-[11px] font-mono text-muted-foreground uppercase tracking-wider">
               ${escapeHtml(language)}
             </div>
-            <pre class="p-4 overflow-x-auto text-xs font-mono text-cyan-200 leading-relaxed"><code>${escapeHtml(codeText)}</code></pre>
+            <pre class="p-4 overflow-x-auto text-xs font-mono text-foreground leading-relaxed"><code>${escapeHtml(codeText)}</code></pre>
           </div>
         `);
         break;
@@ -324,8 +324,8 @@ export function convertNotionBlocksToHtml(recordMap: any, rootPageId: string): C
           const caption = properties.caption ? renderNotionRichText(properties.caption) : "";
           htmlParts.push(`
             <figure class="my-6">
-              <img src="${escapeHtml(src)}" alt="${escapeHtml(caption || pageTitle)}" loading="lazy" class="w-full rounded-xl border border-white/10" />
-              ${caption ? `<figcaption class="text-center text-xs text-zinc-500 mt-2 font-mono">${caption}</figcaption>` : ""}
+              <img src="${escapeHtml(src)}" alt="${escapeHtml(caption || pageTitle)}" loading="lazy" class="w-full rounded-xl border border-hairline" />
+              ${caption ? `<figcaption class="text-center text-xs text-muted mt-2 font-mono">${caption}</figcaption>` : ""}
             </figure>
           `);
         }
@@ -333,14 +333,14 @@ export function convertNotionBlocksToHtml(recordMap: any, rootPageId: string): C
       }
 
       case "divider":
-        htmlParts.push(`<hr class="my-8 border-white/10" />`);
+        htmlParts.push(`<hr class="my-8 border-hairline" />`);
         break;
 
       case "toggle": {
         htmlParts.push(`
-          <details class="my-3 p-3 rounded-lg bg-white/[0.02] border border-white/10">
-            <summary class="cursor-pointer font-medium text-white">${textHtml}</summary>
-            <div class="mt-2 text-zinc-300 pl-4 border-l border-white/10">
+          <details class="my-3 p-3 rounded-lg bg-white/[0.02] border border-hairline">
+            <summary class="cursor-pointer font-medium text-primary">${textHtml}</summary>
+            <div class="mt-2 text-secondary pl-4 border-l border-hairline">
               <!-- Nested toggle content handled if present -->
             </div>
           </details>
@@ -350,7 +350,7 @@ export function convertNotionBlocksToHtml(recordMap: any, rootPageId: string): C
 
       default:
         if (textHtml.trim()) {
-          htmlParts.push(`<p class="my-3 leading-relaxed text-zinc-300">${textHtml}</p>`);
+          htmlParts.push(`<p class="my-3 leading-relaxed text-secondary">${textHtml}</p>`);
         }
     }
   }
@@ -422,11 +422,11 @@ export function parseNotionMarkdown(markdownText: string): ConvertedNotionArticl
         inCodeBlock = false;
         stats.codeBlocksConverted++;
         htmlParts.push(`
-          <div class="my-5 rounded-xl border border-white/10 bg-black/80 overflow-hidden">
-            <div class="px-4 py-1.5 bg-white/5 border-b border-white/5 text-[11px] font-mono text-zinc-400 uppercase">
+          <div class="my-5 rounded-[6px] border border-border/70 bg-surface overflow-hidden">
+            <div class="px-4 py-1.5 bg-surface-subtle border-b border-border/60 text-[11px] font-mono text-muted-foreground uppercase">
               ${escapeHtml(codeLang)}
             </div>
-            <pre class="p-4 overflow-x-auto text-xs font-mono text-cyan-200 leading-relaxed"><code>${escapeHtml(codeBuffer.join("\n"))}</code></pre>
+            <pre class="p-4 overflow-x-auto text-xs font-mono text-foreground leading-relaxed"><code>${escapeHtml(codeBuffer.join("\n"))}</code></pre>
           </div>
         `);
       }
@@ -449,13 +449,13 @@ export function parseNotionMarkdown(markdownText: string): ConvertedNotionArticl
       if (title === "Untitled Notion Document") {
         title = text;
       }
-      htmlParts.push(`<h1 class="text-3xl font-serif font-bold text-white mt-8 mb-4">${escapeHtml(text)}</h1>`);
+      htmlParts.push(`<h1 class="text-3xl font-serif font-bold text-foreground mt-8 mb-4">${escapeHtml(text)}</h1>`);
     } else if (trimmed.startsWith("## ")) {
       stats.headingsConverted++;
-      htmlParts.push(`<h2 class="text-2xl font-serif font-bold text-white mt-6 mb-3">${escapeHtml(trimmed.slice(3).trim())}</h2>`);
+      htmlParts.push(`<h2 class="text-2xl font-serif font-bold text-foreground mt-6 mb-3">${escapeHtml(trimmed.slice(3).trim())}</h2>`);
     } else if (trimmed.startsWith("### ")) {
       stats.headingsConverted++;
-      htmlParts.push(`<h3 class="text-xl font-serif font-semibold text-zinc-200 mt-5 mb-2">${escapeHtml(trimmed.slice(4).trim())}</h3>`);
+      htmlParts.push(`<h3 class="text-xl font-serif font-semibold text-foreground/90 mt-5 mb-2">${escapeHtml(trimmed.slice(4).trim())}</h3>`);
     }
     // Notion Callouts formatted as `> 💡 ...` or `> ⚠️ ...` or `> 🚨 ...`
     else if (/^>\s*([\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF]|💡|⚠️|🚨|🔥|🛡️)\s*/.test(trimmed)) {
@@ -472,7 +472,7 @@ export function parseNotionMarkdown(markdownText: string): ConvertedNotionArticl
       }
 
       htmlParts.push(`
-        <div data-type="callout" data-callout-type="${calloutType}" class="my-5 p-4 rounded-xl border border-cyan-500/30 bg-cyan-950/20 flex items-start gap-3 text-zinc-200">
+        <div data-type="callout" data-callout-type="${calloutType}" class="my-5 p-4 rounded-[6px] border border-border/70 bg-surface-subtle flex items-start gap-3 text-foreground">
           <span class="text-xl flex-shrink-0 select-none">${icon}</span>
           <div class="leading-relaxed text-sm">${escapeHtml(content)}</div>
         </div>
@@ -482,7 +482,7 @@ export function parseNotionMarkdown(markdownText: string): ConvertedNotionArticl
     else if (trimmed.startsWith("> ")) {
       stats.quotesConverted++;
       htmlParts.push(`
-        <blockquote class="my-5 pl-4 border-l-4 border-cyan-400 italic text-zinc-300 font-serif">
+        <blockquote class="my-5 pl-4 border-l-2 border-primary italic text-foreground/90 font-serif">
           ${escapeHtml(trimmed.slice(2).trim())}
         </blockquote>
       `);
@@ -493,20 +493,20 @@ export function parseNotionMarkdown(markdownText: string): ConvertedNotionArticl
       const isChecked = /-\s*\[[xX]\]/.test(trimmed);
       const text = trimmed.replace(/^-\s*\[([ xX])\]\s*/, "");
       htmlParts.push(`
-        <div class="flex items-center gap-2 my-1.5 text-zinc-300 text-sm">
-          <input type="checkbox" ${isChecked ? "checked" : ""} disabled class="rounded border-white/20 bg-zinc-900 text-cyan-500" />
-          <span class="${isChecked ? "line-through text-zinc-500" : ""}">${escapeHtml(text)}</span>
+        <div class="flex items-center gap-2 my-1.5 text-foreground/90 text-sm">
+          <input type="checkbox" ${isChecked ? "checked" : ""} disabled class="rounded-[4px] border-border bg-surface accent-primary" />
+          <span class="${isChecked ? "line-through text-muted-foreground" : ""}">${escapeHtml(text)}</span>
         </div>
       `);
     }
     // List item
     else if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
       stats.listsConverted++;
-      htmlParts.push(`<li class="my-1 ml-4 list-disc text-zinc-300">${escapeHtml(trimmed.slice(2).trim())}</li>`);
+      htmlParts.push(`<li class="my-1 ml-4 list-disc text-secondary">${escapeHtml(trimmed.slice(2).trim())}</li>`);
     }
     // Divider
     else if (trimmed === "---" || trimmed === "***") {
-      htmlParts.push(`<hr class="my-8 border-white/10" />`);
+      htmlParts.push(`<hr class="my-8 border-hairline" />`);
     }
     // Image
     else if (/^!\[(.*?)\]\((.*?)\)/.test(trimmed)) {
@@ -517,15 +517,15 @@ export function parseNotionMarkdown(markdownText: string): ConvertedNotionArticl
         const src = match[2];
         htmlParts.push(`
           <figure class="my-6">
-            <img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" loading="lazy" class="w-full rounded-xl border border-white/10" />
-            ${alt ? `<figcaption class="text-center text-xs text-zinc-500 mt-2 font-mono">${escapeHtml(alt)}</figcaption>` : ""}
+            <img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" loading="lazy" class="w-full rounded-xl border border-hairline" />
+            ${alt ? `<figcaption class="text-center text-xs text-muted mt-2 font-mono">${escapeHtml(alt)}</figcaption>` : ""}
           </figure>
         `);
       }
     }
     // Regular paragraph
     else {
-      htmlParts.push(`<p class="my-3 leading-relaxed text-zinc-300">${escapeHtml(trimmed)}</p>`);
+      htmlParts.push(`<p class="my-3 leading-relaxed text-secondary">${escapeHtml(trimmed)}</p>`);
     }
   }
 
