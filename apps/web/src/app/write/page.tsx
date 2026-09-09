@@ -467,21 +467,21 @@ export default function WritePage() {
   const isAnon = !authenticated || identityMode === "anonymous";
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white selection:bg-cyan-500/30 selection:text-cyan-200">
-      {/* Ambient background subtle lighting */}
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[500px] bg-gradient-to-b from-indigo-950/20 via-cyan-950/10 to-transparent blur-3xl pointer-events-none -z-10" />
+    <div className="min-h-screen bg-canvas text-primary selection:bg-[var(--accent-tint)] selection:text-primary">
+      {/* Ambient subtle burgundy vignette */}
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[500px] bg-[radial-gradient(ellipse_at_top,_rgba(124,39,51,0.08),_transparent_70%)] pointer-events-none -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* LEFT / CENTER COLUMN: Editorial Card Canvas (8 cols) */}
-          <div className="lg:col-span-8 rounded-2xl border border-white/10 bg-[#0B0D14]/90 backdrop-blur-xl p-6 sm:p-10 lg:p-12 shadow-2xl space-y-6 relative">
+          <div className="lg:col-span-8 rounded-[6px] border border-hairline bg-surface p-6 sm:p-10 lg:p-12 shadow-[0_1px_2px_rgba(0,0,0,0.3)] space-y-6 relative">
             {/* Top Navigation Row in Canvas: Back + View Toggles */}
-            <div className="flex items-center justify-between border-b border-white/[0.06] pb-4">
+            <div className="flex items-center justify-between border-b border-hairline pb-4">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => router.push("/")}
-                className="text-neutral-400 hover:text-white hover:bg-white/[0.06] text-xs -ml-2 gap-1.5 font-medium"
+                className="text-muted hover:text-primary hover:bg-overlay text-xs -ml-2 gap-1.5 font-medium"
               >
                 ← Back
               </Button>
@@ -491,25 +491,25 @@ export default function WritePage() {
                   variant="outline"
                   size="sm"
                   onClick={() => setShowPreview(!showPreview)}
-                  className="border-white/10 bg-white/[0.03] hover:bg-white/[0.08] text-neutral-300 text-xs h-8 px-3 rounded-lg"
+                  className="border-hairline bg-overlay/50 hover:bg-overlay text-secondary hover:text-primary text-xs h-8 px-3 rounded-[6px]"
                 >
-                  <Eye className="h-3.5 w-3.5 mr-1.5 text-cyan-400" />
+                  <Eye className="h-3.5 w-3.5 mr-1.5 text-muted" />
                   {showPreview ? "Edit Mode" : "Preview"}
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setIsZenMode(true)}
-                  className="hidden sm:inline-flex border-white/10 bg-white/[0.03] hover:bg-white/[0.08] text-neutral-300 text-xs h-8 px-3 rounded-lg"
+                  className="hidden sm:inline-flex border-hairline bg-overlay/50 hover:bg-overlay text-secondary hover:text-primary text-xs h-8 px-3 rounded-[6px]"
                   title="Zen Focus Mode (⌘+Shift+F)"
                 >
-                  <Maximize2 className="h-3.5 w-3.5 mr-1.5 text-cyan-400" />
+                  <Maximize2 className="h-3.5 w-3.5 mr-1.5 text-muted" />
                   Zen Mode
                 </Button>
               </div>
             </div>
 
-            {/* Article Headline & Subtitle */}
+            {/* Article Headline & Subtitle (Section 3.1: Hero font for masthead headline) */}
             <div className="space-y-3 pt-1">
               <textarea
                 ref={titleTextareaRef}
@@ -521,7 +521,7 @@ export default function WritePage() {
                   e.target.style.height = `${e.target.scrollHeight}px`;
                 }}
                 placeholder="Untitled article"
-                className="w-full bg-transparent border-0 text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-white placeholder:text-neutral-600 focus:outline-none focus:ring-0 resize-none leading-[1.12] tracking-tight p-0"
+                className="w-full bg-transparent border-0 text-4xl sm:text-5xl lg:text-6xl font-hero font-normal text-primary placeholder:text-muted focus:outline-none focus:ring-0 resize-none leading-[1.12] tracking-tight p-0"
               />
 
               <input
@@ -529,24 +529,24 @@ export default function WritePage() {
                 value={subtitle}
                 onChange={(e) => setSubtitle(e.target.value)}
                 placeholder="Add a subtitle to give your article more context..."
-                className="w-full bg-transparent border-0 text-base sm:text-lg text-neutral-400 font-sans placeholder:text-neutral-600 focus:outline-none focus:ring-0 p-0"
+                className="w-full bg-transparent border-0 text-base sm:text-lg text-secondary font-sans placeholder:text-muted focus:outline-none focus:ring-0 p-0"
               />
 
               {/* Metadata Row: Date/Time + Reading Time */}
-              <div className="flex flex-wrap items-center justify-between text-xs text-neutral-500 font-sans pt-3 pb-4 border-b border-white/[0.06]">
+              <div className="flex flex-wrap items-center justify-between text-xs text-muted font-sans pt-3 pb-4 border-b border-hairline">
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-3.5 w-3.5 text-neutral-400" />
+                  <Calendar className="h-3.5 w-3.5 text-muted" />
                   <span>Draft</span>
-                  <span>•</span>
-                  <span>
+                  <span>&bull;</span>
+                  <span className="tabular-nums">
                     {new Date().toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
                       year: "numeric",
                     })}
                   </span>
-                  <span>•</span>
-                  <span>
+                  <span>&bull;</span>
+                  <span className="tabular-nums">
                     {new Date().toLocaleTimeString("en-US", {
                       hour: "numeric",
                       minute: "2-digit",
@@ -555,9 +555,9 @@ export default function WritePage() {
                   </span>
                 </div>
 
-                <div className="flex items-center gap-1.5 text-neutral-400 font-mono text-[11px]">
-                  <Clock className="h-3.5 w-3.5 text-neutral-500" />
-                  <span>
+                <div className="flex items-center gap-1.5 text-muted font-mono text-[11px]">
+                  <Clock className="h-3.5 w-3.5 text-muted" />
+                  <span className="tabular-nums">
                     {readingStats
                       ? `${readingStats.formattedTime} • ${readingStats.words} words`
                       : "0 min read"}
@@ -569,7 +569,7 @@ export default function WritePage() {
             {/* Editorial Body: TipTap or Preview */}
             {showPreview ? (
               <div
-                className="prose prose-lg dark:prose-invert max-w-none pt-4 font-serif leading-relaxed"
+                className="prose prose-lg dark:prose-invert max-w-none pt-4 font-serif leading-relaxed text-primary dispatch-prose"
                 dangerouslySetInnerHTML={{ __html: content }}
               />
             ) : (
@@ -585,18 +585,17 @@ export default function WritePage() {
 
           {/* RIGHT COLUMN: Institutional Publishing Sidebar (4 cols, sticky) */}
           <div className="lg:col-span-4 space-y-5 sticky top-24">
-            {/* 1. Live Draft Status Bar */}
-            <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-[#0B0D14]/90 border border-white/10 text-xs font-mono">
+            {/* 1. Live Draft Status Bar (Section 7: No blinking/ping animations) */}
+            <div className="flex items-center justify-between px-4 py-3 rounded-[6px] bg-surface border border-hairline text-xs font-mono shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
               <div className="flex items-center gap-2">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  <span className="inline-flex rounded-full h-2 w-2 bg-verified"></span>
                 </span>
-                <span className="text-emerald-400 font-medium">
+                <span className="text-verified font-medium">
                   {autoSaving ? "Saving draft..." : "Draft saved"}
                 </span>
               </div>
-              <span className="text-neutral-400">
+              <span className="text-muted tabular-nums">
                 {lastSaved
                   ? new Date(lastSaved).toLocaleTimeString([], {
                       hour: "2-digit",
@@ -607,12 +606,12 @@ export default function WritePage() {
             </div>
 
             {/* 2. TAGS Section */}
-            <div className="p-5 rounded-xl bg-[#0B0D14]/90 border border-white/10 space-y-3">
-              <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-neutral-400">
+            <div className="p-5 rounded-[6px] bg-surface border border-hairline space-y-3 shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+              <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-muted">
                 <span className="flex items-center gap-1.5">
-                  <Tag className="h-3.5 w-3.5 text-cyan-400" /> Tags
+                  <Tag className="h-3.5 w-3.5 text-muted" /> Tags
                 </span>
-                <span className="text-[10px] text-neutral-500 font-mono">
+                <span className="text-[10px] text-muted font-mono tabular-nums">
                   {tags.length} added
                 </span>
               </div>
@@ -629,13 +628,13 @@ export default function WritePage() {
                     }
                   }}
                   placeholder="Add tags (press Enter)"
-                  className="flex-1 bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder:text-neutral-500 focus:outline-none focus:border-cyan-500"
+                  className="flex-1 bg-canvas border border-hairline rounded-[4px] px-3 py-2 text-xs text-primary placeholder:text-muted focus:outline-none focus:border-focus"
                 />
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={handleAddTag}
-                  className="h-8 px-2.5 border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white text-xs"
+                  className="h-8 px-2.5 border-hairline bg-overlay/50 hover:bg-overlay text-primary text-xs rounded-[4px]"
                 >
                   +
                 </Button>
@@ -646,12 +645,12 @@ export default function WritePage() {
                   {tags.map((tag) => (
                     <span
                       key={tag}
-                      className="inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-full bg-white/[0.05] border border-white/10 text-neutral-300 hover:border-white/20 transition-colors"
+                      className="inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-[4px] bg-overlay border border-hairline text-secondary hover:border-focus transition-colors font-mono"
                     >
                       #{tag}
                       <button
                         onClick={() => handleRemoveTag(tag)}
-                        className="text-neutral-500 hover:text-red-400 ml-0.5"
+                        className="text-muted hover:text-error ml-0.5"
                       >
                         ×
                       </button>
@@ -662,24 +661,24 @@ export default function WritePage() {
             </div>
 
             {/* 3. PRIVACY & IDENTITY Section */}
-            <div className="p-5 rounded-xl bg-[#0B0D14]/90 border border-white/10 space-y-3">
-              <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-neutral-400">
+            <div className="p-5 rounded-[6px] bg-surface border border-hairline space-y-3 shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+              <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-muted">
                 <span className="flex items-center gap-1.5">
-                  <Globe className="h-3.5 w-3.5 text-cyan-400" /> Privacy & Identity
+                  <Globe className="h-3.5 w-3.5 text-muted" /> Privacy & Identity
                 </span>
                 <Badge
-                  variant="outline"
-                  className="text-[10px] bg-emerald-950/40 text-emerald-300 border-emerald-500/30 font-mono"
+                  variant={isAnon ? "anonymous" : "verified"}
+                  className="text-[10px] font-mono px-2 py-0.5 rounded-[4px]"
                 >
                   {isAnon ? "Ed25519" : "Verified"}
                 </Badge>
               </div>
 
-              <div className="p-3.5 rounded-lg bg-black/40 border border-white/10 space-y-2.5">
+              <div className="p-3.5 rounded-[6px] bg-canvas border border-hairline space-y-2.5">
                 <div className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-emerald-400" />
-                    <span className="font-mono text-emerald-300 font-medium">
+                    <Shield className="h-4 w-4 text-verified" />
+                    <span className="font-mono text-primary font-medium">
                       {isAnon
                         ? burnerWallet?.pseudonym || "Anon Burner"
                         : user?.email?.address || "Verified Author"}
@@ -688,7 +687,7 @@ export default function WritePage() {
                   {burnerWallet && isAnon && (
                     <button
                       onClick={handleCopyPublicKey}
-                      className="text-neutral-400 hover:text-white text-[11px] flex items-center gap-1 font-mono cursor-pointer"
+                      className="text-muted hover:text-primary text-[11px] flex items-center gap-1 font-mono cursor-pointer"
                       title="Copy Ed25519 Public Key"
                     >
                       <Copy className="h-3 w-3" /> Key
@@ -696,7 +695,7 @@ export default function WritePage() {
                   )}
                 </div>
 
-                <p className="text-[11px] text-neutral-400 leading-relaxed">
+                <p className="text-[11px] text-secondary leading-relaxed font-sans">
                   {isAnon
                     ? "Your article will be visible to everyone on the network, signed cryptographically with in-memory Ed25519 burner keys. Zero KYC or user link."
                     : `Signed under your verified profile (${
@@ -706,26 +705,26 @@ export default function WritePage() {
                       }).`}
                 </p>
 
-                <div className="pt-2 flex items-center justify-between text-[11px] border-t border-white/[0.06]">
+                <div className="pt-2 flex items-center justify-between text-[11px] border-t border-hairline font-mono">
                   {isAnon ? (
                     <>
                       <button
                         onClick={handleBurnWallet}
-                        className="text-red-400 hover:text-red-300 flex items-center gap-1 transition-colors cursor-pointer"
+                        className="text-error hover:text-error/80 flex items-center gap-1 transition-colors cursor-pointer"
                       >
                         <Flame className="h-3 w-3" /> Burn Key
                       </button>
                       <button
                         onClick={login}
-                        className="text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors cursor-pointer"
+                        className="text-[var(--accent-ribbon)] hover:text-primary flex items-center gap-1 transition-colors cursor-pointer"
                       >
-                        Sign in profile →
+                        Sign in profile &rarr;
                       </button>
                     </>
                   ) : (
                     <button
                       onClick={() => setIdentityMode("anonymous")}
-                      className="text-neutral-400 hover:text-white cursor-pointer"
+                      className="text-muted hover:text-primary cursor-pointer"
                     >
                       Switch to anonymous burner
                     </button>
@@ -735,27 +734,27 @@ export default function WritePage() {
             </div>
 
             {/* 4. PUBLISHING DISPATCH Section */}
-            <div className="p-5 rounded-xl bg-[#0B0D14]/90 border border-white/10 space-y-4">
-              <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-neutral-400">
+            <div className="p-5 rounded-[6px] bg-surface border border-hairline space-y-4 shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+              <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-muted">
                 <span className="flex items-center gap-1.5">
-                  <Send className="h-3.5 w-3.5 text-cyan-400" /> Publishing
+                  <Send className="h-3.5 w-3.5 text-muted" /> Publishing
                 </span>
-                <span className="text-[10px] text-neutral-500 font-mono">Dual-Pin</span>
+                <span className="text-[10px] text-muted font-mono">Dual-Pin</span>
               </div>
 
-              <div className="p-3 rounded-lg bg-black/40 border border-white/10 text-xs text-neutral-300 flex items-center justify-between">
+              <div className="p-3 rounded-[6px] bg-canvas border border-hairline text-xs text-secondary flex items-center justify-between font-mono">
                 <span className="flex items-center gap-2">
-                  <span className="text-cyan-400">⚡</span> Publish immediately
+                  <span className="text-verified">&bull;</span> Publish immediately
                 </span>
-                <span className="text-[10px] font-mono text-neutral-500">IPFS + Tor</span>
+                <span className="text-[10px] text-muted">IPFS + Tor</span>
               </div>
 
-              {/* Main Publish CTA */}
+              {/* Main Publish CTA: Section 2.1 Press Burgundy */}
               <Button
                 size="lg"
                 onClick={handlePublish}
                 disabled={isPublishing || !title.trim() || !content.trim()}
-                className="w-full h-12 bg-cyan-400 hover:bg-cyan-300 text-black font-semibold rounded-xl text-sm shadow-[0_0_25px_rgba(6,182,212,0.35)] transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+                className="w-full h-12 bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-primary font-semibold rounded-[6px] text-sm shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer border border-[rgba(240,232,232,0.12)]"
               >
                 {isPublishing ? (
                   <>
@@ -775,7 +774,7 @@ export default function WritePage() {
                 <button
                   onClick={handleManualSave}
                   disabled={autoSaving || (!title && !content)}
-                  className="text-xs text-neutral-400 hover:text-white transition-colors cursor-pointer disabled:opacity-40"
+                  className="text-xs text-muted hover:text-primary transition-colors cursor-pointer disabled:opacity-40 font-mono"
                 >
                   Save Draft
                 </button>
@@ -783,21 +782,21 @@ export default function WritePage() {
             </div>
 
             {/* 5. Sovereign Toolkit Utilities */}
-            <div className="p-4 rounded-xl bg-[#0B0D14]/60 border border-white/10 space-y-1.5">
-              <div className="flex items-center justify-between text-[11px] font-mono text-neutral-400 pb-2 border-b border-white/[0.06]">
+            <div className="p-4 rounded-[6px] bg-surface border border-hairline space-y-1.5 shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+              <div className="flex items-center justify-between text-[11px] font-mono text-muted pb-2 border-b border-hairline">
                 <span>SOVEREIGN TOOLKIT</span>
-                <span className="text-cyan-400">v1.0</span>
+                <span className="text-secondary font-medium">v1.6</span>
               </div>
 
               <button
                 onClick={() => setIsVaultOpen(true)}
-                className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-white/[0.04] text-xs text-neutral-300 transition-colors text-left cursor-pointer"
+                className="w-full flex items-center justify-between p-2 rounded-[4px] hover:bg-overlay text-xs text-secondary hover:text-primary transition-colors text-left cursor-pointer"
               >
                 <span className="flex items-center gap-2">
-                  <Archive className="h-3.5 w-3.5 text-cyan-400" />
+                  <Archive className="h-3.5 w-3.5 text-muted" />
                   Offline Drafts Vault
                 </span>
-                <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-white/[0.06] text-neutral-400">
+                <span className="font-mono text-[10px] px-1.5 py-0.5 rounded-[4px] bg-overlay border border-hairline text-muted">
                   {draftsCount}
                 </span>
               </button>
@@ -805,24 +804,24 @@ export default function WritePage() {
               <button
                 onClick={handleExportAirGappedProof}
                 disabled={!title.trim() || !content.trim()}
-                className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-white/[0.04] text-xs text-neutral-300 transition-colors text-left disabled:opacity-40 cursor-pointer"
+                className="w-full flex items-center justify-between p-2 rounded-[4px] hover:bg-overlay text-xs text-secondary hover:text-primary transition-colors text-left disabled:opacity-40 cursor-pointer"
               >
                 <span className="flex items-center gap-2">
-                  <FileCheck className="h-3.5 w-3.5 text-cyan-400" />
+                  <FileCheck className="h-3.5 w-3.5 text-muted" />
                   Export .pressproof.json
                 </span>
-                <span className="text-[10px] text-neutral-500 font-mono">Air-Gapped</span>
+                <span className="text-[10px] text-muted font-mono">Air-Gapped</span>
               </button>
 
               <button
                 onClick={handleCleanseTrackers}
-                className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-white/[0.04] text-xs text-neutral-300 transition-colors text-left cursor-pointer"
+                className="w-full flex items-center justify-between p-2 rounded-[4px] hover:bg-overlay text-xs text-secondary hover:text-primary transition-colors text-left cursor-pointer"
               >
                 <span className="flex items-center gap-2">
-                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-                  Cleanse Trackers & UTM
+                  <ShieldCheck className="h-3.5 w-3.5 text-verified" />
+                  Cleanse Trackers &amp; UTM
                 </span>
-                <span className="text-[10px] text-emerald-400 font-mono">Clean</span>
+                <span className="text-[10px] text-verified font-mono">Clean</span>
               </button>
             </div>
           </div>
@@ -882,17 +881,17 @@ export default function WritePage() {
             setOfflineFallbackModal((prev) => (prev ? { ...prev, open } : null))
           }
         >
-          <DialogContent className="max-w-md bg-[#0B0D14] border border-white/10 text-white shadow-2xl p-6 sm:p-7">
+          <DialogContent className="max-w-md bg-surface border border-hairline text-primary shadow-[0_12px_28px_rgba(0,0,0,0.55)] p-6 sm:p-7 rounded-[6px]">
             <DialogHeader className="space-y-3">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                <div className="w-10 h-10 rounded-[6px] bg-warning/10 border border-warning/20 flex items-center justify-center text-warning">
                   <ShieldCheck className="h-5 w-5" />
                 </div>
                 <div>
-                  <DialogTitle className="text-lg font-sans font-bold text-white tracking-tight">
+                  <DialogTitle className="text-lg font-sans font-semibold text-primary tracking-tight">
                     Sovereign Fallback Active
                   </DialogTitle>
-                  <DialogDescription className="text-xs text-neutral-400">
+                  <DialogDescription className="text-xs text-secondary">
                     Remote gateway node unreachable. Content sealed locally on-device.
                   </DialogDescription>
                 </div>
@@ -900,36 +899,36 @@ export default function WritePage() {
             </DialogHeader>
 
             <div className="space-y-4 py-3">
-              <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 space-y-2">
-                <div className="flex items-center justify-between text-[11px] font-mono text-neutral-400">
+              <div className="p-3.5 rounded-[6px] bg-canvas border border-hairline space-y-2">
+                <div className="flex items-center justify-between text-[11px] font-mono text-muted">
                   <span>DETERMINISTIC IPFS CIDv1</span>
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(offlineFallbackModal.cid);
                       toast.success("CID copied to clipboard");
                     }}
-                    className="flex items-center gap-1 text-cyan-400 hover:text-cyan-300 transition-colors"
+                    className="flex items-center gap-1 text-secondary hover:text-primary transition-colors"
                   >
                     <Copy className="h-3 w-3" /> Copy
                   </button>
                 </div>
-                <div className="font-mono text-xs text-cyan-300 break-all bg-black/40 p-2.5 rounded-lg border border-white/5">
+                <div className="font-mono text-xs text-primary break-all bg-overlay/50 p-2.5 rounded-[4px] border border-hairline">
                   {offlineFallbackModal.cid}
                 </div>
               </div>
 
-              <div className="text-xs text-neutral-300 space-y-2 leading-relaxed">
+              <div className="text-xs text-secondary space-y-2 leading-relaxed font-sans">
                 <p className="flex items-start gap-2">
-                  <span className="text-emerald-400 font-bold">✓</span>
+                  <span className="text-verified font-bold">&bull;</span>
                   <span><strong>Encrypted Vault:</strong> Draft is securely stored in your browser&apos;s IndexedDB offline vault.</span>
                 </p>
                 <p className="flex items-start gap-2">
-                  <span className="text-emerald-400 font-bold">✓</span>
+                  <span className="text-verified font-bold">&bull;</span>
                   <span><strong>Cryptographic Sealing:</strong> Signed with your in-memory Ed25519 identity ({burnerWallet?.pseudonym || "Burner"}).</span>
                 </p>
                 <p className="flex items-start gap-2">
-                  <span className="text-cyan-400 font-bold">✓</span>
-                  <span><strong>Air-Gapped Portability:</strong> Export <code className="text-white font-mono">.pressproof.json</code> to syndicate across any IPFS node or CLI later.</span>
+                  <span className="text-primary font-bold">&bull;</span>
+                  <span><strong>Air-Gapped Portability:</strong> Export <code className="text-primary font-mono bg-elevated px-1 py-0.5 rounded">.pressproof.json</code> to syndicate across any IPFS node or CLI later.</span>
                 </p>
               </div>
             </div>
@@ -942,14 +941,14 @@ export default function WritePage() {
                   downloadPressProofFile(offlineFallbackModal.proof);
                   toast.success("Exported .pressproof.json");
                 }}
-                className="w-full sm:w-auto gap-1.5 border-white/15 bg-white/[0.04] hover:bg-white/[0.08] text-white text-xs h-9"
+                className="w-full sm:w-auto gap-1.5 border-hairline bg-overlay hover:bg-elevated text-primary text-xs h-9 rounded-[6px]"
               >
-                <Download className="h-3.5 w-3.5 text-cyan-400" /> Export Proof (.pressproof.json)
+                <Download className="h-3.5 w-3.5 text-muted" /> Export Proof (.pressproof.json)
               </Button>
               <Button
                 size="sm"
                 onClick={() => router.push(`/read/${offlineFallbackModal.cid}`)}
-                className="w-full sm:w-auto gap-1.5 bg-cyan-500 hover:bg-cyan-400 text-black font-semibold text-xs h-9"
+                className="w-full sm:w-auto gap-1.5 bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-primary font-semibold text-xs h-9 rounded-[6px] border border-[rgba(240,232,232,0.12)]"
               >
                 <ExternalLink className="h-3.5 w-3.5" /> View in Reader
               </Button>
