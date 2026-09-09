@@ -186,26 +186,23 @@ export function Hero() {
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-10 xl:gap-14 items-center">
           {/* Left Column: Editorial Typography & Protocol Actions */}
           <div className="lg:col-span-7">
-            {/* Status Pill Badge with Solo Builder Mission */}
-            <Link href="/support" className="group inline-block mb-8">
-              <div
-                className={`inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 hover:border-rose-500/40 hover:bg-white/[0.07] backdrop-blur-md transition-all duration-700 shadow-sm group-hover:shadow-[0_0_20px_rgba(244,63,94,0.15)] ${
-                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            {/* High-Authority Status Pill Badge */}
+            <div
+              className={`inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md mb-8 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
                 }`}
-              >
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-                </span>
-                <span className="font-mono text-[11px] text-zinc-300">Sovereign Infrastructure</span>
-                <span className="text-zinc-600 font-mono text-[11px]">&bull;</span>
-                <span className="font-mono text-[11px] text-rose-300 flex items-center gap-1 group-hover:text-rose-200 transition-colors">
-                  <Heart className="w-3 h-3 text-rose-400 fill-rose-400 group-hover:scale-110 transition-transform" />
-                  <span>100% Solo-Built Public Good</span>
-                  <span className="text-rose-400/60 group-hover:translate-x-0.5 transition-transform">&rarr;</span>
-                </span>
-              </div>
-            </Link>
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              </span>
+              <span className="font-mono text-[11px] text-cyan-400 font-semibold tracking-wider">
+                Mainnet v1.6 Swarm Active
+              </span>
+              <span className="text-white/20 font-mono text-[11px]">&bull;</span>
+              <span className="font-mono text-[11px] text-zinc-300">
+                Zero-Custody IPFS &amp; Tor Transports
+              </span>
+            </div>
 
             {/* Main Headline */}
             <h1
@@ -258,9 +255,8 @@ export function Hero() {
 
             {/* Categorized Dual-Tier Ecosystem Strip */}
             <div
-              className={`space-y-2.5 mb-8 transition-all duration-1000 delay-350 ${
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-              }`}
+              className={`space-y-2.5 mb-8 transition-all duration-1000 delay-350 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                }`}
             >
               {/* Row 1: Publish From Anywhere */}
               <div className="flex flex-wrap items-center gap-1.5 text-xs font-mono">

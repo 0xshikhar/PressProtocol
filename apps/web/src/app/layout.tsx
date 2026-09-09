@@ -99,7 +99,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
             {children}
           </main>
           <Footer />
-          <SupportPrompt />
         </Providers>
       </body>
     </html>

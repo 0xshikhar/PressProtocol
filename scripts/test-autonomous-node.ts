@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
-import * as ed from '../core/node/node_modules/@noble/ed25519/index.js';
+import crypto from 'node:crypto';
 import { federationService } from '../core/node/src/services/FederationService.js';
 import { torService } from '../core/node/src/services/TorService.js';
 import { embeddedDB } from '../core/node/src/lib/embedded-db.js';
@@ -65,11 +65,11 @@ async function runAutonomousNodeTests() {
   
   // Test Policy 1: 'all'
   federationService.setAutoPinPolicy('all');
-  const privKey1 = ed.utils.randomPrivateKey();
-  const pubKey1 = Buffer.from(await ed.getPublicKeyAsync(privKey1)).toString('hex');
+  const { publicKey: pubKeyObj, privateKey: privKeyObj } = crypto.generateKeyPairSync('ed25519');
+  const pubKeyRaw = pubKeyObj.export({ type: 'spki', format: 'der' }).subarray(-32);
+  const pubKey1 = pubKeyRaw.toString('hex');
   const testCid1 = 'bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi';
-  const msg1 = new TextEncoder().encode(testCid1);
-  const sig1 = Buffer.from(await ed.signAsync(msg1, privKey1)).toString('hex');
+  const sig1 = crypto.sign(null, Buffer.from(testCid1), privKeyObj).toString('hex');
 
   const gossipRes1 = await federationService.handleGossip({
     cid: testCid1,
@@ -84,10 +84,8 @@ async function runAutonomousNodeTests() {
   assert(embeddedDB.isPinned(testCid1), 'CID recorded in persistent local pin store');
 
   // Test Policy 2: 'followed'
-  const privKeyFollowed = ed.utils.randomPrivateKey();
-  const pubKeyFollowed = Buffer.from(await ed.getPublicKeyAsync(privKeyFollowed)).toString('hex');
-  const privKeyIgnored = ed.utils.randomPrivateKey();
-  const pubKeyIgnored = Buffer.from(await ed.getPublicKeyAsync(privKeyIgnored)).toString('hex');
+  const pubKeyFollowed = crypto.randomBytes(32).toString('hex');
+  const pubKeyIgnored = crypto.randomBytes(32).toString('hex');
 
   federationService.setAutoPinPolicy('followed', [pubKeyFollowed]);
 

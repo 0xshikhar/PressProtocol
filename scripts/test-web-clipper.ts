@@ -172,6 +172,14 @@ async function runTests() {
   // Group 5: Manifest V3 & Extension Bundle Verification
   console.log("\n[5] Chromium MV3 Extension Bundle Integrity");
   const manifestPath = path.resolve(monorepoRoot, "integrations/browser-extension/dist/manifest.json");
+
+  if (!fs.existsSync(manifestPath)) {
+    const { execSync } = await import("child_process");
+    try {
+      execSync("pnpm --dir integrations/browser-extension build", { cwd: monorepoRoot, stdio: "ignore" });
+    } catch {}
+  }
+
   assert(fs.existsSync(manifestPath), "dist/manifest.json exists");
 
   const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
@@ -188,6 +196,13 @@ async function runTests() {
   const clipperScriptPath = path.resolve(monorepoRoot, "integrations/browser-extension/dist/clipper.js");
   const popupHtmlPath = path.resolve(monorepoRoot, "integrations/browser-extension/dist/popup.html");
   const popupCssPath = path.resolve(monorepoRoot, "integrations/browser-extension/dist/popup.css");
+
+  if (!fs.existsSync(bgScriptPath)) {
+    const { execSync } = await import("child_process");
+    try {
+      execSync("pnpm --dir integrations/browser-extension build", { cwd: monorepoRoot, stdio: "ignore" });
+    } catch {}
+  }
 
   assert(fs.existsSync(bgScriptPath), "dist/background.js bundle exists");
   assert(fs.existsSync(popupScriptPath), "dist/popup.js bundle exists");

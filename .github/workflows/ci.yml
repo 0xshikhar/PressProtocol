@@ -88,7 +88,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build Workspace Packages
-        run: pnpm --filter "@pressprotocol/*" run build
+        run: |
+          pnpm --filter "@pressprotocol/*" run build
+          pnpm --dir integrations/browser-extension build
 
       - name: Run Test Harness
         run: bash scripts/test.sh
+

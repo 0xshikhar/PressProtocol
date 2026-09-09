@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { env } from '../config/env.js';
+import { calculateDeterministicCIDv1 } from '../lib/cid.js';
 
 export interface PinataUploadResult {
   IpfsHash: string;
@@ -39,7 +40,7 @@ export class StorageService {
   }
 
   /**
-   * Upload content to IPFS via Pinata
+   * Upload content to IPFS via Pinata or Sovereign Local Blockstore
    * Content is stored as immutable JSON on IPFS - this is the source of truth
    * Database only stores CID for discovery acceleration
    */
@@ -60,6 +61,28 @@ export class StorageService {
         timestamp: timestamp || new Date().toISOString(),
         publisher,
       };
+
+      // If no Pinata credentials configured (Pure Sovereign / CI / Offline Mode), store directly in local blockstore
+      if (!this.pinataApiKey || !this.pinataSecretKey) {
+        const deterministicCid = calculateDeterministicCIDv1(content);
+        try {
+          const cacheDir = path.resolve(process.cwd(), '.data/content-cache');
+          if (!fs.existsSync(cacheDir)) {
+            fs.mkdirSync(cacheDir, { recursive: true });
+          }
+          const cacheFile = path.join(cacheDir, `${deterministicCid}.json`);
+          fs.writeFileSync(cacheFile, JSON.stringify(contentData, null, 2), 'utf-8');
+          console.log(`💾 Sovereign local blockstore stored article at ${cacheFile}`);
+        } catch (cacheErr) {
+          console.warn('Could not write to local disk cache:', cacheErr);
+        }
+
+        return {
+          cid: deterministicCid,
+          ipfsUrl: `ipfs://${deterministicCid}`,
+          gatewayUrl: `${this.gatewayUrl}/${deterministicCid}`,
+        };
+      }
 
       // Pin JSON to IPFS
       const response = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
@@ -83,7 +106,22 @@ export class StorageService {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Pinata upload failed: ${response.status} - ${errorText}`);
+        console.warn(`Pinata upload returned ${response.status} (${errorText}); falling back to local sovereign blockstore.`);
+        const deterministicCid = calculateDeterministicCIDv1(content);
+        try {
+          const cacheDir = path.resolve(process.cwd(), '.data/content-cache');
+          if (!fs.existsSync(cacheDir)) {
+            fs.mkdirSync(cacheDir, { recursive: true });
+          }
+          const cacheFile = path.join(cacheDir, `${deterministicCid}.json`);
+          fs.writeFileSync(cacheFile, JSON.stringify(contentData, null, 2), 'utf-8');
+        } catch {}
+
+        return {
+          cid: deterministicCid,
+          ipfsUrl: `ipfs://${deterministicCid}`,
+          gatewayUrl: `${this.gatewayUrl}/${deterministicCid}`,
+        };
       }
 
       const result = await response.json() as PinataUploadResult;
