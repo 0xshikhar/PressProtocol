@@ -1,4 +1,5 @@
 import { Hero } from "@/components/landing/Hero";
+import { FeaturedDispatches } from "@/components/landing/FeaturedDispatches";
 import { GatewayTelemetry } from "@/components/landing/GatewayTelemetry";
 import { ProcessStepper } from "@/components/landing/ProcessStepper";
 import { TransportNetwork } from "@/components/landing/TransportNetwork";
@@ -9,12 +10,15 @@ import { CallToAction } from "@/components/landing/CallToAction";
 
 export default function Home() {
   return (
-    <div className="relative min-h-screen bg-black text-white selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden">
+    <div className="relative min-h-screen bg-[#0B0A0C] text-[var(--text-primary)] selection:bg-[#7C2733]/40 selection:text-[#EEE7E1] overflow-x-hidden">
       <main className="pt-2 sm:pt-4">
-        {/* 1. Hero: Editorial Typography, Letter Blur, Volumetric Depth & Protocol Telemetry */}
+        {/* 1. Hero: Editorial Typography, Living Dispatch Card & Failover Demonstration */}
         <Hero />
 
-        {/* 2. Live Gateway & Relay Telemetry: Real-time probes across Pinata, Cloudflare, Tor */}
+        {/* 2. Featured Dispatches: Verified, unseizable investigative journalism */}
+        <FeaturedDispatches />
+
+        {/* 3. Live Gateway & Relay Telemetry: Real-time probes across edge relays */}
         <GatewayTelemetry />
 
         {/* 3. 3-Step Interactive Process Stepper: Write & Sanitize -> Ed25519 Sign -> Dual Pin */}

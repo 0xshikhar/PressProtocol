@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 import { Providers } from "@/app/providers"
 import Navbar from "@/components/navigation/navbar"
 import Footer from "@/components/navigation/footer"
-import { SupportPrompt } from "@/components/navigation/SupportPrompt"
+
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 const sourceSerif = Source_Serif_4({
@@ -76,7 +76,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#050508",
+  themeColor: "#0B0A0C",
 }
 
 export default function RootLayout({ children }: RootLayoutProps) {
@@ -85,7 +85,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <head />
       <body
         className={cn(
-          "min-h-screen bg-[#050508] text-foreground antialiased flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200",
+          "min-h-screen bg-[#0B0A0C] text-text-primary antialiased flex flex-col font-sans selection:bg-[#7C2733]/40 selection:text-[#EEE7E1]",
           inter.variable,
           sourceSerif.variable,
           instrumentSerif.variable,
