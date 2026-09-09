@@ -13,8 +13,6 @@ import {
   Download, 
   Trash2, 
   HardDrive,
-  RefreshCw,
-  ExternalLink,
   Lock,
   Chrome,
   Globe,
@@ -162,7 +160,7 @@ export default function SettingsPage() {
       setBurnerWallet(fresh);
       await updateStorageEstimate();
       toast.success("Local cache cleared. Fresh sovereign burner identity generated.");
-    } catch (e) {
+    } catch {
       toast.error("Failed to clear local storage.");
     } finally {
       setClearing(false);
@@ -180,22 +178,22 @@ export default function SettingsPage() {
   const usedPercentage = storageUsage?.quota ? Math.min(100, Math.max(1, (storageUsage.used / storageUsage.quota) * 100)) : 0;
 
   return (
-    <div className="min-h-screen bg-[#050508] text-[#F0F2F8] selection:bg-cyan-500/30 selection:text-cyan-200">
+    <div className="min-h-screen bg-canvas text-primary selection:bg-[var(--accent-tint)] selection:text-primary font-sans">
       {/* Header */}
-      <div className="border-b border-white/[0.08] bg-[#070910] relative overflow-hidden">
+      <div className="border-b border-hairline bg-surface relative overflow-hidden">
         <div className="container relative z-10 mx-auto px-4 sm:px-6 py-8 max-w-6xl">
           <div className="flex items-center gap-3.5">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.12)]">
-              <Settings className="h-5 w-5 text-cyan-400" />
+            <div className="flex h-11 w-11 items-center justify-center rounded-[6px] bg-surface-raised border border-hairline text-secondary">
+              <Settings className="h-5 w-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="border-cyan-500/30 bg-cyan-500/10 text-cyan-400 font-mono text-[10px]">
-                  SOVEREIGN CONFIG
+                <Badge variant="outline" className="border-hairline bg-overlay text-secondary font-mono text-[10px] rounded-[6px]">
+                  Sovereign config
                 </Badge>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mt-1">Protocol Settings</h1>
-              <p className="text-xs sm:text-sm text-zinc-400">
+              <h1 className="text-2xl sm:text-3xl font-hero font-normal text-primary tracking-tight mt-1">Protocol Settings</h1>
+              <p className="text-xs sm:text-sm text-muted">
                 Configure local cryptographic burner keys, zero-knowledge proxies, and storage telemetry
               </p>
             </div>
@@ -205,85 +203,85 @@ export default function SettingsPage() {
 
       <div className="container mx-auto px-4 sm:px-6 py-8 max-w-6xl">
         <Tabs defaultValue="wallet" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 bg-[#0B0D14] border border-white/[0.08] p-1 rounded-xl text-zinc-400 gap-1 h-auto">
-            <TabsTrigger value="wallet" className="rounded-lg py-2 text-xs font-medium gap-2 data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300 transition-all">
-              <Wallet className="h-3.5 w-3.5 text-cyan-400" />
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 bg-surface border border-hairline p-1 rounded-[6px] text-muted gap-1 h-auto">
+            <TabsTrigger value="wallet" className="rounded-[4px] py-2 text-xs font-mono gap-2 data-[state=active]:bg-overlay data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-[var(--accent-primary)] transition-all">
+              <Wallet className="h-3.5 w-3.5" />
               <span>Identity &amp; Keys</span>
             </TabsTrigger>
-            <TabsTrigger value="indexers" className="rounded-lg py-2 text-xs font-medium gap-2 data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300 transition-all">
-              <Server className="h-3.5 w-3.5 text-cyan-400" />
+            <TabsTrigger value="indexers" className="rounded-[4px] py-2 text-xs font-mono gap-2 data-[state=active]:bg-overlay data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-[var(--accent-primary)] transition-all">
+              <Server className="h-3.5 w-3.5" />
               <span>Indexers &amp; Swarm</span>
             </TabsTrigger>
-            <TabsTrigger value="privacy" className="rounded-lg py-2 text-xs font-medium gap-2 data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300 transition-all">
-              <Shield className="h-3.5 w-3.5 text-cyan-400" />
+            <TabsTrigger value="privacy" className="rounded-[4px] py-2 text-xs font-mono gap-2 data-[state=active]:bg-overlay data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-[var(--accent-primary)] transition-all">
+              <Shield className="h-3.5 w-3.5" />
               <span>Privacy Rules</span>
             </TabsTrigger>
-            <TabsTrigger value="data" className="rounded-lg py-2 text-xs font-medium gap-2 data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300 transition-all">
-              <Database className="h-3.5 w-3.5 text-cyan-400" />
+            <TabsTrigger value="data" className="rounded-[4px] py-2 text-xs font-mono gap-2 data-[state=active]:bg-overlay data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-[var(--accent-primary)] transition-all">
+              <Database className="h-3.5 w-3.5" />
               <span>Data &amp; Backup</span>
             </TabsTrigger>
-            <TabsTrigger value="integrations" className="rounded-lg py-2 text-xs font-medium gap-2 data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300 transition-all">
-              <Package className="h-3.5 w-3.5 text-cyan-400" />
-              <span>Extensions &amp; Downloads</span>
+            <TabsTrigger value="integrations" className="rounded-[4px] py-2 text-xs font-mono gap-2 data-[state=active]:bg-overlay data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-[var(--accent-primary)] transition-all">
+              <Package className="h-3.5 w-3.5" />
+              <span>Extensions</span>
             </TabsTrigger>
           </TabsList>
 
           {/* Identity & Wallet Tab */}
           <TabsContent value="wallet" className="space-y-6">
-            <Card className="border-white/[0.08] bg-[#0B0D14]/90 backdrop-blur-xl">
-              <CardHeader className="pb-4 border-b border-white/[0.06]">
-                <CardTitle className="text-base font-semibold text-white flex items-center gap-2">
-                  <Wallet className="h-4 w-4 text-cyan-400" /> Sovereign Identity &amp; Keypair
+            <Card className="border-hairline bg-surface rounded-[6px]">
+              <CardHeader className="pb-4 border-b border-hairline">
+                <CardTitle className="text-base font-sans font-semibold text-primary flex items-center gap-2">
+                  <Wallet className="h-4 w-4 text-secondary" /> Sovereign Identity &amp; Keypair
                 </CardTitle>
-                <CardDescription className="text-xs text-zinc-400">
+                <CardDescription className="text-xs text-muted">
                   Client-side Ed25519 signing keys and optional Web3 wallet linkage
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6 pt-4">
+              <CardContent className="space-y-6 pt-5">
                 {/* Active Burner Key */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-xs font-semibold text-zinc-200 uppercase tracking-wider">
+                    <h4 className="text-xs font-mono font-semibold text-secondary uppercase tracking-wider">
                       Active In-Browser Ed25519 Key
                     </h4>
-                    <span className="text-[10px] font-mono text-cyan-400 bg-cyan-950/40 border border-cyan-500/30 px-2 py-0.5 rounded-full">
+                    <span className="text-[10px] font-mono text-secondary bg-overlay border border-hairline px-2 py-0.5 rounded-[6px]">
                       {burnerWallet?.pseudonym || "Loading..."}
                     </span>
                   </div>
-                  <p className="text-xs text-zinc-400 mb-3">
+                  <p className="text-xs text-muted mb-3 font-sans">
                     Every article and draft is cryptographically signed using this elliptic curve keypair stored strictly in your browser.
                   </p>
-                  <div className="p-3.5 bg-black/60 border border-white/10 rounded-xl font-mono text-xs break-all text-cyan-300 flex items-center justify-between gap-3">
+                  <div className="p-3.5 bg-background border border-hairline rounded-[6px] font-mono text-xs break-all text-primary flex items-center justify-between gap-3">
                     <span className="truncate">{burnerWallet?.publicKey || "Generating keypair..."}</span>
                     <Button 
                       size="sm" 
                       variant="ghost" 
                       onClick={handleCopyKey}
-                      className="h-7 text-xs font-mono gap-1 text-zinc-300 hover:text-white shrink-0 hover:bg-white/[0.08]"
+                      className="h-7 text-xs font-mono gap-1 text-muted hover:text-primary shrink-0 hover:bg-surface-raised rounded-[6px]"
                     >
-                      {copiedKey ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+                      {copiedKey ? <Check className="h-3 w-3 text-verified" /> : <Copy className="h-3 w-3" />}
                       <span>{copiedKey ? "Copied" : "Copy"}</span>
                     </Button>
                   </div>
                 </div>
 
                 {/* Optional Web3 Wallet */}
-                <div className="border-t border-white/[0.08] pt-5">
-                  <h4 className="text-xs font-semibold text-zinc-200 uppercase tracking-wider mb-1">
+                <div className="border-t border-hairline pt-5">
+                  <h4 className="text-xs font-mono font-semibold text-secondary uppercase tracking-wider mb-1">
                     Optional Linked Web3 Wallet
                   </h4>
-                  <p className="text-xs text-zinc-400 mb-3">
+                  <p className="text-xs text-muted mb-3 font-sans">
                     Link an external wallet (MetaMask, Coinbase, Phantom) if you wish to verify authorship via onchain EVM address.
                   </p>
-                  <div className="bg-black/40 border border-white/[0.08] p-3.5 rounded-xl">
+                  <div className="bg-surface-raised border border-hairline p-3.5 rounded-[6px]">
                     <div className="flex items-center justify-between flex-wrap gap-2">
                       <div className="flex items-center gap-2.5">
-                        <div className={`h-2.5 w-2.5 rounded-full ${authenticated ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" : "bg-zinc-600"}`} />
+                        <div className={`h-2.5 w-2.5 rounded-full ${authenticated ? "bg-verified" : "bg-muted"}`} />
                         <div>
-                          <p className="text-xs font-medium text-white">
+                          <p className="text-xs font-medium text-primary">
                             {authenticated ? (user?.wallet?.address ? "Web3 Wallet Connected" : "Authenticated") : "No External Wallet Linked"}
                           </p>
-                          <p className="text-[11px] font-mono text-zinc-400">
+                          <p className="text-[11px] font-mono text-muted">
                             {authenticated 
                               ? (user?.wallet?.address ? `${user.wallet.address.slice(0, 8)}...${user.wallet.address.slice(-6)}` : user?.email?.address || "Connected")
                               : "Operating in 100% anonymous burner mode"}
@@ -296,7 +294,7 @@ export default function SettingsPage() {
                             variant="outline" 
                             size="sm" 
                             onClick={logout}
-                            className="h-8 text-xs border-white/10 bg-black/40 hover:bg-white/[0.08] text-zinc-300"
+                            className="h-8 text-xs border-hairline bg-surface hover:bg-overlay text-secondary rounded-[6px]"
                           >
                             Disconnect
                           </Button>
@@ -304,7 +302,7 @@ export default function SettingsPage() {
                           <Button 
                             size="sm" 
                             onClick={login}
-                            className="h-8 text-xs bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500/30 border border-cyan-500/30"
+                            className="h-8 text-xs bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-primary rounded-[6px] font-medium shadow-sm"
                           >
                             Link Wallet
                           </Button>
@@ -314,10 +312,10 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                <div className="p-3.5 bg-cyan-950/20 border border-cyan-500/25 rounded-xl text-cyan-300/90 flex items-start gap-2.5">
-                  <Lock className="h-4 w-4 text-cyan-400 shrink-0 mt-0.5" />
-                  <p className="text-xs leading-relaxed">
-                    <strong>Zero-Custody Guarantee:</strong> PressProtocol servers never receive, log, or hold private keys. All cryptographic operations occur strictly within your client-side JavaScript sandbox via WebCrypto.
+                <div className="p-3.5 bg-background border border-hairline rounded-[6px] text-muted flex items-start gap-2.5">
+                  <Lock className="h-4 w-4 text-muted shrink-0 mt-0.5" />
+                  <p className="text-xs leading-relaxed font-sans">
+                    <strong className="text-primary font-normal">Zero-Custody Guarantee:</strong> PressProtocol servers never receive, log, or hold private keys. All cryptographic operations occur strictly within your client-side JavaScript sandbox via WebCrypto.
                   </p>
                 </div>
               </CardContent>
@@ -331,20 +329,20 @@ export default function SettingsPage() {
 
           {/* Privacy Tab */}
           <TabsContent value="privacy" className="space-y-6">
-            <Card className="border-white/[0.08] bg-[#0B0D14]/90 backdrop-blur-xl">
-              <CardHeader className="pb-4 border-b border-white/[0.06]">
-                <CardTitle className="text-base font-semibold text-white flex items-center gap-2">
-                  <Shield className="h-4 w-4 text-cyan-400" /> Privacy &amp; Transport Engine
+            <Card className="border-hairline bg-surface rounded-[6px]">
+              <CardHeader className="pb-4 border-b border-hairline">
+                <CardTitle className="text-base font-sans font-semibold text-primary flex items-center gap-2">
+                  <Shield className="h-4 w-4 text-secondary" /> Privacy &amp; Transport Engine
                 </CardTitle>
-                <CardDescription className="text-xs text-zinc-400">
+                <CardDescription className="text-xs text-muted">
                   Fine-tune routing relays, anonymity hops, and IPFS swarm mirroring
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-5 pt-4">
+              <CardContent className="space-y-5 pt-5">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5 max-w-[80%]">
-                    <div className="text-xs font-semibold text-white">Default Anonymous Mode</div>
-                    <p className="text-xs text-zinc-400">
+                    <div className="text-xs font-semibold text-primary font-sans">Default Anonymous Mode</div>
+                    <p className="text-xs text-muted font-sans">
                       Generate a single-use burner identity on publication without linking persistent identity.
                     </p>
                   </div>
@@ -354,10 +352,10 @@ export default function SettingsPage() {
                   />
                 </div>
 
-                <div className="border-t border-white/[0.08] pt-4 flex items-center justify-between">
+                <div className="border-t border-hairline pt-4 flex items-center justify-between">
                   <div className="space-y-0.5 max-w-[80%]">
-                    <div className="text-xs font-semibold text-white">Tor v3 Onion Resolution</div>
-                    <p className="text-xs text-zinc-400">
+                    <div className="text-xs font-semibold text-primary font-sans">Tor v3 Onion Resolution</div>
+                    <p className="text-xs text-muted font-sans">
                       Route IPFS and gateway queries over 56-character Ed25519 Tor hidden services.
                     </p>
                   </div>
@@ -367,10 +365,10 @@ export default function SettingsPage() {
                   />
                 </div>
 
-                <div className="border-t border-white/[0.08] pt-4 flex items-center justify-between">
+                <div className="border-t border-hairline pt-4 flex items-center justify-between">
                   <div className="space-y-0.5 max-w-[80%]">
-                    <div className="text-xs font-semibold text-white">Parallel Gateway Race</div>
-                    <p className="text-xs text-zinc-400">
+                    <div className="text-xs font-semibold text-primary font-sans">Parallel Gateway Race</div>
+                    <p className="text-xs text-muted font-sans">
                       Simultaneously query Cloudflare, Pinata, ipfs.io, and dweb.link for high-speed fallback.
                     </p>
                   </div>
@@ -380,8 +378,8 @@ export default function SettingsPage() {
                   />
                 </div>
 
-                <div className="p-3.5 bg-amber-950/20 border border-amber-500/25 rounded-xl text-amber-300/90 text-xs leading-relaxed">
-                  <strong>⚠️ Latency Trade-off:</strong> Onion routing maximizes censorship evasion and location unobservability, but adds 800ms-1,500ms network round-trip overhead.
+                <div className="p-3.5 bg-background border border-hairline rounded-[6px] text-muted text-xs leading-relaxed font-sans">
+                  <strong className="text-secondary font-normal">Latency Notice:</strong> Onion routing maximizes censorship evasion and location unobservability, but adds 800ms&ndash;1,500ms network round-trip overhead.
                 </div>
               </CardContent>
             </Card>
@@ -389,42 +387,42 @@ export default function SettingsPage() {
 
           {/* Data & Backup Tab */}
           <TabsContent value="data" className="space-y-6">
-            <Card className="border-white/[0.08] bg-[#0B0D14]/90 backdrop-blur-xl">
-              <CardHeader className="pb-4 border-b border-white/[0.06]">
-                <CardTitle className="text-base font-semibold text-white flex items-center gap-2">
-                  <Database className="h-4 w-4 text-cyan-400" /> Backup, Telemetry &amp; Quota
+            <Card className="border-hairline bg-surface rounded-[6px]">
+              <CardHeader className="pb-4 border-b border-hairline">
+                <CardTitle className="text-base font-sans font-semibold text-primary flex items-center gap-2">
+                  <Database className="h-4 w-4 text-secondary" /> Backup, Telemetry &amp; Quota
                 </CardTitle>
-                <CardDescription className="text-xs text-zinc-400">
+                <CardDescription className="text-xs text-muted">
                   Export sovereign cryptographic artifacts and inspect client storage usage
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6 pt-4">
+              <CardContent className="space-y-6 pt-5">
                 {/* Storage Telemetry Gauge */}
-                <div className="p-4 rounded-xl border border-white/[0.08] bg-black/40 space-y-2.5">
+                <div className="p-4 rounded-[6px] border border-hairline bg-surface-raised space-y-2.5">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-semibold text-zinc-200 flex items-center gap-1.5">
-                      <HardDrive className="h-3.5 w-3.5 text-cyan-400" /> Local Storage Quota
+                    <span className="font-semibold text-primary flex items-center gap-1.5 font-sans">
+                      <HardDrive className="h-3.5 w-3.5 text-muted" /> Local Storage Quota
                     </span>
-                    <span className="font-mono text-zinc-400">
+                    <span className="font-mono text-muted">
                       {storageUsage ? `${formatBytes(storageUsage.used)} / ${formatBytes(storageUsage.quota)}` : "Calculating..."}
                     </span>
                   </div>
-                  <div className="w-full bg-white/[0.06] rounded-full h-2 overflow-hidden">
+                  <div className="w-full bg-background rounded-full h-1.5 overflow-hidden">
                     <div 
-                      className="bg-gradient-to-r from-cyan-500 to-emerald-400 h-2 rounded-full transition-all duration-500"
+                      className="bg-secondary h-1.5 rounded-full transition-all duration-500"
                       style={{ width: `${Math.max(1, usedPercentage)}%` }}
                     />
                   </div>
-                  <p className="text-[11px] text-zinc-500">
+                  <p className="text-[11px] text-muted font-sans">
                     Includes browser index, cached proofs, draft versions, and cryptographic identities.
                   </p>
                 </div>
 
                 {/* Key Backup */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-white/[0.08] pt-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-hairline pt-4">
                   <div className="space-y-0.5">
-                    <h4 className="text-xs font-semibold text-white">Download Signing Keypair</h4>
-                    <p className="text-xs text-zinc-400">
+                    <h4 className="text-xs font-semibold text-primary font-sans">Download Signing Keypair</h4>
+                    <p className="text-xs text-muted font-sans">
                       Save a portable JSON envelope of your active Ed25519 identity for import on other devices.
                     </p>
                   </div>
@@ -432,18 +430,18 @@ export default function SettingsPage() {
                     variant="outline" 
                     size="sm" 
                     onClick={handleDownloadKeyBackup}
-                    className="h-8 text-xs font-mono gap-1.5 border-white/10 bg-black/40 hover:bg-white/[0.08] text-zinc-200 shrink-0"
+                    className="h-8 text-xs font-mono gap-1.5 border-hairline bg-surface hover:bg-overlay text-primary shrink-0 rounded-[6px]"
                   >
-                    <Download className="h-3.5 w-3.5 text-cyan-400" />
+                    <Download className="h-3.5 w-3.5 text-muted" />
                     <span>Download Key Backup</span>
                   </Button>
                 </div>
 
                 {/* Manifest Export */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-white/[0.08] pt-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-hairline pt-4">
                   <div className="space-y-0.5">
-                    <h4 className="text-xs font-semibold text-white">Export Content Manifest</h4>
-                    <p className="text-xs text-zinc-400">
+                    <h4 className="text-xs font-semibold text-primary font-sans">Export Content Manifest</h4>
+                    <p className="text-xs text-muted font-sans">
                       Export a verifiable JSON catalog containing all published CIDs, timestamps, and bookmarks.
                     </p>
                   </div>
@@ -451,18 +449,18 @@ export default function SettingsPage() {
                     variant="outline" 
                     size="sm" 
                     onClick={handleExportManifest}
-                    className="h-8 text-xs font-mono gap-1.5 border-white/10 bg-black/40 hover:bg-white/[0.08] text-zinc-200 shrink-0"
+                    className="h-8 text-xs font-mono gap-1.5 border-hairline bg-surface hover:bg-overlay text-primary shrink-0 rounded-[6px]"
                   >
-                    <Download className="h-3.5 w-3.5 text-emerald-400" />
+                    <Download className="h-3.5 w-3.5 text-verified" />
                     <span>Export Manifest (JSON)</span>
                   </Button>
                 </div>
 
                 {/* Clear Local Data */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-white/[0.08] pt-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-hairline pt-4">
                   <div className="space-y-0.5">
-                    <h4 className="text-xs font-semibold text-white">Purge Local Storage</h4>
-                    <p className="text-xs text-zinc-400">
+                    <h4 className="text-xs font-semibold text-primary font-sans">Purge Local Storage</h4>
+                    <p className="text-xs text-muted font-sans">
                       Wipe browser cache, local drafts, and regenerate fresh burner credentials.
                     </p>
                   </div>
@@ -471,15 +469,15 @@ export default function SettingsPage() {
                     size="sm" 
                     onClick={handleClearLocalData}
                     disabled={clearing}
-                    className="h-8 text-xs font-mono gap-1.5 border-rose-500/30 bg-rose-950/20 hover:bg-rose-900/30 text-rose-300 shrink-0"
+                    className="h-8 text-xs font-mono gap-1.5 border-hairline bg-overlay hover:bg-surface-raised text-error hover:text-error-bright shrink-0 rounded-[6px]"
                   >
-                    <Trash2 className="h-3.5 w-3.5 text-rose-400" />
+                    <Trash2 className="h-3.5 w-3.5" />
                     <span>Clear Local Data</span>
                   </Button>
                 </div>
 
-                <div className="p-3.5 bg-emerald-950/20 border border-emerald-500/25 rounded-xl text-emerald-300/90 text-xs leading-relaxed">
-                  <strong>💡 Immutability Assurance:</strong> Purging local data does NOT delete published articles from the IPFS swarm. Content addressing ensures your articles persist across distributed peers permanently.
+                <div className="p-3.5 bg-background border border-hairline rounded-[6px] text-muted text-xs leading-relaxed font-sans">
+                  <strong className="text-primary font-normal">Immutability Assurance:</strong> Purging local data does NOT delete published articles from the IPFS swarm. Content addressing ensures your articles persist across distributed peers permanently.
                 </div>
               </CardContent>
             </Card>
@@ -487,45 +485,45 @@ export default function SettingsPage() {
 
           {/* Extensions & Downloads Tab */}
           <TabsContent value="integrations" className="space-y-6">
-            <Card className="border-white/[0.08] bg-[#0B0D14]/90 backdrop-blur-xl">
-              <CardHeader className="pb-4 border-b border-white/[0.06]">
+            <Card className="border-hairline bg-surface rounded-[6px]">
+              <CardHeader className="pb-4 border-b border-hairline">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
-                    <CardTitle className="text-base font-semibold text-white flex items-center gap-2">
-                      <Package className="h-4 w-4 text-cyan-400" /> Client Extensions &amp; Publishing Bridges
+                    <CardTitle className="text-base font-sans font-semibold text-primary flex items-center gap-2">
+                      <Package className="h-4 w-4 text-secondary" /> Client Extensions &amp; Publishing Bridges
                     </CardTitle>
-                    <CardDescription className="text-xs text-zinc-400 mt-1">
+                    <CardDescription className="text-xs text-muted mt-1">
                       1-click prebuilt bundles to integrate sovereign publishing into your browser, CMS, and notes
                     </CardDescription>
                   </div>
                   <Link href="/downloads">
-                    <Button variant="outline" size="sm" className="h-7 text-xs font-mono gap-1 text-cyan-400 border-cyan-500/30 hover:bg-cyan-500/10 shrink-0">
+                    <Button variant="outline" size="sm" className="h-8 text-xs font-mono gap-1 text-primary border-hairline hover:bg-overlay shrink-0 rounded-[6px]">
                       <span>Full Downloads Hub</span>
                       <ArrowRight className="h-3 w-3" />
                     </Button>
                   </Link>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4 pt-4">
+              <CardContent className="space-y-4 pt-5">
                 {/* 1. Chrome Extension */}
-                <div className="p-4 rounded-xl border border-white/10 bg-black/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="p-4 rounded-[6px] border border-hairline bg-surface-raised flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-start gap-3">
-                    <div className="h-9 w-9 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 shrink-0 mt-0.5">
+                    <div className="h-9 w-9 rounded-[6px] bg-surface border border-hairline flex items-center justify-center text-secondary shrink-0 mt-0.5">
                       <Chrome className="h-4 w-4" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h4 className="text-xs font-semibold text-white">Chromium Browser Extension</h4>
-                        <Badge className="bg-cyan-500/10 text-cyan-300 border-cyan-500/20 font-mono text-[9px]">Manifest V3</Badge>
-                        <Badge variant="outline" className="border-white/10 text-zinc-500 font-mono text-[9px]">31 KB</Badge>
+                        <h4 className="text-xs font-semibold text-primary font-sans">Chromium Browser Extension</h4>
+                        <Badge className="bg-surface border border-hairline text-secondary font-mono text-[9px] rounded-[4px]">Manifest V3</Badge>
+                        <Badge variant="outline" className="border-hairline text-muted font-mono text-[9px] rounded-[4px]">31 KB</Badge>
                       </div>
-                      <p className="text-xs text-zinc-400 mt-1">
+                      <p className="text-xs text-muted mt-1 font-sans">
                         Chrome, Brave, Edge, Arc. Provides instant burner identity generation and 1-click article archival to IPFS/Tor.
                       </p>
                     </div>
                   </div>
                   <a href="/downloads/press-protocol-extension.zip" download="press-protocol-extension.zip">
-                    <Button size="sm" className="h-8 text-xs font-mono gap-1.5 bg-cyan-500 hover:bg-cyan-400 text-black font-semibold shrink-0">
+                    <Button size="sm" className="h-8 text-xs font-mono gap-1.5 bg-surface border border-hairline hover:bg-overlay text-primary font-medium shrink-0 rounded-[6px]">
                       <Download className="h-3.5 w-3.5" />
                       <span>Download .zip</span>
                     </Button>
@@ -533,24 +531,24 @@ export default function SettingsPage() {
                 </div>
 
                 {/* 2. WordPress Bridge */}
-                <div className="p-4 rounded-xl border border-white/10 bg-black/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="p-4 rounded-[6px] border border-hairline bg-surface-raised flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-start gap-3">
-                    <div className="h-9 w-9 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shrink-0 mt-0.5">
+                    <div className="h-9 w-9 rounded-[6px] bg-surface border border-hairline flex items-center justify-center text-secondary shrink-0 mt-0.5">
                       <Globe className="h-4 w-4" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h4 className="text-xs font-semibold text-white">WordPress Publishing Bridge</h4>
-                        <Badge className="bg-purple-500/10 text-purple-300 border-purple-500/20 font-mono text-[9px]">WP 6.0+</Badge>
-                        <Badge variant="outline" className="border-white/10 text-zinc-500 font-mono text-[9px]">27 KB</Badge>
+                        <h4 className="text-xs font-semibold text-primary font-sans">WordPress Publishing Bridge</h4>
+                        <Badge className="bg-anonymous/10 text-anonymous border border-anonymous/30 font-mono text-[9px] rounded-[4px]">WP 6.0+</Badge>
+                        <Badge variant="outline" className="border-hairline text-muted font-mono text-[9px] rounded-[4px]">27 KB</Badge>
                       </div>
-                      <p className="text-xs text-zinc-400 mt-1">
+                      <p className="text-xs text-muted mt-1 font-sans">
                         Turn your self-hosted WordPress site into a decentralized publishing node with auto-syndication and proof badges.
                       </p>
                     </div>
                   </div>
                   <a href="/downloads/press-protocol-wordpress.zip" download="press-protocol-wordpress.zip">
-                    <Button size="sm" className="h-8 text-xs font-mono gap-1.5 bg-purple-500 hover:bg-purple-400 text-black font-semibold shrink-0">
+                    <Button size="sm" className="h-8 text-xs font-mono gap-1.5 bg-surface border border-hairline hover:bg-overlay text-primary font-medium shrink-0 rounded-[6px]">
                       <Download className="h-3.5 w-3.5" />
                       <span>Download .zip</span>
                     </Button>
@@ -558,34 +556,34 @@ export default function SettingsPage() {
                 </div>
 
                 {/* 3. Obsidian Plugin */}
-                <div className="p-4 rounded-xl border border-white/10 bg-black/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="p-4 rounded-[6px] border border-hairline bg-surface-raised flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-start gap-3">
-                    <div className="h-9 w-9 rounded-lg bg-purple-950/40 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0 mt-0.5">
+                    <div className="h-9 w-9 rounded-[6px] bg-surface border border-hairline flex items-center justify-center text-secondary shrink-0 mt-0.5">
                       <FileText className="h-4 w-4" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h4 className="text-xs font-semibold text-white">Obsidian Sovereign Publisher</h4>
-                        <Badge className="bg-purple-500/10 text-purple-300 border-purple-500/20 font-mono text-[9px]">Markdown Native</Badge>
+                        <h4 className="text-xs font-semibold text-primary font-sans">Obsidian Sovereign Publisher</h4>
+                        <Badge className="bg-anonymous/10 text-anonymous border border-anonymous/30 font-mono text-[9px] rounded-[4px]">Markdown Native</Badge>
                       </div>
-                      <p className="text-xs text-zinc-400 mt-1">
+                      <p className="text-xs text-muted mt-1 font-sans">
                         Publish notes straight from your personal vault with local WebCrypto signatures and zero metadata leaks.
                       </p>
                     </div>
                   </div>
                   <a href="/downloads/press-protocol-obsidian.zip" download="press-protocol-obsidian.zip">
-                    <Button size="sm" className="h-8 text-xs font-mono gap-1.5 bg-purple-500 hover:bg-purple-400 text-black font-semibold shrink-0">
+                    <Button size="sm" className="h-8 text-xs font-mono gap-1.5 bg-surface border border-hairline hover:bg-overlay text-primary font-medium shrink-0 rounded-[6px]">
                       <Download className="h-3.5 w-3.5" />
                       <span>Download .zip</span>
                     </Button>
                   </a>
                 </div>
 
-                <div className="p-3.5 bg-cyan-950/20 border border-cyan-500/20 rounded-xl text-cyan-300/90 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                <div className="p-3.5 bg-background border border-hairline rounded-[6px] text-muted text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                   <span>Looking for Docker Compose node daemons or GitHub Actions CI/CD workflows?</span>
                   <Link href="/downloads">
-                    <Button variant="ghost" size="sm" className="h-7 text-xs font-mono text-cyan-300 hover:text-white hover:bg-white/5 p-0 sm:px-2">
-                      View all in Downloads Hub →
+                    <Button variant="ghost" size="sm" className="h-7 text-xs font-mono text-secondary hover:text-primary hover:bg-surface p-0 sm:px-2 rounded-[6px]">
+                      View all in Downloads Hub
                     </Button>
                   </Link>
                 </div>
