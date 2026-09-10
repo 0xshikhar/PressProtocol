@@ -51,66 +51,66 @@ export default function SpecPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050508] text-[#F0F2F8] py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-canvas text-primary selection:bg-[var(--accent-tint)] selection:text-primary py-12 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="container mx-auto max-w-4xl space-y-12">
         {/* Navigation */}
         <div>
           <Link href="/">
-            <Button variant="ghost" size="sm" className="gap-2 text-zinc-400 hover:text-white hover:bg-white/[0.06] text-xs">
+            <Button variant="ghost" size="sm" className="gap-2 text-muted hover:text-primary hover:bg-surface text-xs font-mono rounded-[6px]">
               <ArrowLeft className="h-3.5 w-3.5" /> Back to Home
             </Button>
           </Link>
         </div>
 
         {/* Page Header */}
-        <div className="space-y-4 border-b border-white/[0.08] pb-8">
+        <div className="space-y-4 border-b border-hairline pb-8">
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="border-cyan-500/30 bg-cyan-500/10 text-cyan-400 font-mono text-[11px]">
-              <Terminal className="h-3 w-3 mr-1" /> RFC SPECIFICATION
+            <Badge variant="outline" className="border-hairline bg-overlay text-secondary font-mono text-[11px] rounded-[6px]">
+              <Terminal className="h-3 w-3 mr-1 text-muted" /> RFC Specification
             </Badge>
-            <span className="text-xs text-zinc-500 font-mono">SPEC-2026-09-V1.2</span>
+            <span className="text-xs text-muted font-mono">SPEC-2026-09-V1.2</span>
           </div>
-          <h1 className="font-sans text-3xl sm:text-5xl font-bold tracking-tight text-white">
+          <h1 className="font-hero text-3xl sm:text-5xl font-normal tracking-tight text-primary">
             PressProtocol Architecture Specification
           </h1>
-          <p className="text-base sm:text-lg text-zinc-400 leading-relaxed font-sans">
+          <p className="text-base sm:text-lg text-secondary leading-relaxed font-light">
             The formal engineering definition for content addressing, client-side sovereign cryptography, multi-transport routing, and failover mechanics.
           </p>
         </div>
 
         {/* Protocol Invariants */}
         <div className="grid sm:grid-cols-3 gap-4">
-          <Card className="border-white/[0.08] bg-[#0B0D14]/90 backdrop-blur-xl">
+          <Card className="border-hairline bg-surface rounded-[6px]">
             <CardContent className="p-5 space-y-2">
-              <span className="text-xs font-mono text-cyan-400 font-semibold tracking-wider">PRIMITIVE 01</span>
-              <h3 className="font-semibold text-sm text-white flex items-center gap-1.5">
-                <Shield className="h-4 w-4 text-cyan-400" /> RFC 8032 Ed25519
+              <span className="text-xs font-mono text-secondary font-medium tracking-wider">Primitive 01</span>
+              <h3 className="font-semibold text-sm text-primary flex items-center gap-1.5 font-sans">
+                <Shield className="h-4 w-4 text-muted" /> RFC 8032 Ed25519
               </h3>
-              <p className="text-xs text-zinc-400 leading-relaxed">
+              <p className="text-xs text-muted leading-relaxed font-sans">
                 All author signatures are generated over canonical payloads using 256-bit elliptic curves directly in the browser via WebCrypto.
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-white/[0.08] bg-[#0B0D14]/90 backdrop-blur-xl">
+          <Card className="border-hairline bg-surface rounded-[6px]">
             <CardContent className="p-5 space-y-2">
-              <span className="text-xs font-mono text-emerald-400 font-semibold tracking-wider">PRIMITIVE 02</span>
-              <h3 className="font-semibold text-sm text-white flex items-center gap-1.5">
-                <FileCode className="h-4 w-4 text-emerald-400" /> CIDv1 Multihash
+              <span className="text-xs font-mono text-verified font-medium tracking-wider">Primitive 02</span>
+              <h3 className="font-semibold text-sm text-primary flex items-center gap-1.5 font-sans">
+                <FileCode className="h-4 w-4 text-verified" /> CIDv1 Multihash
               </h3>
-              <p className="text-xs text-zinc-400 leading-relaxed">
+              <p className="text-xs text-muted leading-relaxed font-sans">
                 Base32/SHA-256 content addressing ensuring tamper-proof bit-level immutability across decentralized storage networks.
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-white/[0.08] bg-[#0B0D14]/90 backdrop-blur-xl">
+          <Card className="border-hairline bg-surface rounded-[6px]">
             <CardContent className="p-5 space-y-2">
-              <span className="text-xs font-mono text-purple-400 font-semibold tracking-wider">PRIMITIVE 03</span>
-              <h3 className="font-semibold text-sm text-white flex items-center gap-1.5">
-                <Network className="h-4 w-4 text-purple-400" /> Tor v3 Onionize
+              <span className="text-xs font-mono text-anonymous font-medium tracking-wider">Primitive 03</span>
+              <h3 className="font-semibold text-sm text-primary flex items-center gap-1.5 font-sans">
+                <Network className="h-4 w-4 text-anonymous" /> Tor v3 Onionize
               </h3>
-              <p className="text-xs text-zinc-400 leading-relaxed">
+              <p className="text-xs text-muted leading-relaxed font-sans">
                 56-character Ed25519 onion services mapped 1:1 with content CIDs for deep censorship evasion and sovereign access.
               </p>
             </CardContent>
@@ -118,15 +118,15 @@ export default function SpecPage() {
         </div>
 
         {/* Multi-Transport Failover Visual Diagram */}
-        <div className="border border-white/[0.08] rounded-2xl bg-[#0B0D14]/90 p-6 sm:p-8 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/[0.06] pb-4">
+        <div className="border border-hairline rounded-[6px] bg-surface p-6 sm:p-8 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-hairline pb-4">
             <div>
-              <h3 className="text-base font-semibold text-white flex items-center gap-2">
-                <Radio className="h-4 w-4 text-cyan-400" /> Multi-Transport Resolution Flow
+              <h3 className="text-base font-semibold text-primary flex items-center gap-2 font-sans">
+                <Radio className="h-4 w-4 text-muted" /> Multi-Transport Resolution Flow
               </h3>
-              <p className="text-xs text-zinc-400 mt-0.5">Automated resilient routing with zero single-point-of-failure</p>
+              <p className="text-xs text-muted mt-0.5 font-sans">Automated resilient routing with zero single-point-of-failure</p>
             </div>
-            <Badge variant="outline" className="border-white/10 text-[11px] font-mono text-zinc-300 w-fit">
+            <Badge variant="outline" className="border-hairline text-[11px] font-mono text-muted w-fit rounded-[4px]">
               2,500ms Fast-Path SLA
             </Badge>
           </div>
@@ -134,44 +134,44 @@ export default function SpecPage() {
           {/* Diagram Pipeline */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 relative">
             {/* Step 1 */}
-            <div className="p-4 rounded-xl border border-cyan-500/30 bg-cyan-950/20 space-y-2 relative">
+            <div className="p-4 rounded-[6px] border border-hairline bg-surface-raised space-y-2 relative">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold">Phase 1</span>
-                <span className="text-[10px] font-mono text-cyan-300/70 bg-cyan-500/10 px-1.5 py-0.5 rounded">&le; 2.5s</span>
+                <span className="text-[10px] font-mono text-secondary uppercase tracking-widest font-medium">Phase 1</span>
+                <span className="text-[10px] font-mono text-muted bg-surface px-1.5 py-0.5 rounded-[4px] border border-hairline">&le; 2.5s</span>
               </div>
-              <div className="font-semibold text-sm text-white flex items-center gap-1.5">
-                <Cpu className="h-4 w-4 text-cyan-400" /> Local Node Fast-Path
+              <div className="font-semibold text-sm text-primary flex items-center gap-1.5 font-sans">
+                <Cpu className="h-4 w-4 text-muted" /> Local Node Fast-Path
               </div>
-              <p className="text-xs text-zinc-400 leading-relaxed">
-                Queries local or cloud daemon via <code className="text-cyan-300 font-mono text-[11px]">GET /api/content/[cid]</code>. Aborts at 2,500ms.
+              <p className="text-xs text-muted leading-relaxed font-sans">
+                Queries local or cloud daemon via <code className="text-primary font-mono text-[11px]">GET /api/content/[cid]</code>. Aborts at 2,500ms.
               </p>
             </div>
 
             {/* Step 2 */}
-            <div className="p-4 rounded-xl border border-emerald-500/30 bg-emerald-950/20 space-y-2 relative">
+            <div className="p-4 rounded-[6px] border border-hairline bg-surface-raised space-y-2 relative">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-widest font-bold">Phase 2</span>
-                <span className="text-[10px] font-mono text-emerald-300/70 bg-emerald-500/10 px-1.5 py-0.5 rounded">Swarm Race</span>
+                <span className="text-[10px] font-mono text-verified uppercase tracking-widest font-medium">Phase 2</span>
+                <span className="text-[10px] font-mono text-muted bg-surface px-1.5 py-0.5 rounded-[4px] border border-hairline">Swarm Race</span>
               </div>
-              <div className="font-semibold text-sm text-white flex items-center gap-1.5">
-                <Globe className="h-4 w-4 text-emerald-400" /> Parallel Gateway Race
+              <div className="font-semibold text-sm text-primary flex items-center gap-1.5 font-sans">
+                <Globe className="h-4 w-4 text-verified" /> Parallel Gateway Race
               </div>
-              <p className="text-xs text-zinc-400 leading-relaxed">
-                Fires <code className="text-emerald-300 font-mono text-[11px]">Promise.any()</code> across Pinata, Cloudflare, ipfs.io, and dweb.link.
+              <p className="text-xs text-muted leading-relaxed font-sans">
+                Fires <code className="text-primary font-mono text-[11px]">Promise.any()</code> across Pinata, Cloudflare, ipfs.io, and dweb.link.
               </p>
             </div>
 
             {/* Step 3 */}
-            <div className="p-4 rounded-xl border border-purple-500/30 bg-purple-950/20 space-y-2 relative">
+            <div className="p-4 rounded-[6px] border border-hairline bg-surface-raised space-y-2 relative">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-mono text-purple-400 uppercase tracking-widest font-bold">Phase 3</span>
-                <span className="text-[10px] font-mono text-purple-300/70 bg-purple-500/10 px-1.5 py-0.5 rounded">Air-Gapped</span>
+                <span className="text-[10px] font-mono text-anonymous uppercase tracking-widest font-medium">Phase 3</span>
+                <span className="text-[10px] font-mono text-muted bg-surface px-1.5 py-0.5 rounded-[4px] border border-hairline">Air-Gapped</span>
               </div>
-              <div className="font-semibold text-sm text-white flex items-center gap-1.5">
-                <Lock className="h-4 w-4 text-purple-400" /> Tor &amp; Proof Verify
+              <div className="font-semibold text-sm text-primary flex items-center gap-1.5 font-sans">
+                <Lock className="h-4 w-4 text-anonymous" /> Tor &amp; Proof Verify
               </div>
-              <p className="text-xs text-zinc-400 leading-relaxed">
-                Tor v3 onion routing + local cryptographic verification via exported <code className="text-purple-300 font-mono text-[11px]">.pressproof.json</code>.
+              <p className="text-xs text-muted leading-relaxed font-sans">
+                Tor v3 onion routing + local cryptographic verification via exported <code className="text-primary font-mono text-[11px]">.pressproof.json</code>.
               </p>
             </div>
           </div>
@@ -182,90 +182,90 @@ export default function SpecPage() {
           {/* Section 1 */}
           <section className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl sm:text-2xl font-sans font-bold text-white">
+              <h2 className="text-xl sm:text-2xl font-hero font-normal text-primary">
                 1. Canonical JSON Schema &amp; Signing Payload
               </h2>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handleCopy(CANONICAL_JSON_PAYLOAD, "canon")}
-                className="h-7 text-xs font-mono gap-1.5 border-white/10 bg-[#0B0D14] hover:bg-white/[0.08] text-zinc-300"
+                className="h-7 text-xs font-mono gap-1.5 border-hairline bg-surface hover:bg-overlay text-primary rounded-[6px]"
               >
-                {copiedSection === "canon" ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+                {copiedSection === "canon" ? <Check className="h-3 w-3 text-verified" /> : <Copy className="h-3 w-3" />}
                 Copy JSON
               </Button>
             </div>
-            <p className="text-zinc-400 leading-relaxed text-sm">
-              To prevent signature malleability across different JSON serialization implementations, PressProtocol conforms to <strong className="text-white">RFC 8785 (JSON Canonicalization Scheme)</strong>. 
+            <p className="text-secondary leading-relaxed text-sm font-light">
+              To prevent signature malleability across different JSON serialization implementations, PressProtocol conforms to <strong className="text-primary font-normal">RFC 8785 (JSON Canonicalization Scheme)</strong>. 
               The exact byte sequence signed by the author&apos;s Ed25519 private key is structured as follows:
             </p>
-            <pre className="p-4 rounded-xl bg-[#06080F] text-cyan-300 font-mono text-xs overflow-x-auto border border-white/[0.08] leading-relaxed select-all">
+            <pre className="p-4 rounded-[6px] bg-background text-primary font-mono text-xs overflow-x-auto border border-hairline leading-relaxed select-all">
               {CANONICAL_JSON_PAYLOAD}
             </pre>
-            <p className="text-xs text-zinc-400">
-              The signature is encoded as a <strong className="text-zinc-200">64-byte (128 character) hexadecimal string</strong>. Public keys are standard <strong className="text-zinc-200">32-byte (64 character) hex-encoded Ed25519 points</strong>.
+            <p className="text-xs text-muted font-mono">
+              The signature is encoded as a <strong className="text-secondary font-normal">64-byte (128 character) hexadecimal string</strong>. Public keys are standard <strong className="text-secondary font-normal">32-byte (64 character) hex-encoded Ed25519 points</strong>.
             </p>
           </section>
 
           {/* Section 2 */}
           <section className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl sm:text-2xl font-sans font-bold text-white">
+              <h2 className="text-xl sm:text-2xl font-hero font-normal text-primary">
                 2. Immutable IPFS Content Envelope
               </h2>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handleCopy(IPFS_SOURCE_ENVELOPE, "envelope")}
-                className="h-7 text-xs font-mono gap-1.5 border-white/10 bg-[#0B0D14] hover:bg-white/[0.08] text-zinc-300"
+                className="h-7 text-xs font-mono gap-1.5 border-hairline bg-surface hover:bg-overlay text-primary rounded-[6px]"
               >
-                {copiedSection === "envelope" ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+                {copiedSection === "envelope" ? <Check className="h-3 w-3 text-verified" /> : <Copy className="h-3 w-3" />}
                 Copy Envelope
               </Button>
             </div>
-            <p className="text-zinc-400 leading-relaxed text-sm">
+            <p className="text-secondary leading-relaxed text-sm font-light">
               The full document payload pinned to IPFS constitutes the unalterable source of truth:
             </p>
-            <pre className="p-4 rounded-xl bg-[#06080F] text-emerald-300 font-mono text-xs overflow-x-auto border border-white/[0.08] leading-relaxed select-all">
+            <pre className="p-4 rounded-[6px] bg-background text-primary font-mono text-xs overflow-x-auto border border-hairline leading-relaxed select-all">
               {IPFS_SOURCE_ENVELOPE}
             </pre>
           </section>
 
           {/* Section 3 */}
           <section className="space-y-4">
-            <h2 className="text-xl sm:text-2xl font-sans font-bold text-white">
+            <h2 className="text-xl sm:text-2xl font-hero font-normal text-primary">
               3. Multi-Transport Resolution Algorithm
             </h2>
-            <p className="text-zinc-400 leading-relaxed text-sm">
+            <p className="text-secondary leading-relaxed text-sm font-light">
               When a client or proxy resolves a document by CID, the resolution engine executes a resilient 2-phase failover:
             </p>
-            <div className="space-y-4 text-zinc-400 text-sm leading-relaxed">
-              <div className="p-4 rounded-xl border border-white/[0.08] bg-[#0B0D14]/80 space-y-1.5">
-                <strong className="text-white flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-cyan-400" />
+            <div className="space-y-4 text-secondary text-sm leading-relaxed">
+              <div className="p-4 rounded-[6px] border border-hairline bg-surface space-y-1.5">
+                <strong className="text-primary flex items-center gap-2 font-sans font-semibold">
+                  <span className="h-1.5 w-1.5 rounded-full bg-secondary" />
                   Stage 1 (Local Node Fast-Path)
                 </strong>
-                <p className="text-xs text-zinc-400">
-                  Dispatches <code className="text-xs font-mono bg-black/50 text-cyan-300 px-1.5 py-0.5 rounded border border-white/[0.06]">GET /api/content/[cid]</code> to the local or cloud Node daemon with an active <strong>2,500ms AbortController</strong>. If the node answers within SLA, returns the cached metadata and IPFS block.
+                <p className="text-xs text-muted leading-relaxed font-sans">
+                  Dispatches <code className="text-xs font-mono bg-background text-primary px-1.5 py-0.5 rounded-[4px] border border-hairline">GET /api/content/[cid]</code> to the local or cloud Node daemon with an active <strong className="text-secondary font-normal">2,500ms AbortController</strong>. If the node answers within SLA, returns the cached metadata and IPFS block.
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl border border-white/[0.08] bg-[#0B0D14]/80 space-y-1.5">
-                <strong className="text-white flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-emerald-400" />
+              <div className="p-4 rounded-[6px] border border-hairline bg-surface space-y-1.5">
+                <strong className="text-primary flex items-center gap-2 font-sans font-semibold">
+                  <span className="h-1.5 w-1.5 rounded-full bg-verified" />
                   Stage 2 (Parallel Swarm Race)
                 </strong>
-                <p className="text-xs text-zinc-400">
+                <p className="text-xs text-muted leading-relaxed font-sans">
                   If the Node daemon times out or responds with an HTTP error, the engine instantly fires concurrent requests across independent public gateways:
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
-                  <code className="text-[11px] font-mono bg-black/60 text-zinc-300 p-2 rounded border border-white/[0.06]">gateway.pinata.cloud/ipfs/[cid]</code>
-                  <code className="text-[11px] font-mono bg-black/60 text-zinc-300 p-2 rounded border border-white/[0.06]">cloudflare-ipfs.com/ipfs/[cid]</code>
-                  <code className="text-[11px] font-mono bg-black/60 text-zinc-300 p-2 rounded border border-white/[0.06]">ipfs.io/ipfs/[cid]</code>
-                  <code className="text-[11px] font-mono bg-black/60 text-zinc-300 p-2 rounded border border-white/[0.06]">dweb.link/ipfs/[cid]</code>
+                  <code className="text-[11px] font-mono bg-background text-muted p-2 rounded-[4px] border border-hairline">gateway.pinata.cloud/ipfs/[cid]</code>
+                  <code className="text-[11px] font-mono bg-background text-muted p-2 rounded-[4px] border border-hairline">cloudflare-ipfs.com/ipfs/[cid]</code>
+                  <code className="text-[11px] font-mono bg-background text-muted p-2 rounded-[4px] border border-hairline">ipfs.io/ipfs/[cid]</code>
+                  <code className="text-[11px] font-mono bg-background text-muted p-2 rounded-[4px] border border-hairline">dweb.link/ipfs/[cid]</code>
                 </div>
-                <p className="text-xs text-zinc-400 mt-2">
-                  Using <code className="text-xs font-mono bg-black/50 text-emerald-300 px-1.5 py-0.5 rounded border border-white/[0.06]">Promise.any()</code>, the fastest responsive peer hydrates the document, while slower requests are aborted immediately.
+                <p className="text-xs text-muted mt-2 font-sans">
+                  Using <code className="text-xs font-mono bg-background text-primary px-1.5 py-0.5 rounded-[4px] border border-hairline">Promise.any()</code>, the fastest responsive peer hydrates the document, while slower requests are aborted immediately.
                 </p>
               </div>
             </div>
@@ -273,16 +273,16 @@ export default function SpecPage() {
         </div>
 
         {/* Footer */}
-        <div className="border-t border-white/[0.08] pt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <p className="text-xs text-zinc-500 font-mono">
+        <div className="border-t border-hairline pt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <p className="text-xs text-muted font-mono">
             Open Standard &bull; Deterministic Cryptography
           </p>
           <div className="flex gap-3">
             <Link href="/about">
-              <Button variant="outline" size="sm" className="text-xs border-white/10 bg-[#0B0D14] hover:bg-white/[0.08] text-zinc-300">About &amp; Mission</Button>
+              <Button variant="outline" size="sm" className="text-xs font-mono border-hairline bg-surface hover:bg-overlay text-primary rounded-[6px]">About &amp; Mission</Button>
             </Link>
             <Link href="/privacy">
-              <Button variant="outline" size="sm" className="text-xs border-white/10 bg-[#0B0D14] hover:bg-white/[0.08] text-zinc-300">Privacy Architecture</Button>
+              <Button variant="outline" size="sm" className="text-xs font-mono border-hairline bg-surface hover:bg-overlay text-primary rounded-[6px]">Privacy Architecture</Button>
             </Link>
           </div>
         </div>

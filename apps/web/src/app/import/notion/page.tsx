@@ -19,22 +19,19 @@ export default function NotionImportPage() {
         </div>
 
         {/* Hero Banner */}
-        <div className="relative rounded-xl border border-white/[0.08] bg-gradient-to-b from-[#0E111A] to-[#07080C] p-6 sm:p-8 overflow-hidden shadow-2xl">
+        <div className="relative rounded-[6px] border border-border/60 bg-surface p-6 sm:p-8 overflow-hidden shadow-sm">
           {/* Hairline Horizon Accent */}
-          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-500/40 to-transparent" />
-          
-          {/* Controlled Ambient Glow */}
-          <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/[0.04] rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
 
           <div className="relative z-10 max-w-3xl space-y-3">
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 font-mono text-[11px] uppercase tracking-wider">
-              <Sparkles className="w-3 h-3 text-cyan-400" />
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-[4px] border border-primary/20 bg-primary/10 text-primary font-mono text-[11px] uppercase tracking-wider">
+              <Sparkles className="w-3.5 h-3.5 text-primary" />
               <span>Notion Block Sovereign Bridge</span>
             </div>
-            <h1 className="text-2xl sm:text-4xl font-sans font-bold tracking-tight text-white">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-hero font-normal tracking-tight text-foreground">
               Import Notion Documents to IPFS & Tor
             </h1>
-            <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed max-w-2xl">
+            <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed max-w-2xl">
               Preserve research notes, DAO proposals, and security disclosures drafted in Notion.
               Notion Callouts, Quotes, Headings, and Code blocks are transformed into pure semantic HTML5,
               signed with your Ed25519 sovereign burner key, and mirrored globally across decentralized transports.
