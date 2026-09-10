@@ -161,24 +161,24 @@ const ENDPOINTS = [
 
 export default function ApiReferencePage() {
   return (
-    <div className="min-h-screen bg-[#050508] text-white selection:bg-cyan-500/30 selection:text-cyan-200 py-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-canvas text-text-primary py-10 px-4 sm:px-6 lg:px-8">
       <div className="container mx-auto max-w-6xl space-y-10">
         {/* Navigation Breadcrumb */}
         <div className="flex items-center justify-between">
           <Link href="/developers">
-            <Button variant="ghost" size="sm" className="gap-2 text-zinc-400 hover:text-white hover:bg-white/5 text-xs font-mono">
+            <Button variant="ghost" size="sm" className="gap-2 text-text-muted hover:text-text-primary hover:bg-overlay text-xs font-mono">
               <ArrowLeft className="h-3.5 w-3.5" /> Back to Developer Portal
             </Button>
           </Link>
           <div className="flex items-center gap-3">
-            <Badge variant="outline" className="border-cyan-500/30 bg-cyan-500/10 text-cyan-300 font-mono text-[11px]">
+            <Badge variant="outline" className="border-hairline bg-overlay text-text-secondary font-mono text-[11px]">
               OpenAPI 3.0.3
             </Badge>
             <a
               href="/api/v1/openapi.json"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs font-mono text-zinc-400 hover:text-cyan-300 transition-colors"
+              className="flex items-center gap-1 text-xs font-mono text-text-muted hover:text-text-primary transition-colors"
             >
               <span>Raw JSON Spec</span>
               <ExternalLink className="h-3 w-3" />
@@ -187,22 +187,22 @@ export default function ApiReferencePage() {
         </div>
 
         {/* Header Title */}
-        <div className="space-y-3 border-b border-white/10 pb-8">
+        <div className="space-y-3 border-b border-hairline pb-8">
           <div className="flex items-center gap-2">
-            <div className="h-7 w-7 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+            <div className="h-7 w-7 rounded-[6px] bg-[rgba(124,39,51,0.14)] border border-[rgba(124,39,51,0.28)] flex items-center justify-center text-accent-ribbon">
               <Terminal className="h-4 w-4" />
             </div>
-            <span className="font-mono text-xs text-cyan-400 uppercase tracking-widest">Protocol Specification</span>
+            <span className="font-mono text-xs text-accent-ribbon uppercase tracking-widest">Protocol Specification</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold font-sans tracking-tight text-white">
+          <h1 className="text-3xl sm:text-4xl font-hero tracking-tight text-text-primary">
             REST API Reference
           </h1>
-          <p className="text-sm text-zinc-400 max-w-3xl leading-relaxed">
+          <p className="text-sm text-text-muted max-w-3xl leading-relaxed font-sans">
             Autonomous censorship-resistant publishing API. All dispatches are content-addressed via IPFS DAG-PB and cryptographically verifiable with RFC 8032 Ed25519 signatures. Zero custody, zero server dependencies.
           </p>
-          <div className="pt-2 flex items-center gap-6 text-xs font-mono text-zinc-500">
-            <div>Base URL: <code className="text-zinc-300 bg-white/5 px-2 py-0.5 rounded">https://api.pressprotocol.com</code></div>
-            <div>Default Encoding: <code className="text-zinc-300 bg-white/5 px-2 py-0.5 rounded">UTF-8 / JSON</code></div>
+          <div className="pt-2 flex flex-wrap items-center gap-6 text-xs font-mono text-text-muted">
+            <div>Base URL: <code className="text-text-secondary bg-surface border border-hairline px-2 py-0.5 rounded-[4px]">https://api.pressprotocol.com</code></div>
+            <div>Default Encoding: <code className="text-text-secondary bg-surface border border-hairline px-2 py-0.5 rounded-[4px]">UTF-8 / JSON</code></div>
           </div>
         </div>
 
@@ -210,8 +210,8 @@ export default function ApiReferencePage() {
         <div className="space-y-12">
           {ENDPOINTS.map((section) => (
             <div key={section.category} className="space-y-6">
-              <h2 className="text-lg font-mono font-bold uppercase tracking-wider text-zinc-300 flex items-center gap-2 border-b border-white/5 pb-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
+              <h2 className="text-sm font-mono font-medium uppercase tracking-wider text-text-secondary flex items-center gap-2 border-b border-hairline pb-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-accent-ribbon" />
                 {section.category}
               </h2>
 
@@ -220,45 +220,45 @@ export default function ApiReferencePage() {
                   <div
                     key={ep.id}
                     id={ep.id}
-                    className="p-6 rounded-xl border border-white/10 bg-[#0B0D14] space-y-5 shadow-xl hover:border-cyan-500/30 transition-colors"
+                    className="p-6 rounded-[6px] border border-hairline bg-surface space-y-5 shadow-sm hover:bg-elevated transition-colors"
                   >
                     {/* Method & Path Header */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        <span className={`px-2.5 py-1 rounded-md text-xs font-mono font-bold ${
-                          ep.method === "POST" ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/40" : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
+                        <span className={`px-2.5 py-1 rounded-[4px] text-xs font-mono font-medium border border-hairline ${
+                          ep.method === "POST" ? "bg-overlay text-accent-ribbon" : "bg-overlay text-verified"
                         }`}>
                           {ep.method}
                         </span>
-                        <code className="text-sm font-mono text-white font-semibold">
+                        <code className="text-sm font-mono text-text-primary font-medium">
                           {ep.path}
                         </code>
                       </div>
-                      <div className="flex items-center gap-2 text-xs font-mono text-zinc-500">
-                        <span>Auth: <strong className="text-zinc-300">{ep.auth}</strong></span>
+                      <div className="flex items-center gap-2 text-xs font-mono text-text-muted">
+                        <span>Auth: <strong className="text-text-secondary">{ep.auth}</strong></span>
                       </div>
                     </div>
 
-                    <p className="text-xs text-zinc-400 leading-relaxed font-sans">
+                    <p className="text-xs text-text-muted leading-relaxed font-sans">
                       {ep.description}
                     </p>
 
                     {/* Request / cURL Preview */}
                     <div className="grid lg:grid-cols-2 gap-4 pt-2">
                       <div className="space-y-2">
-                        <div className="text-[11px] font-mono uppercase tracking-wider text-zinc-500 flex items-center justify-between">
+                        <div className="text-[11px] font-mono uppercase tracking-wider text-text-muted flex items-center justify-between">
                           <span>Example Request (cURL)</span>
                         </div>
-                        <div className="rounded-lg border border-white/10 bg-black/60 p-3.5 font-mono text-xs text-cyan-300 overflow-x-auto">
+                        <div className="rounded-[6px] border border-hairline bg-canvas p-3.5 font-mono text-xs text-text-secondary overflow-x-auto">
                           <pre>{ep.curl}</pre>
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <div className="text-[11px] font-mono uppercase tracking-wider text-zinc-500 flex items-center justify-between">
+                        <div className="text-[11px] font-mono uppercase tracking-wider text-text-muted flex items-center justify-between">
                           <span>200 OK Response</span>
                         </div>
-                        <div className="rounded-lg border border-white/10 bg-black/60 p-3.5 font-mono text-xs text-emerald-400 overflow-x-auto">
+                        <div className="rounded-[6px] border border-hairline bg-canvas p-3.5 font-mono text-xs text-verified/90 overflow-x-auto">
                           <pre>{JSON.stringify(ep.response, null, 2)}</pre>
                         </div>
                       </div>
