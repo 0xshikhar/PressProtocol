@@ -4,79 +4,64 @@
 
 @layer base {
   :root, .dark {
-    /* Sovereign Dark Theme - Elevation & Off-White Hierarchy (claude-design-system.md) */
-    --background: 240 23% 3%; /* #050508 - bg-base */
-    --foreground: 240 6% 94%; /* #EDEDF1 - text-primary (off-white, anti-glare) */
+    /* Design System v2: Editorial Sovereign Identity (Wax seal on a leather ledger) */
     
-    --card: 240 16% 6%; /* #0D0D12 - bg-surface */
-    --card-foreground: 240 6% 94%; /* #EDEDF1 */
-    
-    --popover: 240 13% 10%; /* #15151C - bg-elevated */
-    --popover-foreground: 240 6% 94%;
-    
-    /* Primary: Electric Cyan Protocol Signal */
-    --primary: 189 94% 43%; /* #06B6D4 */
-    --primary-foreground: 240 23% 3%;
-    
-    /* Secondary: bg-overlay */
-    --secondary: 240 13% 13%; /* #1C1C24 */
-    --secondary-foreground: 240 6% 94%;
-    
-    /* Muted: Supporting text & subtle containers */
-    --muted: 240 13% 10%; /* #15151C */
-    --muted-foreground: 240 5% 63%; /* #9A9AA6 - text-secondary */
-    
-    /* Semantic Status Accents */
-    --accent: 151 65% 54%; /* #3DD68C - accent-success (verified signatures, live peers) */
-    --accent-foreground: 240 23% 3%;
-    
-    --success: 151 65% 54%; /* #3DD68C */
-    --success-foreground: 240 23% 3%;
-    
-    --warning: 42 79% 57%; /* #E8B339 - accent-warning (degraded, pending) */
-    --warning-foreground: 240 23% 3%;
-    
-    --destructive: 352 83% 64%; /* #F0576B - accent-danger (purged, invalid, delete) */
-    --destructive-foreground: 0 0% 100%;
-    
-    --border: 240 10% 16%; /* rgba(255,255,255,0.10) */
-    --input: 240 10% 16%;
-    --ring: 189 94% 43%;
-    
-    --radius: 0.5rem; /* 8px default mechanical radius */
-    
-    /* Chart Colors */
-    --chart-1: 189 94% 43%;
-    --chart-2: 151 65% 54%;
-    --chart-3: 240 70% 65%;
-    --chart-4: 42 79% 57%;
-    --chart-5: 352 83% 64%;
-  }
+    /* Surfaces — warm-undertone matte charcoal */
+    --bg-canvas: #0B0A0C;
+    --bg-surface: #141216;
+    --bg-elevated: #1C181D;
+    --bg-overlay: #262024;
+    --border-hairline: rgba(240, 232, 232, 0.07);
+    --border-focus: rgba(240, 232, 232, 0.16);
 
-  .light {
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 189 94% 43%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 220 13% 95%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 210 100% 95%;
-    --accent-foreground: 221 83% 53%;
-    --success: 142 71% 45%;
-    --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 189 94% 43%;
+    /* Text — warm ivory scale */
+    --text-primary: #EEE7E1;
+    --text-secondary: #A79E96;
+    --text-muted: #6F675F;
+
+    /* Brand Accent — Press Burgundy */
+    --accent-primary: #7C2733;
+    --accent-hover: #98333F;
+    --accent-deep: #571A22;
+    --accent-tint: rgba(124, 39, 51, 0.14);
+    --accent-ribbon: #B44A54;
+
+    /* Semantic Locks */
+    --verified: #3E9C72;
+    --verified-bright: #59B98C;
+    --verified-tint: rgba(62, 156, 114, 0.14);
+    --warning: #C97A2E;
+    --warning-bright: #DE9750;
+    --warning-tint: rgba(201, 122, 46, 0.14);
+    --error: #D65C4A;
+    --error-bright: #E37B6B;
+    --error-tint: rgba(214, 92, 74, 0.14);
+    --anonymous: #8770C4;
+    --anonymous-bright: #A18CDA;
+    --anonymous-tint: rgba(135, 112, 196, 0.14);
+
+    /* Component compatibility variables */
+    --background: var(--bg-canvas);
+    --foreground: var(--text-primary);
+    --card: var(--bg-surface);
+    --card-foreground: var(--text-primary);
+    --popover: var(--bg-elevated);
+    --popover-foreground: var(--text-primary);
+    --primary: var(--text-primary);
+    --primary-foreground: var(--bg-canvas);
+    --secondary: var(--text-secondary);
+    --secondary-foreground: var(--bg-canvas);
+    --muted: var(--text-muted);
+    --muted-foreground: var(--text-secondary);
+    --accent: var(--accent-primary);
+    --accent-foreground: var(--text-primary);
+    --destructive: var(--error);
+    --destructive-foreground: var(--text-primary);
+    --border: var(--border-hairline);
+    --input: var(--border-hairline);
+    --ring: var(--border-focus);
+
+    --radius: 6px;
   }
 }
 
@@ -86,49 +71,127 @@
   }
   
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    background-color: var(--bg-canvas);
+    color: var(--text-primary);
+    @apply font-sans antialiased;
   }
   
   /* Custom Scrollbar */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
   
   ::-webkit-scrollbar-track {
-    @apply bg-secondary;
+    background-color: var(--bg-canvas);
   }
   
   ::-webkit-scrollbar-thumb {
-    @apply bg-muted-foreground/30 rounded-full;
+    background-color: var(--bg-elevated);
+    border-radius: 9999px;
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground/50;
+    background-color: var(--bg-overlay);
   }
 }
 
 @layer utilities {
-  .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+  /* Fluid Hero Typography - Section 3.2 & Edge Case 2 */
+  .font-hero {
+    font-family: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
+    font-size: clamp(2.5rem, 5vw + 1rem, 3.8125rem);
+    line-height: 1.04;
+    letter-spacing: -0.025em;
   }
-  
-  .glass-effect {
-    @apply bg-white/80 backdrop-blur-md border border-white/20;
+
+  /* Micro-Typography Tabular Figures - Section 3.1a */
+  .font-mono, .metric-counter {
+    font-family: var(--font-jetbrains), Menlo, Monaco, Consolas, monospace;
+    font-feature-settings: "tnum" 1, "zero" 1;
+    letter-spacing: -0.02em;
   }
-  
-  .shadow-glow {
-    box-shadow: 0 0 20px rgba(var(--primary), 0.15);
+
+  /* Dispatch Prose Reading Pane - Section 3.1a */
+  .dispatch-prose {
+    hanging-punctuation: first allow-end;
+    text-rendering: optimizeLegibility;
+    font-variant-ligatures: common-ligatures;
+    font-family: 'Charter', 'Bitstream Charter', var(--font-source-serif), serif;
+    max-width: 75ch;
+  }
+
+  /* Elevation Hierarchy - Section 4.2 & Edge Case 3 */
+  .elevation-flat {
+    border-radius: 0px;
+    box-shadow: none;
+  }
+
+  .elevation-card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-hairline);
+    border-radius: 6px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  .elevation-raised {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-hairline);
+    border-radius: 8px;
+    box-shadow: 
+      inset 0 1px 0 0 rgba(240, 232, 232, 0.06), /* subtle overhead light rim / physical ledger edge */
+      0 12px 32px -4px rgba(0, 0, 0, 0.6);
+  }
+
+  /* Buttons - Section 8 & Edge Case 1 */
+  .btn-primary {
+    background-color: var(--accent-primary);
+    color: var(--text-primary);
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+  }
+  .btn-primary:hover {
+    background-color: var(--accent-hover);
+  }
+  .btn-primary:active {
+    background-color: var(--accent-deep);
+  }
+
+  .btn-secondary {
+    background-color: transparent;
+    border: 1px solid var(--border-hairline);
+    color: var(--text-secondary);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+  }
+  .btn-secondary:hover {
+    border-color: var(--border-focus);
+    background-color: var(--bg-overlay);
+    color: var(--text-primary);
+  }
+
+  /* Simulation Affordances - Section 8 & 9 (calm neutral, never alarm-colored) */
+  .btn-simulation {
+    background-color: var(--bg-overlay);
+    border: 1px solid var(--border-hairline);
+    color: var(--text-secondary);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+  }
+  .btn-simulation:hover {
+    border-color: var(--border-focus);
+    color: var(--text-primary);
+    background-color: rgba(38, 32, 36, 0.8);
   }
 
   .font-display {
     font-family: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
   }
 
-  /* Scoped Reader Palettes (claude-design-system.md) */
+  /* Scoped Reader Palettes */
   .reader-onyx {
-    background-color: #0B0B0F;
-    color: #E4E4E9;
+    background-color: #0B0A0C;
+    color: #EEE7E1;
   }
 
   .reader-sepia {
@@ -142,37 +205,64 @@
   }
 
   .surface-card {
-    background-color: #0b0d14;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-hairline);
   }
 
   .hairline-border {
-    border-color: rgba(255, 255, 255, 0.08);
+    border-color: var(--border-hairline);
   }
 
-  .glow-cyan {
-    box-shadow: 0 0 25px rgba(6, 182, 212, 0.2);
+  /* Semantic Token Utilities */
+  .text-primary {
+    color: var(--text-primary);
+  }
+  .text-secondary {
+    color: var(--text-secondary);
+  }
+  .text-muted {
+    color: var(--text-muted);
+  }
+  .text-accent-primary {
+    color: var(--accent-primary);
+  }
+  .bg-canvas {
+    background-color: var(--bg-canvas);
+  }
+  .bg-surface {
+    background-color: var(--bg-surface);
+  }
+  .bg-elevated {
+    background-color: var(--bg-elevated);
+  }
+  .bg-overlay {
+    background-color: var(--bg-overlay);
+  }
+  .border-hairline {
+    border-color: var(--border-hairline);
+  }
+  .border-focus {
+    border-color: var(--border-focus);
   }
 
-  .glow-emerald {
-    box-shadow: 0 0 25px rgba(16, 185, 129, 0.2);
+  .glow-burgundy {
+    box-shadow: 0 0 25px rgba(124, 39, 51, 0.25);
   }
 
   .glass-panel {
-    background: rgba(11, 13, 20, 0.7);
+    background: rgba(20, 18, 22, 0.75);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-hairline);
   }
 
   .glass-panel-hover {
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.2s ease;
   }
 
   .glass-panel-hover:hover {
-    background: rgba(17, 20, 32, 0.85);
-    border-color: rgba(6, 182, 212, 0.3);
-    transform: translateY(-2px);
+    background: var(--bg-overlay);
+    border-color: var(--border-focus);
   }
 
   .hairline-grid {
@@ -205,31 +295,9 @@
     100% { transform: translateX(0); }
   }
 
-  .word-gradient {
-    background: linear-gradient(
-      45deg,
-      #eca8d6 0%,
-      #a78bfa 25%,
-      #67e8f9 50%,
-      #fbbf24 75%,
-      #eca8d6 100%
-    );
-    background-size: 300% 300%;
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: gradient-shift 1.5s ease infinite;
-  }
-
-  @keyframes gradient-shift {
-    0%   { background-position: 0% 50%; }
-    50%  { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-
   /* TipTap Editor & Callout Styles */
   .tiptap p.is-editor-empty:first-child::before {
-    color: hsl(var(--muted-foreground));
+    color: var(--text-muted);
     content: attr(data-placeholder);
     float: left;
     height: 0;
@@ -240,26 +308,26 @@
   .press-callout {
     margin: 1.5rem 0;
     padding: 1rem 1.25rem;
-    border-radius: 0.75rem;
+    border-radius: 6px;
     border-left-width: 4px;
-    background-color: hsl(var(--muted) / 0.35);
-    border-color: hsl(var(--border));
+    background-color: var(--bg-surface);
+    border-color: var(--border-hairline);
     transition: all 0.2s ease;
   }
 
   .press-callout-info {
-    border-left-color: #0ea5e9;
-    background-color: rgba(14, 165, 233, 0.07);
+    border-left-color: var(--anonymous);
+    background-color: var(--anonymous-tint);
   }
 
   .press-callout-warning {
-    border-left-color: #f59e0b;
-    background-color: rgba(245, 158, 11, 0.07);
+    border-left-color: var(--warning);
+    background-color: var(--warning-tint);
   }
 
   .press-callout-whistleblower {
-    border-left-color: #10b981;
-    background-color: rgba(16, 185, 129, 0.07);
+    border-left-color: var(--verified);
+    background-color: var(--verified-tint);
   }
 
   .press-callout p {
@@ -455,5 +523,22 @@
     border-top: 1px solid currentColor !important;
     opacity: 0.12 !important;
     width: 50% !important;
+  }
+
+  /* Editorial Reading Measure & Craft Constraints */
+  .measure-reading {
+    max-width: 68ch;
+  }
+  .measure-lead {
+    max-width: 62ch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
