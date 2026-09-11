@@ -32,7 +32,8 @@ import {
   Layers,
   Heart,
   ExternalLink,
-  Download
+  Download,
+  PenLine
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -167,12 +168,12 @@ const Navbar = () => {
   const isProfileActive = pathname === "/profile" || pathname === "/bookmarks" || pathname === "/dashboard";
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-white/[0.08] bg-[#050508]/90 backdrop-blur-2xl text-white shadow-2xl transition-colors">
+    <nav className="sticky top-0 z-50 w-full border-b border-[var(--border-hairline)] bg-[var(--bg-canvas)]/95 backdrop-blur-2xl text-[var(--text-primary)] shadow-sm transition-colors">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 max-w-7xl">
-        {/* Left: Brand Identity & Network Badge */}
+        {/* Left: Brand Identity */}
         <div className="flex items-center gap-5 shrink-0">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-white/5 border border-white/15 group-hover:border-cyan-400/50 transition-colors overflow-hidden p-1 shadow-lg">
+            <div className="relative flex items-center justify-center w-10 h-10 rounded-[6px] bg-[var(--bg-surface)] border border-[var(--border-hairline)] group-hover:border-[var(--accent-primary)]/50 transition-colors overflow-hidden p-1 shadow-sm">
               <Image
                 src="/pressprotocol-logo-small.png"
                 alt="PressProtocol Logo"
@@ -180,15 +181,15 @@ const Navbar = () => {
                 height={40}
                 className="w-full h-full object-contain"
               />
-              <div className="absolute -inset-0.5 rounded-xl bg-cyan-500/20 blur opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+              <div className="absolute -inset-0.5 rounded-[6px] bg-[var(--accent-primary)]/15 blur opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
             </div>
-            <span className="font-sans tracking-tight text-lg text-white font-bold group-hover:text-cyan-300 transition-colors">
+            <span className="font-sans tracking-tight text-lg text-[var(--text-primary)] font-bold transition-colors">
               PressProtocol
             </span>
           </Link>
         </div>
 
-        {/* Center: Desktop Navigation: 3 Toggle-Based Category Headers */}
+        {/* Center: Desktop Navigation */}
         <div className="hidden lg:flex items-center justify-center space-x-1 flex-1 min-w-0 px-4">
           {/* 1. Dispatches Dropdown */}
           <DropdownMenu>
@@ -197,22 +198,22 @@ const Navbar = () => {
                 variant="ghost"
                 size="sm"
                 className={cn(
-                  "gap-1 text-xs font-mono tracking-wide transition-all h-8 px-2.5 rounded-lg border",
+                  "gap-1 text-xs font-mono tracking-wide transition-all h-9 px-3 rounded-[6px]",
                   isDispatchesActive
-                    ? "border-cyan-500/40 bg-cyan-500/15 text-cyan-300 shadow-[0_0_12px_rgba(34,211,238,0.15)]"
-                    : "border-transparent text-zinc-400 hover:text-white hover:bg-white/5 hover:border-white/10"
+                    ? "border-b-2 border-b-[var(--accent-primary)] text-[var(--text-primary)] rounded-b-none bg-transparent"
+                    : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)]"
                 )}
               >
-                <span>Discovery & Editorial</span>
+                <span>Read</span>
                 <ChevronDown className="h-3 w-3 opacity-60" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="start"
-              className="w-80 bg-[#0B0D14]/95 backdrop-blur-2xl border-white/10 p-2 shadow-2xl text-white"
+              className="w-80 bg-[var(--bg-elevated)] backdrop-blur-2xl border border-[var(--border-hairline)] p-2 shadow-2xl text-[var(--text-primary)]"
             >
-              <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-zinc-500">
-                Discovery & Editorial
+              <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-[var(--text-muted)]">
+                Editorial &amp; Dispatches
               </div>
               {dispatchesLinks.map((link) => {
                 const Icon = link.icon;
@@ -222,14 +223,14 @@ const Navbar = () => {
                     key={link.href}
                     onClick={() => router.push(link.href)}
                     className={cn(
-                      "flex items-start gap-2.5 p-2 rounded-lg cursor-pointer transition-colors",
-                      isActive ? "bg-cyan-500/15 text-cyan-300" : "hover:bg-white/5 text-zinc-300 hover:text-white"
+                      "flex items-start gap-2.5 p-2 rounded-[6px] cursor-pointer transition-colors",
+                      isActive ? "bg-[var(--accent-tint)] text-[var(--text-primary)]" : "hover:bg-[var(--bg-overlay)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                     )}
                   >
-                    <Icon className={cn("h-4 w-4 mt-0.5 shrink-0", isActive ? "text-cyan-400" : "text-zinc-400")} />
+                    <Icon className={cn("h-4 w-4 mt-0.5 shrink-0", isActive ? "text-[var(--accent-hover)]" : "text-[var(--text-muted)]")} />
                     <div>
                       <div className="text-xs font-mono font-medium leading-none mb-1">{link.label}</div>
-                      <div className="text-[11px] text-zinc-500 leading-snug">{link.desc}</div>
+                      <div className="text-[11px] text-[var(--text-muted)] leading-snug">{link.desc}</div>
                     </div>
                   </DropdownMenuItem>
                 );
@@ -237,17 +238,17 @@ const Navbar = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* 2. Protocol Dropdown (Public Goods & Mission first) */}
+          {/* 2. Protocol Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="sm"
                 className={cn(
-                  "gap-1 text-xs font-mono tracking-wide transition-all h-8 px-2.5 rounded-lg border",
+                  "gap-1 text-xs font-mono tracking-wide transition-all h-9 px-3 rounded-[6px]",
                   isProtocolActive
-                    ? "border-cyan-500/40 bg-cyan-500/15 text-cyan-300 shadow-[0_0_12px_rgba(34,211,238,0.15)]"
-                    : "border-transparent text-zinc-400 hover:text-white hover:bg-white/5 hover:border-white/10"
+                    ? "border-b-2 border-b-[var(--accent-primary)] text-[var(--text-primary)] rounded-b-none bg-transparent"
+                    : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)]"
                 )}
               >
                 <span>Protocol</span>
@@ -256,10 +257,10 @@ const Navbar = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="start"
-              className="w-80 bg-[#0B0D14]/95 backdrop-blur-2xl border-white/10 p-2 shadow-2xl text-white"
+              className="w-80 bg-[var(--bg-elevated)] backdrop-blur-2xl border border-[var(--border-hairline)] p-2 shadow-2xl text-[var(--text-primary)]"
             >
-              <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-zinc-500">
-                Network & Governance
+              <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-[var(--text-muted)]">
+                Network &amp; Governance
               </div>
               {protocolLinks.map((link) => {
                 const Icon = link.icon;
@@ -269,22 +270,16 @@ const Navbar = () => {
                     key={link.href}
                     onClick={() => router.push(link.href)}
                     className={cn(
-                      "flex items-start gap-2.5 p-2 rounded-lg cursor-pointer transition-colors",
-                      isActive ? "bg-cyan-500/15 text-cyan-300" : "hover:bg-white/5 text-zinc-300 hover:text-white"
+                      "flex items-start gap-2.5 p-2 rounded-[6px] cursor-pointer transition-colors",
+                      isActive ? "bg-[var(--accent-tint)] text-[var(--text-primary)]" : "hover:bg-[var(--bg-overlay)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                     )}
                   >
-                    <Icon className={cn("h-4 w-4 mt-0.5 shrink-0", isActive ? "text-cyan-400" : "text-zinc-400")} />
+                    <Icon className={cn("h-4 w-4 mt-0.5 shrink-0", isActive ? "text-[var(--accent-hover)]" : "text-[var(--text-muted)]")} />
                     <div>
-                      <div className="text-xs font-mono font-medium leading-none mb-1 flex items-center gap-1.5">
-                        <span>{link.label}</span>
-                        {link.href === "/support" && (
-                          <span className="px-1.5 py-0.2 rounded text-[9px] bg-rose-500/25 text-rose-300 font-mono border border-rose-500/40">Solo Built</span>
-                        )}
-                        {link.href === "/about" && (
-                          <span className="px-1.5 py-0.2 rounded text-[9px] bg-cyan-500/20 text-cyan-300 font-mono">Manifesto</span>
-                        )}
+                      <div className="text-xs font-mono font-medium leading-none mb-1 text-[var(--text-primary)]">
+                        {link.label}
                       </div>
-                      <div className="text-[11px] text-zinc-500 leading-snug">{link.desc}</div>
+                      <div className="text-[11px] text-[var(--text-muted)] leading-snug">{link.desc}</div>
                     </div>
                   </DropdownMenuItem>
                 );
@@ -299,10 +294,10 @@ const Navbar = () => {
                 variant="ghost"
                 size="sm"
                 className={cn(
-                  "gap-1 text-xs font-mono tracking-wide transition-all h-8 px-2.5 rounded-lg border",
+                  "gap-1 text-xs font-mono tracking-wide transition-all h-9 px-3 rounded-[6px]",
                   isDevelopersActive
-                    ? "border-cyan-500/40 bg-cyan-500/15 text-cyan-300 shadow-[0_0_12px_rgba(34,211,238,0.15)]"
-                    : "border-transparent text-zinc-400 hover:text-white hover:bg-white/5 hover:border-white/10"
+                    ? "border-b-2 border-b-[var(--accent-primary)] text-[var(--text-primary)] rounded-b-none bg-transparent"
+                    : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)]"
                 )}
               >
                 <span>Developers</span>
@@ -311,10 +306,10 @@ const Navbar = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="start"
-              className="w-80 bg-[#0B0D14]/95 backdrop-blur-2xl border-white/10 p-2 shadow-2xl text-white"
+              className="w-80 bg-[var(--bg-elevated)] backdrop-blur-2xl border border-[var(--border-hairline)] p-2 shadow-2xl text-[var(--text-primary)]"
             >
-              <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-zinc-500">
-                SDKs & Infrastructure
+              <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-[var(--text-muted)]">
+                SDKs &amp; Infrastructure
               </div>
               {developerLinks.map((link) => {
                 const Icon = link.icon;
@@ -324,14 +319,14 @@ const Navbar = () => {
                     key={link.href}
                     onClick={() => router.push(link.href)}
                     className={cn(
-                      "flex items-start gap-2.5 p-2 rounded-lg cursor-pointer transition-colors",
-                      isActive ? "bg-cyan-500/15 text-cyan-300" : "hover:bg-white/5 text-zinc-300 hover:text-white"
+                      "flex items-start gap-2.5 p-2 rounded-[6px] cursor-pointer transition-colors",
+                      isActive ? "bg-[var(--accent-tint)] text-[var(--text-primary)]" : "hover:bg-[var(--bg-overlay)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                     )}
                   >
-                    <Icon className={cn("h-4 w-4 mt-0.5 shrink-0", isActive ? "text-cyan-400" : "text-zinc-400")} />
+                    <Icon className={cn("h-4 w-4 mt-0.5 shrink-0", isActive ? "text-[var(--accent-hover)]" : "text-[var(--text-muted)]")} />
                     <div>
                       <div className="text-xs font-mono font-medium leading-none mb-1">{link.label}</div>
-                      <div className="text-[11px] text-zinc-500 leading-snug">{link.desc}</div>
+                      <div className="text-[11px] text-[var(--text-muted)] leading-snug">{link.desc}</div>
                     </div>
                   </DropdownMenuItem>
                 );
@@ -348,16 +343,16 @@ const Navbar = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="hidden md:flex h-8 px-2.5 gap-2 rounded-lg border border-white/10 bg-white/5 text-zinc-400 hover:text-white hover:border-white/20 transition-all font-mono text-xs"
+                className="hidden md:flex h-8 px-2.5 gap-2 rounded-[6px] border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-focus)] transition-all font-mono text-xs"
               >
-                <Search className="h-3.5 w-3.5 text-zinc-400" />
-                <span className="hidden xl:inline text-[11px] text-zinc-500">Search CIDs...</span>
-                <kbd className="hidden xl:inline-flex items-center px-1 py-0.5 text-[9px] font-mono bg-white/10 text-zinc-400 rounded">⌘K</kbd>
+                <Search className="h-3.5 w-3.5 text-[var(--text-muted)]" />
+                <span className="hidden xl:inline text-[11px] text-[var(--text-muted)]">Search CIDs...</span>
+                <kbd className="hidden xl:inline-flex items-center px-1 py-0.5 text-[9px] font-mono bg-[var(--bg-overlay)] text-[var(--text-secondary)] rounded-[4px]">⌘K</kbd>
               </Button>
             </SheetTrigger>
-            <SheetContent side="top" className="h-auto bg-[#050508]/95 backdrop-blur-2xl border-b border-white/10 text-white">
+            <SheetContent side="top" className="h-auto bg-[var(--bg-canvas)]/98 backdrop-blur-2xl border-b border-[var(--border-hairline)] text-[var(--text-primary)]">
               <SheetHeader>
-                <SheetTitle className="text-white font-mono text-xs uppercase tracking-wider">Search Network Publications</SheetTitle>
+                <SheetTitle className="text-[var(--text-primary)] font-mono text-xs uppercase tracking-wider">Search Network Publications</SheetTitle>
               </SheetHeader>
               <form onSubmit={handleSearch} className="mt-4 max-w-2xl mx-auto">
                 <Input
@@ -365,26 +360,26 @@ const Navbar = () => {
                   placeholder="Search by CID (bafy...), title, or Ed25519 author..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-white/5 border-white/10 text-white placeholder:text-zinc-500 focus:border-cyan-400 h-11"
+                  className="w-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] h-11 rounded-[6px]"
                   autoFocus
                 />
               </form>
             </SheetContent>
           </Sheet>
 
-          {/* Primary High-Contrast CTA Button: Publish */}
+          {/* Primary Editorial CTA Button: Write (Press Burgundy - Section 8) */}
           <Link href="/write">
             <Button
               size="sm"
               className={cn(
-                "gap-1.5 text-xs font-mono font-semibold tracking-wide transition-all h-8 px-3.5 rounded-lg border shadow-lg",
+                "gap-1.5 text-xs font-sans font-medium tracking-normal transition-all h-8 px-3.5 rounded-[6px]",
                 isPublishActive
-                  ? "border-cyan-300 bg-cyan-400 text-black shadow-[0_0_20px_rgba(34,211,238,0.4)]"
-                  : "border-cyan-400/60 bg-cyan-500 text-black hover:bg-cyan-400 hover:border-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.25)]"
+                  ? "bg-[var(--accent-hover)] text-[var(--text-primary)] shadow-sm"
+                  : "bg-[var(--accent-primary)] text-[var(--text-primary)] hover:bg-[var(--accent-hover)] active:bg-[var(--accent-deep)] shadow-sm"
               )}
             >
-              <FileText className="h-3.5 w-3.5" />
-              <span>Publish</span>
+              <PenLine className="h-3.5 w-3.5 text-[var(--text-primary)]" />
+              <span>Write</span>
             </Button>
           </Link>
 
@@ -396,14 +391,14 @@ const Navbar = () => {
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "h-8 px-2.5 gap-2 rounded-lg border transition-all font-mono text-xs",
+                    "h-8 px-2.5 gap-2 rounded-[6px] border transition-all font-mono text-xs",
                     isProfileActive
-                      ? "border-cyan-500/50 bg-cyan-500/15 text-cyan-300 shadow-[0_0_10px_rgba(34,211,238,0.15)]"
-                      : "border-white/10 bg-white/5 text-zinc-300 hover:text-white hover:border-white/20"
+                      ? "border-[var(--border-focus)] bg-[var(--bg-overlay)] text-[var(--text-primary)]"
+                      : "border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-focus)]"
                   )}
                   title="Sovereign Identity Cockpit & Local Vault"
                 >
-                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--verified-bright)]" />
                   <span className="hidden sm:inline">{burnerWallet.pseudonym}</span>
                   <User className="h-3.5 w-3.5 sm:hidden" />
                   <ChevronDown className="h-3 w-3 opacity-60 ml-0.5" />
@@ -417,16 +412,16 @@ const Navbar = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 px-2.5 sm:px-3 gap-1.5 rounded-lg border border-cyan-500/40 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 font-mono text-xs transition-all shadow-[0_0_12px_rgba(34,211,238,0.1)]"
+                        className="h-8 px-2.5 sm:px-3 gap-1.5 rounded-[6px] border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-overlay)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-mono text-xs transition-all"
                       >
-                        <Key className="h-3.5 w-3.5 text-cyan-400" />
-                        <span className="hidden sm:inline">Set Up Local Key</span>
+                        <Key className="h-3.5 w-3.5 text-[var(--text-muted)]" />
+                        <span className="hidden sm:inline">Identity</span>
                         <ChevronDown className="h-3 w-3 opacity-60 ml-0.5" />
                       </Button>
                     </DropdownMenuTrigger>
                   </TooltipTrigger>
-                  <TooltipContent side="bottom" className="bg-[#0B0D14] border border-white/15 text-xs text-zinc-300 max-w-xs p-2.5 font-sans">
-                    Generates an Ed25519 keypair in your browser. Nothing is sent to a server.
+                  <TooltipContent side="bottom" className="bg-[var(--bg-elevated)] border border-[var(--border-hairline)] text-xs text-[var(--text-secondary)] max-w-xs p-2.5 font-sans">
+                    Local Ed25519 cryptographic keypair in browser storage. Zero server custody.
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -434,37 +429,37 @@ const Navbar = () => {
 
             <DropdownMenuContent
               align="end"
-              className="w-72 bg-[#0B0D14]/95 backdrop-blur-2xl border-white/10 p-2 shadow-2xl text-white font-mono"
+              className="w-72 bg-[var(--bg-elevated)] backdrop-blur-2xl border border-[var(--border-hairline)] p-2 shadow-2xl text-[var(--text-primary)] font-mono rounded-[6px]"
             >
               {/* Identity Header */}
-              <div className="p-2.5 mb-1 rounded-lg bg-white/[0.03] border border-white/5">
+              <div className="p-2.5 mb-1 rounded-[6px] bg-[var(--bg-overlay)] border border-[var(--border-hairline)]">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-cyan-400 font-semibold flex items-center gap-1.5">
-                    <Shield className="h-3 w-3" />
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-primary)] font-medium flex items-center gap-1.5">
+                    <Shield className="h-3 w-3 text-[var(--verified-bright)]" />
                     <span>Sovereign Identity</span>
                   </span>
-                  <span className="flex items-center gap-1 text-[9px] font-mono text-emerald-400">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="flex items-center gap-1 text-[9px] font-mono text-[var(--verified-bright)]">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[var(--verified-bright)]" />
                     Active
                   </span>
                 </div>
 
                 {burnerWallet ? (
-                  <div className="mt-1.5 flex items-center justify-between text-xs font-mono text-zinc-300">
+                  <div className="mt-1.5 flex items-center justify-between text-xs font-mono text-[var(--text-secondary)]">
                     <span className="truncate">{burnerWallet.pseudonym}</span>
                     <button
                       onClick={handleCopyKey}
-                      className="text-zinc-500 hover:text-cyan-400 transition-colors p-1"
+                      className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1"
                       title="Copy Public Key"
                     >
-                      {copiedKey ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+                      {copiedKey ? <Check className="h-3 w-3 text-[var(--verified-bright)]" /> : <Copy className="h-3 w-3" />}
                     </button>
                   </div>
                 ) : (
                   <Button
                     onClick={handleSetupLocalKey}
                     size="sm"
-                    className="w-full mt-2 h-7 text-xs bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 font-mono"
+                    className="w-full mt-2 h-7 text-xs bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-[var(--text-primary)] border-none font-mono rounded-[6px]"
                   >
                     Generate Local Keypair
                   </Button>
@@ -472,86 +467,86 @@ const Navbar = () => {
               </div>
 
               {/* Section 1: Content & Vault */}
-              <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-zinc-500">
-                Content & Vault
+              <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-[var(--text-muted)]">
+                Content &amp; Vault
               </div>
 
-              {/* 1. My Vault (Saved offline articles) */}
+              {/* 1. My Vault */}
               <DropdownMenuItem
                 onClick={() => router.push("/bookmarks")}
-                className="flex items-start gap-2.5 p-2 rounded-lg cursor-pointer hover:bg-white/5 transition-colors"
+                className="flex items-start gap-2.5 p-2 rounded-[6px] cursor-pointer hover:bg-[var(--bg-overlay)] transition-colors"
               >
-                <BookMarked className="h-4 w-4 text-cyan-400 mt-0.5 shrink-0" />
+                <BookMarked className="h-4 w-4 text-[var(--text-muted)] mt-0.5 shrink-0" />
                 <div>
-                  <div className="text-xs font-mono font-medium text-zinc-200">My Vault</div>
-                  <div className="text-[10px] text-zinc-500 font-sans">Encrypted offline articles & proofs</div>
+                  <div className="text-xs font-mono font-medium text-[var(--text-primary)]">My Vault</div>
+                  <div className="text-[10px] text-[var(--text-muted)] font-sans">Encrypted offline articles &amp; proofs</div>
                 </div>
               </DropdownMenuItem>
 
-              {/* 2. My Drafts (Locally hosted drafts) */}
+              {/* 2. My Drafts */}
               <DropdownMenuItem
                 onClick={() => router.push("/write")}
-                className="flex items-start gap-2.5 p-2 rounded-lg cursor-pointer hover:bg-white/5 transition-colors"
+                className="flex items-start gap-2.5 p-2 rounded-[6px] cursor-pointer hover:bg-[var(--bg-overlay)] transition-colors"
               >
-                <HardDrive className="h-4 w-4 text-purple-400 mt-0.5 shrink-0" />
+                <HardDrive className="h-4 w-4 text-[var(--text-muted)] mt-0.5 shrink-0" />
                 <div>
-                  <div className="text-xs font-mono font-medium text-zinc-200">My Drafts</div>
-                  <div className="text-[10px] text-zinc-500 font-sans">Local unpinned drafts in browser storage</div>
+                  <div className="text-xs font-mono font-medium text-[var(--text-primary)]">My Drafts</div>
+                  <div className="text-[10px] text-[var(--text-muted)] font-sans">Local unpinned drafts in browser storage</div>
                 </div>
               </DropdownMenuItem>
 
               {/* 3. My Publications */}
               <DropdownMenuItem
                 onClick={() => router.push("/dashboard")}
-                className="flex items-start gap-2.5 p-2 rounded-lg cursor-pointer hover:bg-white/5 transition-colors"
+                className="flex items-start gap-2.5 p-2 rounded-[6px] cursor-pointer hover:bg-[var(--bg-overlay)] transition-colors"
               >
-                <CheckCircle2 className="h-4 w-4 text-emerald-400 mt-0.5 shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-[var(--verified-bright)] mt-0.5 shrink-0" />
                 <div>
-                  <div className="text-xs font-mono font-medium text-zinc-200">My Publications</div>
-                  <div className="text-[10px] text-zinc-500 font-sans">All signed articles published to IPFS & Tor</div>
+                  <div className="text-xs font-mono font-medium text-[var(--text-primary)]">My Publications</div>
+                  <div className="text-[10px] text-[var(--text-muted)] font-sans">All signed articles published to IPFS &amp; Tor</div>
                 </div>
               </DropdownMenuItem>
 
-              <DropdownMenuSeparator className="my-1.5 bg-white/10" />
+              <DropdownMenuSeparator className="my-1.5 bg-[var(--border-hairline)]" />
 
               {/* Section 2: Identity & Protocol Controls */}
-              <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-zinc-500">
+              <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-[var(--text-muted)]">
                 Key Management
               </div>
 
               <DropdownMenuItem
                 onClick={() => router.push("/profile")}
-                className="flex items-start gap-2.5 p-2 rounded-lg cursor-pointer hover:bg-white/5 transition-colors"
+                className="flex items-start gap-2.5 p-2 rounded-[6px] cursor-pointer hover:bg-[var(--bg-overlay)] transition-colors"
               >
-                <UserCheck className="h-4 w-4 text-cyan-400 mt-0.5 shrink-0" />
+                <UserCheck className="h-4 w-4 text-[var(--text-muted)] mt-0.5 shrink-0" />
                 <div>
-                  <div className="text-xs font-mono font-medium text-zinc-200">Identity Cockpit</div>
-                  <div className="text-[10px] text-zinc-500 font-sans">Burner key rotation, backup export & import</div>
+                  <div className="text-xs font-mono font-medium text-[var(--text-primary)]">Identity Cockpit</div>
+                  <div className="text-[10px] text-[var(--text-muted)] font-sans">Burner key rotation, backup export &amp; import</div>
                 </div>
               </DropdownMenuItem>
 
               <DropdownMenuItem
                 onClick={() => router.push("/settings")}
-                className="flex items-start gap-2.5 p-2 rounded-lg cursor-pointer hover:bg-white/5 transition-colors"
+                className="flex items-start gap-2.5 p-2 rounded-[6px] cursor-pointer hover:bg-[var(--bg-overlay)] transition-colors"
               >
-                <Settings className="h-4 w-4 text-zinc-400 mt-0.5 shrink-0" />
+                <Settings className="h-4 w-4 text-[var(--text-muted)] mt-0.5 shrink-0" />
                 <div>
-                  <div className="text-xs font-mono font-medium text-zinc-200">Protocol Settings</div>
-                  <div className="text-[10px] text-zinc-500 font-sans">Gateways, Tor routing & local data purge</div>
+                  <div className="text-xs font-mono font-medium text-[var(--text-primary)]">Protocol Settings</div>
+                  <div className="text-[10px] text-[var(--text-muted)] font-sans">Gateways, Tor routing &amp; local data purge</div>
                 </div>
               </DropdownMenuItem>
 
-              <DropdownMenuSeparator className="my-1.5 bg-white/10" />
+              <DropdownMenuSeparator className="my-1.5 bg-[var(--border-hairline)]" />
 
               {/* Emergency Burn Action */}
               <DropdownMenuItem
                 onClick={handleBurn}
-                className="flex items-start gap-2.5 p-2 rounded-lg cursor-pointer hover:bg-red-500/10 text-red-400 transition-colors"
+                className="flex items-start gap-2.5 p-2 rounded-[6px] cursor-pointer hover:bg-[var(--error-tint)] text-[var(--error-bright)] transition-colors"
               >
-                <Flame className="h-4 w-4 text-red-400 mt-0.5 shrink-0" />
+                <Flame className="h-4 w-4 text-[var(--error-bright)] mt-0.5 shrink-0" />
                 <div>
-                  <div className="text-xs font-mono font-medium text-red-300">Emergency Burn</div>
-                  <div className="text-[10px] text-red-400/70 font-sans">Wipe local keys from this device</div>
+                  <div className="text-xs font-mono font-medium text-[var(--error-bright)]">Emergency Burn</div>
+                  <div className="text-[10px] text-[var(--error-bright)]/70 font-sans">Wipe local keys from this device</div>
                 </div>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -561,14 +556,14 @@ const Navbar = () => {
           <div className="lg:hidden flex items-center">
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-zinc-400 hover:text-white hover:bg-white/5">
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-overlay">
                   <Menu className="h-4 w-4" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[320px] bg-[#050508]/95 backdrop-blur-3xl border-l border-white/10 text-white overflow-y-auto">
+              <SheetContent side="right" className="w-[320px] bg-[var(--bg-canvas)]/98 backdrop-blur-3xl border-l border-[var(--border-hairline)] text-[var(--text-primary)] overflow-y-auto">
                 <SheetHeader className="mb-4">
                   <SheetTitle className="flex items-center gap-2.5">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 border border-white/15 overflow-hidden p-1 shadow-md">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-[6px] bg-[var(--bg-surface)] border border-[var(--border-hairline)] overflow-hidden p-1 shadow-sm">
                       <Image
                         src="/pressprotocol-logo-small.png"
                         alt="PressProtocol Logo"
@@ -577,16 +572,16 @@ const Navbar = () => {
                         className="w-full h-full object-contain"
                       />
                     </div>
-                    <span className="font-sans font-bold text-base text-white">PressProtocol</span>
+                    <span className="font-sans font-bold text-base text-[var(--text-primary)]">PressProtocol</span>
                   </SheetTitle>
                 </SheetHeader>
 
                 {/* Mobile Accordion */}
                 <Accordion type="single" collapsible defaultValue="dispatches" className="w-full space-y-2">
                   {/* 1. Discovery & Editorial */}
-                  <AccordionItem value="dispatches" className="border-white/10">
-                    <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-zinc-300 hover:text-cyan-300 py-3">
-                      Discovery & Editorial
+                  <AccordionItem value="dispatches" className="border-[var(--border-hairline)]">
+                    <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)] hover:text-[var(--text-primary)] py-3">
+                      Discovery &amp; Editorial
                     </AccordionTrigger>
                     <AccordionContent className="space-y-1 pt-1 pb-3">
                       {dispatchesLinks.map((link) => (
@@ -594,11 +589,11 @@ const Navbar = () => {
                           <Button
                             variant="ghost"
                             className={cn(
-                              "w-full justify-start gap-2.5 text-xs font-mono h-9",
-                              pathname === link.href ? "bg-cyan-500/15 text-cyan-300" : "text-zinc-400 hover:text-white"
+                              "w-full justify-start gap-2.5 text-xs font-mono h-9 rounded-[6px]",
+                              pathname === link.href ? "bg-[var(--accent-tint)] text-[var(--text-primary)]" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)]"
                             )}
                           >
-                            <link.icon className="h-3.5 w-3.5 text-cyan-400" />
+                            <link.icon className="h-3.5 w-3.5 text-[var(--text-muted)]" />
                             {link.label}
                           </Button>
                         </Link>
@@ -607,9 +602,9 @@ const Navbar = () => {
                   </AccordionItem>
 
                   {/* 2. Protocol */}
-                  <AccordionItem value="protocol" className="border-white/10">
-                    <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-zinc-300 hover:text-cyan-300 py-3">
-                      Protocol & Governance
+                  <AccordionItem value="protocol" className="border-[var(--border-hairline)]">
+                    <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)] hover:text-[var(--text-primary)] py-3">
+                      Protocol &amp; Governance
                     </AccordionTrigger>
                     <AccordionContent className="space-y-1 pt-1 pb-3">
                       {protocolLinks.map((link) => (
@@ -617,11 +612,11 @@ const Navbar = () => {
                           <Button
                             variant="ghost"
                             className={cn(
-                              "w-full justify-start gap-2.5 text-xs font-mono h-9",
-                              pathname === link.href ? "bg-cyan-500/15 text-cyan-300" : "text-zinc-400 hover:text-white"
+                              "w-full justify-start gap-2.5 text-xs font-mono h-9 rounded-[6px]",
+                              pathname === link.href ? "bg-[var(--accent-tint)] text-[var(--text-primary)]" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)]"
                             )}
                           >
-                            <link.icon className="h-3.5 w-3.5 text-zinc-400" />
+                            <link.icon className="h-3.5 w-3.5 text-[var(--text-muted)]" />
                             {link.label}
                           </Button>
                         </Link>
@@ -630,8 +625,8 @@ const Navbar = () => {
                   </AccordionItem>
 
                   {/* 3. Developers */}
-                  <AccordionItem value="developers" className="border-white/10">
-                    <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-zinc-300 hover:text-cyan-300 py-3">
+                  <AccordionItem value="developers" className="border-[var(--border-hairline)]">
+                    <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)] hover:text-[var(--text-primary)] py-3">
                       Developers
                     </AccordionTrigger>
                     <AccordionContent className="space-y-1 pt-1 pb-3">
@@ -640,11 +635,11 @@ const Navbar = () => {
                           <Button
                             variant="ghost"
                             className={cn(
-                              "w-full justify-start gap-2.5 text-xs font-mono h-9",
-                              pathname === link.href ? "bg-cyan-500/15 text-cyan-300" : "text-zinc-400 hover:text-white"
+                              "w-full justify-start gap-2.5 text-xs font-mono h-9 rounded-[6px]",
+                              pathname === link.href ? "bg-[var(--accent-tint)] text-[var(--text-primary)]" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)]"
                             )}
                           >
-                            <link.icon className="h-3.5 w-3.5 text-zinc-400" />
+                            <link.icon className="h-3.5 w-3.5 text-[var(--text-muted)]" />
                             {link.label}
                           </Button>
                         </Link>
@@ -653,38 +648,38 @@ const Navbar = () => {
                   </AccordionItem>
 
                   {/* 4. Sovereign Vault */}
-                  <AccordionItem value="vault" className="border-white/10">
-                    <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-cyan-400 hover:text-cyan-300 py-3">
+                  <AccordionItem value="vault" className="border-[var(--border-hairline)]">
+                    <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)] hover:text-[var(--text-primary)] py-3">
                       Sovereign Vault
                     </AccordionTrigger>
                     <AccordionContent className="space-y-1 pt-1 pb-3">
                       <Link href="/bookmarks">
-                        <Button variant="ghost" className="w-full justify-start gap-2.5 text-xs font-mono text-zinc-400 hover:text-white h-9">
-                          <BookMarked className="h-3.5 w-3.5 text-cyan-400" />
+                        <Button variant="ghost" className="w-full justify-start gap-2.5 text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)] rounded-[6px] h-9">
+                          <BookMarked className="h-3.5 w-3.5 text-[var(--text-muted)]" />
                           My Vault (Saved)
                         </Button>
                       </Link>
                       <Link href="/write">
-                        <Button variant="ghost" className="w-full justify-start gap-2.5 text-xs font-mono text-zinc-400 hover:text-white h-9">
-                          <HardDrive className="h-3.5 w-3.5 text-purple-400" />
+                        <Button variant="ghost" className="w-full justify-start gap-2.5 text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)] rounded-[6px] h-9">
+                          <HardDrive className="h-3.5 w-3.5 text-[var(--text-muted)]" />
                           My Drafts
                         </Button>
                       </Link>
                       <Link href="/dashboard">
-                        <Button variant="ghost" className="w-full justify-start gap-2.5 text-xs font-mono text-zinc-400 hover:text-white h-9">
-                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                        <Button variant="ghost" className="w-full justify-start gap-2.5 text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)] rounded-[6px] h-9">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-[var(--verified-bright)]" />
                           My Publications
                         </Button>
                       </Link>
                       <Link href="/profile">
-                        <Button variant="ghost" className="w-full justify-start gap-2.5 text-xs font-mono text-zinc-400 hover:text-white h-9">
-                          <UserCheck className="h-3.5 w-3.5 text-cyan-400" />
+                        <Button variant="ghost" className="w-full justify-start gap-2.5 text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)] rounded-[6px] h-9">
+                          <UserCheck className="h-3.5 w-3.5 text-[var(--text-muted)]" />
                           Identity Cockpit
                         </Button>
                       </Link>
                       <Link href="/settings">
-                        <Button variant="ghost" className="w-full justify-start gap-2.5 text-xs font-mono text-zinc-400 hover:text-white h-9">
-                          <Settings className="h-3.5 w-3.5 text-zinc-400" />
+                        <Button variant="ghost" className="w-full justify-start gap-2.5 text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)] rounded-[6px] h-9">
+                          <Settings className="h-3.5 w-3.5 text-[var(--text-muted)]" />
                           Protocol Settings
                         </Button>
                       </Link>

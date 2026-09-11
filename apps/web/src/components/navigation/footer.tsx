@@ -42,7 +42,7 @@ export default function Footer() {
         { name: "How It Works", href: "/#features" },
         { name: "Threat Model", href: "/privacy" },
         { name: "Public Goods Mission", href: "/about" },
-        { name: "Contact & Security", href: "/contact" },
+        { name: "Contact & Security", href: "/about" },
       ],
     },
     {
@@ -61,9 +61,9 @@ export default function Footer() {
       links: [
         { name: "IPFS Swarm Guide", href: "/docs" },
         { name: "Tor Onion Daemon", href: "/docs" },
-        { name: "WordPress Bridge", href: "https://github.com/0xshikhar/PressProtocol/tree/main/integrations/wordpress-plugin", external: true },
-        { name: "Obsidian Plugin", href: "https://github.com/0xshikhar/PressProtocol/tree/main/integrations/obsidian-plugin", external: true },
-        { name: "Browser Web Clipper", href: "https://github.com/0xshikhar/PressProtocol/tree/main/integrations/browser-extension", external: true },
+        { name: "WordPress Bridge", href: "https://github.com/0xshikhar/PressProtocol/tree/master/integrations/wordpress-plugin", external: true },
+        { name: "Obsidian Plugin", href: "https://github.com/0xshikhar/PressProtocol/tree/master/integrations/obsidian-plugin", external: true },
+        { name: "Browser Web Clipper", href: "https://github.com/0xshikhar/PressProtocol/tree/master/integrations/browser-extension", external: true },
         { name: "GitHub Organization", href: "https://github.com/0xshikhar/PressProtocol", external: true },
       ],
     },
@@ -76,13 +76,13 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="border-t border-white/[0.08] bg-[#050508] text-white">
+    <footer className="border-t border-[var(--border-hairline)] bg-[var(--bg-canvas)] text-[var(--text-primary)]">
       <div className="container mx-auto px-4 py-12 max-w-7xl">
-        {/* Top Tier: Brand Identity, Telemetry & Sleek Support Callout */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-10 border-b border-white/[0.08]">
+        {/* Top Tier: Brand Identity & Telemetry */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-10 border-b border-[var(--border-hairline)]">
           <div className="max-w-xl">
             <Link href="/" className="mb-3 flex items-center gap-2.5 group">
-              <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-white/5 border border-white/15 group-hover:border-cyan-400/50 transition-colors overflow-hidden p-1 shadow-lg">
+              <div className="relative flex items-center justify-center w-10 h-10 rounded-[6px] bg-[var(--bg-surface)] border border-[var(--border-hairline)] group-hover:border-[var(--accent-primary)]/50 transition-colors overflow-hidden p-1 shadow-sm">
                 <Image
                   src="/pressprotocol-logo-small.png"
                   alt="PressProtocol Logo"
@@ -90,13 +90,13 @@ export default function Footer() {
                   height={40}
                   className="w-full h-full object-contain"
                 />
-                <div className="absolute -inset-0.5 rounded-xl bg-cyan-500/20 blur opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                <div className="absolute -inset-0.5 rounded-[6px] bg-[var(--accent-primary)]/15 blur opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
               </div>
-              <span className="font-sans tracking-tight text-xl text-white font-bold group-hover:text-cyan-300 transition-colors">
+              <span className="font-sans tracking-tight text-xl text-[var(--text-primary)] font-bold transition-colors">
                 PressProtocol
               </span>
             </Link>
-            <p className="text-xs text-zinc-400 leading-relaxed font-sans">
+            <p className="text-xs text-[var(--text-secondary)] leading-relaxed font-sans">
               Autonomous censorship-resistant publishing infrastructure. Decentralized syndicated dispatch across IPFS swarms, Tor hidden services, and air-gapped cryptographic proofs.
             </p>
           </div>
@@ -104,11 +104,11 @@ export default function Footer() {
           {/* Live Protocol Health Status, Social Badges & Support Public Good Pill */}
           <div className="flex flex-col sm:items-end gap-3">
             <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-950/30 border border-emerald-500/20 text-emerald-400 font-mono text-xs">
-                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Mainnet Swarm Active</span>
-                <span className="text-emerald-500/50">|</span>
-                <span className="text-zinc-400">18ms SLA</span>
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-[6px] bg-[var(--verified-tint)] border border-[var(--verified)]/30 text-[var(--verified-bright)] font-mono text-xs">
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--verified-bright)]" />
+                <span>Swarm Active</span>
+                <span className="text-[var(--border-focus)]">|</span>
+                <span className="text-[var(--text-secondary)]">18ms SLA</span>
               </div>
 
               <div className="flex gap-2">
@@ -119,7 +119,7 @@ export default function Footer() {
                       key={social.name}
                       variant="outline"
                       size="icon"
-                      className="h-8 w-8 bg-white/5 border-white/10 text-zinc-400 hover:text-white hover:bg-white/10 hover:border-cyan-500/30 transition-colors"
+                      className="h-8 w-8 bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)] hover:border-[var(--border-focus)] rounded-[6px] transition-colors"
                       asChild
                     >
                       <a
@@ -136,12 +136,11 @@ export default function Footer() {
               </div>
             </div>
 
-            {/* Refined Support Public Good Pill in the empty right space */}
+            {/* Support Public Good Pill */}
             <Link href="/support" className="group">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-rose-500/30 bg-rose-500/[0.08] hover:bg-rose-500/[0.18] hover:border-rose-500/50 text-rose-300 hover:text-white font-mono text-xs transition-all shadow-[0_0_20px_rgba(244,63,94,0.12)]">
-                <Heart className="h-3.5 w-3.5 fill-rose-400 text-rose-400 group-hover:scale-110 transition-transform" />
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-[6px] border border-[var(--accent-primary)]/30 bg-[var(--accent-tint)] hover:bg-[var(--accent-primary)]/25 text-[var(--text-primary)] font-mono text-xs transition-all">
+                <Heart className="h-3.5 w-3.5 fill-[var(--accent-ribbon)] text-[var(--accent-ribbon)] group-hover:scale-105 transition-transform" />
                 <span>Support Public Good</span>
-                <span className="text-rose-400/60 group-hover:translate-x-0.5 transition-transform">&rarr;</span>
               </div>
             </Link>
           </div>
@@ -151,7 +150,7 @@ export default function Footer() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8 py-10">
           {footerSections.map((section) => (
             <div key={section.title} className="space-y-3.5">
-              <h3 className="text-xs font-mono uppercase tracking-wider text-zinc-300 font-semibold flex items-center gap-1.5">
+              <h3 className="text-xs font-mono uppercase tracking-wider text-[var(--text-primary)] font-medium flex items-center gap-1.5">
                 {section.title}
               </h3>
               <ul className="space-y-2 text-xs font-mono">
@@ -161,9 +160,9 @@ export default function Footer() {
                       href={link.href}
                       target={link.external ? "_blank" : undefined}
                       rel={link.external ? "noopener noreferrer" : undefined}
-                      className="text-zinc-400 hover:text-cyan-300 transition-colors flex items-center gap-1 group"
+                      className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors flex items-center gap-1 group"
                     >
-                      <span className="group-hover:translate-x-0.5 transition-transform">{link.name}</span>
+                      <span>{link.name}</span>
                       {link.external && (
                         <ArrowUpRight className="h-3 w-3 opacity-40 group-hover:opacity-100 transition-opacity" />
                       )}
@@ -176,23 +175,23 @@ export default function Footer() {
         </div>
 
         {/* Bottom Tier: Copyright, Guarantees & Legal */}
-        <div className="pt-8 border-t border-white/[0.08] flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-mono text-zinc-300">
+        <div className="pt-8 border-t border-[var(--border-hairline)] flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-mono text-[var(--text-secondary)]">
           <div className="flex items-center gap-3">
             <span>© {new Date().getFullYear()} PressProtocol.</span>
-            <span className="hidden sm:inline text-zinc-700">•</span>
-            <span className="hidden sm:inline text-zinc-400">Pure sovereign, zero-custody publishing.</span>
+            <span className="hidden sm:inline text-[var(--border-focus)]">•</span>
+            <span className="hidden sm:inline text-[var(--text-muted)]">Pure sovereign, zero-custody publishing.</span>
           </div>
 
-          <div className="flex items-center gap-4 flex-wrap text-zinc-400">
-            <Link href="/privacy" className="hover:text-cyan-300 transition-colors">
+          <div className="flex items-center gap-4 flex-wrap text-[var(--text-muted)]">
+            <Link href="/privacy" className="hover:text-[var(--text-primary)] transition-colors">
               Privacy Policy
             </Link>
-            <span className="text-zinc-700">•</span>
-            <Link href="/terms" className="hover:text-cyan-300 transition-colors">
+            <span className="text-[var(--border-focus)]">•</span>
+            <Link href="/terms" className="hover:text-[var(--text-primary)] transition-colors">
               Terms of Service
             </Link>
-            <span className="text-zinc-700">•</span>
-            <Link href="/spec" className="hover:text-cyan-300 transition-colors">
+            <span className="text-[var(--border-focus)]">•</span>
+            <Link href="/spec" className="hover:text-[var(--text-primary)] transition-colors">
               Protocol RFC Architecture
             </Link>
           </div>
