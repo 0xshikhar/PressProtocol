@@ -141,19 +141,19 @@ function EmbedReaderContent() {
       case "dark":
       default:
         return {
-          wrapper: "bg-[#090d16] text-slate-100 border-slate-800",
-          headerBg: "bg-[#0d131f]/90 border-slate-800 backdrop-blur-md",
-          brandText: "text-white",
+          wrapper: "bg-[#0B0A0C] text-[#EEE7E1] border-[rgba(240,232,232,0.07)]",
+          headerBg: "bg-[#141216]/90 border-[rgba(240,232,232,0.07)] backdrop-blur-md",
+          brandText: "text-[#EEE7E1]",
           prose: "prose-invert",
-          badgeBg: "bg-slate-800/80 text-slate-300 border-slate-700",
-          verifiedBadge: "bg-emerald-950/80 text-emerald-400 border-emerald-700/60 hover:bg-emerald-900/60 shadow-[0_0_10px_rgba(16,185,129,0.15)]",
-          unsignedBadge: "bg-slate-800 text-slate-400 border-slate-700",
-          invalidBadge: "bg-rose-950/80 text-rose-400 border-rose-700/60",
-          pillBg: "bg-slate-800/80 hover:bg-slate-700 text-slate-200 border-slate-700",
-          accentButton: "bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-900/30",
-          cardBorder: "border-slate-800 shadow-xl",
-          mutedText: "text-slate-400",
-          footerBorder: "border-slate-800 text-slate-400",
+          badgeBg: "bg-[#1C181D] text-[#A79E96] border-[rgba(240,232,232,0.07)]",
+          verifiedBadge: "bg-[rgba(62,156,114,0.14)] text-[#3E9C72] border-[rgba(62,156,114,0.3)] hover:bg-[rgba(62,156,114,0.2)]",
+          unsignedBadge: "bg-[#1C181D] text-[#A79E96] border-[rgba(240,232,232,0.07)]",
+          invalidBadge: "bg-[rgba(214,92,74,0.14)] text-[#D65C4A] border-[rgba(214,92,74,0.3)]",
+          pillBg: "bg-[#1C181D] hover:bg-[#262024] text-[#EEE7E1] border-[rgba(240,232,232,0.07)]",
+          accentButton: "bg-[#7C2733] hover:bg-[#98333F] text-[#EEE7E1] shadow-sm",
+          cardBorder: "border-[rgba(240,232,232,0.07)] shadow-sm",
+          mutedText: "text-[#6F675F]",
+          footerBorder: "border-[rgba(240,232,232,0.07)] text-[#A79E96]",
         };
     }
   }, [theme]);
@@ -162,7 +162,7 @@ function EmbedReaderContent() {
   if (loading) {
     return (
       <div className={`w-full min-h-[320px] p-6 flex flex-col justify-center items-center ${themeStyles.wrapper}`}>
-        <Loader2 className="w-8 h-8 animate-spin text-emerald-500 mb-3" />
+        <Loader2 className="w-8 h-8 animate-spin text-verified mb-3" />
         <p className={`text-sm ${themeStyles.mutedText} font-mono tracking-wide`}>
           Resolving CID from decentralized swarm...
         </p>
@@ -206,12 +206,12 @@ function EmbedReaderContent() {
             >
               {isVerifying ? (
                 <>
-                  <Loader2 className="w-3 h-3 animate-spin text-emerald-400" />
+                  <Loader2 className="w-3 h-3 animate-spin text-verified" />
                   <span className="font-mono text-[11px]">Verifying...</span>
                 </>
               ) : verificationResult?.isValid ? (
                 <>
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-verified shrink-0" />
                   <span className="font-mono text-[11px] font-semibold">Ed25519 Verified</span>
                   {verificationResult.latencyMs !== undefined && (
                     <span className="text-[10px] opacity-75 font-mono">
@@ -226,7 +226,7 @@ function EmbedReaderContent() {
                 </>
               ) : (
                 <>
-                  <ShieldAlert className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+                  <ShieldAlert className="w-3.5 h-3.5 text-error shrink-0" />
                   <span className="font-mono text-[11px]">Invalid Signature</span>
                 </>
               )}
@@ -234,37 +234,37 @@ function EmbedReaderContent() {
           </TooltipTrigger>
           <TooltipContent
             side="bottom"
-            className="max-w-[340px] p-3 text-xs bg-slate-900 border-slate-700 text-slate-100 shadow-2xl rounded-lg font-sans"
+            className="max-w-[340px] p-3 text-xs bg-surface-elevated border-hairline text-primary shadow-2xl rounded-lg font-sans"
           >
             <div className="space-y-2">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-1.5">
-                <span className="font-semibold text-emerald-400 flex items-center gap-1">
+              <div className="flex items-center justify-between border-b border-hairline pb-1.5">
+                <span className="font-semibold text-verified flex items-center gap-1">
                   <ShieldCheck className="w-3.5 h-3.5" />
                   Client-Side In-Browser Proof
                 </span>
-                <span className="font-mono text-[10px] text-slate-400">
+                <span className="font-mono text-[10px] text-muted-foreground">
                   {verificationResult?.latencyMs}ms
                 </span>
               </div>
-              <p className="text-[11px] text-slate-300 leading-relaxed">
+              <p className="text-[11px] text-secondary leading-relaxed">
                 Cryptographically authenticated directly within your browser sandbox via WebCrypto. Zero trust in central servers.
               </p>
               {authorPubkey && (
                 <div className="space-y-1 pt-1">
-                  <div className="flex items-center justify-between text-[10px] text-slate-400">
+                  <div className="flex items-center justify-between text-[10px] text-muted-foreground">
                     <span>Ed25519 Sovereign Author Key:</span>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         copyToClipboard(authorPubkey, "key");
                       }}
-                      className="text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-mono"
+                      className="text-verified hover:opacity-80 flex items-center gap-1 font-mono"
                     >
                       {copiedKey ? <Check className="w-2.5 h-2.5" /> : <Copy className="w-2.5 h-2.5" />}
                       {copiedKey ? "Copied" : "Copy Key"}
                     </button>
                   </div>
-                  <p className="font-mono text-[10px] text-slate-200 bg-slate-950 p-1.5 rounded border border-slate-800 break-all select-all">
+                  <p className="font-mono text-[10px] text-primary bg-surface p-1.5 rounded border border-hairline break-all select-all">
                     {authorPubkey}
                   </p>
                 </div>
@@ -283,7 +283,7 @@ function EmbedReaderContent() {
         {/* Top Header */}
         <div className="flex items-center justify-between gap-2 mb-3">
           <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-6 h-6 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+            <div className="flex items-center justify-center w-6 h-6 rounded-md bg-verified/10 border border-verified/30 text-verified">
               <FileText className="w-3.5 h-3.5" />
             </div>
             <span className={`text-xs font-semibold ${themeStyles.brandText}`}>PressProtocol</span>
@@ -314,7 +314,7 @@ function EmbedReaderContent() {
               title="Copy Multihash CID"
               className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-[11px] font-mono transition-colors ${themeStyles.pillBg}`}
             >
-              {copiedCid ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3 opacity-60" />}
+              {copiedCid ? <Check className="w-3 h-3 text-verified" /> : <Copy className="w-3 h-3 opacity-60" />}
               <span>{cid.slice(0, 6)}...{cid.slice(-4)}</span>
             </button>
 
@@ -354,7 +354,7 @@ function EmbedReaderContent() {
             rel="noopener noreferrer"
             className="flex items-center gap-2 group shrink-0"
           >
-            <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform">
+            <div className="w-7 h-7 rounded-lg bg-verified/10 border border-verified/30 flex items-center justify-center text-verified group-hover:scale-105 transition-transform">
               <FileText className="w-4 h-4" />
             </div>
             <span className={`text-sm font-bold tracking-tight hidden sm:inline ${themeStyles.brandText}`}>
@@ -381,7 +381,7 @@ function EmbedReaderContent() {
             title="Copy Multihash CID"
             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-xs font-mono transition-colors ${themeStyles.pillBg}`}
           >
-            {copiedCid ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3 opacity-60" />}
+            {copiedCid ? <Check className="w-3 h-3 text-verified" /> : <Copy className="w-3 h-3 opacity-60" />}
             <span className="hidden md:inline">CID:</span>
             <span>{cid.slice(0, 5)}...{cid.slice(-4)}</span>
           </button>
@@ -446,7 +446,7 @@ function EmbedReaderContent() {
           className={`article-content prose max-w-none leading-relaxed ${themeStyles.prose}
                      prose-p:text-base sm:prose-p:text-lg prose-p:leading-relaxed
                      prose-headings:font-bold prose-headings:tracking-tight
-                     prose-a:text-emerald-500 hover:prose-a:underline
+                     prose-a:text-[#EEE7E1] hover:prose-a:text-[#98333F] hover:prose-a:underline
                      prose-img:rounded-xl prose-img:border prose-img:border-inherit
                      prose-code:font-mono prose-code:text-xs prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
                      prose-pre:p-4 prose-pre:rounded-xl prose-pre:border prose-pre:border-inherit`}
@@ -457,7 +457,7 @@ function EmbedReaderContent() {
       {/* Sovereign Protocol Footer Attribution */}
       <footer className={`w-full py-4 px-6 border-t flex flex-wrap items-center justify-between gap-3 text-xs ${themeStyles.footerBorder}`}>
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="w-2 h-2 rounded-full bg-verified" />
           <span className="font-mono">Decentralized Content // IPFS Multihash</span>
         </div>
 
@@ -479,7 +479,7 @@ function EmbedReaderContent() {
 
 export default function EmbedPage() {
   return (
-    <Suspense fallback={<div className="w-full min-h-screen bg-[#090d16]" />}>
+    <Suspense fallback={<div className="w-full min-h-screen bg-[#0B0A0C]" />}>
       <EmbedReaderContent />
     </Suspense>
   );

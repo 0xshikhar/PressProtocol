@@ -46,7 +46,7 @@ export default function EmbedLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="w-full h-full min-h-screen m-0 p-0 antialiased selection:bg-emerald-500/30">
+    <div className="w-full h-full min-h-screen m-0 p-0 antialiased selection:bg-[#7C2733]/20 selection:text-[#EEE7E1]">
       {children}
     </div>
   );
