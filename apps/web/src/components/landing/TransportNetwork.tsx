@@ -1,17 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Network, ShieldAlert, CheckCircle2, Radio, Server, Globe, Cpu, RefreshCw } from "lucide-react";
+import { Globe, Server, RefreshCw, Radio } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-interface NodeStatus {
-  name: string;
-  type: string;
-  status: "active" | "blocked" | "fallback";
-  latency: string;
-  description: string;
-  circuit: string;
-}
+import { cn } from "@/lib/utils";
 
 export function TransportNetwork() {
   const [simulateBlock, setSimulateBlock] = useState(false);
@@ -21,7 +13,7 @@ export function TransportNetwork() {
     if (simulateBlock) {
       const timer = setTimeout(() => {
         setActiveRoute("tor");
-      }, 400);
+      }, 350);
       return () => clearTimeout(timer);
     } else {
       setActiveRoute("gateway");
@@ -29,214 +21,210 @@ export function TransportNetwork() {
   }, [simulateBlock]);
 
   return (
-    <section id="network" className="relative py-28 lg:py-36 bg-black text-white overflow-hidden border-t border-white/10">
-      {/* Background ambient accents */}
-      <div className="absolute top-1/4 right-10 w-96 h-96 rounded-full bg-emerald-950/20 blur-[130px] pointer-events-none" />
-      <div className="absolute bottom-10 left-10 w-96 h-96 rounded-full bg-cyan-950/20 blur-[130px] pointer-events-none" />
-
-      <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12">
-        {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-16 gap-6">
+    <section id="network" className="relative py-24 sm:py-32 bg-canvas text-primary overflow-hidden border-t border-hairline">
+      <div className="relative z-10 max-w-[1360px] mx-auto px-6 lg:px-12">
+        {/* Header: 1-Eyebrow Rule */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-14 gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white/5 border border-white/10 text-xs font-mono text-emerald-400 mb-6">
-              <Radio className="w-3.5 h-3.5 animate-pulse" />
-              <span>FAILOVER INFRASTRUCTURE</span>
+            <div className="text-[11px] font-mono tracking-widest text-muted uppercase mb-3">
+              Routing Topology &bull; Autonomous Failover
             </div>
-            <h2 className="font-display text-4xl sm:text-6xl lg:text-7xl tracking-tight leading-[0.95] text-white">
+            <h2 className="font-hero text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-[0.98] text-primary">
               Multi-Transport.
               <br />
-              <span className="text-white/40">Zero single point of blackout.</span>
+              <span className="text-secondary font-light">Zero single point of blackout.</span>
             </h2>
           </div>
-          <p className="max-w-md text-sm lg:text-base text-white/60 font-light leading-relaxed">
+          <p className="max-w-md text-base text-secondary font-light leading-relaxed measure-lead">
             Content addressing means URLs are not bound to any IP address, cloud host, or domain registrar. If an authoritarian ISP censors DNS or clearnet mirrors, clients fail over to Tor in milliseconds.
           </p>
         </div>
 
-        {/* Interactive Failover Sandbox Diagram */}
-        <div className="grid lg:grid-cols-12 gap-8 items-stretch mb-12">
-          {/* Main Visual Terminal / Network Diagram */}
-          <div className="lg:col-span-8 p-6 lg:p-10 rounded-2xl border border-white/10 bg-[#050811] relative overflow-hidden flex flex-col justify-between shadow-2xl">
+        {/* Interactive Failover Topology Diagram */}
+        <div className="grid lg:grid-cols-12 gap-8 items-stretch mb-8">
+          {/* Main Network Canvas */}
+          <div className="lg:col-span-8 p-6 lg:p-8 rounded-[6px] border border-hairline bg-surface relative overflow-hidden flex flex-col justify-between shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
             {/* Top Toolbar */}
-            <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-white/10">
-              <div className="flex items-center gap-3">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-mono text-xs uppercase tracking-wider text-white/80">
-                  Active In-Flight Packet Route:
+            <div className="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-hairline">
+              <div className="flex items-center gap-2.5">
+                <span
+                  className={cn(
+                    "w-2 h-2 rounded-full",
+                    activeRoute === "gateway" ? "bg-verified" : "bg-anonymous"
+                  )}
+                />
+                <span className="font-mono text-xs uppercase tracking-wider text-muted">
+                  Packet Routing:
                 </span>
-                <span className="font-mono text-xs text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
-                  {activeRoute === "gateway" ? "CLEANNET IPFS GATEWAY (FASTEST)" : "TOR ONION HIDDEN CIRCUIT (FAILOVER ACTIVE)"}
+                <span className="font-mono text-xs text-primary font-medium">
+                  {activeRoute === "gateway" ? "Clearnet Edge Gateway" : "Tor Onion Circuit (Failover Active)"}
                 </span>
               </div>
 
-              {/* Simulation Toggle Button */}
+              {/* Simulation Toggle Button: Section 10 Calm Neutral (Never alarm-red) */}
               <Button
                 size="sm"
+                variant="simulation"
                 onClick={() => setSimulateBlock(!simulateBlock)}
-                className={`font-mono text-xs h-9 px-4 transition-all ${simulateBlock
-                    ? "bg-red-500/20 text-red-300 border border-red-500/40 hover:bg-red-500/30"
-                    : "bg-white/10 text-white border border-white/20 hover:bg-white/20"
-                  }`}
+                className="font-mono text-xs h-8 px-3.5"
               >
                 {simulateBlock ? (
                   <>
-                    <RefreshCw className="w-3.5 h-3.5 mr-2 animate-spin" />
-                    Restore Clearnet Gateway
+                    <RefreshCw className="w-3.5 h-3.5 mr-1.5 text-muted" />
+                    Restore Clearnet Route
                   </>
                 ) : (
                   <>
-                    <ShieldAlert className="w-3.5 h-3.5 mr-2 text-amber-400" />
+                    <Radio className="w-3.5 h-3.5 mr-1.5 text-muted" />
                     Simulate ISP Gateway Block
                   </>
                 )}
               </Button>
             </div>
 
-            {/* Interactive SVG Diagram Canvas */}
-            <div className="my-8 relative min-h-[260px] flex items-center justify-between px-4 sm:px-12">
+            {/* SVG Diagram Canvas */}
+            <div className="my-10 relative min-h-[220px] flex items-center justify-between px-4 sm:px-10">
               {/* Client Reader Node */}
               <div className="flex flex-col items-center gap-2 z-10">
-                <div className="w-16 h-16 rounded-2xl border border-cyan-400/40 bg-cyan-950/40 flex items-center justify-center shadow-lg shadow-cyan-900/30">
-                  <Globe className="w-7 h-7 text-cyan-400" />
+                <div className="w-14 h-14 rounded-[6px] border border-hairline bg-overlay flex items-center justify-center shadow-sm">
+                  <Globe className="w-6 h-6 text-primary" />
                 </div>
-                <span className="font-mono text-xs text-white/90">Reader Client</span>
-                <span className="font-mono text-[10px] text-white/40">Web3 Browser / Agent</span>
+                <span className="font-mono text-xs text-primary font-medium">Reader Client</span>
+                <span className="font-mono text-[10px] text-muted">Browser / Agent</span>
               </div>
 
               {/* Connecting Wave SVG with 3 Parallel Transports */}
-              <div className="absolute inset-0 flex items-center pointer-events-none px-20">
-                <svg className="w-full h-44" viewBox="0 0 500 180" fill="none">
+              <div className="absolute inset-0 flex items-center pointer-events-none px-16">
+                <svg className="w-full h-40" viewBox="0 0 500 180" fill="none">
                   {/* Route 1: Clearnet CDN Edge */}
                   <path
-                    d="M 20 90 C 140 15, 260 15, 480 90"
-                    stroke={simulateBlock ? "rgba(239, 68, 68, 0.5)" : "rgba(6, 182, 212, 0.75)"}
-                    strokeWidth={simulateBlock ? "1.5" : "2.5"}
+                    d="M 20 90 C 140 20, 260 20, 480 90"
+                    stroke={simulateBlock ? "rgba(214, 92, 74, 0.45)" : "rgba(238, 231, 225, 0.5)"}
+                    strokeWidth={simulateBlock ? "1" : "2"}
                     strokeDasharray={simulateBlock ? "4 4" : "none"}
                   />
 
-                  {/* Route 2: Decentralized IPFS DHT (Middle parallel path) */}
+                  {/* Route 2: Decentralized IPFS DHT */}
                   <path
                     d="M 20 90 C 140 90, 260 90, 480 90"
-                    stroke="rgba(16, 185, 129, 0.4)"
+                    stroke="rgba(240, 232, 232, 0.18)"
                     strokeWidth="1.5"
-                    strokeDasharray="6 4"
+                    strokeDasharray="4 4"
                   />
 
-                  {/* Route 3: Tor Onion Circuit */}
+                  {/* Route 3: Tor Onion Circuit (#8770C4) */}
                   <path
-                    d="M 20 90 C 140 165, 260 165, 480 90"
-                    stroke={activeRoute === "tor" ? "rgba(168, 85, 247, 0.9)" : "rgba(255, 255, 255, 0.15)"}
-                    strokeWidth={activeRoute === "tor" ? "2.5" : "1.5"}
+                    d="M 20 90 C 140 160, 260 160, 480 90"
+                    stroke={activeRoute === "tor" ? "rgba(135, 112, 196, 0.95)" : "rgba(240, 232, 232, 0.15)"}
+                    strokeWidth={activeRoute === "tor" ? "2" : "1"}
                   />
                 </svg>
               </div>
 
               {/* Central Dynamic Switch Indicator */}
-              <div className="hidden sm:flex flex-col items-center gap-2 z-10">
+              <div className="hidden sm:flex flex-col items-center gap-1.5 z-10">
                 <div
-                  className={`px-4 py-2 rounded-xl border backdrop-blur-md transition-all duration-500 ${simulateBlock
-                      ? "border-purple-500/50 bg-purple-950/40 text-purple-200 ring-1 ring-purple-500/30"
-                      : "border-emerald-500/50 bg-emerald-950/40 text-emerald-300"
-                    }`}
+                  className={cn(
+                    "px-3.5 py-1.5 rounded-[6px] border text-xs font-mono transition-colors",
+                    simulateBlock
+                      ? "border-anonymous/30 bg-anonymous/10 text-anonymous"
+                      : "border-hairline bg-overlay text-secondary"
+                  )}
                 >
-                  <div className="font-mono text-xs font-semibold flex items-center gap-2">
-                    {simulateBlock ? (
-                      <>
-                        <ShieldAlert className="w-4 h-4 text-purple-400" />
-                        <span>TOR ONION ACTIVE · 420ms</span>
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                        <span>CLEARNET ACTIVE · 88ms</span>
-                      </>
-                    )}
-                  </div>
+                  {simulateBlock ? "Tor Onion Active &bull; 280ms" : "Clearnet Edge Active &bull; 38ms"}
                 </div>
-                <span className="font-mono text-[10px] text-white/40">
-                  {simulateBlock ? "Automatic Tor Reroute: <35ms" : "3-Way Parallel Transport Racing"}
+                <span className="font-mono text-[10px] text-muted">
+                  {simulateBlock ? "Automatic Reroute <25ms" : "Parallel Racing"}
                 </span>
               </div>
 
-              {/* Immutable IPFS Content Storage */}
+              {/* Decentralized Storage Node */}
               <div className="flex flex-col items-center gap-2 z-10">
-                <div className="w-16 h-16 rounded-2xl border border-emerald-400/40 bg-emerald-950/40 flex items-center justify-center shadow-lg shadow-emerald-900/30">
-                  <Server className="w-7 h-7 text-emerald-400" />
+                <div className="w-14 h-14 rounded-[6px] border border-hairline bg-overlay flex items-center justify-center shadow-sm">
+                  <Server className="w-6 h-6 text-primary" />
                 </div>
-                <span className="font-mono text-xs text-white/90">Decentralized DHT</span>
-                <span className="font-mono text-[10px] text-white/40">IPFS Pinning + Tor</span>
+                <span className="font-mono text-xs text-primary font-medium">Decentralized DHT</span>
+                <span className="font-mono text-[10px] text-muted">IPFS + Tor</span>
               </div>
             </div>
 
             {/* Bottom Real-time Telemetry Bar */}
-            <div className="p-4 rounded-xl bg-black/50 border border-white/10 font-mono text-xs flex flex-wrap items-center justify-between gap-3 text-white/70">
+            <div className="p-3.5 rounded-[6px] bg-canvas border border-hairline font-mono text-xs flex flex-wrap items-center justify-between gap-3 text-secondary">
               <div className="flex items-center gap-2">
-                <span className="text-cyan-400">STATUS:</span>
-                <span>
+                <span className="text-muted">STATE:</span>
+                <span className="text-primary font-sans text-xs">
                   {simulateBlock
-                    ? "HTTP 451 / DNS Poisoning detected on Primary CDN - Switched to Tor Onion Service (press7fk2...onion)"
-                    : "Primary gateway healthy - IPFS peer discovery active in the background"}
+                    ? "HTTP 451 / DNS Poisoning detected on Primary Edge — Traffic shifted to Tor Onion Circuit"
+                    : "Clearnet gateway reachable — IPFS peer discovery running concurrently"}
                 </span>
               </div>
-              <div className="text-white/40 text-[11px]">Failover Latency: 28ms</div>
+              <div className="text-muted text-[11px] tabular-nums">Failover Latency: 22ms</div>
             </div>
           </div>
 
-          {/* Right Status Cards */}
-          <div className="lg:col-span-4 flex flex-col gap-4">
-            {/* Gateway 1: Pinata IPFS */}
-            <div className="p-6 rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] transition-all flex flex-col justify-between">
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-display text-xl text-white">IPFS Gateway (Pinata)</span>
-                <span
-                  className={`font-mono text-[11px] px-2 py-0.5 rounded ${simulateBlock
-                      ? "bg-red-500/10 text-red-400 border border-red-500/20"
-                      : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                    }`}
-                >
-                  {simulateBlock ? "BLOCKED / DNS POISONED" : "● OPERATIONAL"}
-                </span>
+          {/* Right Status Cards (Section 4.1 Card Elevation) */}
+          <div className="lg:col-span-4 flex flex-col gap-3.5">
+            {/* Gateway 1: IPFS Gateway */}
+            <div className="p-5 rounded-[6px] border border-hairline bg-surface flex flex-col justify-between flex-1 shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-sans text-sm font-semibold text-primary">Edge Mirror (Clearnet)</span>
+                  <span
+                    className={cn(
+                      "font-mono text-[10px] px-1.5 py-0.5 rounded-[4px]",
+                      simulateBlock
+                        ? "text-error bg-error/10 border border-error/20"
+                        : "text-verified bg-verified/10 border border-verified/20"
+                    )}
+                  >
+                    {simulateBlock ? "BLOCKED" : "OPERATIONAL"}
+                  </span>
+                </div>
+                <p className="text-xs text-secondary font-light leading-relaxed mb-3">
+                  Anycast edge gateway caching immutable CIDs for sub-100ms global read latencies.
+                </p>
               </div>
-              <p className="text-xs text-white/50 leading-relaxed mb-4">
-                Clearnet CDN edge gateway caching immutable content CIDs for sub-100ms global read latencies.
-              </p>
-              <div className="flex items-center justify-between font-mono text-xs text-white/40 border-t border-white/5 pt-3">
-                <span>Latency: {simulateBlock ? "TIMEOUT" : "88ms"}</span>
-                <span>Mirror: gateway.pinata.cloud</span>
-              </div>
-            </div>
-
-            {/* Gateway 2: Tor Hidden Service */}
-            <div className="p-6 rounded-2xl border border-purple-500/30 bg-purple-950/10 hover:bg-purple-950/20 transition-all flex flex-col justify-between shadow-lg">
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-display text-xl text-white">Tor Onion Service</span>
-                <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/30">
-                  ● RESISTANT TO DNS/IP BLOCKS
-                </span>
-              </div>
-              <p className="text-xs text-white/50 leading-relaxed mb-4">
-                End-to-end encrypted .onion rendezvous circuit resistant to DNS seizures, BGP hijacking, and ISP blocking.
-              </p>
-              <div className="flex items-center justify-between font-mono text-xs text-white/40 border-t border-white/5 pt-3">
-                <span>Latency: 420ms (Tor hop)</span>
-                <span>Circuit: 3-Hop Onion Guard</span>
+              <div className="flex items-center justify-between font-mono text-[11px] text-muted pt-2 border-t border-hairline">
+                <span className="tabular-nums">Latency: {simulateBlock ? "TIMEOUT" : "38ms"}</span>
+                <span>gateway.pinata.cloud</span>
               </div>
             </div>
 
-            {/* Gateway 3: Secondary Mirrors */}
-            <div className="p-6 rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] transition-all flex flex-col justify-between">
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-display text-xl text-white">IPFS.io & Cloudflare</span>
-                <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-                  ● FALLBACK STANDBY
-                </span>
+            {/* Gateway 2: Tor Onion Service */}
+            <div className="p-5 rounded-[6px] border border-hairline bg-surface flex flex-col justify-between flex-1 shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-sans text-sm font-semibold text-primary">Tor Onion Service</span>
+                  <span className="font-mono text-[10px] px-1.5 py-0.5 rounded-[4px] text-anonymous bg-anonymous/10 border border-anonymous/20">
+                    ANTI-CENSORSHIP
+                  </span>
+                </div>
+                <p className="text-xs text-secondary font-light leading-relaxed mb-3">
+                  End-to-end encrypted .onion rendezvous circuit immune to domain seizures and BGP hijacking.
+                </p>
               </div>
-              <p className="text-xs text-white/50 leading-relaxed mb-4">
-                Secondary public gateways distributed across North America, Europe, and Asia-Pacific.
-              </p>
-              <div className="flex items-center justify-between font-mono text-xs text-white/40 border-t border-white/5 pt-3">
-                <span>Latency: 124ms</span>
-                <span>Mirrors: 14 Active Nodes</span>
+              <div className="flex items-center justify-between font-mono text-[11px] text-muted pt-2 border-t border-hairline">
+                <span className="tabular-nums">Latency: 280ms</span>
+                <span>3-Hop Guard Circuit</span>
+              </div>
+            </div>
+
+            {/* Gateway 3: Secondary Swarm */}
+            <div className="p-5 rounded-[6px] border border-hairline bg-surface flex flex-col justify-between flex-1 shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-sans text-sm font-semibold text-primary">Public P2P Swarm</span>
+                  <span className="font-mono text-[10px] px-1.5 py-0.5 rounded-[4px] text-secondary bg-overlay border border-hairline">
+                    DHT BACKUP
+                  </span>
+                </div>
+                <p className="text-xs text-secondary font-light leading-relaxed mb-3">
+                  Secondary public nodes distributed across global independent edge providers.
+                </p>
+              </div>
+              <div className="flex items-center justify-between font-mono text-[11px] text-muted pt-2 border-t border-hairline">
+                <span className="tabular-nums">Latency: 142ms</span>
+                <span>320 Active Peers</span>
               </div>
             </div>
           </div>

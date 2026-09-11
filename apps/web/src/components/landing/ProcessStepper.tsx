@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { PenLine, Key, Share2, CheckCircle2, Shield, Code, ArrowRight } from "lucide-react";
+import { useEffect, useState } from "react";
+import { CheckCircle2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const steps = [
   {
     number: "01",
-    tag: "CLIENT COMPOSITION",
+    tag: "Sanitization",
     title: "Write & Sanitize",
-    subtitle: "Zero-telemetry drafting",
+    subtitle: "Zero-telemetry drafting in browser memory",
     description:
       "Draft in our minimal distraction-free editor or import directly from WordPress or Ghost. HTML is deterministically sanitized client-side against strict XSS and tracking allowlists before leaving your browser.",
     bullets: [
@@ -27,11 +28,11 @@ const cleanEnvelope = sanitizeArticle({
   },
   {
     number: "02",
-    tag: "CLIENT CRYPTOGRAPHY",
-    title: "Cryptographic Signing",
+    tag: "Cryptography",
+    title: "Cryptographic Attestation",
     subtitle: "Client-side Ed25519, key never leaves device",
     description:
-      "An Ed25519 keypair is generated in volatile browser memory. The private key signs the canonical SHA-256 hash of the sanitized payload. The private key is discarded immediately after signing; your identity is your public key.",
+      "An Ed25519 keypair is generated in volatile browser memory. The private key signs the canonical RFC 8785 SHA-256 hash of the sanitized payload. The private key is discarded immediately after signing; your identity is your public key.",
     bullets: [
       "Volatile memory only - never touches disk or server",
       "Ed25519 high-speed elliptic curve signatures",
@@ -47,7 +48,7 @@ const authorPubKey = ed25519.getPublicKey(volatilePrivKey);
   },
   {
     number: "03",
-    tag: "MULTI-NETWORK RESILIENCE",
+    tag: "Replication",
     title: "Multi-Transport Pinning",
     subtitle: "Simultaneous IPFS + Tor replication",
     description:
@@ -55,7 +56,7 @@ const authorPubKey = ed25519.getPublicKey(volatilePrivKey);
     bullets: [
       "Immutable IPFS content addressing (CIDv1)",
       "Tor hidden service onion circuit redundancy",
-      "Zero single points of failure across 30+ countries",
+      "Zero single points of failure across independent nodes",
     ],
     code: `// 3. Multi-Transport Distribution
 const bundle = await publishMultiTransport({
@@ -73,12 +74,12 @@ export function ProcessStepper() {
   const [activeStep, setActiveStep] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const STEP_DURATION = 6000; // 6 seconds per step
+  const STEP_DURATION = 6000;
 
   useEffect(() => {
     if (isPaused) return;
 
-    const interval = 50; // update progress every 50ms
+    const interval = 50;
     const stepIncrement = (interval / STEP_DURATION) * 100;
 
     const timer = setInterval(() => {
@@ -100,30 +101,26 @@ export function ProcessStepper() {
   };
 
   return (
-    <section id="process" className="relative py-28 lg:py-36 bg-[#04070e] text-white overflow-hidden border-t border-white/10">
-      {/* Background radial glow */}
-      <div className="absolute top-1/2 left-1/3 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-cyan-950/20 blur-[140px] pointer-events-none" />
-
-      <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12">
-        {/* Section Header */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-16 gap-6">
+    <section id="process" className="relative py-24 sm:py-32 bg-canvas text-primary border-t border-hairline">
+      <div className="max-w-[1360px] mx-auto px-6 lg:px-12">
+        {/* Section Header: 1-Eyebrow Rule */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-14 gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white/5 border border-white/10 text-xs font-mono text-cyan-400 mb-6">
-              <span>●</span>
-              <span>VERIFIED WORKFLOW</span>
+            <div className="text-[11px] font-mono tracking-widest text-muted uppercase mb-3">
+              Verified Architecture &bull; Client Lifecycle
             </div>
-            <h2 className="font-display text-4xl sm:text-6xl lg:text-7xl tracking-tight leading-[0.95] text-white">
+            <h2 className="font-hero text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-[0.98] text-primary">
               Deterministic.
               <br />
-              <span className="text-white/40">From keystroke to peer.</span>
+              <span className="text-secondary font-light">From keystroke to peer.</span>
             </h2>
           </div>
-          <p className="max-w-md text-sm lg:text-base text-white/60 font-light leading-relaxed">
-            Every publication executes a verifiable, mathematically provable cryptographic cycle designed to survive state censorship and gateway manipulation.
+          <p className="max-w-md text-base text-secondary font-light leading-relaxed measure-lead">
+            Every publication executes a verifiable, mathematically provable cryptographic cycle designed to survive network censorship and gateway manipulation.
           </p>
         </div>
 
-        {/* 3-Card Stepper Header Grid */}
+        {/* 3-Card Stepper Header Grid (Section 3.3: Authentic 01/02/03 sequence) */}
         <div className="grid md:grid-cols-3 gap-4 lg:gap-6 mb-8">
           {steps.map((step, idx) => {
             const isActive = activeStep === idx;
@@ -133,16 +130,18 @@ export function ProcessStepper() {
                 onClick={() => handleStepClick(idx)}
                 onMouseEnter={() => setIsPaused(true)}
                 onMouseLeave={() => setIsPaused(false)}
-                className={`relative p-6 lg:p-8 rounded-2xl border cursor-pointer transition-all duration-300 ${isActive
-                    ? "bg-white/[0.05] border-cyan-500/50 shadow-lg shadow-cyan-950/30"
-                    : "bg-white/[0.015] border-white/10 hover:border-white/20 hover:bg-white/[0.03]"
-                  }`}
+                className={cn(
+                  "relative p-6 rounded-[6px] border cursor-pointer transition-all duration-200 shadow-[0_1px_2px_rgba(0,0,0,0.3)]",
+                  isActive
+                    ? "bg-elevated border-focus"
+                    : "bg-surface border-hairline hover:border-focus"
+                )}
               >
-                {/* Progress bar line for active step */}
-                <div className="absolute top-0 left-0 right-0 h-1 overflow-hidden rounded-t-2xl bg-white/5">
+                {/* Progress bar line for active step: Press Burgundy accent */}
+                <div className="absolute top-0 left-0 right-0 h-0.5 overflow-hidden rounded-t-[6px] bg-white/[0.04]">
                   {isActive && (
                     <div
-                      className="h-full bg-gradient-to-r from-cyan-500 to-emerald-400 transition-all duration-75"
+                      className="h-full bg-[var(--accent-primary)] transition-all duration-75"
                       style={{ width: `${progress}%` }}
                     />
                   )}
@@ -150,50 +149,53 @@ export function ProcessStepper() {
 
                 <div className="flex items-center justify-between mb-4">
                   <span
-                    className={`font-mono text-2xl lg:text-3xl font-bold ${isActive ? "text-cyan-400" : "text-white/30"
-                      }`}
+                    className={cn(
+                      "font-mono text-xl font-medium tabular-nums",
+                      isActive ? "text-primary" : "text-muted"
+                    )}
                   >
                     {step.number}
                   </span>
-                  <span className="font-mono text-[10px] uppercase tracking-wider text-white/40 px-2 py-0.5 rounded bg-white/5">
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-secondary px-2 py-0.5 rounded-[4px] bg-overlay border border-hairline">
                     {step.tag}
                   </span>
                 </div>
 
-                <h3 className="font-display text-2xl lg:text-3xl text-white mb-2 font-medium">
+                {/* Section 3.1 & 10: Inter ONLY for card title */}
+                <h3 className="font-sans text-lg font-semibold text-primary mb-1.5 tracking-tight">
                   {step.title}
                 </h3>
-                <p className="text-xs lg:text-sm text-white/50 line-clamp-2">{step.subtitle}</p>
+                <p className="font-sans text-xs text-secondary line-clamp-2 leading-relaxed">{step.subtitle}</p>
               </div>
             );
           })}
         </div>
 
-        {/* Detailed Active Step Inspector Panel */}
+        {/* Detailed Active Step Inspector Panel (Card Elevation) */}
         <div
           key={activeStep}
-          className="relative rounded-2xl border border-white/10 bg-black/60 backdrop-blur-2xl p-6 lg:p-12 overflow-hidden shadow-2xl animate-in fade-in duration-200"
+          className="relative rounded-[6px] border border-hairline bg-surface p-6 lg:p-10 overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.3)]"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
           <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             {/* Left Column: Description & Guarantees */}
             <div className="lg:col-span-6 flex flex-col justify-center">
-              <div className="inline-flex items-center gap-2 font-mono text-xs text-emerald-400 mb-3">
-                <CheckCircle2 className="w-4 h-4" />
-                <span>STEP {steps[activeStep].number} SPECIFICATION</span>
+              <div className="inline-flex items-center gap-2 font-mono text-xs text-muted mb-3">
+                <CheckCircle2 className="w-4 h-4 text-verified" />
+                <span>Phase {steps[activeStep].number} &bull; Client Execution</span>
               </div>
-              <h4 className="font-display text-3xl lg:text-4xl text-white mb-4">
+              <h4 className="font-sans text-2xl lg:text-3xl font-semibold text-primary mb-4 tracking-tight">
                 {steps[activeStep].title}
               </h4>
-              <p className="text-white/70 text-sm lg:text-base leading-relaxed mb-6 font-light">
+              <p className="text-secondary text-sm lg:text-base leading-relaxed mb-6 font-light measure-lead">
                 {steps[activeStep].description}
               </p>
 
-              <div className="space-y-3 pt-4 border-t border-white/10">
+              <div className="space-y-2.5 pt-4 border-t border-hairline">
                 {steps[activeStep].bullets.map((bullet, i) => (
-                  <div key={i} className="flex items-center gap-3 text-xs lg:text-sm text-white/80">
-                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shrink-0" />
+                  <div key={i} className="flex items-center gap-2.5 text-xs lg:text-sm text-secondary">
+                    <span className="w-1.5 h-1.5 rounded-full bg-verified shrink-0" />
                     <span>{bullet}</span>
                   </div>
                 ))}
@@ -202,24 +204,24 @@ export function ProcessStepper() {
 
             {/* Right Column: Code Terminal */}
             <div className="lg:col-span-6">
-              <div className="rounded-xl border border-white/10 bg-[#060a12] overflow-hidden shadow-2xl">
+              <div className="rounded-[6px] border border-hairline bg-canvas overflow-hidden">
                 {/* Terminal Header */}
-                <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-white/[0.02]">
+                <div className="flex items-center justify-between px-4 py-2.5 border-b border-hairline bg-surface">
                   <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
-                    <span className="ml-2 font-mono text-[11px] text-white/40">
+                    <div className="w-2 h-2 rounded-full bg-muted/40" />
+                    <div className="w-2 h-2 rounded-full bg-muted/40" />
+                    <div className="w-2 h-2 rounded-full bg-muted/40" />
+                    <span className="ml-2 font-mono text-[11px] text-muted">
                       protocol-step-{steps[activeStep].number}.ts
                     </span>
                   </div>
-                  <span className="font-mono text-[10px] text-cyan-400/70 uppercase">
-                    TypeScript SDK
+                  <span className="font-mono text-[10px] text-muted uppercase">
+                    TypeScript
                   </span>
                 </div>
 
                 {/* Code Content */}
-                <div className="p-5 font-mono text-xs text-white/90 overflow-x-auto leading-relaxed bg-[#02050a]">
+                <div className="p-5 font-mono text-xs text-primary/90 overflow-x-auto leading-relaxed bg-[#0E0C0E]">
                   <pre>
                     <code>{steps[activeStep].code}</code>
                   </pre>

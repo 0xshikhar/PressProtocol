@@ -1,6 +1,6 @@
 "use client";
 
-import { ShieldCheck, Lock, EyeOff, ServerOff, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
+import { ShieldCheck, Lock, EyeOff, ServerOff, CheckCircle2, XCircle } from "lucide-react";
 
 const threatGuarantees = [
   {
@@ -26,7 +26,7 @@ const threatGuarantees = [
     title: "ISP & DNS Poisoning Resilience",
     subtitle: "Domain seizures cannot kill articles",
     description:
-      "Content is addressed by immutable SHA-256 CID, not DNS names. If `pressprotocol.com` is blocked or revoked by a government registrar, articles remain reachable via IPFS gateways, Tor `.onion`, or the browser extension.",
+      "Content is addressed by immutable SHA-256 CID, not DNS names. If pressprotocol.com is blocked or revoked by a government registrar, articles remain reachable via IPFS gateways, Tor .onion, or the browser extension.",
     vector: "DNS Hijacking & Domain Revocation",
     mitigation: "Content-Addressed Routing",
   },
@@ -45,88 +45,81 @@ const comparisonMatrix = [
   {
     feature: "Single Point of Take-Down",
     centralized: "Single database query deletes article globally",
-    pressprotocol: "Impossible; decentralized across IPFS & Tor",
-    winner: true,
+    pressprotocol: "Decentralized replication across IPFS & Tor",
   },
   {
     feature: "Identity Requirement",
-    centralized: "Credit card, phone number, or KYC email",
-    pressprotocol: "0 accounts; ephemeral or persistent Ed25519 keys",
-    winner: true,
+    centralized: "Credit card, phone number, or verified email",
+    pressprotocol: "Zero accounts; ephemeral or persistent Ed25519 keys",
   },
   {
     feature: "Domain Seizure Resistance",
     centralized: "Domain seizure removes 100% of publications",
     pressprotocol: "Survives via CID, Tor hidden service, & browser extension",
-    winner: true,
   },
   {
     feature: "Content Integrity Assurance",
     centralized: "Trust the database admin not to alter text",
     pressprotocol: "Cryptographically verified SHA-256 Ed25519 signature",
-    winner: true,
   },
 ];
 
 export function PrivacyThreatModel() {
   return (
-    <section id="security" className="relative py-28 lg:py-36 bg-[#02050a] text-white overflow-hidden border-t border-white/10">
-      {/* Background glow */}
-      <div className="absolute top-1/3 left-1/4 w-[600px] h-[600px] rounded-full bg-cyan-950/15 blur-[150px] pointer-events-none" />
-
-      <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12">
-        {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-16 gap-6">
+    <section id="security" className="relative py-24 sm:py-32 bg-canvas text-primary overflow-hidden border-t border-hairline">
+      <div className="relative z-10 max-w-[1360px] mx-auto px-6 lg:px-12">
+        {/* Header: 1-Eyebrow Rule */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-14 gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white/5 border border-white/10 text-xs font-mono text-cyan-400 mb-6">
-              <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
-              <span>FORMAL THREAT MODEL & VERIFIABLE SPECIFICATION</span>
+            <div className="text-[11px] font-mono tracking-widest text-muted uppercase mb-3">
+              Security Specification &bull; Adversarial Threat Model
             </div>
-            <h2 className="font-display text-4xl sm:text-6xl lg:text-7xl tracking-tight leading-[0.95] text-white">
+            <h2 className="font-hero text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-[0.98] text-primary">
               Institutional assurance.
               <br />
-              <span className="text-white/40">Mathematical guarantees.</span>
+              <span className="text-secondary font-light">Mathematical guarantees.</span>
             </h2>
           </div>
-          <p className="max-w-md text-sm lg:text-base text-white/60 font-light leading-relaxed">
-            Designed to withstand aggressive nation-state censorship, BGP route hijacking, and rogue intermediary gateways.
+          <p className="max-w-md text-base text-secondary font-light leading-relaxed measure-lead">
+            Designed to withstand state-level network blocks, BGP route hijacking, and rogue intermediary gateways.
           </p>
         </div>
 
-        {/* 4 Threat Model Cards */}
-        <div className="grid md:grid-cols-2 gap-6 mb-16">
-          {threatGuarantees.map((item, idx) => {
+        {/* 4 Threat Model Cards (Elevation: Card, Inter Typography) */}
+        <div className="grid md:grid-cols-2 gap-6 mb-14">
+          {threatGuarantees.map((item) => {
             const Icon = item.icon;
             return (
               <div
                 key={item.title}
-                className="p-8 rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] transition-all flex flex-col justify-between group shadow-xl"
+                className="p-7 rounded-[6px] border border-hairline bg-surface hover:border-focus transition-all flex flex-col justify-between shadow-[0_1px_2px_rgba(0,0,0,0.3)]"
               >
                 <div>
-                  <div className="flex items-center justify-between gap-4 mb-6">
-                    <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-cyan-400 group-hover:border-cyan-400/40 transition-colors">
-                      <Icon className="w-6 h-6" />
+                  <div className="flex items-center justify-between gap-4 mb-5">
+                    <div className="w-10 h-10 rounded-[6px] bg-overlay border border-hairline flex items-center justify-center text-primary">
+                      <Icon className="w-5 h-5" />
                     </div>
-                    <div className="text-right">
-                      <span className="font-mono text-[10px] text-white/40 uppercase block">
+                    <div className="text-right font-mono text-xs">
+                      <span className="text-[10px] text-muted uppercase block">
                         Threat Vector
                       </span>
-                      <span className="font-mono text-xs text-amber-400/90">{item.vector}</span>
+                      <span className="text-secondary">{item.vector}</span>
                     </div>
                   </div>
 
-                  <h3 className="font-display text-2xl lg:text-3xl text-white mb-2">
+                  {/* Section 3.1 & 10: Inter ONLY for card titles */}
+                  <h3 className="font-sans text-xl font-semibold text-primary mb-1.5 tracking-tight">
                     {item.title}
                   </h3>
-                  <p className="font-mono text-xs text-cyan-400/80 mb-4">{item.subtitle}</p>
-                  <p className="text-white/70 text-sm leading-relaxed font-light mb-6">
+                  <p className="font-mono text-xs text-muted mb-3">{item.subtitle}</p>
+                  <p className="text-secondary text-sm leading-relaxed font-light mb-6 measure-reading">
                     {item.description}
                   </p>
                 </div>
 
-                <div className="pt-4 border-t border-white/10 flex items-center justify-between font-mono text-xs">
-                  <span className="text-white/50 uppercase tracking-wider text-[10px] font-semibold">Primary Defense:</span>
-                  <span className="text-emerald-400 flex items-center gap-1.5 font-bold">
+                <div className="pt-3 border-t border-hairline flex items-center justify-between font-mono text-xs">
+                  <span className="text-muted uppercase text-[10px]">Primary Defense:</span>
+                  <span className="text-verified flex items-center gap-1.5 font-medium">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     {item.mitigation}
                   </span>
@@ -136,32 +129,34 @@ export function PrivacyThreatModel() {
           })}
         </div>
 
-        {/* Institutional Threat Matrix Comparison Table */}
-        <div className="rounded-2xl border border-white/10 bg-black/60 backdrop-blur-2xl overflow-hidden p-6 lg:p-10 shadow-2xl">
-          <h3 className="font-display text-2xl lg:text-3xl text-white mb-6">
-            Architecture Comparison: Centralized CMS vs. PressProtocol
+        {/* Threat Matrix Comparison Table */}
+        <div className="rounded-[6px] border border-hairline bg-surface overflow-hidden p-6 lg:p-8 shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+          <h3 className="font-sans text-xl font-semibold text-primary mb-5 tracking-tight">
+            Architecture Comparison: Centralized Cloud vs. PressProtocol
           </h3>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left font-mono text-xs">
+            <table className="w-full text-left font-mono text-xs border-collapse">
               <thead>
-                <tr className="border-b border-white/10 text-white/40 uppercase tracking-wider">
-                  <th className="pb-4 font-normal">Threat Dimension</th>
-                  <th className="pb-4 font-normal">Traditional Centralized Publishing (hosted CMS, blog platforms)</th>
-                  <th className="pb-4 font-normal text-cyan-400">PressProtocol Multi-Transport</th>
+                <tr className="border-b border-hairline text-muted text-[11px] uppercase tracking-wider">
+                  <th className="pb-3.5 font-medium">Threat Dimension</th>
+                  <th className="pb-3.5 font-medium">Traditional Centralized Publishing</th>
+                  <th className="pb-3.5 font-medium text-primary">PressProtocol Multi-Transport</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-hairline">
                 {comparisonMatrix.map((row) => (
-                  <tr key={row.feature} className="hover:bg-white/[0.02] transition-colors">
-                    <td className="py-4 font-semibold text-white/90">{row.feature}</td>
-                    <td className="py-4 text-white/50 pr-4 flex items-center gap-2">
-                      <XCircle className="w-4 h-4 text-red-400/70 shrink-0" />
-                      <span>{row.centralized}</span>
-                    </td>
-                    <td className="py-4 text-emerald-400 font-semibold">
+                  <tr key={row.feature} className="hover:bg-overlay/20 transition-colors">
+                    <td className="py-3.5 font-medium text-primary pr-4">{row.feature}</td>
+                    <td className="py-3.5 text-secondary pr-4">
                       <div className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                        <XCircle className="w-3.5 h-3.5 text-error shrink-0" />
+                        <span>{row.centralized}</span>
+                      </div>
+                    </td>
+                    <td className="py-3.5 text-verified">
+                      <div className="flex items-center gap-2 font-medium">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-verified shrink-0" />
                         <span>{row.pressprotocol}</span>
                       </div>
                     </td>
