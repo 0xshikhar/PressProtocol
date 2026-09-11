@@ -43,7 +43,7 @@ export function IndexerSettings() {
   const handleToggle = (url: string) => {
     discoveryService.toggleIndexer(url);
     loadIndexers();
-    toast.success("Indexer updated - refresh explore page to see changes");
+    toast.success("Indexer status updated");
   };
 
   const handleRemove = (url: string) => {
@@ -61,7 +61,7 @@ export function IndexerSettings() {
     // Validate URL
     try {
       new URL(newIndexerUrl);
-    } catch (error) {
+    } catch {
       toast.error("Invalid URL format");
       return;
     }
@@ -77,61 +77,62 @@ export function IndexerSettings() {
     loadIndexers();
     setShowAddDialog(false);
     setNewIndexerUrl("");
-    toast.success("Indexer added - refresh explore page to see changes");
+    toast.success("Indexer added");
   };
 
-  const getTypeColor = (type: IndexerConfig["type"]) => {
+  const getTypeBadgeClass = (type: IndexerConfig["type"]) => {
     switch (type) {
       case "official":
-        return "bg-green-500";
+        return "bg-verified/10 text-verified border-verified/30";
       case "community":
-        return "bg-blue-500";
+        return "bg-overlay text-secondary border-hairline";
       case "self-hosted":
-        return "bg-purple-500";
+        return "bg-anonymous/10 text-anonymous border-anonymous/30";
+      default:
+        return "bg-surface-raised text-secondary border-border/60";
     }
   };
 
   return (
-    <Card className="border-white/10 bg-[#0B0D14] text-white">
-      <CardHeader>
-        <div className="flex items-center justify-between">
+    <Card className="border-border/60 bg-surface text-primary rounded-[6px]">
+      <CardHeader className="pb-4 border-b border-border/60">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <CardTitle className="text-lg font-sans font-semibold text-white">Indexer Configuration</CardTitle>
-            <CardDescription className="text-zinc-400">
-              Manage indexers for content discovery. The system tries each indexer in order
-              and falls back to IPFS DHT if all fail.
+            <CardTitle className="text-base font-sans font-semibold text-primary">Indexer Configuration</CardTitle>
+            <CardDescription className="text-xs text-muted mt-1">
+              Manage indexers for content discovery. The system queries indexers in sequence and falls back to DHT if unreachable.
             </CardDescription>
           </div>
           <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
             <DialogTrigger asChild>
-              <Button size="sm" className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold text-xs rounded-md">
-                <Plus className="h-4 w-4 mr-2" />
+              <Button size="sm" className="bg-accent-primary hover:bg-accent-hover text-primary font-mono text-xs rounded-[6px] h-9 px-4 shrink-0">
+                <Plus className="h-3.5 w-3.5 mr-1.5" />
                 Add Indexer
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-[#15151C] border-white/10 text-white">
+            <DialogContent className="bg-surface border-border/80 text-primary rounded-[6px] max-w-md">
               <DialogHeader>
-                <DialogTitle className="text-lg font-sans font-semibold text-white">Add Custom Indexer</DialogTitle>
-                <DialogDescription className="text-neutral-400">
+                <DialogTitle className="text-lg font-sans font-semibold text-primary">Add Custom Indexer</DialogTitle>
+                <DialogDescription className="text-xs text-muted">
                   Add a community or self-hosted indexer to improve discovery speed and redundancy.
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 mt-4">
-                <div>
-                  <Label htmlFor="indexer-url" className="text-xs text-neutral-400">Indexer URL</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="indexer-url" className="text-xs font-mono text-secondary">Indexer URL</Label>
                   <Input
                     id="indexer-url"
                     placeholder="https://indexer.example.com"
                     value={newIndexerUrl}
                     onChange={(e) => setNewIndexerUrl(e.target.value)}
-                    className="mt-1 bg-black/60 border-white/10 text-white placeholder:text-neutral-500"
+                    className="bg-background border-border/70 text-primary placeholder:text-muted/50 rounded-[6px] font-mono text-xs h-10"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="indexer-type" className="text-xs text-neutral-400">Type</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="indexer-type" className="text-xs font-mono text-secondary">Type</Label>
                   <select
                     id="indexer-type"
-                    className="w-full border border-white/10 rounded-md p-2 bg-black/60 text-white mt-1"
+                    className="w-full border border-border/70 rounded-[6px] px-3 py-2 bg-background text-primary font-mono text-xs"
                     value={newIndexerType}
                     onChange={(e) => setNewIndexerType(e.target.value as any)}
                   >
@@ -139,7 +140,7 @@ export function IndexerSettings() {
                     <option value="self-hosted">Self-Hosted</option>
                   </select>
                 </div>
-                <Button onClick={handleAdd} className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold">
+                <Button onClick={handleAdd} className="w-full bg-accent-primary hover:bg-accent-hover text-primary font-mono text-xs rounded-[6px] h-10">
                   Add Indexer
                 </Button>
               </div>
@@ -147,37 +148,39 @@ export function IndexerSettings() {
           </Dialog>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-5 space-y-4">
         <div className="space-y-3">
           {indexers.map((indexer) => (
             <div
               key={indexer.url}
-              className="flex items-center justify-between p-4 border border-white/10 bg-white/[0.03] rounded-xl text-white"
+              className="flex items-center justify-between p-4 border border-border/60 bg-surface-raised rounded-[6px] text-primary"
             >
-              <div className="flex items-center gap-3 flex-1">
-                <Server className="h-5 w-5 text-cyan-400" />
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-sm text-neutral-200">{indexer.url}</span>
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="h-8 w-8 rounded-[6px] bg-background border border-border/60 flex items-center justify-center text-secondary shrink-0">
+                  <Server className="h-4 w-4 text-secondary" />
+                </div>
+                <div className="flex-1 min-w-0 pr-4">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-mono text-xs text-primary truncate">{indexer.url}</span>
                     <Badge
                       variant="outline"
-                      className={`text-xs ${getTypeColor(indexer.type)} text-white border-0`}
+                      className={`text-[10px] font-mono rounded-[6px] px-2 py-0.5 border ${getTypeBadgeClass(indexer.type)}`}
                     >
                       {indexer.type}
                     </Badge>
                   </div>
-                  <div className="text-xs text-neutral-400 mt-1 font-mono">
-                    {indexer.trusted ? "Trusted" : "Untrusted"} •{" "}
+                  <div className="text-[11px] text-muted mt-1 font-mono">
+                    {indexer.trusted ? "Trusted" : "Untrusted"} &bull;{" "}
                     {indexer.enabled ? "Active" : "Disabled"}
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0">
                 <div className="flex items-center gap-2">
                   {indexer.enabled ? (
-                    <CheckCircle className="h-4 w-4 text-emerald-400" />
+                    <CheckCircle className="h-4 w-4 text-verified" />
                   ) : (
-                    <XCircle className="h-4 w-4 text-red-400" />
+                    <XCircle className="h-4 w-4 text-muted" />
                   )}
                   <Switch
                     checked={indexer.enabled}
@@ -189,9 +192,9 @@ export function IndexerSettings() {
                     variant="ghost"
                     size="sm"
                     onClick={() => handleRemove(indexer.url)}
-                    className="text-neutral-400 hover:text-red-400"
+                    className="text-muted hover:text-primary hover:bg-overlay h-8 w-8 p-0 rounded-[6px]"
                   >
-                    <Trash2 className="h-4 w-4 text-destructive" />
+                    <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 )}
               </div>
@@ -200,20 +203,20 @@ export function IndexerSettings() {
         </div>
 
         {indexers.length === 0 && (
-          <div className="text-center py-8 text-neutral-400">
-            <Server className="h-12 w-12 mx-auto mb-3 opacity-30 text-cyan-400" />
-            <p>No indexers configured</p>
-            <p className="text-xs mt-1 text-neutral-500">Add an indexer to enable fast discovery</p>
+          <div className="text-center py-8 text-muted">
+            <Server className="h-10 w-10 mx-auto mb-3 opacity-30 text-muted" />
+            <p className="text-xs font-mono">No indexers configured</p>
+            <p className="text-[11px] mt-1 text-muted/70">Add an indexer to enable fast discovery</p>
           </div>
         )}
 
-        <div className="mt-6 p-4 bg-white/[0.03] border border-white/10 rounded-xl text-sm">
-          <p className="font-medium text-white mb-2">🔒 Privacy & Decentralization</p>
-          <ul className="space-y-1 text-xs text-neutral-400">
-            <li>• Indexers improve speed but are optional</li>
-            <li>• Content always stays on IPFS (source of truth)</li>
-            <li>• If all indexers fail, DHT fallback activates</li>
-            <li>• Disable all indexers for maximum privacy (slower)</li>
+        <div className="mt-6 p-4 bg-background border border-border/60 rounded-[6px] text-xs">
+          <p className="font-mono font-medium text-primary mb-2">Privacy &amp; Swarm Redundancy</p>
+          <ul className="space-y-1.5 text-xs text-muted font-sans">
+            <li>&bull; Indexers accelerate content lookups but are strictly non-custodial</li>
+            <li>&bull; Content always resides directly on IPFS and Tor v3 onion networks</li>
+            <li>&bull; If all indexers fail or go offline, DHT distributed fallback activates</li>
+            <li>&bull; Disable all indexers for maximum anonymity with higher network latency</li>
           </ul>
         </div>
       </CardContent>

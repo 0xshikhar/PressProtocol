@@ -9,17 +9,13 @@ import {
   Server,
   Bookmark,
   ShieldCheck,
-  Shield,
   Layers,
-  Globe,
-  Check,
   Radio,
   LayoutGrid,
   List,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
@@ -141,22 +137,17 @@ export function DiscoveryFeed({
     return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
   };
 
-  const getRailStyle = (rail: string) => {
+  const getRailBadgeVariant = (rail: string) => {
     switch (rail) {
-      case "Notion":
-        return "border-cyan-500/30 bg-cyan-950/40 text-cyan-300";
-      case "Substack/RSS":
-        return "border-orange-500/30 bg-orange-950/40 text-orange-300";
-      case "WordPress":
-        return "border-blue-500/30 bg-blue-950/40 text-blue-300";
-      case "Web Clipper":
-        return "border-emerald-500/30 bg-emerald-950/40 text-emerald-300";
-      case "Git SSG":
-        return "border-purple-500/30 bg-purple-950/40 text-purple-300";
       case "Studio":
-        return "border-teal-500/30 bg-teal-950/40 text-teal-300";
+        return "default";
+      case "Notion":
+      case "Substack/RSS":
+      case "WordPress":
+      case "Web Clipper":
+      case "Git SSG":
       default:
-        return "border-white/10 bg-white/[0.04] text-neutral-400";
+        return "outline";
     }
   };
 
@@ -189,10 +180,10 @@ export function DiscoveryFeed({
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-primary">
       {usingFallback && (
-        <Alert className="border-amber-500/30 bg-amber-950/30 text-amber-200">
-          <Server className="h-4 w-4 text-amber-400" />
+        <Alert className="border-warning/30 bg-warning/10 text-warning rounded-[6px]">
+          <Server className="h-4 w-4 text-warning" />
           <AlertDescription className="text-xs">
             Using decentralized discovery (DHT Swarm fallback). Ensuring zero-censorship resolution across multi-node peer networks.
           </AlertDescription>
@@ -202,12 +193,12 @@ export function DiscoveryFeed({
       {/* Filter Header Controls */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
           <Input
             placeholder="Search feed by title, tag, or author..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 h-10 bg-[#0B0D14] border-white/10 text-white placeholder:text-neutral-500 rounded-xl focus-visible:ring-cyan-500/30 focus-visible:border-cyan-500/50"
+            className="pl-10 h-10 bg-surface border-hairline text-primary placeholder:text-muted rounded-[6px] focus-visible:ring-0 focus-visible:border-focus"
           />
         </div>
 
@@ -217,32 +208,35 @@ export function DiscoveryFeed({
             variant="outline"
             size="sm"
             onClick={() => setOnlyVerified(!onlyVerified)}
-            className={`text-xs h-9 gap-1.5 rounded-lg border transition-all ${onlyVerified
-                ? "border-emerald-500/40 bg-emerald-950/40 text-emerald-300 font-semibold shadow-[0_0_15px_rgba(16,185,129,0.15)]"
-                : "border-white/10 bg-white/[0.03] text-neutral-400 hover:text-white hover:bg-white/[0.06]"
-              }`}
+            className={`text-xs h-9 gap-1.5 rounded-[6px] border transition-all ${
+              onlyVerified
+                ? "border-verified/30 bg-verified/15 text-verified font-medium"
+                : "border-hairline bg-surface text-secondary hover:text-primary hover:bg-overlay"
+            }`}
           >
             <ShieldCheck className="h-3.5 w-3.5" />
             Verified Ed25519
           </Button>
 
           {/* Transport filter toggle */}
-          <div className="flex items-center rounded-lg border border-white/10 bg-[#0B0D14] p-0.5 text-xs font-mono">
+          <div className="flex items-center rounded-[6px] border border-hairline bg-surface p-0.5 text-xs font-mono">
             <button
               onClick={() => setSelectedTransport("all")}
-              className={`px-2.5 py-1 rounded-md transition-all ${selectedTransport === "all"
-                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold shadow-sm"
-                  : "text-neutral-400 hover:text-white"
-                }`}
+              className={`px-2.5 py-1 rounded-[4px] transition-all ${
+                selectedTransport === "all"
+                  ? "bg-overlay text-primary border border-focus font-medium"
+                  : "text-muted hover:text-primary"
+              }`}
             >
               All Transports
             </button>
             <button
               onClick={() => setSelectedTransport("tor")}
-              className={`px-2.5 py-1 rounded-md transition-all flex items-center gap-1 ${selectedTransport === "tor"
-                  ? "bg-purple-500/20 text-purple-300 border border-purple-500/40 font-semibold shadow-sm"
-                  : "text-neutral-400 hover:text-white"
-                }`}
+              className={`px-2.5 py-1 rounded-[4px] transition-all flex items-center gap-1 ${
+                selectedTransport === "tor"
+                  ? "bg-anonymous/15 text-anonymous border border-anonymous/30 font-medium"
+                  : "text-muted hover:text-primary"
+              }`}
             >
               <Radio className="h-3 w-3" />
               Tor v3
@@ -250,23 +244,25 @@ export function DiscoveryFeed({
           </div>
 
           {/* View Mode Switcher */}
-          <div className="flex items-center rounded-lg border border-white/10 bg-[#0B0D14] p-0.5 text-xs font-mono">
+          <div className="flex items-center rounded-[6px] border border-hairline bg-surface p-0.5 text-xs font-mono">
             <button
               onClick={() => setViewMode("cards")}
-              className={`p-1.5 rounded-md transition-all ${viewMode === "cards"
-                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
-                  : "text-neutral-400 hover:text-white"
-                }`}
+              className={`p-1.5 rounded-[4px] transition-all ${
+                viewMode === "cards"
+                  ? "bg-overlay text-primary border border-focus"
+                  : "text-muted hover:text-primary"
+              }`}
               title="Card View"
             >
               <LayoutGrid className="h-3.5 w-3.5" />
             </button>
             <button
               onClick={() => setViewMode("table")}
-              className={`p-1.5 rounded-md transition-all ${viewMode === "table"
-                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
-                  : "text-neutral-400 hover:text-white"
-                }`}
+              className={`p-1.5 rounded-[4px] transition-all ${
+                viewMode === "table"
+                  ? "bg-overlay text-primary border border-focus"
+                  : "text-muted hover:text-primary"
+              }`}
               title="High-Density Ledger Table"
             >
               <List className="h-3.5 w-3.5" />
@@ -281,10 +277,11 @@ export function DiscoveryFeed({
           <button
             key={rail}
             onClick={() => setSelectedRail(rail)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${selectedRail === rail
-                ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 font-semibold shadow-[0_0_15px_rgba(6,182,212,0.15)]"
-                : "bg-[#0B0D14] hover:bg-white/[0.06] text-neutral-400 hover:text-white border border-white/10"
-              }`}
+            className={`px-3 py-1.5 rounded-[6px] text-xs font-medium whitespace-nowrap transition-all ${
+              selectedRail === rail
+                ? "bg-overlay text-primary border border-focus font-semibold"
+                : "bg-surface hover:bg-overlay text-secondary hover:text-primary border border-hairline"
+            }`}
           >
             {rail}
           </button>
@@ -295,16 +292,16 @@ export function DiscoveryFeed({
       {loading ? (
         <div className="space-y-3.5">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-28 rounded-2xl bg-white/[0.03] animate-pulse border border-white/5" />
+            <div key={i} className="h-28 rounded-[6px] bg-surface animate-pulse border border-hairline" />
           ))}
         </div>
       ) : filteredItems.length === 0 ? (
-        <div className="rounded-2xl border border-white/10 bg-[#0B0D14]/60 p-12 text-center my-6">
-          <Layers className="h-10 w-10 text-zinc-500 mx-auto mb-3" />
-          <h3 className="text-base font-sans font-semibold text-white mb-1">
+        <div className="rounded-[6px] border border-hairline bg-surface p-12 text-center my-6 shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+          <Layers className="h-10 w-10 text-muted mx-auto mb-3" />
+          <h3 className="text-base font-sans font-semibold text-primary mb-1">
             No articles match current filters
           </h3>
-          <p className="text-xs text-neutral-400 max-w-sm mx-auto mb-4">
+          <p className="text-xs text-secondary max-w-sm mx-auto mb-4">
             Try switching to &quot;All Rails&quot; or clearing your search term to see other syndicated publications.
           </p>
 
@@ -317,27 +314,27 @@ export function DiscoveryFeed({
               setSearchQuery("");
             }}
             variant="outline"
-            className="text-xs border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white"
+            className="text-xs border-hairline bg-overlay hover:bg-elevated text-primary rounded-[6px]"
           >
             Reset Filters
           </Button>
         </div>
       ) : viewMode === "table" ? (
         /* High-Density Ledger Table View */
-        <div className="rounded-2xl border border-white/10 bg-[#0B0D14] overflow-hidden shadow-xl">
+        <div className="rounded-[6px] border border-hairline bg-surface overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs font-mono">
               <thead>
-                <tr className="border-b border-white/[0.08] bg-black/40 text-zinc-400">
-                  <th className="py-3 px-4 font-semibold">Rail &amp; Status</th>
-                  <th className="py-3 px-4 font-semibold">Title</th>
-                  <th className="py-3 px-4 font-semibold">Content CID</th>
-                  <th className="py-3 px-4 font-semibold">Signer</th>
-                  <th className="py-3 px-4 font-semibold">Age</th>
-                  <th className="py-3 px-4 font-semibold text-right">Actions</th>
+                <tr className="border-b border-hairline bg-overlay/30 text-muted uppercase text-[11px] tracking-wider">
+                  <th className="py-3 px-4 font-medium">Rail &amp; Status</th>
+                  <th className="py-3 px-4 font-medium">Title</th>
+                  <th className="py-3 px-4 font-medium">Content CID</th>
+                  <th className="py-3 px-4 font-medium">Signer</th>
+                  <th className="py-3 px-4 font-medium">Age</th>
+                  <th className="py-3 px-4 font-medium text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/[0.06]">
+              <tbody className="divide-y divide-hairline">
                 {filteredItems.map((item) => {
                   const rail = classifySourceRail(item.tags || []);
                   const isVerified = !!(item.publisher?.publicKey && item.publisher.publicKey.length >= 32);
@@ -347,17 +344,17 @@ export function DiscoveryFeed({
                     <tr
                       key={item.cid}
                       onClick={() => { window.location.href = `/read/${item.cid}`; }}
-                      className="hover:bg-white/[0.03] transition-colors cursor-pointer group"
+                      className="hover:bg-overlay/20 transition-colors cursor-pointer group"
                     >
                       <td className="py-3 px-4 whitespace-nowrap">
                         <div className="flex items-center gap-1.5">
-                          <span className={`h-2 w-2 rounded-full ${isVerified ? "bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.6)]" : "bg-zinc-500"}`} />
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded border ${getRailStyle(rail)}`}>
+                          <span className={`h-1.5 w-1.5 rounded-full ${isVerified ? "bg-verified" : "bg-muted"}`} />
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-[4px] border border-hairline bg-overlay text-secondary">
                             {rail}
                           </span>
                         </div>
                       </td>
-                      <td className="py-3 px-4 font-sans font-medium text-white group-hover:text-cyan-300 transition-colors max-w-[280px] truncate">
+                      <td className="py-3 px-4 font-sans font-medium text-primary group-hover:text-primary/80 transition-colors max-w-[280px] truncate">
                         {item.title}
                       </td>
                       <td className="py-3 px-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
@@ -367,10 +364,10 @@ export function DiscoveryFeed({
                         {item.publisher?.publicKey ? (
                           <SignatureBadge publicKey={item.publisher.publicKey} compact />
                         ) : (
-                          <span className="text-zinc-500 text-[10px]">Unsigned</span>
+                          <span className="text-muted text-[10px]">Unsigned</span>
                         )}
                       </td>
-                      <td className="py-3 px-4 text-zinc-400 text-[11px] whitespace-nowrap">
+                      <td className="py-3 px-4 text-muted text-[11px] whitespace-nowrap tabular-nums">
                         {formatTimestamp(item.createdAt)}
                       </td>
                       <td className="py-3 px-4 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
@@ -379,13 +376,13 @@ export function DiscoveryFeed({
                             variant="ghost"
                             size="sm"
                             onClick={(e) => handleToggleBookmark(item, e)}
-                            className="h-7 w-7 p-0 text-zinc-400 hover:text-white"
+                            className="h-7 w-7 p-0 text-muted hover:text-primary"
                             title={isSaved ? "Saved" : "Save Offline"}
                           >
-                            <Bookmark className={`h-3.5 w-3.5 ${isSaved ? "fill-emerald-400 text-emerald-400" : ""}`} />
+                            <Bookmark className={`h-3.5 w-3.5 ${isSaved ? "fill-verified text-verified" : ""}`} />
                           </Button>
                           <Link href={`/read/${item.cid}`}>
-                            <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-cyan-400 hover:text-cyan-300">
+                            <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-secondary hover:text-primary font-medium">
                               Read
                             </Button>
                           </Link>
@@ -399,7 +396,7 @@ export function DiscoveryFeed({
           </div>
         </div>
       ) : (
-        /* Card Grid View */
+        /* Card Grid View (Section 3.3: Badge budget max 2, Inter titles) */
         <div className="space-y-3.5">
           {filteredItems.map((item) => {
             const rail = classifySourceRail(item.tags || []);
@@ -412,35 +409,35 @@ export function DiscoveryFeed({
                 onClick={() => {
                   window.location.href = `/read/${item.cid}`;
                 }}
-                className="group rounded-2xl border border-white/10 bg-[#0B0D14] hover:border-cyan-500/40 hover:shadow-[0_0_25px_rgba(6,182,212,0.1)] p-5 transition-all cursor-pointer shadow-lg text-white"
+                className="group rounded-[6px] border border-hairline bg-surface hover:border-focus p-5 transition-all cursor-pointer shadow-[0_1px_2px_rgba(0,0,0,0.3)] text-primary"
               >
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
-                    {/* Rail & Provenance Badges */}
+                    {/* Section 3.3: Badge budget <= 2 per preview */}
                     <div className="flex flex-wrap items-center gap-2 mb-2">
-                      <Badge variant="outline" className={`text-[10px] px-2 py-0.5 rounded-md font-mono ${getRailStyle(rail)}`}>
+                      <Badge variant={getRailBadgeVariant(rail)} className="text-[10px] px-2 py-0.5 rounded-[4px] font-mono">
                         {rail}
                       </Badge>
 
                       {isVerified ? (
-                        <Badge variant="outline" className="text-[10px] px-2 py-0.5 rounded-md font-mono border-emerald-500/30 bg-emerald-950/50 text-emerald-300 flex items-center gap-1">
+                        <Badge variant="verified" className="text-[10px] px-2 py-0.5 rounded-[4px] font-mono flex items-center gap-1">
                           <ShieldCheck className="h-3 w-3" />
                           Ed25519 Verified
                         </Badge>
                       ) : (
-                        <Badge variant="outline" className="text-[10px] px-2 py-0.5 rounded-md font-mono border-white/10 bg-white/[0.04] text-neutral-400">
+                        <Badge variant="muted" className="text-[10px] px-2 py-0.5 rounded-[4px] font-mono">
                           Community Mirror
                         </Badge>
                       )}
 
-                      <span className="text-[11px] font-mono text-neutral-400 flex items-center gap-1">
+                      <span className="text-[11px] font-mono text-muted flex items-center gap-1 tabular-nums ml-1">
                         <Clock className="h-3 w-3" />
                         {formatTimestamp(item.createdAt)}
                       </span>
                     </div>
 
-                    {/* Title */}
-                    <h2 className="text-lg font-sans font-bold text-white group-hover:text-cyan-300 transition-colors line-clamp-1">
+                    {/* Section 3.1 & 10: Inter ONLY for preview titles */}
+                    <h2 className="text-lg font-sans font-semibold text-primary group-hover:text-primary/80 transition-colors line-clamp-1 tracking-tight">
                       {item.title}
                     </h2>
 
@@ -450,7 +447,7 @@ export function DiscoveryFeed({
                         {item.tags.slice(0, 4).map((tag) => (
                           <span
                             key={tag}
-                            className="text-[11px] font-mono text-zinc-400 bg-white/[0.03] border border-white/10 px-2 py-0.5 rounded-md"
+                            className="text-[11px] font-mono text-muted bg-overlay border border-hairline px-2 py-0.5 rounded-[4px]"
                           >
                             #{tag}
                           </span>
@@ -465,7 +462,7 @@ export function DiscoveryFeed({
                         <SignatureBadge publicKey={item.publisher.publicKey} compact />
                       )}
                       {item.publisher?.username && (
-                        <span className="text-zinc-500 font-mono text-[11px]">
+                        <span className="text-muted font-mono text-[11px]">
                           by @{item.publisher.username}
                         </span>
                       )}
@@ -478,17 +475,18 @@ export function DiscoveryFeed({
                       variant={isSaved ? "default" : "outline"}
                       size="sm"
                       onClick={(e) => handleToggleBookmark(item, e)}
-                      className={`text-xs h-8 px-3 gap-1.5 rounded-lg ${isSaved
-                          ? "bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-sm"
-                          : "border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-neutral-300 hover:text-white"
-                        }`}
+                      className={`text-xs h-8 px-3 gap-1.5 rounded-[6px] ${
+                        isSaved
+                          ? "bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-primary font-medium shadow-sm"
+                          : "border-hairline bg-overlay/50 hover:bg-overlay text-secondary hover:text-primary"
+                      }`}
                     >
                       <Bookmark className={`h-3.5 w-3.5 ${isSaved ? "fill-current" : ""}`} />
                       <span>{isSaved ? "Saved Offline" : "Save Offline"}</span>
                     </Button>
 
                     <Link href={`/read/${item.cid}`} onClick={(e) => e.stopPropagation()}>
-                      <Button variant="ghost" size="sm" className="h-8 text-xs text-neutral-400 hover:text-cyan-300 gap-1 px-2">
+                      <Button variant="ghost" size="sm" className="h-8 text-xs text-muted hover:text-primary gap-1 px-2 font-medium">
                         <span>Read</span>
                         <ExternalLink className="h-3 w-3" />
                       </Button>
@@ -508,9 +506,9 @@ export function DiscoveryFeed({
             variant="outline"
             size="sm"
             onClick={loadDiscoveryFeed}
-            className="text-xs h-9 gap-1.5 border-white/10 bg-[#0B0D14] hover:bg-white/[0.06] text-neutral-300 hover:text-white"
+            className="text-xs h-9 gap-1.5 border-hairline bg-surface hover:bg-overlay text-secondary hover:text-primary rounded-[6px]"
           >
-            <Server className="h-3.5 w-3.5 text-cyan-400" />
+            <Server className="h-3.5 w-3.5 text-muted" />
             Refresh Decentralized Feed
           </Button>
         </div>
