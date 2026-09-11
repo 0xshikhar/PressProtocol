@@ -97,26 +97,26 @@ export default function DeveloperHero({ onSelectEndpoint }: DeveloperHeroProps) 
     <section className="space-y-12">
       {/* Top Status Bar Pill */}
       <div className="flex justify-center">
-        <div className="inline-flex flex-wrap items-center gap-4 sm:gap-8 px-5 py-2 rounded-full border border-white/[0.08] bg-[#0A0B14]/80 backdrop-blur-xl shadow-xl text-xs font-mono">
-          <div className="flex items-center gap-2 text-neutral-300">
-            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+        <div className="inline-flex flex-wrap items-center gap-4 sm:gap-8 px-5 py-2 rounded-[6px] border border-hairline bg-surface text-xs font-mono">
+          <div className="flex items-center gap-2 text-text-secondary">
+            <span className="h-2 w-2 rounded-full bg-verified" />
             <span>
-              Clearnet REST <span className="text-emerald-400 font-semibold">42ms</span>
+              Clearnet REST <span className="text-text-primary font-medium tnum">42ms</span>
             </span>
           </div>
-          <div className="flex items-center gap-2 text-neutral-300">
-            <span className="h-2 w-2 rounded-full bg-purple-400" />
+          <div className="flex items-center gap-2 text-text-secondary">
+            <span className="h-2 w-2 rounded-full bg-[#8770C4]" />
             <span>
-              Tor v3 Onion <span className="text-purple-300 font-semibold">Active</span>
+              Tor v3 Onion <span className="text-text-primary font-medium">Active</span>
             </span>
           </div>
-          <div className="flex items-center gap-2 text-neutral-300">
-            <span className="h-2 w-2 rounded-full bg-cyan-400" />
+          <div className="flex items-center gap-2 text-text-secondary">
+            <span className="h-2 w-2 rounded-full bg-accent-ribbon" />
             <span>
-              IPFS Swarm <span className="text-cyan-300 font-semibold">318 Peers</span>
+              IPFS Swarm <span className="text-text-primary font-medium tnum">318 Peers</span>
             </span>
           </div>
-          <ChevronRight className="h-3.5 w-3.5 text-neutral-600 hidden md:block" />
+          <ChevronRight className="h-3.5 w-3.5 text-text-muted hidden md:block" />
         </div>
       </div>
 
@@ -125,16 +125,14 @@ export default function DeveloperHero({ onSelectEndpoint }: DeveloperHeroProps) 
         {/* Left Column */}
         <div className="lg:col-span-7 space-y-6">
           <div className="space-y-3">
-            <div className="text-[11px] font-mono tracking-[0.25em] text-neutral-400 uppercase font-semibold">
-              PRESSPROTOCOL
+            <div className="text-xs font-mono text-text-muted">
+              Protocol Infrastructure
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-sans font-extrabold tracking-tight text-white leading-[1.08]">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-hero tracking-tight text-text-primary leading-[1.08]">
               Infrastructure for <br />
-              <span className="bg-gradient-to-r from-cyan-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">
-                sovereign publishing
-              </span>
+              sovereign publishing
             </h1>
-            <p className="text-sm sm:text-base text-neutral-400 max-w-xl leading-relaxed font-sans pt-1">
+            <p className="text-sm sm:text-base text-text-secondary max-w-xl leading-relaxed font-sans pt-1">
               PressProtocol is a decentralized infrastructure protocol for censorship-resistant, sovereign
               publishing. Build, publish, and fetch content without trusted third parties.
             </p>
@@ -142,16 +140,16 @@ export default function DeveloperHero({ onSelectEndpoint }: DeveloperHeroProps) 
 
           <div className="flex flex-wrap items-center gap-3 pt-2">
             <Link href="#api-explorer">
-              <Button className="gap-2 bg-cyan-500 hover:bg-cyan-400 text-black font-semibold rounded-full px-6 py-2.5 text-xs sm:text-sm shadow-[0_0_30px_rgba(6,182,212,0.35)] transition-all h-11">
-                <Play className="h-4 w-4 fill-current" /> Open API Explorer
+              <Button className="gap-2 bg-accent-primary hover:bg-accent-hover text-[#EEE7E1] font-medium rounded-[6px] px-6 py-2.5 text-xs sm:text-sm shadow-none transition-all h-10">
+                <Play className="h-3.5 w-3.5 fill-current" /> Open API Explorer
               </Button>
             </Link>
             <Link href="#widget-playground">
               <Button
                 variant="outline"
-                className="gap-2 border border-white/15 bg-white/[0.03] hover:bg-white/[0.08] text-white rounded-full px-5 py-2.5 text-xs sm:text-sm font-medium transition-all h-11"
+                className="gap-2 border-hairline bg-surface hover:bg-elevated text-text-primary rounded-[6px] px-5 py-2.5 text-xs sm:text-sm font-medium transition-all h-10"
               >
-                <Code2 className="h-4 w-4 text-cyan-400" /> Web Component Playground
+                <Code2 className="h-4 w-4 text-text-secondary" /> Web Component Playground
               </Button>
             </Link>
           </div>
@@ -159,42 +157,41 @@ export default function DeveloperHero({ onSelectEndpoint }: DeveloperHeroProps) 
 
         {/* Right Column: Code Snippet Card */}
         <div className="lg:col-span-5 relative">
-          <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-cyan-500/20 via-indigo-500/20 to-purple-500/20 blur-xl opacity-60 pointer-events-none" />
-          <div className="relative rounded-2xl border border-indigo-500/30 bg-[#0A0C16]/95 backdrop-blur-xl p-5 shadow-2xl space-y-3">
-            <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
-              <div className="flex items-center gap-2 text-xs font-mono text-neutral-300">
-                <Code2 className="h-3.5 w-3.5 text-cyan-400" />
-                <span>Code Snippet</span>
+          <div className="relative rounded-[6px] border border-hairline bg-surface p-5 shadow-sm space-y-3">
+            <div className="flex items-center justify-between pb-3 border-b border-hairline">
+              <div className="flex items-center gap-2 text-xs font-mono text-text-secondary">
+                <Code2 className="h-3.5 w-3.5 text-accent-ribbon" />
+                <span>Protocol Envelope Schema</span>
               </div>
               <button
                 onClick={handleCopySnippet}
-                className="p-1.5 rounded-lg hover:bg-white/[0.08] text-neutral-400 hover:text-white transition-colors"
+                className="p-1.5 rounded-[4px] hover:bg-overlay text-text-muted hover:text-text-primary transition-colors"
                 title="Copy JSON snippet"
               >
-                {copiedSnippet ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+                {copiedSnippet ? <Check className="h-3.5 w-3.5 text-verified" /> : <Copy className="h-3.5 w-3.5" />}
               </button>
             </div>
 
-            <pre className="font-mono text-xs sm:text-[13px] leading-relaxed text-neutral-300 overflow-x-auto selection:bg-cyan-500/30">
+            <pre className="font-mono text-xs sm:text-[13px] leading-relaxed text-text-secondary overflow-x-auto">
               <code>
-                <span className="text-white">{"{"}</span>
-                {"\n"}  <span className="text-cyan-300">&quot;sovereign_publishing&quot;</span>
-                <span className="text-white">: </span>
-                <span className="text-emerald-400">true</span>
-                <span className="text-white">,</span>
-                {"\n"}  <span className="text-cyan-300">&quot;publication_id&quot;</span>
-                <span className="text-white">: </span>
-                <span className="text-indigo-300">&quot;bafyeih...4gf6q&quot;</span>
-                <span className="text-white">,</span>
-                {"\n"}  <span className="text-cyan-300">&quot;content_hash&quot;</span>
-                <span className="text-white">: </span>
-                <span className="text-indigo-300">&quot;QmT78zXy...f2j4k&quot;</span>
-                <span className="text-white">,</span>
-                {"\n"}  <span className="text-cyan-300">&quot;timestamp&quot;</span>
-                <span className="text-white">: </span>
-                <span className="text-purple-300">1620000000</span>
+                <span className="text-text-primary">{"{"}</span>
+                {"\n"}  <span className="text-text-primary">&quot;sovereign_publishing&quot;</span>
+                <span className="text-text-primary">: </span>
+                <span className="text-verified">true</span>
+                <span className="text-text-primary">,</span>
+                {"\n"}  <span className="text-text-primary">&quot;publication_id&quot;</span>
+                <span className="text-text-primary">: </span>
+                <span className="text-accent-ribbon">&quot;bafyeih...4gf6q&quot;</span>
+                <span className="text-text-primary">,</span>
+                {"\n"}  <span className="text-text-primary">&quot;content_hash&quot;</span>
+                <span className="text-text-primary">: </span>
+                <span className="text-[#8770C4]">&quot;QmT78zXy...f2j4k&quot;</span>
+                <span className="text-text-primary">,</span>
+                {"\n"}  <span className="text-text-primary">&quot;timestamp&quot;</span>
+                <span className="text-text-primary">: </span>
+                <span className="text-text-secondary tnum">1620000000</span>
                 {"\n"}
-                <span className="text-white">{"}"}</span>
+                <span className="text-text-primary">{"}"}</span>
               </code>
             </pre>
           </div>
@@ -209,27 +206,27 @@ export default function DeveloperHero({ onSelectEndpoint }: DeveloperHeroProps) 
             return (
               <div
                 key={ep.path}
-                className="group relative rounded-2xl border border-white/[0.08] bg-[#0A0B14]/90 hover:bg-[#0E0F1B] hover:border-cyan-500/40 p-5 transition-all shadow-lg flex flex-col justify-between"
+                className="group relative rounded-[6px] border border-hairline bg-surface hover:bg-elevated p-5 transition-all shadow-sm flex flex-col justify-between"
               >
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span
-                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-semibold tracking-wide ${
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] text-[10px] font-mono font-semibold tracking-wide border border-hairline ${
                         isPost
-                          ? "bg-purple-500/15 text-purple-300 border border-purple-500/30"
-                          : "bg-cyan-500/15 text-cyan-300 border border-cyan-500/30"
+                          ? "bg-overlay text-accent-ribbon"
+                          : "bg-overlay text-verified"
                       }`}
                     >
-                      <span className="opacity-70">&lt;/&gt;</span> {ep.method}
+                      <span>&lt;/&gt;</span> {ep.method}
                     </span>
 
                     <button
                       onClick={() => handleCopyEndpointCode(ep.code, idx)}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] text-neutral-400 hover:text-white"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-[4px] bg-overlay hover:bg-elevated text-text-muted hover:text-text-primary"
                       title="Copy cURL command"
                     >
                       {copiedIndex === idx ? (
-                        <Check className="h-3 w-3 text-emerald-400" />
+                        <Check className="h-3 w-3 text-verified" />
                       ) : (
                         <Copy className="h-3 w-3" />
                       )}
@@ -237,15 +234,15 @@ export default function DeveloperHero({ onSelectEndpoint }: DeveloperHeroProps) 
                   </div>
 
                   <div>
-                    <h3 className="text-base sm:text-lg font-mono font-bold text-white tracking-tight group-hover:text-cyan-300 transition-colors">
+                    <h3 className="text-sm sm:text-base font-mono font-medium text-text-primary tracking-tight">
                       {ep.path}
                     </h3>
-                    <p className="text-xs text-neutral-400 mt-1 font-sans">{ep.description}</p>
+                    <p className="text-xs text-text-muted mt-1 font-sans">{ep.description}</p>
                   </div>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-white/[0.06] space-y-1.5">
-                  <div className="flex items-center justify-between text-[10px] font-mono uppercase text-neutral-500 font-semibold tracking-wider">
+                <div className="mt-4 pt-3 border-t border-hairline space-y-1.5">
+                  <div className="flex items-center justify-between text-[10px] font-mono uppercase text-text-muted font-semibold tracking-wider">
                     <span>Code</span>
                     {onSelectEndpoint && (
                       <button
@@ -254,13 +251,13 @@ export default function DeveloperHero({ onSelectEndpoint }: DeveloperHeroProps) 
                           const el = document.getElementById("api-explorer");
                           if (el) el.scrollIntoView({ behavior: "smooth" });
                         }}
-                        className="text-cyan-400 hover:text-cyan-300 lowercase text-[10px] tracking-normal font-normal"
+                        className="text-text-secondary hover:text-text-primary lowercase text-[10px] tracking-normal font-normal"
                       >
-                        try in explorer →
+                        try in explorer
                       </button>
                     )}
                   </div>
-                  <div className="rounded-xl bg-black/60 border border-white/[0.04] p-3 font-mono text-[11px] leading-relaxed text-neutral-300 overflow-x-auto selection:bg-cyan-500/30">
+                  <div className="rounded-[6px] bg-canvas border border-hairline p-3 font-mono text-[11px] leading-relaxed text-text-secondary overflow-x-auto">
                     <code>{ep.code}</code>
                   </div>
                 </div>
@@ -270,8 +267,8 @@ export default function DeveloperHero({ onSelectEndpoint }: DeveloperHeroProps) 
         </div>
 
         {/* Bottom Connecting / Swarm Status Indicator */}
-        <div className="pt-2 flex items-center gap-2 text-xs font-mono text-neutral-400">
-          <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+        <div className="pt-2 flex items-center gap-2 text-xs font-mono text-text-muted">
+          <span className="h-2 w-2 rounded-full bg-verified" />
           <span>Connected to Global Swarm (Helia IPFS · Tor v3 · 42ms latency)</span>
         </div>
       </div>

@@ -30,7 +30,7 @@ export default function SdkCodeSnippets({ apiKey }: SdkCodeSnippetsProps) {
       git: 'pip install "git+https://github.com/0xshikhar/PressProtocol.git#subdirectory=sdks/python"',
     },
     go: {
-      registry: "go get github.com/0xshikhar/PressProtocol/sdks/go@v1.0.6",
+      registry: "go get github.com/0xshikhar/PressProtocol/sdks/go@v1.0.7",
       git: "go get github.com/0xshikhar/PressProtocol/sdks/go@master",
     },
     rust: {
@@ -144,48 +144,48 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     const code = snippets[lang];
 
     return (
-      <div className="rounded-2xl border border-white/10 bg-[#0B0D14] overflow-hidden shadow-2xl space-y-0">
+      <div className="rounded-[6px] border border-hairline bg-surface overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.3)] space-y-0">
         {/* macOS Terminal Window Titlebar Chrome */}
-        <div className="flex items-center justify-between px-4 py-3 bg-[#111420] border-b border-white/10">
+        <div className="flex items-center justify-between px-4 py-2.5 bg-overlay/40 border-b border-hairline">
           <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded-full bg-[#FF5F56] border border-[#E0443E]" />
-            <span className="h-3 w-3 rounded-full bg-[#FFBD2E] border border-[#DEA123]" />
-            <span className="h-3 w-3 rounded-full bg-[#27C93F] border border-[#1AAB29]" />
-            <span className="ml-2 font-mono text-xs text-white/50">{title}</span>
+            <span className="h-2.5 w-2.5 rounded-full bg-[#D65C4A]/80 border border-[#D65C4A]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#C97A2E]/80 border border-[#C97A2E]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#3E9C72]/80 border border-[#3E9C72]" />
+            <span className="ml-2 font-mono text-xs text-muted">{title}</span>
           </div>
 
           <Button
             size="sm"
             variant="outline"
             onClick={() => copyText(code, `${lang}-code`)}
-            className="h-7 text-xs font-mono border-white/10 bg-white/5 hover:bg-white/10 text-white/80 hover:text-white rounded-lg gap-1.5"
+            className="h-7 text-xs font-mono border-hairline bg-overlay/50 hover:bg-overlay text-secondary hover:text-primary rounded-[4px] gap-1.5"
           >
-            {copiedId === `${lang}-code` ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+            {copiedId === `${lang}-code` ? <Check className="h-3.5 w-3.5 text-verified" /> : <Copy className="h-3.5 w-3.5" />}
             <span>{copiedId === `${lang}-code` ? "Copied Snippet" : "Copy Code"}</span>
           </Button>
         </div>
 
         {/* 1-Line Installation Header if applicable */}
         {installCmd && (
-          <div className="flex items-center justify-between px-4 py-2.5 bg-black/40 border-b border-white/5 text-xs font-mono text-cyan-300">
+          <div className="flex items-center justify-between px-4 py-2.5 bg-canvas border-b border-hairline text-xs font-mono text-primary">
             <div className="flex items-center gap-2 truncate">
-              <span className="text-white/40 select-none">$</span>
+              <span className="text-muted select-none">$</span>
               <span className="truncate">{installCmd}</span>
             </div>
             <Button
               size="sm"
               variant="ghost"
               onClick={() => copyText(installCmd, `${lang}-install`)}
-              className="h-6 px-2 text-xs font-mono text-white/60 hover:text-white shrink-0 ml-2"
+              className="h-6 px-2 text-xs font-mono text-muted hover:text-primary shrink-0 ml-2"
               title="Copy install command"
             >
-              {copiedId === `${lang}-install` ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+              {copiedId === `${lang}-install` ? <Check className="h-3 w-3 text-verified" /> : <Copy className="h-3 w-3" />}
             </Button>
           </div>
         )}
 
         {/* Code Content */}
-        <div className="p-4 font-mono text-xs overflow-x-auto text-cyan-100/90 leading-relaxed whitespace-pre selection:bg-cyan-500/30">
+        <div className="p-4 font-mono text-xs overflow-x-auto text-primary/90 leading-relaxed whitespace-pre bg-[#0E0C0E]">
           {code}
         </div>
       </div>
@@ -197,33 +197,35 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <Layers className="h-5 w-5 text-cyan-400" />
-            <h2 className="text-2xl font-bold tracking-tight text-white font-sans">Multi-Language SDK Ecosystem</h2>
+            <Layers className="h-5 w-5 text-muted" />
+            <h2 className="text-2xl font-semibold tracking-tight text-primary font-sans">Multi-Language SDK Ecosystem</h2>
           </div>
-          <p className="text-sm text-white/60 mt-1 font-sans">
+          <p className="text-sm text-secondary mt-1 font-sans">
             Native, idiomatic libraries with embedded cryptographic multihashing and automatic failover.
           </p>
         </div>
 
         {/* Public Registry vs Direct Git Install Toggle */}
-        <div className="flex items-center gap-1 p-1 rounded-xl bg-white/5 border border-white/10 self-start sm:self-auto">
+        <div className="flex items-center gap-1 p-1 rounded-[6px] bg-surface border border-hairline self-start sm:self-auto">
           <button
             type="button"
             onClick={() => setInstallMethod("registry")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${installMethod === "registry"
-              ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold"
-              : "text-white/60 hover:text-white"
-              }`}
+            className={`px-3 py-1.5 rounded-[4px] text-xs font-mono transition-all ${
+              installMethod === "registry"
+                ? "bg-overlay text-primary border border-focus font-medium"
+                : "text-muted hover:text-primary"
+            }`}
           >
             Public Registry
           </button>
           <button
             type="button"
             onClick={() => setInstallMethod("git")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${installMethod === "git"
-              ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold"
-              : "text-white/60 hover:text-white"
-              }`}
+            className={`px-3 py-1.5 rounded-[4px] text-xs font-mono transition-all ${
+              installMethod === "git"
+                ? "bg-overlay text-primary border border-focus font-medium"
+                : "text-muted hover:text-primary"
+            }`}
           >
             Direct Git Install
           </button>
@@ -231,28 +233,30 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
       </div>
 
       <Tabs defaultValue="typescript" className="space-y-4">
-        <TabsList className="grid grid-cols-2 sm:grid-cols-5 w-full sm:w-auto h-auto p-1 bg-white/5 border border-white/10 rounded-xl">
-          <TabsTrigger value="typescript" className="text-xs font-mono py-2 text-white/70 data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300 rounded-lg">TypeScript / JS</TabsTrigger>
-          <TabsTrigger value="python" className="text-xs font-mono py-2 text-white/70 data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300 rounded-lg">Python</TabsTrigger>
-          <TabsTrigger value="go" className="text-xs font-mono py-2 text-white/70 data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300 rounded-lg">Go</TabsTrigger>
-          <TabsTrigger value="rust" className="text-xs font-mono py-2 text-white/70 data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300 rounded-lg">Rust</TabsTrigger>
-          <TabsTrigger value="curl" className="text-xs font-mono py-2 text-white/70 data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300 rounded-lg">cURL</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto pb-1 no-scrollbar">
+          <TabsList className="flex items-center gap-1 w-full sm:w-auto min-w-max h-auto p-1 bg-surface border border-hairline rounded-[6px]">
+            <TabsTrigger value="typescript" className="text-xs font-mono py-1.5 px-3 text-secondary data-[state=active]:bg-overlay data-[state=active]:text-primary data-[state=active]:border data-[state=active]:border-focus rounded-[4px] whitespace-nowrap">TypeScript / JS</TabsTrigger>
+            <TabsTrigger value="python" className="text-xs font-mono py-1.5 px-3 text-secondary data-[state=active]:bg-overlay data-[state=active]:text-primary data-[state=active]:border data-[state=active]:border-focus rounded-[4px] whitespace-nowrap">Python</TabsTrigger>
+            <TabsTrigger value="go" className="text-xs font-mono py-1.5 px-3 text-secondary data-[state=active]:bg-overlay data-[state=active]:text-primary data-[state=active]:border data-[state=active]:border-focus rounded-[4px] whitespace-nowrap">Go</TabsTrigger>
+            <TabsTrigger value="rust" className="text-xs font-mono py-1.5 px-3 text-secondary data-[state=active]:bg-overlay data-[state=active]:text-primary data-[state=active]:border data-[state=active]:border-focus rounded-[4px] whitespace-nowrap">Rust</TabsTrigger>
+            <TabsTrigger value="curl" className="text-xs font-mono py-1.5 px-3 text-secondary data-[state=active]:bg-overlay data-[state=active]:text-primary data-[state=active]:border data-[state=active]:border-focus rounded-[4px] whitespace-nowrap">cURL</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="typescript">
-          {renderTerminalWindow("typescript", "node - pressprotocol-sdk v1.0.6")}
+          {renderTerminalWindow("typescript", "node - @pressprotocol/sdk v1.0.7")}
         </TabsContent>
 
         <TabsContent value="python">
-          {renderTerminalWindow("python", "python3 - pressprotocol v1.0.6")}
+          {renderTerminalWindow("python", "python3 - pressprotocol-py v1.0.7")}
         </TabsContent>
 
         <TabsContent value="go">
-          {renderTerminalWindow("go", "go run - main.go")}
+          {renderTerminalWindow("go", "go run - main.go (v1.0.7)")}
         </TabsContent>
 
         <TabsContent value="rust">
-          {renderTerminalWindow("rust", "cargo run - main.rs")}
+          {renderTerminalWindow("rust", "cargo run - main.rs (v1.0.7)")}
         </TabsContent>
 
         <TabsContent value="curl">
