@@ -90,15 +90,15 @@ export function CryptographicPreFlightHUD({
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 max-w-2xl w-[94%] sm:w-auto">
       {/* Expanded Inspector Drawer */}
       {isExpanded && (
-        <div className="mb-3 rounded-2xl border border-border/80 bg-background/95 dark:bg-zinc-950/95 backdrop-blur-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-3 duration-200">
+        <div className="mb-3 rounded-2xl border border-hairline bg-surface/95 backdrop-blur-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-3 duration-200">
           {/* Header */}
           <div className="px-4 py-3 border-b border-border/50 flex items-center justify-between bg-muted/20">
             <div className="flex items-center gap-2">
-              <Shield className="h-4 w-4 text-emerald-500" />
+              <Shield className="h-4 w-4 text-verified" />
               <span className="font-semibold text-xs sm:text-sm text-foreground">
                 Cryptographic Pre-Flight HUD
               </span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-verified/10 text-verified border border-verified/30">
                 In-Memory RAM
               </span>
             </div>
@@ -137,7 +137,7 @@ export function CryptographicPreFlightHUD({
             >
               <span>Sovereign Identity</span>
               {burnerWallet && (
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span className="w-1.5 h-1.5 rounded-full bg-verified" />
               )}
             </button>
             <button
@@ -151,9 +151,9 @@ export function CryptographicPreFlightHUD({
             >
               <span>Privacy Scanner</span>
               {privacyScan.isClean ? (
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span className="w-1.5 h-1.5 rounded-full bg-verified" />
               ) : (
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                <span className="w-1.5 h-1.5 rounded-full bg-warning" />
               )}
             </button>
           </div>
@@ -201,7 +201,7 @@ export function CryptographicPreFlightHUD({
                 <div className="flex items-center justify-between p-2.5 rounded-lg bg-muted/30 border border-border/40">
                   <div>
                     <span className="text-muted-foreground block text-[10px] uppercase">Active Pseudonym</span>
-                    <span className="font-mono font-semibold text-sm text-emerald-600 dark:text-emerald-400">
+                    <span className="font-mono font-semibold text-sm text-verified">
                       {burnerWallet?.pseudonym || "Anon Burner"}
                     </span>
                   </div>
@@ -224,7 +224,7 @@ export function CryptographicPreFlightHUD({
                       onClick={handleCopyPubKey}
                       className="text-primary hover:underline flex items-center gap-1 text-[11px]"
                     >
-                      {copiedPubKey ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
+                      {copiedPubKey ? <Check className="h-3 w-3 text-verified" /> : <Copy className="h-3 w-3" />}
                       <span>{copiedPubKey ? "Copied" : "Copy"}</span>
                     </button>
                   </div>
@@ -254,7 +254,7 @@ export function CryptographicPreFlightHUD({
                   <div>
                     <span className="text-muted-foreground block text-[10px] uppercase">Privacy Health Score</span>
                     <div className="flex items-center gap-2">
-                      <span className={`text-base font-bold font-mono ${privacyScan.score >= 90 ? "text-emerald-500" : "text-amber-500"}`}>
+                      <span className={`text-base font-bold font-mono ${privacyScan.score >= 90 ? "text-verified" : "text-warning"}`}>
                         {privacyScan.score}/100
                       </span>
                       <span className="text-xs text-muted-foreground">
@@ -266,7 +266,7 @@ export function CryptographicPreFlightHUD({
                   {!privacyScan.isClean && (
                     <Button
                       size="sm"
-                      className="h-8 gap-1.5 text-xs bg-emerald-600 hover:bg-emerald-500 text-white"
+                      className="h-8 gap-1.5 text-xs bg-verified hover:bg-verified-bright text-white"
                       onClick={onCleanseTrackers}
                     >
                       <Wand2 className="h-3.5 w-3.5" />
@@ -280,7 +280,7 @@ export function CryptographicPreFlightHUD({
                     {privacyScan.issues.map((issue, idx) => (
                       <div
                         key={idx}
-                        className="p-2 rounded-md bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-700 dark:text-amber-300 space-y-0.5"
+                        className="p-2 rounded-md bg-warning/10 border border-warning/20 text-[11px] text-warning space-y-0.5"
                       >
                         <div className="flex items-center gap-1.5 font-medium">
                           <ShieldAlert className="h-3.5 w-3.5" />
@@ -291,7 +291,7 @@ export function CryptographicPreFlightHUD({
                     ))}
                   </div>
                 ) : (
-                  <div className="p-3 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-[11px] flex items-center gap-2">
+                  <div className="p-3 rounded-md bg-verified/10 border border-verified/20 text-verified text-[11px] flex items-center gap-2">
                     <ShieldCheck className="h-4 w-4" />
                     <span>Clean sovereign text. No tracking query params or surveillance scripts detected.</span>
                   </div>
@@ -303,7 +303,7 @@ export function CryptographicPreFlightHUD({
       )}
 
       {/* Collapsed Status Pill Bar */}
-      <div className="flex items-center gap-2 p-1.5 px-3 rounded-full border border-border/80 bg-background/90 dark:bg-zinc-900/90 backdrop-blur-xl shadow-2xl text-xs">
+      <div className="flex items-center gap-2 p-1.5 px-3 rounded-full border border-hairline bg-surface/90 backdrop-blur-xl shadow-2xl text-xs">
         {/* CID indicator */}
         <button
           type="button"
@@ -313,7 +313,7 @@ export function CryptographicPreFlightHUD({
           }}
           className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors group"
         >
-          <Shield className="h-3.5 w-3.5 text-emerald-500 group-hover:scale-110 transition-transform" />
+          <Shield className="h-3.5 w-3.5 text-verified group-hover:scale-110 transition-transform" />
           <span className="font-mono text-[11px] max-w-[100px] sm:max-w-[140px] truncate">
             {cid ? `${cid.slice(0, 8)}...${cid.slice(-4)}` : "Calculating..."}
           </span>
@@ -339,12 +339,12 @@ export function CryptographicPreFlightHUD({
           className="flex items-center gap-1 text-[11px] hover:underline"
         >
           {privacyScan.isClean ? (
-            <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="flex items-center gap-1 text-verified">
+              <span className="w-1.5 h-1.5 rounded-full bg-verified" />
               <span className="hidden md:inline">Sovereign Clean</span>
             </span>
           ) : (
-            <span className="flex items-center gap-1 text-amber-500 font-medium">
+            <span className="flex items-center gap-1 text-warning font-medium">
               <ShieldAlert className="h-3 w-3" />
               <span>{privacyScan.issuesCount} Trackers</span>
             </span>
@@ -360,7 +360,7 @@ export function CryptographicPreFlightHUD({
             setIsExpanded(true);
             setActiveTab("identity");
           }}
-          className="hidden lg:flex items-center gap-1 text-[11px] font-mono text-emerald-600 dark:text-emerald-400 hover:underline"
+          className="hidden lg:flex items-center gap-1 text-[11px] font-mono text-verified hover:underline"
         >
           <span>{burnerWallet?.pseudonym || "Anon Burner"}</span>
         </button>

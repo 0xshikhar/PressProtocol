@@ -13,7 +13,6 @@ import {
   AlertCircle,
   List,
   ListOrdered,
-  Sparkles,
 } from "lucide-react";
 
 export interface CommandItem {
@@ -275,9 +274,9 @@ export function SlashCommandMenu({ editor, onImageTrigger }: SlashCommandMenuPro
         top: `${coords.top}px`,
         left: `${coords.left}px`,
       }}
-      className="fixed z-50 w-72 max-h-80 overflow-y-auto rounded-xl border border-border/80 bg-background/95 dark:bg-zinc-950/95 backdrop-blur-xl shadow-2xl p-1.5 animate-in fade-in zoom-in-95 duration-100"
+      className="fixed z-50 w-72 max-h-80 overflow-y-auto rounded-[6px] border border-border/70 bg-surface/95 backdrop-blur-xl shadow-2xl p-1.5 animate-in fade-in zoom-in-95 duration-100 font-sans"
     >
-      <div className="px-2 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between border-b border-border/40 mb-1">
+      <div className="px-2 py-1.5 text-[10px] font-mono font-medium text-muted flex items-center justify-between border-b border-border/40 mb-1">
         <span>Slash Commands</span>
         {query && <span className="font-mono text-primary">/{query}</span>}
       </div>
@@ -291,19 +290,19 @@ export function SlashCommandMenu({ editor, onImageTrigger }: SlashCommandMenuPro
             <button
               key={cmd.id}
               type="button"
-              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition-colors text-xs ${
+              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-[4px] text-left transition-colors text-xs ${
                 isSelected
-                  ? "bg-primary/10 text-primary font-medium"
-                  : "hover:bg-muted/60 text-foreground"
+                  ? "bg-overlay text-primary font-medium"
+                  : "hover:bg-overlay/60 text-secondary hover:text-primary"
               }`}
               onClick={() => executeCommand(cmd)}
               onMouseEnter={() => setSelectedIndex(idx)}
             >
               <div
-                className={`p-1.5 rounded-md flex items-center justify-center ${
+                className={`p-1.5 rounded-[4px] flex items-center justify-center ${
                   isSelected
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground"
+                    ? "bg-overlay text-primary border border-hairline"
+                    : "bg-surface-raised text-muted"
                 }`}
               >
                 <Icon className="h-4 w-4" />
@@ -311,18 +310,18 @@ export function SlashCommandMenu({ editor, onImageTrigger }: SlashCommandMenuPro
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <span className="font-medium text-xs">{cmd.title}</span>
+                  <span className="font-medium text-xs text-primary">{cmd.title}</span>
                   {cmd.badge && (
-                    <span className="text-[9px] px-1.5 py-0.2 rounded-full font-mono bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-[3px] font-mono bg-overlay text-secondary border border-hairline">
                       {cmd.badge}
                     </span>
                   )}
                 </div>
-                <p className="text-[10px] text-muted-foreground truncate">{cmd.description}</p>
+                <p className="text-[10px] text-muted truncate font-sans">{cmd.description}</p>
               </div>
 
               {isSelected && (
-                <span className="text-[10px] font-mono text-muted-foreground opacity-70">
+                <span className="text-[10px] font-mono text-muted">
                   ↵
                 </span>
               )}

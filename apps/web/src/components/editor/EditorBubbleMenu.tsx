@@ -47,14 +47,14 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
         animation: "shift-away",
         placement: "top",
       }}
-      className="flex items-center gap-0.5 bg-background/95 dark:bg-zinc-900/95 backdrop-blur-md border border-border/80 shadow-2xl rounded-xl p-1 z-50 animate-in fade-in zoom-in-95"
+      className="flex items-center gap-0.5 bg-surface/95 backdrop-blur-md border border-border/80 shadow-2xl rounded-[6px] p-1 z-50 animate-in fade-in zoom-in-95"
     >
       {/* Bold */}
       <Button
         type="button"
         size="sm"
         variant={editor.isActive("bold") ? "secondary" : "ghost"}
-        className="h-8 w-8 p-0 text-foreground hover:text-foreground"
+        className={`h-7 w-7 p-0 rounded-[4px] ${editor.isActive("bold") ? "bg-overlay text-primary border border-hairline font-semibold" : "text-secondary hover:text-primary hover:bg-overlay"}`}
         onClick={() => editor.chain().focus().toggleBold().run()}
         title="Bold (⌘B)"
       >
@@ -66,7 +66,7 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
         type="button"
         size="sm"
         variant={editor.isActive("italic") ? "secondary" : "ghost"}
-        className="h-8 w-8 p-0 text-foreground hover:text-foreground"
+        className={`h-7 w-7 p-0 rounded-[4px] ${editor.isActive("italic") ? "bg-overlay text-primary border border-hairline font-semibold" : "text-secondary hover:text-primary hover:bg-overlay"}`}
         onClick={() => editor.chain().focus().toggleItalic().run()}
         title="Italic (⌘I)"
       >
@@ -78,7 +78,7 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
         type="button"
         size="sm"
         variant={editor.isActive("strike") ? "secondary" : "ghost"}
-        className="h-8 w-8 p-0 text-foreground hover:text-foreground"
+        className={`h-7 w-7 p-0 rounded-[4px] ${editor.isActive("strike") ? "bg-overlay text-primary border border-hairline font-semibold" : "text-secondary hover:text-primary hover:bg-overlay"}`}
         onClick={() => editor.chain().focus().toggleStrike().run()}
         title="Strikethrough"
       >
@@ -90,7 +90,7 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
         type="button"
         size="sm"
         variant={editor.isActive("code") ? "secondary" : "ghost"}
-        className="h-8 w-8 p-0 text-foreground hover:text-foreground"
+        className={`h-7 w-7 p-0 rounded-[4px] ${editor.isActive("code") ? "bg-overlay text-primary border border-hairline font-semibold" : "text-secondary hover:text-primary hover:bg-overlay"}`}
         onClick={() => editor.chain().focus().toggleCode().run()}
         title="Inline Code (⌘E)"
       >
@@ -104,7 +104,7 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
         type="button"
         size="sm"
         variant={editor.isActive("heading", { level: 2 }) ? "secondary" : "ghost"}
-        className="h-8 w-8 p-0 text-foreground hover:text-foreground"
+        className={`h-7 w-7 p-0 rounded-[4px] ${editor.isActive("heading", { level: 2 }) ? "bg-overlay text-primary border border-hairline font-semibold" : "text-secondary hover:text-primary hover:bg-overlay"}`}
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
         title="Heading 2"
       >
@@ -116,7 +116,7 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
         type="button"
         size="sm"
         variant={editor.isActive("heading", { level: 3 }) ? "secondary" : "ghost"}
-        className="h-8 w-8 p-0 text-foreground hover:text-foreground"
+        className={`h-7 w-7 p-0 rounded-[4px] ${editor.isActive("heading", { level: 3 }) ? "bg-overlay text-primary border border-hairline font-semibold" : "text-secondary hover:text-primary hover:bg-overlay"}`}
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
         title="Heading 3"
       >
@@ -128,7 +128,7 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
         type="button"
         size="sm"
         variant={editor.isActive("blockquote") ? "secondary" : "ghost"}
-        className="h-8 w-8 p-0 text-foreground hover:text-foreground"
+        className={`h-7 w-7 p-0 rounded-[4px] ${editor.isActive("blockquote") ? "bg-overlay text-primary border border-hairline font-semibold" : "text-secondary hover:text-primary hover:bg-overlay"}`}
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
         title="Pull Quote"
       >
@@ -140,7 +140,7 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
         type="button"
         size="sm"
         variant={(editor.isActive as any)("callout") ? "secondary" : "ghost"}
-        className="h-8 w-8 p-0 text-foreground hover:text-foreground"
+        className={`h-7 w-7 p-0 rounded-[4px] ${(editor.isActive as any)("callout") ? "bg-overlay text-primary border border-hairline font-semibold" : "text-secondary hover:text-primary hover:bg-overlay"}`}
         onClick={() => (editor.chain().focus() as any).toggleCallout().run()}
         title="Callout Box"
       >
@@ -154,7 +154,7 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
         type="button"
         size="sm"
         variant={editor.isActive("link") ? "secondary" : "ghost"}
-        className="h-8 w-8 p-0 text-foreground hover:text-foreground"
+        className={`h-7 w-7 p-0 rounded-[4px] ${editor.isActive("link") ? "bg-overlay text-primary border border-hairline font-semibold" : "text-secondary hover:text-primary hover:bg-overlay"}`}
         onClick={setLink}
         title={editor.isActive("link") ? "Edit Link" : "Add Link"}
       >
@@ -166,7 +166,7 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
           type="button"
           size="sm"
           variant="ghost"
-          className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+          className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 rounded-[4px]"
           onClick={() => editor.chain().focus().unsetLink().run()}
           title="Remove Link"
         >

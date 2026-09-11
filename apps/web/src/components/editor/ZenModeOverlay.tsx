@@ -59,7 +59,7 @@ export function ZenModeOverlay({
       <div className="sticky top-0 z-50 bg-background/80 backdrop-blur border-b border-border/40 py-2.5 px-6">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
+            <span className="text-xs font-mono px-2 py-0.5 rounded-[4px] bg-verified-tint text-verified border border-verified/30 flex items-center gap-1.5">
               <Shield className="h-3 w-3" />
               <span>Zen Focus Mode</span>
             </span>
@@ -74,11 +74,7 @@ export function ZenModeOverlay({
             {onPublish && (
               <Button
                 size="sm"
-                className={
-                  isAnon
-                    ? "bg-emerald-600 hover:bg-emerald-500 text-white gap-2 text-xs h-8"
-                    : "gap-2 text-xs h-8"
-                }
+                className="gap-2 text-xs h-8"
                 onClick={onPublish}
                 disabled={isPublishing || !title.trim()}
               >
