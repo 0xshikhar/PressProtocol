@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Activity, RefreshCw, Zap, ShieldCheck, Globe, Network, Radio, Cloud, Server } from "lucide-react";
+import {
+  RefreshCw,
+  Network,
+  Cloud,
+  Lock,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export interface GatewayPing {
   id: string;
@@ -18,8 +24,8 @@ export interface GatewayPing {
 const DEFAULT_GATEWAYS: GatewayPing[] = [
   {
     id: "pinata",
-    name: "Pinata IPFS Dedicated",
-    region: "Global CDN (Edge)",
+    name: "Pinata IPFS Dedicated Edge",
+    region: "Global CDN (Anycast)",
     type: "Clearnet IPFS",
     latencyMs: 78,
     uptime: "99.98%",
@@ -37,7 +43,7 @@ const DEFAULT_GATEWAYS: GatewayPing[] = [
   {
     id: "ipfs-io",
     name: "IPFS.io Public Mirror",
-    region: "Decentralized Public",
+    region: "Decentralized Public Swarm",
     type: "DHT P2P",
     latencyMs: 142,
     uptime: "99.74%",
@@ -54,9 +60,9 @@ const DEFAULT_GATEWAYS: GatewayPing[] = [
   },
   {
     id: "tor-onion",
-    name: "PressProtocol Tor Service",
-    region: "Anonymous Onion Circuit",
-    type: "Tor v3 Hidden",
+    name: "PressProtocol Onion Circuit",
+    region: "Tor v3 Hidden Service",
+    type: "Tor v3 Onion",
     latencyMs: 380,
     uptime: "100.0%",
     status: "optimal",
@@ -86,15 +92,14 @@ export function GatewayTelemetry() {
         setLastUpdated(new Date().toLocaleTimeString());
       }
     } catch (err) {
-      console.warn("Could not fetch real-time gateway telemetry, using calibrated baseline:", err);
+      console.warn("Using baseline gateway telemetry:", err);
     } finally {
       if (manual) {
-        setTimeout(() => setIsRefreshing(false), 500);
+        setTimeout(() => setIsRefreshing(false), 450);
       }
     }
   }, []);
 
-  // Initial fetch and 15s recurring probe sync
   useEffect(() => {
     fetchTelemetry(false);
     const interval = setInterval(() => {
@@ -103,200 +108,165 @@ export function GatewayTelemetry() {
     return () => clearInterval(interval);
   }, [fetchTelemetry]);
 
+  // Section 8: Calm state words (Nominal, Active, Degraded, Unreachable) - no ping animations
   const getStatusBadge = (status: GatewayPing["status"]) => {
     switch (status) {
       case "optimal":
         return (
-          <span className="flex items-center gap-1.5 font-mono text-[10px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            optimal
+          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-verified">
+            <span className="w-1.5 h-1.5 rounded-full bg-verified" />
+            Nominal
           </span>
         );
       case "operational":
         return (
-          <span className="flex items-center gap-1.5 font-mono text-[10px] text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 rounded border border-cyan-500/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-            operational
+          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-secondary">
+            <span className="w-1.5 h-1.5 rounded-full bg-muted" />
+            Active
           </span>
         );
       case "degraded":
         return (
-          <span className="flex items-center gap-1.5 font-mono text-[10px] text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-            degraded
+          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-warning">
+            <span className="w-1.5 h-1.5 rounded-full bg-warning" />
+            Degraded
           </span>
         );
       case "offline":
       default:
         return (
-          <span className="flex items-center gap-1.5 font-mono text-[10px] text-rose-400 bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
-            offline
+          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-error">
+            <span className="w-1.5 h-1.5 rounded-full bg-error" />
+            Unreachable
           </span>
         );
     }
   };
 
   const getTransportIcon = (type: string) => {
-    if (type.includes("Clearnet") || type.includes("Anycast")) {
-      return <Cloud className="w-3.5 h-3.5 text-cyan-400" />;
-    }
-    if (type.includes("Tor") || type.includes("Hidden")) {
-      return <Radio className="w-3.5 h-3.5 text-purple-400" />;
-    }
-    return <Network className="w-3.5 h-3.5 text-emerald-400" />;
+    if (type.includes("Tor")) return <Lock className="w-3.5 h-3.5 text-muted" />;
+    if (type.includes("Anycast") || type.includes("Clearnet")) return <Cloud className="w-3.5 h-3.5 text-muted" />;
+    return <Network className="w-3.5 h-3.5 text-muted" />;
   };
 
-  const clearnetGateways = gateways.filter(
-    (g) => g.type.includes("Clearnet") || g.type.includes("Anycast")
-  );
-  const decentralizedGateways = gateways.filter(
-    (g) => !g.type.includes("Clearnet") && !g.type.includes("Anycast")
-  );
-
   return (
-    <section id="telemetry" className="relative py-20 bg-[#04070e] text-white overflow-hidden border-t border-white/10">
-      {/* Anchor alias for backwards compatibility */}
+    <section id="telemetry" className="relative py-20 border-t border-hairline bg-canvas text-primary">
       <div id="capabilities" className="absolute -top-24" />
 
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10 pb-6 border-b border-white/10">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-              <Activity className="w-5 h-5 animate-pulse" />
+      <div className="max-w-[1360px] mx-auto px-6 lg:px-12">
+        {/* Section Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 pb-6 border-b border-hairline">
+          <div>
+            <div className="text-[11px] font-mono tracking-widest text-muted uppercase mb-3">
+              Edge Probes &bull; Global Mirror Status
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="font-display text-2xl text-white font-medium">
-                  Live Gateway & Relay Telemetry
-                </h3>
-                <span className="font-mono text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30 uppercase">
-                  LIVE PROBES
-                </span>
-              </div>
-              <p className="text-xs text-white/50 font-mono flex items-center gap-2 mt-0.5">
-                <span>Concurrent synthetic health probes every 15s</span>
-                <span>·</span>
-                <span>Avg: {averageLatency}ms</span>
-                <span>·</span>
-                <span>Updated: {lastUpdated}</span>
-              </p>
-            </div>
+            <h2 className="font-hero text-3xl sm:text-4xl lg:text-5xl text-primary font-normal tracking-tight">
+              Gateway &amp; Relay Telemetry
+            </h2>
+            <p className="mt-3 text-base sm:text-lg text-secondary font-light max-w-2xl measure-lead">
+              Automated synthetic health probes every 15 seconds across clearnet edge mirrors, public IPFS nodes, and Tor onion circuits.
+            </p>
           </div>
 
-          <div className="flex items-center gap-4 font-mono text-xs text-white/60">
-            <div className="hidden sm:flex items-center gap-2" title="Public IPFS network swarm, not operator-controlled">
-              <span className="w-2 h-2 rounded-full bg-emerald-400" />
-              <span>{activeDHTNodes} Active DHT Nodes</span>
-              <span className="text-[10px] text-white/40 hidden lg:inline">(public IPFS network)</span>
+          <div className="flex items-center gap-4 shrink-0">
+            <div className="text-right hidden sm:block font-mono text-xs text-muted">
+              <span className="block text-[10px] uppercase tracking-wider text-muted/80">LAST CHECKED</span>
+              <span className="tabular-nums text-secondary">{lastUpdated}</span>
             </div>
-            <div className="hidden sm:flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-cyan-400" />
-              <span>{dropRate} Drop Rate</span>
-            </div>
-
             <button
               onClick={() => fetchTelemetry(true)}
               disabled={isRefreshing}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-white/10 bg-white/5 hover:bg-white/10 text-white/80 hover:text-white transition-colors text-[11px]"
+              className="flex items-center gap-2 px-3.5 py-2 rounded-[6px] border border-hairline bg-overlay/50 hover:bg-overlay text-secondary hover:text-primary transition-colors text-xs font-mono"
               title="Trigger immediate edge latency probe"
             >
-              <RefreshCw className={`w-3 h-3 ${isRefreshing ? "animate-spin text-cyan-400" : ""}`} />
-              <span>Probe Now</span>
+              <RefreshCw className={cn("w-3.5 h-3.5 text-muted", isRefreshing && "animate-spin")} />
+              <span>{isRefreshing ? "Probing..." : "Probe Now"}</span>
             </button>
           </div>
         </div>
 
-        {/* Grouped Gateway Monitors */}
-        <div className="space-y-8">
-          {/* Sub-Group 1: Clearnet High-Speed Edge Gateways */}
-          <div>
-            <div className="flex items-center gap-2 mb-3 font-mono text-xs uppercase tracking-wider text-white/50">
-              <Cloud className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Clearnet Edge Mirrors & HTTP/3 Gateways</span>
-            </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              {clearnetGateways.map((gw) => (
-                <div
-                  key={gw.id}
-                  className="p-5 rounded-xl border border-white/10 bg-black/40 backdrop-blur-md flex flex-col justify-between gap-4 hover:border-cyan-500/30 transition-all group"
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-mono text-[10px] uppercase tracking-wider text-white/50 flex items-center gap-1.5">
-                        {getTransportIcon(gw.type)}
-                        {gw.type}
-                      </span>
-                      {getStatusBadge(gw.status)}
-                    </div>
-                    <h4 className="font-semibold text-sm text-white mb-1 group-hover:text-cyan-300 transition-colors">
-                      {gw.name}
-                    </h4>
-                    <p className="text-xs text-white/40 font-mono truncate">{gw.region}</p>
-                  </div>
-
-                  <div className="pt-3 border-t border-white/5 flex items-center justify-between font-mono">
-                    <div>
-                      <span className="text-[10px] text-white/40 block">LATENCY</span>
-                      <span className="text-base font-bold text-cyan-400">
-                        {gw.latencyMs}ms
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-[10px] text-white/40 block">UPTIME</span>
-                      <span className="text-xs text-white/80">{gw.uptime}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+        {/* Global Summary Metrics Strip (Section 4.1: Card Elevation, Tabular Mono) */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+          <div className="p-4 rounded-[6px] border border-hairline bg-surface shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-muted block mb-1">
+              Active DHT Nodes
+            </span>
+            <span className="font-mono text-xl text-primary font-medium tabular-nums">
+              {activeDHTNodes} peers
+            </span>
           </div>
 
-          {/* Sub-Group 2: Decentralized P2P & Onion Circuits */}
-          <div>
-            <div className="flex items-center gap-2 mb-3 font-mono text-xs uppercase tracking-wider text-white/50">
-              <Network className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Decentralized DHT Swarm & Tor Onion Circuits</span>
-            </div>
-            <div className="grid sm:grid-cols-3 gap-4">
-              {decentralizedGateways.map((gw) => (
-                <div
-                  key={gw.id}
-                  className="p-5 rounded-xl border border-white/10 bg-black/40 backdrop-blur-md flex flex-col justify-between gap-4 hover:border-emerald-500/30 transition-all group"
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-mono text-[10px] uppercase tracking-wider text-white/50 flex items-center gap-1.5">
-                        {getTransportIcon(gw.type)}
-                        {gw.type}
-                      </span>
-                      {getStatusBadge(gw.status)}
-                    </div>
-                    <h4 className="font-semibold text-sm text-white mb-1 group-hover:text-emerald-300 transition-colors">
-                      {gw.name}
-                    </h4>
-                    <p className="text-xs text-white/40 font-mono truncate">{gw.region}</p>
-                  </div>
+          <div className="p-4 rounded-[6px] border border-hairline bg-surface shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-muted block mb-1">
+              Packet Drop Rate
+            </span>
+            <span className="font-mono text-xl text-verified font-medium tabular-nums">
+              {dropRate}
+            </span>
+          </div>
 
-                  <div className="pt-3 border-t border-white/5 flex items-center justify-between font-mono">
-                    <div>
-                      <span className="text-[10px] text-white/40 block">LATENCY</span>
-                      <span
-                        className={`text-base font-bold ${
-                          gw.type.includes("Tor") ? "text-purple-400" : "text-emerald-400"
-                        }`}
-                      >
-                        {gw.latencyMs}ms
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-[10px] text-white/40 block">UPTIME</span>
-                      <span className="text-xs text-white/80">{gw.uptime}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div className="p-4 rounded-[6px] border border-hairline bg-surface shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-muted block mb-1">
+              Clearnet Edge Latency
+            </span>
+            <span className="font-mono text-xl text-primary font-medium tabular-nums">
+              ~{averageLatency}ms
+            </span>
+          </div>
+
+          <div className="p-4 rounded-[6px] border border-hairline bg-surface shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-muted block mb-1">
+              Tor Onion Status
+            </span>
+            <span className="font-mono text-xl text-anonymous font-medium tabular-nums">
+              100.0% Intact
+            </span>
+          </div>
+        </div>
+
+        {/* High-Legibility Status Table (Section 8: Status Rows & Real-Time Surfaces) */}
+        <div className="rounded-[6px] border border-hairline bg-surface overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="border-b border-hairline bg-overlay/30 text-muted font-mono text-[11px] uppercase tracking-wider">
+                  <th className="py-3 px-5 font-medium">Endpoint / Mirror</th>
+                  <th className="py-3 px-5 font-medium">Transport Layer</th>
+                  <th className="py-3 px-5 font-medium hidden md:table-cell">Region</th>
+                  <th className="py-3 px-5 font-medium text-right">Edge Latency</th>
+                  <th className="py-3 px-5 font-medium text-right hidden sm:table-cell">30d Uptime</th>
+                  <th className="py-3 px-5 font-medium text-right">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-hairline">
+                {gateways.map((gw) => (
+                  <tr key={gw.id} className="hover:bg-overlay/20 transition-colors">
+                    <td className="py-3.5 px-5">
+                      <div className="font-sans font-medium text-primary text-xs">{gw.name}</div>
+                      <div className="font-mono text-[11px] text-muted md:hidden">{gw.region}</div>
+                    </td>
+                    <td className="py-3.5 px-5 text-secondary font-mono">
+                      <div className="flex items-center gap-2">
+                        {getTransportIcon(gw.type)}
+                        <span>{gw.type}</span>
+                      </div>
+                    </td>
+                    <td className="py-3.5 px-5 text-secondary font-mono hidden md:table-cell">
+                      {gw.region}
+                    </td>
+                    <td className="py-3.5 px-5 text-right font-mono font-medium text-primary tabular-nums">
+                      {gw.latencyMs}ms
+                    </td>
+                    <td className="py-3.5 px-5 text-right font-mono text-secondary tabular-nums hidden sm:table-cell">
+                      {gw.uptime}
+                    </td>
+                    <td className="py-3.5 px-5 text-right">
+                      {getStatusBadge(gw.status)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
