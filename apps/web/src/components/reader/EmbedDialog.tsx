@@ -62,22 +62,22 @@ export function EmbedDialog({ cid, title }: EmbedDialogProps) {
           <span>Embed</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl bg-slate-950 border-slate-800 text-slate-100 p-6 rounded-2xl shadow-2xl">
+      <DialogContent className="max-w-2xl bg-surface border-hairline text-primary p-6 rounded-2xl shadow-2xl">
         <DialogHeader className="space-y-1">
-          <DialogTitle className="text-xl font-bold flex items-center gap-2">
-            <Code2 className="h-5 w-5 text-emerald-400" />
+          <DialogTitle className="text-xl font-sans font-bold flex items-center gap-2">
+            <Code2 className="h-5 w-5 text-verified" />
             Universal Sovereign Embed Widget
           </DialogTitle>
-          <DialogDescription className="text-slate-400 text-xs">
+          <DialogDescription className="text-muted-foreground text-xs">
             Embed this cryptographically signed article into any external website, Ghost CMS, Substack, Medium, or personal blog.
           </DialogDescription>
         </DialogHeader>
 
         {/* Configuration Controls */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-3 border-y border-slate-800/80">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-3 border-y border-hairline">
           {/* Theme selector */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-300">Widget Theme</label>
+            <label className="text-xs font-semibold text-primary">Widget Theme</label>
             <div className="flex gap-2">
               {(["cyber", "dark", "light"] as const).map((t) => (
                 <button
@@ -85,13 +85,10 @@ export function EmbedDialog({ cid, title }: EmbedDialogProps) {
                   onClick={() => setTheme(t)}
                   className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium capitalize border transition-all ${
                     theme === t
-                      ? t === "cyber"
-                        ? "bg-emerald-950 text-emerald-400 border-emerald-500/60 shadow-[0_0_10px_rgba(16,185,129,0.2)]"
-                        : "bg-slate-800 text-white border-slate-600"
-                      : "bg-slate-900/50 text-slate-400 border-slate-800 hover:bg-slate-800/50"
+                      ? "bg-overlay text-primary border-border-focus font-semibold"
+                      : "bg-surface-subtle text-muted-foreground border-hairline hover:bg-surface-elevated"
                   }`}
                 >
-                  {t === "cyber" && <Sparkles className="w-3 h-3 inline mr-1 text-emerald-400" />}
                   {t}
                 </button>
               ))}
@@ -100,14 +97,14 @@ export function EmbedDialog({ cid, title }: EmbedDialogProps) {
 
           {/* Mode selector */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-300">Display Density</label>
+            <label className="text-xs font-semibold text-primary">Display Density</label>
             <div className="flex gap-2">
               <button
                 onClick={() => setCompact(false)}
                 className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium border transition-all ${
                   !compact
-                    ? "bg-slate-800 text-white border-slate-600"
-                    : "bg-slate-900/50 text-slate-400 border-slate-800 hover:bg-slate-800/50"
+                    ? "bg-overlay text-primary border-border-focus font-semibold"
+                    : "bg-surface-subtle text-muted-foreground border-hairline hover:bg-surface-elevated"
                 }`}
               >
                 Full Reader
@@ -116,8 +113,8 @@ export function EmbedDialog({ cid, title }: EmbedDialogProps) {
                 onClick={() => setCompact(true)}
                 className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium border transition-all ${
                   compact
-                    ? "bg-slate-800 text-white border-slate-600"
-                    : "bg-slate-900/50 text-slate-400 border-slate-800 hover:bg-slate-800/50"
+                    ? "bg-overlay text-primary border-border-focus font-semibold"
+                    : "bg-surface-subtle text-muted-foreground border-hairline hover:bg-surface-elevated"
                 }`}
               >
                 Compact Card
@@ -128,18 +125,18 @@ export function EmbedDialog({ cid, title }: EmbedDialogProps) {
 
         {/* Live Preview Container */}
         <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-xs text-slate-400">
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span>Live Interactive Preview</span>
             <a
               href={embedUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-emerald-400 hover:underline flex items-center gap-1 text-[11px]"
+              className="text-primary hover:text-accent-hover hover:underline flex items-center gap-1 text-[11px]"
             >
               Open in new tab <ExternalLink className="w-2.5 h-2.5" />
             </a>
           </div>
-          <div className="w-full rounded-xl overflow-hidden border border-slate-800 bg-slate-900 h-[220px] relative">
+          <div className="w-full rounded-xl overflow-hidden border border-hairline bg-canvas h-[220px] relative">
             <iframe
               src={embedUrl}
               className="w-full h-full border-0"
@@ -151,38 +148,38 @@ export function EmbedDialog({ cid, title }: EmbedDialogProps) {
         {/* Code Snippet */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-semibold text-slate-300">HTML Iframe Embed Code</span>
+            <span className="font-semibold text-primary">HTML Iframe Embed Code</span>
             <div className="flex gap-2">
               <button
                 onClick={copyUrl}
-                className="text-xs text-slate-400 hover:text-slate-200 transition-colors flex items-center gap-1 font-mono"
+                className="text-xs text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 font-mono"
               >
-                {copiedUrl ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                {copiedUrl ? <Check className="w-3 h-3 text-verified" /> : <Copy className="w-3 h-3" />}
                 {copiedUrl ? "URL Copied" : "Copy URL"}
               </button>
               <button
                 onClick={copySnippet}
-                className="text-xs text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1 font-semibold"
+                className="text-xs text-verified hover:opacity-80 transition-colors flex items-center gap-1 font-semibold"
               >
-                {copiedCode ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                {copiedCode ? <Check className="w-3 h-3 text-verified" /> : <Copy className="w-3 h-3" />}
                 {copiedCode ? "Code Copied" : "Copy Iframe Code"}
               </button>
             </div>
           </div>
-          <pre className="p-3 rounded-lg bg-slate-900 border border-slate-800 text-[11px] font-mono text-emerald-300 overflow-x-auto select-all max-h-24">
+          <pre className="p-3 rounded-lg bg-canvas border border-hairline text-[11px] font-mono text-primary overflow-x-auto select-all max-h-24">
             {iframeSnippet}
           </pre>
         </div>
 
-        <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between">
-          <span className="text-[11px] text-slate-400">
+        <div className="pt-2 border-t border-hairline flex items-center justify-between">
+          <span className="text-[11px] text-muted-foreground">
             Need custom widths, Web Component tags, or React snippets?
           </span>
           <Button
             variant="outline"
             size="sm"
             asChild
-            className="h-7 text-xs gap-1.5 font-mono text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/10"
+            className="h-7 text-xs gap-1.5 font-mono text-secondary hover:text-primary border-hairline hover:bg-overlay"
           >
             <Link href={`/embed/builder?cid=${encodeURIComponent(cid)}`}>
               <Sparkles className="h-3 w-3" />

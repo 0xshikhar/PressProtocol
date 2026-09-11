@@ -89,8 +89,8 @@ export function BookmarkButton({
       size="sm"
       onClick={handleToggle}
       className={`gap-2 ${bookmarked
-          ? "bg-emerald-500 hover:bg-emerald-400 text-black border-emerald-500 font-semibold shadow-sm"
-          : "border-white/10 bg-white/5 hover:bg-white/10 text-zinc-300"
+          ? "bg-verified-tint text-verified border border-verified/30 font-semibold shadow-sm"
+          : "border-hairline bg-surface-subtle hover:bg-surface-elevated text-secondary"
         } ${className || ""}`}
     >
       <Bookmark className={`h-4 w-4 ${bookmarked ? "fill-current" : ""}`} />

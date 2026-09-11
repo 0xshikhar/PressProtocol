@@ -99,26 +99,26 @@ export function QuoteSharePill({
         left: `${position.left}px`,
         transform: "translateX(-50%)",
       }}
-      className="fixed z-50 flex items-center gap-1 p-1 bg-zinc-950/95 text-zinc-100 backdrop-blur-xl border border-zinc-800 rounded-full shadow-2xl animate-in fade-in zoom-in-95 duration-150"
+      className="fixed z-50 flex items-center gap-1 p-1 bg-surface-elevated/95 text-primary backdrop-blur-xl border border-hairline rounded-full shadow-2xl animate-in fade-in zoom-in-95 duration-150"
     >
       <button
         onClick={handleCopyQuote}
-        className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full hover:bg-zinc-800 text-zinc-200 transition-colors"
+        className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full hover:bg-overlay text-primary transition-colors"
         title="Copy Quote with Cryptographic Verification Link"
       >
         {copied ? (
-          <Check className="h-3 w-3 text-emerald-400" />
+          <Check className="h-3 w-3 text-verified" />
         ) : (
           <Copy className="h-3 w-3 text-primary" />
         )}
         <span>{copied ? "Copied!" : "Quote & Verify"}</span>
       </button>
 
-      <div className="h-3.5 w-px bg-zinc-800" />
+      <div className="h-3.5 w-px bg-white/10" />
 
       <button
         onClick={handleShareTwitter}
-        className="p-1.5 rounded-full hover:bg-zinc-800 text-zinc-300 hover:text-white transition-colors"
+        className="p-1.5 rounded-full hover:bg-overlay text-secondary hover:text-primary transition-colors"
         title="Share quote to X / Twitter"
       >
         <Twitter className="h-3 w-3" />
@@ -126,7 +126,7 @@ export function QuoteSharePill({
 
       <button
         onClick={handleShareWarpcast}
-        className="flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full hover:bg-zinc-800 text-purple-300 hover:text-purple-200 transition-colors"
+        className="flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full hover:bg-overlay text-anonymous hover:opacity-80 transition-colors"
         title="Share quote to Warpcast / Farcaster"
       >
         <Share2 className="h-3 w-3" />
