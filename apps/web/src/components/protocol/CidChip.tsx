@@ -43,20 +43,20 @@ export function CidChip({
     <div
       onClick={showCopy ? handleCopy : undefined}
       className={cn(
-        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md font-mono text-xs",
-        "bg-white/[0.04] border border-white/[0.08] hover:border-cyan-500/30 text-cyan-300/90 hover:text-cyan-200",
+        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] font-mono text-xs",
+        "bg-[var(--bg-overlay)] border border-[var(--border-hairline)] hover:border-[var(--border-focus)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]",
         "shadow-sm transition-all select-none cursor-pointer group",
         className
       )}
       title={`IPFS CID: ${cid} (Click to copy)`}
     >
-      <span className="text-zinc-500 text-[10px] font-sans uppercase tracking-wider">CID</span>
+      <span className="text-[var(--text-muted)] text-[10px] font-sans uppercase tracking-wider">CID</span>
       <span className="tracking-wide font-medium">{displayCid}</span>
 
       {showCopy && (
-        <span className="text-zinc-500 group-hover:text-cyan-300 transition-colors ml-0.5">
+        <span className="text-[var(--text-muted)] group-hover:text-[var(--text-primary)] transition-colors ml-0.5">
           {copied ? (
-            <Check className="h-3 w-3 text-emerald-400" />
+            <Check className="h-3 w-3 text-[var(--verified-bright)]" />
           ) : (
             <Copy className="h-3 w-3" />
           )}
@@ -69,7 +69,7 @@ export function CidChip({
           target="_blank"
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
-          className="text-zinc-500 hover:text-cyan-300 ml-0.5"
+          className="text-[var(--text-muted)] hover:text-[var(--text-primary)] ml-0.5"
           title="Open in IPFS Gateway"
         >
           <ExternalLink className="h-3 w-3" />

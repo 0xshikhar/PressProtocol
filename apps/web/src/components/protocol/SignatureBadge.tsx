@@ -39,12 +39,12 @@ export function SignatureBadge({
     return (
       <div
         className={cn(
-          "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md font-mono text-[11px]",
-          "bg-amber-500/10 border border-amber-500/20 text-amber-300",
+          "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[6px] font-mono text-[11px]",
+          "bg-[var(--warning-tint)] border border-[var(--warning)]/30 text-[var(--warning-bright)]",
           className
         )}
       >
-        <ShieldAlert className="h-3 w-3 text-amber-400" />
+        <ShieldAlert className="h-3 w-3 text-[var(--warning-bright)]" />
         <span>Unverified</span>
       </div>
     );
@@ -54,29 +54,29 @@ export function SignatureBadge({
     <div
       onClick={publicKey ? handleCopy : undefined}
       className={cn(
-        "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md font-mono text-[11px]",
-        "bg-emerald-500/10 border border-emerald-500/20 text-emerald-300",
+        "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[6px] font-mono text-[11px]",
+        "bg-[var(--verified-tint)] border border-[var(--verified)]/30 text-[var(--verified-bright)]",
         "shadow-sm select-none transition-all",
-        publicKey ? "cursor-pointer hover:border-emerald-500/40 hover:bg-emerald-500/15" : "",
+        publicKey ? "cursor-pointer hover:border-[var(--verified)]/50 hover:bg-[var(--verified-tint)]/80" : "",
         className
       )}
       title={publicKey ? `Public Key: ${publicKey} (Click to copy)` : "Cryptographically Signed"}
     >
-      <ShieldCheck className="h-3 w-3 text-emerald-400" />
-      <span className="font-semibold uppercase text-[10px] tracking-wider text-emerald-400/90">
+      <ShieldCheck className="h-3 w-3 text-[var(--verified-bright)]" />
+      <span className="font-medium uppercase text-[10px] tracking-wider text-[var(--verified-bright)]">
         {algorithm}
       </span>
-      <span className="text-emerald-200">✓ Verified</span>
+      <span className="text-[var(--text-primary)]">Verified</span>
 
       {!compact && displayKey && (
-        <span className="text-emerald-400/70 border-l border-emerald-500/30 pl-1.5 ml-0.5 text-[10px]">
+        <span className="text-[var(--text-secondary)] border-l border-[var(--verified)]/30 pl-1.5 ml-0.5 text-[10px]">
           {displayKey}
         </span>
       )}
 
       {publicKey && !compact && (
-        <span className="text-emerald-400/60 ml-0.5">
-          {copied ? <Check className="h-2.5 w-2.5 text-emerald-300" /> : <Copy className="h-2.5 w-2.5" />}
+        <span className="text-[var(--text-muted)] hover:text-[var(--text-primary)] ml-0.5">
+          {copied ? <Check className="h-2.5 w-2.5 text-[var(--verified-bright)]" /> : <Copy className="h-2.5 w-2.5" />}
         </span>
       )}
     </div>
