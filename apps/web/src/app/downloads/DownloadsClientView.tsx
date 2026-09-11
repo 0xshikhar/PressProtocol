@@ -1,410 +1,711 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { 
   Download, 
   Chrome, 
   Globe, 
   FileText, 
-  Terminal, 
   ExternalLink, 
   Check, 
   Copy, 
-  ArrowRight, 
-  ArrowLeft,
-  Shield, 
+  ArrowLeft, 
   Cpu, 
-  Layers, 
   Package, 
-  FolderDown, 
   CheckCircle2, 
-  Sparkles,
-  GitBranch,
-  Server
+  GitBranch, 
+  Server, 
+  ListFilter,
+  LayoutGrid,
+  Table as TableIcon,
+  ChevronDown,
+  ChevronUp,
+  Terminal,
+  Code2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+
+interface EcosystemItem {
+  id: string;
+  category: "extensions" | "integrations" | "node" | "sdks";
+  categoryLabel: string;
+  name: string;
+  platform: string;
+  type: string;
+  format: string;
+  version: string;
+  description: string;
+  badges: string[];
+  actionType: "download" | "copy";
+  actionLabel: string;
+  actionSnippet?: string;
+  actionUrl?: string;
+  sourceUrl: string;
+  registryUrl?: string;
+  registryName?: string;
+  installSteps?: string[];
+  quickstart?: string;
+  icon: "chrome" | "globe" | "file-text" | "git-branch" | "server" | "cpu";
+}
+
+// Complete Ecosystem Registry Catalog (Single Source of Truth)
+const ECOSYSTEM_REGISTRY: EcosystemItem[] = [
+  {
+    id: "chrome",
+    category: "extensions",
+    categoryLabel: "Browser & CMS",
+    name: "Chromium Browser Web Clipper",
+    platform: "Chrome, Brave, Edge, Arc",
+    type: "Manifest V3 Extension",
+    format: ".zip (38 KB)",
+    version: "v1.0.7",
+    description: "In-browser Ed25519 burner keypair management, automatic URL tracker scrubbing (UTM/fbclid), and 1-click sovereign archival to IPFS and Tor.",
+    badges: ["Manifest V3", "38 KB", "v1.0.7"],
+    actionType: "download",
+    actionUrl: "/downloads/press-protocol-extension.zip",
+    actionLabel: "Download Extension (.zip)",
+    sourceUrl: "https://github.com/0xshikhar/PressProtocol/tree/master/integrations/browser-extension",
+    installSteps: [
+      "Extract press-protocol-extension.zip on your local machine.",
+      "Navigate to chrome://extensions and toggle 'Developer mode' ON.",
+      "Click 'Load unpacked' and select the extracted directory."
+    ],
+    icon: "chrome"
+  },
+  {
+    id: "wordpress",
+    category: "extensions",
+    categoryLabel: "Browser & CMS",
+    name: "WordPress Publishing Bridge",
+    platform: "WordPress 6.0+ & Multisite",
+    type: "CMS Plugin",
+    format: ".zip (27 KB)",
+    version: "v1.0.7",
+    description: "Mirror every WordPress post into a signed, immutable IPFS multihash and Tor onion publication. Zero database modifications; runs alongside your existing theme.",
+    badges: ["WP 6.0+", "PHP 8.0+", "27 KB", "v1.0.7"],
+    actionType: "download",
+    actionUrl: "/downloads/press-protocol-wordpress.zip",
+    actionLabel: "Download Plugin (.zip)",
+    sourceUrl: "https://github.com/0xshikhar/PressProtocol/tree/master/integrations/wordpress-plugin",
+    installSteps: [
+      "In WP Admin: navigate to Plugins → Add New → Upload Plugin.",
+      "Upload press-protocol-wordpress.zip and click 'Install Now'.",
+      "Click 'Activate Plugin' and configure your IPFS/Tor relays in Settings."
+    ],
+    icon: "globe"
+  },
+  {
+    id: "obsidian",
+    category: "integrations",
+    categoryLabel: "Editor & CI/CD",
+    name: "Obsidian Sovereign Publisher",
+    platform: "Desktop & Mobile",
+    type: "Markdown Vault Native",
+    format: ".zip (18 KB)",
+    version: "v1.0.7",
+    description: "Publish investigative notes and research memos straight from Obsidian. Calculates CIDs locally and syndicates without leaving your editor.",
+    badges: ["Desktop & Mobile", "Community Plugin", "v1.0.7"],
+    actionType: "download",
+    actionUrl: "/downloads/press-protocol-obsidian.zip",
+    actionLabel: "Download Plugin (.zip)",
+    sourceUrl: "https://github.com/0xshikhar/PressProtocol/tree/master/integrations/obsidian-plugin",
+    installSteps: [
+      "Extract zip contents into .obsidian/plugins/pressprotocol/.",
+      "In Obsidian Settings → Community Plugins: reload and toggle ON.",
+      "Hit Cmd + P (or Ctrl + P) → select 'Publish Note to PressProtocol'."
+    ],
+    icon: "file-text"
+  },
+  {
+    id: "github-action",
+    category: "integrations",
+    categoryLabel: "Editor & CI/CD",
+    name: "GitHub Actions Automated Publisher",
+    platform: "GitHub Actions CI/CD",
+    type: "CI/CD Pipeline",
+    format: "Marketplace Action",
+    version: "v1.0.7",
+    description: "Sign and syndicate new markdown posts to IPFS and Tor whenever commits are pushed to your repository.",
+    badges: ["CI/CD Pipeline", "v1.0.7"],
+    actionType: "copy",
+    actionSnippet: "- uses: 0xshikhar/PressProtocol/integrations/publish-action@v1.0.7\n  with:\n    content_dir: './content/posts'\n    private_key: ${{ secrets.PRESSPROTOCOL_PRIVATE_KEY }}",
+    actionLabel: "Copy Action YAML",
+    sourceUrl: "https://github.com/0xshikhar/PressProtocol/tree/master/integrations/publish-action",
+    installSteps: [
+      "Add PRESSPROTOCOL_PRIVATE_KEY to your GitHub repository Secrets.",
+      "Create .github/workflows/pressprotocol.yml in your repo.",
+      "Paste the Action workflow snippet to automate decentralized publishing."
+    ],
+    icon: "git-branch"
+  },
+  {
+    id: "node",
+    category: "node",
+    categoryLabel: "Node Daemon",
+    name: "Autonomous Node Daemon",
+    platform: "Docker, VPS, Linux/macOS",
+    type: "Daemon Service",
+    format: "docker-compose.yml",
+    version: "v1.0.7",
+    description: "Deploy a sovereign community node on your VPS or home server in 30 seconds. Features automatic IPFS peer discovery, DHT indexing, and auto-generated Tor v3 onion services.",
+    badges: ["Fastify", "Embedded Helia IPFS", "Tor v3", "v1.0.7"],
+    actionType: "download",
+    actionUrl: "/downloads/docker-compose.yml",
+    actionLabel: "Download docker-compose.yml",
+    actionSnippet: "docker compose up -d",
+    sourceUrl: "https://github.com/0xshikhar/PressProtocol/tree/master/apps/node",
+    installSteps: [
+      "Download docker-compose.yml via button or curl -O https://pressprotocol.com/downloads/docker-compose.yml",
+      "Run: docker compose up -d",
+      "Verify health: curl http://localhost:4001/metrics"
+    ],
+    icon: "server"
+  },
+  {
+    id: "ts-sdk",
+    category: "sdks",
+    categoryLabel: "Developer SDKs",
+    name: "TypeScript / Node.js SDK",
+    platform: "Node 18+, Bun, Deno, Browser",
+    type: "npm Package",
+    format: "@pressprotocol/sdk",
+    version: "v1.0.7",
+    description: "Isomorphic TypeScript client for Node, Bun, Deno, and modern browser runtimes. Complete typings for manifest signing, multihash verification, and gateway resolution.",
+    badges: ["npm package", "v1.0.7"],
+    actionType: "copy",
+    actionSnippet: "pnpm add @pressprotocol/sdk",
+    actionLabel: "pnpm add @pressprotocol/sdk",
+    sourceUrl: "https://github.com/0xshikhar/PressProtocol/tree/master/packages/sdk",
+    registryUrl: "https://www.npmjs.com/package/@pressprotocol/sdk",
+    registryName: "npm",
+    quickstart: "import { PressProtocolClient } from '@pressprotocol/sdk';\n\nconst client = new PressProtocolClient();\nconst result = await client.publish({ title: 'My Post', content: 'Hello Web3' });",
+    icon: "cpu"
+  },
+  {
+    id: "py-sdk",
+    category: "sdks",
+    categoryLabel: "Developer SDKs",
+    name: "Python Client SDK",
+    platform: "Python 3.9 - 3.14",
+    type: "PyPI Package",
+    format: "pressprotocol-py",
+    version: "v1.0.7",
+    description: "Async Python library with cryptographic Ed25519 signing, canonical JSON hashing, and multi-gateway failover resolution.",
+    badges: ["PyPI Package", "v1.0.7"],
+    actionType: "copy",
+    actionSnippet: "pip install pressprotocol-py",
+    actionLabel: "pip install pressprotocol-py",
+    sourceUrl: "https://github.com/0xshikhar/PressProtocol/tree/master/sdks/python",
+    registryUrl: "https://pypi.org/project/pressprotocol-py/",
+    registryName: "PyPI",
+    quickstart: "from pressprotocol import PressProtocol\n\nclient = PressProtocol()\nstatus = client.ping()",
+    icon: "cpu"
+  },
+  {
+    id: "go-sdk",
+    category: "sdks",
+    categoryLabel: "Developer SDKs",
+    name: "Go (Golang) Client SDK",
+    platform: "Go 1.20+",
+    type: "Go Module",
+    format: "github.com/.../sdks/go",
+    version: "v1.0.7",
+    description: "High-performance Golang module with zero external C-dependencies. Optimized for daemons, CLI tools, and microservices.",
+    badges: ["pkg.go.dev", "v1.0.7"],
+    actionType: "copy",
+    actionSnippet: "go get github.com/0xshikhar/PressProtocol/sdks/go@v1.0.7",
+    actionLabel: "go get sdks/go@v1.0.7",
+    sourceUrl: "https://github.com/0xshikhar/PressProtocol/tree/master/sdks/go",
+    registryUrl: "https://pkg.go.dev/github.com/0xshikhar/PressProtocol/sdks/go",
+    registryName: "pkg.go.dev",
+    quickstart: "import pressprotocol \"github.com/0xshikhar/PressProtocol/sdks/go\"\n\nclient := pressprotocol.NewClient()",
+    icon: "cpu"
+  },
+  {
+    id: "rs-sdk",
+    category: "sdks",
+    categoryLabel: "Developer SDKs",
+    name: "Rust Client SDK",
+    platform: "Rust 2021 Edition",
+    type: "Cargo Crate",
+    format: "pressprotocol-rs",
+    version: "v1.0.7",
+    description: "Zero-copy Rust crate for memory-safe decentralized publication parsing, CID calculation, and multihash verification.",
+    badges: ["crates.io", "v1.0.7"],
+    actionType: "copy",
+    actionSnippet: "cargo add pressprotocol-rs",
+    actionLabel: "cargo add pressprotocol-rs",
+    sourceUrl: "https://github.com/0xshikhar/PressProtocol/tree/master/sdks/rust",
+    registryUrl: "https://crates.io/crates/pressprotocol-rs",
+    registryName: "crates.io",
+    quickstart: "use pressprotocol_rs::PressProtocolClient;\n\nlet client = PressProtocolClient::new();",
+    icon: "cpu"
+  }
+];
+
+const CATEGORIES = [
+  { id: "all", label: "All Releases", count: 9 },
+  { id: "extensions", label: "Browser & CMS", count: 2 },
+  { id: "integrations", label: "Editor & CI/CD", count: 2 },
+  { id: "node", label: "Node Daemon", count: 1 },
+  { id: "sdks", label: "Developer SDKs", count: 4 },
+];
 
 export function DownloadsClientView() {
   const [copiedSnippet, setCopiedSnippet] = useState<string | null>(null);
-
-  const [activeTab, setActiveTab] = useState("extensions");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
+  const [expandedGuides, setExpandedGuides] = useState<Record<string, boolean>>({});
 
   const handleCopy = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
     setCopiedSnippet(id);
-    toast.success("Snippet copied to clipboard");
+    toast.success("Copied to clipboard!");
     setTimeout(() => setCopiedSnippet(null), 2000);
   };
 
-  const handleDownload = (filename: string, path: string) => {
+  const handleDownload = (filename: string) => {
     toast.success(`Starting download for ${filename}...`);
   };
 
+  const toggleGuide = (id: string) => {
+    setExpandedGuides((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const filteredItems = useMemo(() => {
+    if (selectedCategory === "all") return ECOSYSTEM_REGISTRY;
+    return ECOSYSTEM_REGISTRY.filter((item) => item.category === selectedCategory);
+  }, [selectedCategory]);
+
+  const renderIcon = (iconName: EcosystemItem["icon"]) => {
+    switch (iconName) {
+      case "chrome":
+        return <Chrome className="h-5 w-5 text-accent-ribbon" />;
+      case "globe":
+        return <Globe className="h-5 w-5 text-[#8770C4]" />;
+      case "file-text":
+        return <FileText className="h-5 w-5 text-accent-ribbon" />;
+      case "git-branch":
+        return <GitBranch className="h-5 w-5 text-accent-ribbon" />;
+      case "server":
+        return <Server className="h-5 w-5 text-verified" />;
+      case "cpu":
+      default:
+        return <Cpu className="h-5 w-5 text-accent-ribbon" />;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#050508] text-white selection:bg-cyan-500/30 py-10 px-4 sm:px-6 lg:px-8">
-      <div className="container mx-auto max-w-6xl space-y-12">
+    <div className="min-h-screen bg-canvas text-text-primary py-8 sm:py-12 px-4 sm:px-6 lg:px-8 font-sans">
+      <div className="container mx-auto max-w-6xl space-y-8 sm:space-y-10">
         
         {/* Navigation Breadcrumb */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           <Link href="/">
-            <Button variant="ghost" size="sm" className="gap-2 text-zinc-400 hover:text-white hover:bg-white/[0.06] text-xs font-mono">
+            <Button variant="ghost" size="sm" className="gap-2 text-text-muted hover:text-text-primary hover:bg-overlay text-xs font-mono h-8 px-2.5">
               <ArrowLeft className="h-4 w-4" /> Back to Home
             </Button>
           </Link>
-          <div className="flex items-center gap-2 text-xs font-mono text-zinc-500">
-            <span>Protocol v1.0.6</span>
+          <div className="flex items-center gap-2 text-[11px] sm:text-xs font-mono text-text-muted">
+            <span>Protocol v1.0.7</span>
             <span>&bull;</span>
-            <span className="text-emerald-400">All Downloads Verified</span>
+            <span className="text-verified">9 Production Packages</span>
           </div>
         </div>
 
         {/* Hero Section */}
-        <div className="space-y-4 border-b border-white/10 pb-8">
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="border-cyan-500/30 bg-cyan-950/50 text-cyan-300 font-mono text-xs">
-              <Package className="h-3 w-3 mr-1 text-cyan-400" /> ECOSYSTEM CLIENTS & INTEGRATIONS
+        <div className="space-y-3 sm:space-y-4 border-b border-hairline pb-6 sm:pb-8">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="outline" className="border-hairline bg-overlay text-text-secondary font-mono text-xs">
+              <Package className="h-3 w-3 mr-1 text-accent-ribbon" /> ECOSYSTEM CLIENTS &amp; BINARIES
             </Badge>
-            <span className="text-xs text-zinc-400 font-mono">ONE-CLICK DOWNLOADS</span>
+            <span className="text-xs text-text-muted font-mono hidden sm:inline">&bull; 100% OPEN SOURCE (MIT)</span>
           </div>
-          <h1 className="font-sans text-3xl sm:text-5xl font-bold tracking-tight text-white">
-            Prebuilt Extensions, Plugins & Binaries
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-hero tracking-tight text-text-primary leading-tight">
+            Downloads &amp; Ecosystem Directory
           </h1>
-          <p className="text-base sm:text-lg text-zinc-300 max-w-3xl leading-relaxed">
-            Download production-ready client bundles with 1-click. Integrate sovereign decentralized publishing into your Chromium browser, WordPress site, Obsidian vault, or CI/CD pipelines.
+          <p className="text-xs sm:text-base text-text-muted max-w-3xl leading-relaxed">
+            Download verified client binaries, install official language SDKs, or deploy sovereign daemon nodes. All tools feature in-memory cryptographic attestation and multi-transport failover across IPFS and Tor.
           </p>
         </div>
 
-        {/* Quick Links Filter Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-          <TabsList className="bg-[#0B0D14] border border-white/10 p-1 rounded-xl">
-            <TabsTrigger value="extensions" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300 font-mono text-xs gap-1.5">
-              <Chrome className="h-3.5 w-3.5" /> Browser & CMS Extensions
-            </TabsTrigger>
-            <TabsTrigger value="obsidian" className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300 font-mono text-xs gap-1.5">
-              <FileText className="h-3.5 w-3.5" /> Obsidian & Notes
-            </TabsTrigger>
-            <TabsTrigger value="developer" className="data-[state=active]:bg-emerald-500/20 data-[state=active]:text-emerald-300 font-mono text-xs gap-1.5">
-              <Terminal className="h-3.5 w-3.5" /> SDKs & Docker Daemon
-            </TabsTrigger>
-          </TabsList>
+        {/* Unified Control Bar: Categories Filter & View Mode Switcher */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2">
+          {/* Category Filter Pills (Mobile Horizontal Scrollable) */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full no-scrollbar">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.id)}
+                className={`px-3 py-1.5 rounded-[6px] text-xs font-mono whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                  selectedCategory === cat.id
+                    ? "bg-elevated text-text-primary border border-hairline font-medium shadow-sm"
+                    : "bg-surface hover:bg-overlay text-text-muted hover:text-text-primary border border-hairline"
+                }`}
+              >
+                <span>{cat.label}</span>
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                  selectedCategory === cat.id ? "bg-overlay text-accent-ribbon" : "bg-overlay text-text-muted"
+                }`}>
+                  {cat.count}
+                </span>
+              </button>
+            ))}
+          </div>
 
-          {/* TAB 1: Browser & CMS Extensions */}
-          <TabsContent value="extensions" className="space-y-6 mt-0">
-            <div className="grid md:grid-cols-2 gap-6">
-              
-              {/* Card 1: Chromium Extension */}
-              <Card className="border-white/10 bg-[#0B0D14] text-white rounded-2xl overflow-hidden flex flex-col justify-between shadow-xl">
-                <CardContent className="p-6 space-y-5">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="h-12 w-12 rounded-xl bg-cyan-950/60 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
-                      <Chrome className="h-6 w-6" />
+          {/* View Mode Toggle (Cards vs Directory Table) */}
+          <div className="flex items-center gap-1 bg-overlay p-1 rounded-[6px] border border-hairline self-start sm:self-auto shrink-0">
+            <button
+              onClick={() => setViewMode("cards")}
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-[4px] text-xs font-mono transition-all ${
+                viewMode === "cards"
+                  ? "bg-elevated text-text-primary border border-hairline font-medium"
+                  : "text-text-muted hover:text-text-primary"
+              }`}
+              title="Card Grid View"
+            >
+              <LayoutGrid className="h-3.5 w-3.5" />
+              <span>Guides &amp; Cards</span>
+            </button>
+            <button
+              onClick={() => setViewMode("table")}
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-[4px] text-xs font-mono transition-all ${
+                viewMode === "table"
+                  ? "bg-elevated text-text-primary border border-hairline font-medium"
+                  : "text-text-muted hover:text-text-primary"
+              }`}
+              title="High-Density Matrix View"
+            >
+              <TableIcon className="h-3.5 w-3.5" />
+              <span>Package Matrix</span>
+            </button>
+          </div>
+        </div>
+
+        {/* VIEW 1: Rich Cards with Collapsible Setup Guides */}
+        {viewMode === "cards" ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            {filteredItems.map((item) => {
+              const isExpanded = !!expandedGuides[item.id];
+              return (
+                <Card 
+                  key={item.id} 
+                  elevation="card"
+                  className="flex flex-col justify-between"
+                >
+                  <CardContent className="p-4 sm:p-6 space-y-4 flex-1 flex flex-col justify-between">
+                    <div className="space-y-3">
+                      {/* Top Header */}
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="h-11 w-11 rounded-[6px] bg-overlay border border-hairline flex items-center justify-center shrink-0">
+                          {renderIcon(item.icon)}
+                        </div>
+                        <div className="flex flex-wrap gap-1.5 justify-end">
+                          {item.badges.map((b, i) => (
+                            <Badge 
+                              key={i} 
+                              variant="outline" 
+                              className="border-hairline bg-overlay text-text-secondary font-mono text-[10px]"
+                            >
+                              {b}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Title and Platform */}
+                      <div>
+                        <h3 className="text-base sm:text-lg font-medium font-sans text-text-primary tracking-tight">{item.name}</h3>
+                        <p className="text-xs text-accent-ribbon font-mono mt-0.5">{item.platform}</p>
+                        <p className="text-xs text-text-muted mt-2 leading-relaxed font-sans">
+                          {item.description}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex flex-wrap gap-1.5 justify-end">
-                      <Badge className="bg-cyan-500/10 text-cyan-300 border-cyan-500/20 font-mono text-[10px]">Manifest V3</Badge>
-                      <Badge className="bg-emerald-500/10 text-emerald-300 border-emerald-500/20 font-mono text-[10px]">31 KB</Badge>
-                      <Badge variant="outline" className="border-white/10 text-zinc-400 font-mono text-[10px]">v1.0.6</Badge>
+
+                    {/* Action Block & Quick Commands */}
+                    <div className="space-y-3 pt-2">
+                      {item.actionType === "download" ? (
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <a 
+                            href={item.actionUrl} 
+                            download
+                            onClick={() => handleDownload(item.name)}
+                            className="flex-1 block"
+                          >
+                            <Button className="w-full bg-accent-primary hover:bg-accent-hover text-[#EEE7E1] font-medium font-mono text-xs h-10 gap-2 rounded-[6px] shadow-none">
+                              <Download className="h-4 w-4" /> {item.actionLabel}
+                            </Button>
+                          </a>
+                          <a
+                            href={item.sourceUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Button variant="outline" className="w-full sm:w-auto h-10 border-hairline bg-overlay hover:bg-elevated font-mono text-xs text-text-secondary hover:text-text-primary gap-1.5 rounded-[6px]">
+                              <span>Source</span>
+                              <ExternalLink className="h-3.5 w-3.5" />
+                            </Button>
+                          </a>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <div className="p-2.5 rounded-[6px] bg-canvas border border-hairline font-mono text-xs flex items-center justify-between gap-2 overflow-x-auto">
+                            <code className="text-text-primary break-all sm:break-normal text-[11px] select-all">
+                              {item.actionSnippet}
+                            </code>
+                            <button 
+                              onClick={() => handleCopy(item.actionSnippet || "", item.id)} 
+                              className="text-text-muted hover:text-text-primary shrink-0 p-1 rounded-[4px] hover:bg-overlay"
+                              title="Copy command"
+                            >
+                              {copiedSnippet === item.id ? (
+                                <Check className="h-3.5 w-3.5 text-verified" />
+                              ) : (
+                                <Copy className="h-3.5 w-3.5" />
+                              )}
+                            </button>
+                          </div>
+                          
+                          <div className="flex items-center justify-between text-xs font-mono pt-1">
+                            {item.registryUrl ? (
+                              <a 
+                                href={item.registryUrl} 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="text-text-secondary hover:text-text-primary flex items-center gap-1 text-[11px]"
+                              >
+                                <span>View on {item.registryName}</span>
+                                <ExternalLink className="h-3 w-3" />
+                              </a>
+                            ) : <span />}
+                            <a 
+                              href={item.sourceUrl} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="text-text-muted hover:text-text-primary flex items-center gap-1 text-[11px]"
+                            >
+                              <span>GitHub Source</span>
+                              <ExternalLink className="h-3 w-3" />
+                            </a>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Expandable Setup Instructions Accordion */}
+                      {(item.installSteps || item.quickstart) && (
+                        <div className="border-t border-hairline pt-2">
+                          <button
+                            onClick={() => toggleGuide(item.id)}
+                            className="flex items-center justify-between w-full text-left text-[11px] font-mono text-text-muted hover:text-text-primary py-1 transition-colors"
+                          >
+                            <span className="flex items-center gap-1.5">
+                              <Terminal className="h-3 w-3 text-accent-ribbon" />
+                              {item.installSteps ? "Setup & Installation Steps" : "Code Quickstart"}
+                            </span>
+                            {isExpanded ? (
+                              <ChevronUp className="h-3.5 w-3.5 text-text-muted" />
+                            ) : (
+                              <ChevronDown className="h-3.5 w-3.5 text-text-muted" />
+                            )}
+                          </button>
+
+                          {isExpanded && (
+                            <div className="mt-2.5 p-3 rounded-[6px] border border-hairline bg-canvas space-y-2 text-xs font-mono">
+                              {item.installSteps && (
+                                <ol className="list-decimal list-inside space-y-1.5 text-text-secondary leading-relaxed text-[11px]">
+                                  {item.installSteps.map((step, idx) => (
+                                    <li key={idx} className="pl-1">
+                                      <span className="text-text-secondary">{step}</span>
+                                    </li>
+                                  ))}
+                                </ol>
+                              )}
+                              {item.quickstart && (
+                                <div className="space-y-1">
+                                  <div className="text-[10px] text-text-muted uppercase tracking-wider">Example Usage:</div>
+                                  <pre className="p-2 rounded-[4px] bg-overlay border border-hairline text-[10px] sm:text-[11px] text-text-secondary overflow-x-auto">
+                                    {item.quickstart}
+                                  </pre>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-xl font-bold text-white tracking-tight">Chromium Browser Extension</h3>
-                    <p className="text-xs text-cyan-400 font-mono mt-0.5">Chrome, Brave, Edge, Arc</p>
-                    <p className="text-xs text-zinc-300 mt-2 leading-relaxed">
-                      Native browser extension providing instant Ed25519 keypair management, 1-click tracker scrubbing, and right-click article archival to IPFS and Tor.
-                    </p>
-                  </div>
-
-                  {/* 1-Click Download Button */}
-                  <div className="pt-2">
-                    <a 
-                      href="/downloads/press-protocol-extension.zip" 
-                      download="press-protocol-extension.zip"
-                      onClick={() => handleDownload("Chromium Extension", "/downloads/press-protocol-extension.zip")}
-                      className="w-full block"
-                    >
-                      <Button className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-semibold font-mono text-xs h-10 gap-2 rounded-xl shadow-[0_0_15px_rgba(34,211,238,0.25)]">
-                        <Download className="h-4 w-4" /> Download Extension (.zip)
-                      </Button>
-                    </a>
-                  </div>
-
-                  {/* Installation Accordion */}
-                  <div className="p-4 rounded-xl border border-white/5 bg-[#08090E] space-y-2 text-xs font-mono">
-                    <div className="text-zinc-400 font-semibold flex items-center gap-1.5">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-cyan-400" /> Setup Instructions (20 seconds):
-                    </div>
-                    <ol className="list-decimal list-inside space-y-1.5 text-zinc-300 pl-1 leading-relaxed">
-                      <li>Download and extract <code className="text-cyan-300">press-protocol-extension.zip</code>.</li>
-                      <li>Open <code className="text-cyan-300">chrome://extensions</code> in your browser.</li>
-                      <li>Enable the <strong className="text-white">Developer mode</strong> toggle in the top-right.</li>
-                      <li>Click <strong className="text-white">Load unpacked</strong> and select the unzipped directory.</li>
-                      <li>PressProtocol is now active in your extensions toolbar!</li>
-                    </ol>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Card 2: WordPress Plugin */}
-              <Card className="border-white/10 bg-[#0B0D14] text-white rounded-2xl overflow-hidden flex flex-col justify-between shadow-xl">
-                <CardContent className="p-6 space-y-5">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="h-12 w-12 rounded-xl bg-purple-950/60 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0">
-                      <Globe className="h-6 w-6" />
-                    </div>
-                    <div className="flex flex-wrap gap-1.5 justify-end">
-                      <Badge className="bg-purple-500/10 text-purple-300 border-purple-500/20 font-mono text-[10px]">WP 6.0+</Badge>
-                      <Badge className="bg-emerald-500/10 text-emerald-300 border-emerald-500/20 font-mono text-[10px]">27 KB</Badge>
-                      <Badge variant="outline" className="border-white/10 text-zinc-400 font-mono text-[10px]">PHP 8.0+</Badge>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-xl font-bold text-white tracking-tight">WordPress Publishing Bridge</h3>
-                    <p className="text-xs text-purple-400 font-mono mt-0.5">Self-Hosted WP & Multisite</p>
-                    <p className="text-xs text-zinc-300 mt-2 leading-relaxed">
-                      Transform any existing WordPress blog into an unstoppable publishing node. Automatically mirrors new blog posts to IPFS and Tor with signature proofs.
-                    </p>
-                  </div>
-
-                  {/* 1-Click Download Button */}
-                  <div className="pt-2">
-                    <a 
-                      href="/downloads/press-protocol-wordpress.zip" 
-                      download="press-protocol-wordpress.zip"
-                      onClick={() => handleDownload("WordPress Plugin", "/downloads/press-protocol-wordpress.zip")}
-                      className="w-full block"
-                    >
-                      <Button className="w-full bg-purple-500 hover:bg-purple-400 text-black font-semibold font-mono text-xs h-10 gap-2 rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.25)]">
-                        <Download className="h-4 w-4" /> Download WordPress Plugin (.zip)
-                      </Button>
-                    </a>
-                  </div>
-
-                  {/* Installation Accordion */}
-                  <div className="p-4 rounded-xl border border-white/5 bg-[#08090E] space-y-2 text-xs font-mono">
-                    <div className="text-zinc-400 font-semibold flex items-center gap-1.5">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-purple-400" /> Setup Instructions (30 seconds):
-                    </div>
-                    <ol className="list-decimal list-inside space-y-1.5 text-zinc-300 pl-1 leading-relaxed">
-                      <li>Download <code className="text-purple-300">press-protocol-wordpress.zip</code>.</li>
-                      <li>In WP Admin, navigate to <strong className="text-white">Plugins → Add New → Upload Plugin</strong>.</li>
-                      <li>Select the zip file and click <strong className="text-white">Install Now</strong>.</li>
-                      <li>Click <strong className="text-white">Activate Plugin</strong>.</li>
-                      <li>Navigate to <strong className="text-white">Settings → PressProtocol</strong> to configure relays.</li>
-                    </ol>
-                  </div>
-                </CardContent>
-              </Card>
-
-            </div>
-          </TabsContent>
-
-          {/* TAB 2: Obsidian Vault Plugin */}
-          <TabsContent value="obsidian" className="space-y-6 mt-0">
-            <Card className="border-white/10 bg-[#0B0D14] text-white rounded-2xl overflow-hidden shadow-xl">
-              <CardContent className="p-6 sm:p-8 space-y-6">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-xl bg-purple-950/60 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0">
-                      <FileText className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-bold text-white tracking-tight">Obsidian Sovereign Publisher</h3>
-                      <p className="text-xs text-purple-400 font-mono">Desktop & Mobile &bull; Markdown Native</p>
-                    </div>
-                  </div>
-
-                  <a 
-                    href="/downloads/press-protocol-obsidian.zip" 
-                    download="press-protocol-obsidian.zip"
-                    onClick={() => handleDownload("Obsidian Plugin", "/downloads/press-protocol-obsidian.zip")}
-                  >
-                    <Button className="bg-purple-500 hover:bg-purple-400 text-black font-semibold font-mono text-xs h-10 px-5 gap-2 rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.25)]">
-                      <Download className="h-4 w-4" /> Download Obsidian Plugin (.zip)
-                    </Button>
-                  </a>
-                </div>
-
-                <p className="text-sm text-zinc-300 leading-relaxed">
-                  Publish your personal research notes, investigative memos, and essays directly from Obsidian without ever leaving your editor. Retains complete markdown formatting and calculates cryptographic CIDs locally.
-                </p>
-
-                <div className="grid sm:grid-cols-3 gap-4 pt-2">
-                  <div className="p-4 rounded-xl border border-white/5 bg-[#08090E] space-y-1">
-                    <div className="text-xs font-mono text-purple-300 font-semibold">1. Unzip to Vault</div>
-                    <p className="text-[11px] text-zinc-400">Extract bundle to <code className="text-white">.obsidian/plugins/pressprotocol/</code> inside your vault.</p>
-                  </div>
-                  <div className="p-4 rounded-xl border border-white/5 bg-[#08090E] space-y-1">
-                    <div className="text-xs font-mono text-purple-300 font-semibold">2. Enable Plugin</div>
-                    <p className="text-[11px] text-zinc-400">In Obsidian Settings → Community Plugins, reload and toggle PressProtocol ON.</p>
-                  </div>
-                  <div className="p-4 rounded-xl border border-white/5 bg-[#08090E] space-y-1">
-                    <div className="text-xs font-mono text-purple-300 font-semibold">3. 1-Command Publish</div>
-                    <p className="text-[11px] text-zinc-400">Press <code className="text-white">Cmd + P</code> → select <strong className="text-white">PressProtocol: Publish Note</strong>.</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* GitHub Actions CI/CD Integration */}
-            <Card className="border-white/10 bg-[#0B0D14] text-white rounded-2xl overflow-hidden shadow-xl">
-              <CardContent className="p-6 sm:p-8 space-y-5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <GitBranch className="h-5 w-5 text-cyan-400" />
-                    <h3 className="text-lg font-bold text-white">GitHub Actions Automated Publisher</h3>
-                  </div>
-                  <Badge className="bg-cyan-500/10 text-cyan-300 border-cyan-500/20 font-mono text-[10px]">CI/CD Workflow</Badge>
-                </div>
-                <p className="text-xs text-zinc-300 leading-relaxed">
-                  Automatically sign and publish articles whenever markdown files are pushed to your git repository:
-                </p>
-                <div className="rounded-xl border border-white/10 bg-[#08090E] overflow-hidden font-mono text-xs">
-                  <div className="px-4 py-2 bg-white/5 border-b border-white/10 flex items-center justify-between text-zinc-400">
-                    <span>.github/workflows/pressprotocol.yml</span>
-                    <button 
-                      onClick={() => handleCopy(`name: Decentralized Publish\non:\n  push:\n    paths:\n      - 'dispatches/**.md'\njobs:\n  publish:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: 0xshikhar/PressProtocol/integrations/publish-action@v1.0.6\n        with:\n          path: 'dispatches/'\n          private_key: \${{ secrets.PRESS_PRIVATE_KEY }}`, "gh-action")}
-                      className="text-cyan-400 hover:text-white flex items-center gap-1"
-                    >
-                      {copiedSnippet === "gh-action" ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
-                      <span>{copiedSnippet === "gh-action" ? "Copied" : "Copy YAML"}</span>
-                    </button>
-                  </div>
-                  <pre className="p-4 text-cyan-300 overflow-x-auto leading-relaxed">
-{`name: Decentralized Publish
-on:
-  push:
-    paths:
-      - 'dispatches/**.md'
-jobs:
-  publish:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: 0xshikhar/PressProtocol/integrations/publish-action@v1.0.6
-        with:
-          path: 'dispatches/'
-          private_key: \${{ secrets.PRESS_PRIVATE_KEY }}`}
-                  </pre>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* TAB 3: Developer SDKs & Docker Daemon */}
-          <TabsContent value="developer" className="space-y-6 mt-0">
-            {/* Docker Compose Card */}
-            <Card className="border-white/10 bg-[#0B0D14] text-white rounded-2xl overflow-hidden shadow-xl">
-              <CardContent className="p-6 sm:p-8 space-y-6">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-xl bg-emerald-950/60 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
-                      <Server className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-bold text-white tracking-tight">Autonomous Node Daemon</h3>
-                      <p className="text-xs text-emerald-400 font-mono">Fastify + Embedded Helia IPFS + Tor v3 Onion Daemon</p>
-                    </div>
-                  </div>
-
-                  <a 
-                    href="/downloads/docker-compose.yml" 
-                    download="docker-compose.yml"
-                    onClick={() => handleDownload("Docker Compose", "/downloads/docker-compose.yml")}
-                  >
-                    <Button className="bg-emerald-500 hover:bg-emerald-400 text-black font-semibold font-mono text-xs h-10 px-5 gap-2 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.25)]">
-                      <Download className="h-4 w-4" /> Download docker-compose.yml
-                    </Button>
-                  </a>
-                </div>
-
-                <p className="text-sm text-zinc-300 leading-relaxed">
-                  Run a sovereign, self-contained community node on your VPS or home server with a single command. Includes automatic Helia IPFS peer discovery and Tor v3 hidden service generation.
-                </p>
-
-                <div className="rounded-xl border border-white/10 bg-[#08090E] p-4 font-mono text-xs text-zinc-300 flex items-center justify-between">
-                  <span className="text-emerald-300">docker compose up -d</span>
-                  <button 
-                    onClick={() => handleCopy("docker compose up -d", "docker-run")}
-                    className="text-zinc-400 hover:text-white flex items-center gap-1"
-                  >
-                    {copiedSnippet === "docker-run" ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
-                    <span>{copiedSnippet === "docker-run" ? "Copied" : "Copy"}</span>
-                  </button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* SDK Code Snippets */}
-            <div className="p-6 rounded-2xl border border-white/10 bg-[#0B0D14] space-y-4">
-              <h4 className="text-base font-bold text-white font-mono flex items-center gap-2">
-                <Cpu className="h-4 w-4 text-cyan-400" /> Multi-Language Client SDKs
-              </h4>
-              <div className="grid sm:grid-cols-2 gap-3 font-mono text-xs">
-                <div className="p-3.5 rounded-xl border border-white/5 bg-[#08090E] flex items-center justify-between">
-                  <div>
-                    <span className="text-zinc-500 block text-[10px]">TypeScript / Node.js</span>
-                    <span className="text-cyan-300">pnpm add @pressprotocol/sdk</span>
-                  </div>
-                  <button onClick={() => handleCopy("pnpm add @pressprotocol/sdk", "inst-ts-dl")}>
-                    {copiedSnippet === "inst-ts-dl" ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5 text-zinc-500 hover:text-white" />}
-                  </button>
-                </div>
-
-                <div className="p-3.5 rounded-xl border border-white/5 bg-[#08090E] flex items-center justify-between">
-                  <div>
-                    <span className="text-zinc-500 block text-[10px]">Python 3.10+</span>
-                    <span className="text-emerald-300">pip install pressprotocol-sdk</span>
-                  </div>
-                  <button onClick={() => handleCopy("pip install pressprotocol-sdk", "inst-py-dl")}>
-                    {copiedSnippet === "inst-py-dl" ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5 text-zinc-500 hover:text-white" />}
-                  </button>
-                </div>
-
-                <div className="p-3.5 rounded-xl border border-white/5 bg-[#08090E] flex items-center justify-between">
-                  <div>
-                    <span className="text-zinc-500 block text-[10px]">Go</span>
-                    <span className="text-purple-300">go get github.com/0xshikhar/PressProtocol/sdks/go</span>
-                  </div>
-                  <button onClick={() => handleCopy("go get github.com/0xshikhar/PressProtocol/sdks/go", "inst-go-dl")}>
-                    {copiedSnippet === "inst-go-dl" ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5 text-zinc-500 hover:text-white" />}
-                  </button>
-                </div>
-
-                <div className="p-3.5 rounded-xl border border-white/5 bg-[#08090E] flex items-center justify-between">
-                  <div>
-                    <span className="text-zinc-500 block text-[10px]">Instant Terminal Runner</span>
-                    <span className="text-amber-300">npx @pressprotocol/sdk --help</span>
-                  </div>
-                  <button onClick={() => handleCopy("npx @pressprotocol/sdk --help", "inst-npx-dl")}>
-                    {copiedSnippet === "inst-npx-dl" ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5 text-zinc-500 hover:text-white" />}
-                  </button>
-                </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        ) : (
+          /* VIEW 2: High-Density Directory Matrix (Responsive Table) */
+          <div className="space-y-4">
+            {/* Desktop Table View (sm and up) */}
+            <div className="hidden sm:block rounded-[6px] border border-hairline bg-surface overflow-hidden shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs font-mono">
+                  <thead>
+                    <tr className="border-b border-hairline bg-overlay text-text-muted">
+                      <th className="p-4 uppercase tracking-wider font-medium">Package / Tool</th>
+                      <th className="p-4 uppercase tracking-wider font-medium">Platform &amp; Type</th>
+                      <th className="p-4 uppercase tracking-wider font-medium">Target / Format</th>
+                      <th className="p-4 uppercase tracking-wider font-medium">Version</th>
+                      <th className="p-4 uppercase tracking-wider font-medium text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-hairline">
+                    {filteredItems.map((item) => (
+                      <tr key={item.id} className="hover:bg-overlay/40 transition-colors">
+                        <td className="p-4">
+                          <div className="font-sans font-medium text-sm text-text-primary flex items-center gap-2">
+                            <span>{item.name}</span>
+                          </div>
+                          <div className="text-[11px] text-accent-ribbon font-mono mt-0.5">{item.categoryLabel}</div>
+                        </td>
+                        <td className="p-4 text-text-secondary">
+                          <div>{item.platform}</div>
+                          <div className="text-[11px] text-text-muted">{item.type}</div>
+                        </td>
+                        <td className="p-4">
+                          <code className="px-2 py-1 rounded-[4px] bg-canvas border border-hairline text-[11px] text-text-secondary">
+                            {item.format}
+                          </code>
+                        </td>
+                        <td className="p-4 whitespace-nowrap">
+                          <Badge variant="outline" className="border-hairline bg-overlay text-text-muted font-mono text-[10px] tnum">
+                            {item.version}
+                          </Badge>
+                        </td>
+                        <td className="p-4 text-right whitespace-nowrap">
+                          {item.actionType === "download" ? (
+                            <a
+                              href={item.actionUrl}
+                              download
+                              onClick={() => handleDownload(item.name)}
+                            >
+                              <Button size="sm" className="h-8 px-3 rounded-[6px] bg-accent-primary hover:bg-accent-hover text-[#EEE7E1] font-medium text-xs gap-1.5 font-mono shadow-none">
+                                <Download className="h-3.5 w-3.5" />
+                                <span>{item.actionLabel.replace("Download ", "")}</span>
+                              </Button>
+                            </a>
+                          ) : (
+                            <Button
+                              size="sm"
+                              onClick={() => handleCopy(item.actionSnippet || "", item.id)}
+                              className="h-8 px-3 rounded-[6px] bg-overlay hover:bg-elevated text-text-secondary hover:text-text-primary font-mono text-xs gap-1.5 border border-hairline"
+                            >
+                              {copiedSnippet === item.id ? (
+                                <>
+                                  <Check className="h-3.5 w-3.5 text-verified" />
+                                  <span className="text-verified">Copied!</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="h-3.5 w-3.5 text-text-muted" />
+                                  <span>{item.actionLabel.startsWith("pnpm") ? "Copy pnpm" : item.actionLabel.startsWith("pip") ? "Copy pip" : item.actionLabel.startsWith("go") ? "Copy go" : item.actionLabel.startsWith("cargo") ? "Copy cargo" : "Copy YAML"}</span>
+                                </>
+                              )}
+                            </Button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
-          </TabsContent>
-        </Tabs>
 
-        {/* Bottom CTA to Docs & Settings */}
-        <div className="p-6 rounded-2xl border border-white/10 bg-[#0B0D14] flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="space-y-1 text-center sm:text-left">
-            <h4 className="text-base font-bold text-white">Need integration guidance or custom node setup?</h4>
-            <p className="text-xs text-zinc-400">Explore full architectural specifications, REST endpoints, and threat matrices.</p>
+            {/* Mobile Card List View (< sm) */}
+            <div className="sm:hidden space-y-3">
+              {filteredItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="p-4 rounded-[6px] border border-hairline bg-surface space-y-3"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <h3 className="font-sans font-medium text-sm text-text-primary leading-snug">{item.name}</h3>
+                      <div className="text-[11px] text-accent-ribbon font-mono mt-0.5">{item.categoryLabel} &bull; {item.version}</div>
+                    </div>
+                    <Badge variant="outline" className="border-hairline bg-overlay text-[10px] font-mono text-text-muted shrink-0 tnum">
+                      {item.type}
+                    </Badge>
+                  </div>
+
+                  <div className="text-xs text-text-secondary font-mono bg-canvas p-2 rounded-[4px] border border-hairline break-all">
+                    {item.format}
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 pt-1">
+                    <a
+                      href={item.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-text-muted hover:text-text-primary text-xs font-mono flex items-center gap-1"
+                    >
+                      <span>Source</span>
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+
+                    {item.actionType === "download" ? (
+                      <a
+                        href={item.actionUrl}
+                        download
+                        onClick={() => handleDownload(item.name)}
+                        className="flex-1 max-w-[160px]"
+                      >
+                        <Button size="sm" className="w-full h-9 rounded-[6px] bg-accent-primary hover:bg-accent-hover text-[#EEE7E1] font-medium text-xs gap-1.5 font-mono shadow-none">
+                          <Download className="h-3.5 w-3.5" />
+                          <span>Download</span>
+                        </Button>
+                      </a>
+                    ) : (
+                      <Button
+                        size="sm"
+                        onClick={() => handleCopy(item.actionSnippet || "", item.id)}
+                        className="flex-1 max-w-[160px] h-9 rounded-[6px] bg-overlay hover:bg-elevated text-text-secondary hover:text-text-primary font-mono text-xs gap-1.5 border border-hairline"
+                      >
+                        {copiedSnippet === item.id ? (
+                          <>
+                            <Check className="h-3.5 w-3.5 text-verified" />
+                            <span className="text-verified">Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="h-3.5 w-3.5 text-text-muted" />
+                            <span>Copy</span>
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Link href="/docs">
-              <Button variant="outline" size="sm" className="border-white/10 bg-white/5 text-xs font-mono text-zinc-300 hover:text-white rounded-xl">
-                Documentation Hub
+        )}
+
+        {/* Bottom CTA to Docs & Developer Hub */}
+        <div className="p-4 sm:p-6 rounded-[6px] border border-hairline bg-surface flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+          <div className="space-y-1 text-center sm:text-left">
+            <h4 className="text-sm sm:text-base font-medium font-sans text-text-primary">Need integration guidance, REST endpoints, or node setup?</h4>
+            <p className="text-xs text-text-muted">Explore full architectural specifications, interactive sandbox, and OpenAPI 3.1 schema.</p>
+          </div>
+          <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2 w-full sm:w-auto">
+            <Link href="/developers" className="w-full sm:w-auto">
+              <Button variant="outline" size="sm" className="w-full sm:w-auto border-hairline bg-overlay text-xs font-mono text-text-secondary hover:text-text-primary rounded-[6px] h-9">
+                Developer Portal
               </Button>
             </Link>
-            <Link href="/settings">
-              <Button size="sm" className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold font-mono text-xs rounded-xl">
-                Open Settings
+            <Link href="/docs" className="w-full sm:w-auto">
+              <Button size="sm" className="w-full sm:w-auto bg-accent-primary hover:bg-accent-hover text-[#EEE7E1] font-medium font-mono text-xs rounded-[6px] h-9 shadow-none">
+                Documentation Hub
               </Button>
             </Link>
           </div>
