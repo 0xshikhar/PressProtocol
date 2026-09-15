@@ -57,8 +57,13 @@ export class TorService {
       `${env.DATA_DIR}/tor/onion_service/hostname`,
       `/data/tor/onion_service/hostname`,
       `/data/tor/hostname`,
+      `${this.onionServicesPath}/pressprotocol-node/hostname`,
       `${this.onionServicesPath}/anonpress-backend/hostname`,
+      `${this.onionServicesPath}/wordpress/hostname`,
       `${this.onionServicesPath}/anonpress-wordpress/hostname`,
+      `/var/lib/tor/hidden_service/hostname`,
+      `/usr/local/var/lib/tor/onion_service/hostname`,
+      `/opt/homebrew/var/lib/tor/onion_service/hostname`,
     ];
 
     for (const p of candidatePaths) {
@@ -75,8 +80,7 @@ export class TorService {
       }
     }
 
-    // 3. In dev / test / fallback: Generate a deterministic v3 onion address for the node
-    // Format: 56 characters base32 (a-z, 2-7) + .onion
+    // 3. In dev / test / fallback: Return deterministic fallback
     if (env.NODE_ENV === 'test' || env.NODE_ENV === 'development') {
       const fallbackHash = 'pressprotocol7sovereign4node6federation3mesh7relay5v3';
       const padded = (fallbackHash + '234567abcdefghijklmnopqrstuvwxyz').slice(0, 56);
@@ -90,9 +94,9 @@ export class TorService {
    * Get the real onion URL for a service
    * Reads from the autonomous container volume or onionize-generated hostname file
    */
-  async getOnionUrl(serviceName: string = 'anonpress-backend'): Promise<string | null> {
+  async getOnionUrl(serviceName: string = 'self'): Promise<string | null> {
     try {
-      if (serviceName === 'anonpress-backend' || serviceName === 'self') {
+      if (serviceName === 'self' || serviceName === 'anonpress-backend' || serviceName === 'pressprotocol-node') {
         const selfOnion = await this.getSelfOnionAddress();
         if (selfOnion) {
           return selfOnion.startsWith('http') ? selfOnion : `http://${selfOnion}`;
@@ -102,7 +106,7 @@ export class TorService {
       const hostnameFile = `${this.onionServicesPath}/${serviceName}/hostname`;
       
       if (!existsSync(hostnameFile)) {
-        // Check if self onion address is available
+        // Fall back to self onion address
         const selfOnion = await this.getSelfOnionAddress();
         if (selfOnion) {
           return selfOnion.startsWith('http') ? selfOnion : `http://${selfOnion}`;
@@ -114,7 +118,7 @@ export class TorService {
       const onionAddress = hostname.trim();
       
       if (!onionAddress) {
-        console.warn('⚠️  Onion hostname file is empty');
+        console.warn('⚠️ Onion hostname file is empty');
         return null;
       }
 
@@ -147,38 +151,34 @@ export class TorService {
 
   /**
    * Get onion URL for content via Tor hidden service
-   * Returns the actual .onion address from Docker onionize service
+   * Returns the actual .onion address from embedded Tor daemon or onionize
    */
   async createOnionService(contentCid: string, gatewayUrl: string): Promise<OnionServiceResult> {
     try {
-      console.log('🔍 [TOR] Creating onion service for content...');
+      console.log('🔍 [TOR] Creating onion service reference for content...');
       console.log(`   CID: ${contentCid}`);
       
-      // Get the real onion URL from Docker onionize service
-      const baseOnionUrl = await this.getOnionUrl('anonpress-backend');
+      // Get the real onion URL
+      const baseOnionUrl = await this.getOnionUrl('self');
       
       if (baseOnionUrl) {
-        // Construct full URL: http://{onion}/ipfs/{CID}
-        const fullOnionUrl = `${baseOnionUrl}/ipfs/${contentCid}`;
+        // Construct canonical URL: http://{onion}/read/{CID}
+        const fullOnionUrl = `${baseOnionUrl}/read/${contentCid}`;
         
-        console.log('✅ [TOR] Using real Docker Tor onion service!');
+        console.log('✅ [TOR] Using active Tor onion hidden service:');
         console.log(`   Base: ${baseOnionUrl}`);
-        console.log(`   Full: ${fullOnionUrl}`);
-        console.log(`   🧅 Access via Tor Browser: ${fullOnionUrl}`);
+        console.log(`   Canonical: ${fullOnionUrl}`);
+        console.log(`   🧅 Accessible via Tor Browser: ${fullOnionUrl}`);
         
         return {
           onionUrl: fullOnionUrl,
-          serviceId: 'anonpress-backend',
+          serviceId: 'pressprotocol-node',
         };
       }
 
       // Fallback: Onion service not ready yet
-      console.warn('⚠️  [TOR] Onion service not available yet');
-      console.warn('   Docker onionize container may still be generating .onion address');
-      console.warn('   This takes ~30 seconds on first run');
-      
+      console.warn('⚠️ [TOR] Onion hidden service key initializing...');
       const fallbackUrl = `https://ipfs.io/ipfs/${contentCid}`;
-      console.log(`   Using fallback: ${fallbackUrl}`);
       
       return {
         onionUrl: fallbackUrl,
@@ -207,21 +207,25 @@ export class TorService {
    * Check if onion service is accessible
    * In production, would use Tor SOCKS proxy to test connectivity
    */
-  async checkOnionAvailability(serviceName: string = 'anonpress-wordpress'): Promise<boolean> {
+  async checkOnionAvailability(serviceName: string = 'self'): Promise<boolean> {
     try {
-      // Check if hostname file exists - indicates onion service is created
-      const hostnameFile = `${this.onionServicesPath}/${serviceName}/hostname`;
-      const exists = existsSync(hostnameFile);
-      
-      if (!exists) {
-        return false;
+      if (serviceName === 'self' || serviceName === 'anonpress-backend' || serviceName === 'pressprotocol-node') {
+        const selfOnion = await this.getSelfOnionAddress();
+        if (selfOnion && selfOnion.endsWith('.onion')) {
+          return true;
+        }
       }
 
-      const hostname = await readFile(hostnameFile, 'utf-8');
-      const onionAddress = hostname.trim();
-      
-      // If we have a valid onion address, service is available
-      return onionAddress.length > 0 && onionAddress.endsWith('.onion');
+      // Check if hostname file exists in onionServicesPath
+      const hostnameFile = `${this.onionServicesPath}/${serviceName}/hostname`;
+      if (existsSync(hostnameFile)) {
+        const hostname = await readFile(hostnameFile, 'utf-8');
+        const onionAddress = hostname.trim();
+        return onionAddress.length > 0 && onionAddress.endsWith('.onion');
+      }
+
+      const selfOnion = await this.getSelfOnionAddress();
+      return !!(selfOnion && selfOnion.endsWith('.onion'));
     } catch (error) {
       console.error('Onion availability check failed:', error);
       return false;
@@ -232,7 +236,7 @@ export class TorService {
    * Measure latency to onion service
    * Returns typical Tor latency (~450ms)
    */
-  async measureOnionLatency(serviceName: string = 'anonpress-wordpress'): Promise<number | null> {
+  async measureOnionLatency(serviceName: string = 'self'): Promise<number | null> {
     try {
       const isAvailable = await this.checkOnionAvailability(serviceName);
       
