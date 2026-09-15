@@ -6,6 +6,7 @@ export interface Env {
   IPFS_GATEWAY_URL?: string;
   CORS_ORIGIN?: string;
   PUBLIC_APP_URL?: string;
+  TOR_ONION_GATEWAY?: string;
   JWT_SECRET?: string;
   ENVIRONMENT?: string;
 }

@@ -100,10 +100,14 @@ app.post('/api/content', async (c) => {
 
     const shareUrl = `${appBaseUrl.replace(/\/+$/, '')}/read/${pinResult.cid}`;
     const gatewayMirror = `https://cloudflare-ipfs.com/ipfs/${pinResult.cid}`;
+    const onionHost = c.env.TOR_ONION_GATEWAY || '';
+    const torMirror = onionHost
+      ? (onionHost.startsWith('http') ? `${onionHost.replace(/\/+$/, '')}/read/${pinResult.cid}` : `http://${onionHost.replace(/\/+$/, '')}/read/${pinResult.cid}`)
+      : '';
 
     const mirrors = {
       ipfs: pinResult.gatewayUrl,
-      tor: '',
+      tor: torMirror,
       gateway: gatewayMirror,
     };
 
@@ -273,8 +277,13 @@ app.get('/api/content/:cid', async (c) => {
             available: true,
           },
           tor: {
-            url: '',
-            available: false,
+            url: (() => {
+              const onionHost = c.env.TOR_ONION_GATEWAY || '';
+              if (!onionHost) return '';
+              const normalized = onionHost.startsWith('http') ? onionHost : `http://${onionHost}`;
+              return `${normalized.replace(/\/+$/, '')}/read/${cid}`;
+            })(),
+            available: !!c.env.TOR_ONION_GATEWAY,
           },
           gateway: {
             url: `https://cloudflare-ipfs.com/ipfs/${cid}`,
