@@ -137,8 +137,13 @@ export async function GET(
             available: true,
           },
           tor: {
-            url: "",
-            available: false,
+            url: (() => {
+              const onionHost = process.env.TOR_ONION_GATEWAY || process.env.NEXT_PUBLIC_TOR_ONION_HOST;
+              if (!onionHost) return "";
+              const normalized = onionHost.startsWith("http") ? onionHost : `http://${onionHost}`;
+              return `${normalized.replace(/\/+$/, "")}/read/${cid}`;
+            })(),
+            available: !!(process.env.TOR_ONION_GATEWAY || process.env.NEXT_PUBLIC_TOR_ONION_HOST),
           },
           gateway: {
             url: `https://cloudflare-ipfs.com/ipfs/${cid}`,

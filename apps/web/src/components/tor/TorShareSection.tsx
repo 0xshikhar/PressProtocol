@@ -8,12 +8,10 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Copy, Check, Share2, ExternalLink, Shield, QrCode, Info } from "lucide-react";
+import { Copy, Check, Share2, ExternalLink, Shield, Info } from "lucide-react";
 import { toast } from "sonner";
-import { copyOnionUrl, openInTorBrowser, isTorBrowser } from "@/lib/tor-utils";
+import { copyOnionUrl, openInTorBrowser, isAccessingViaOnion, formatOnionDisplay } from "@/lib/tor-utils";
 
 interface TorShareSectionProps {
   onionUrl: string;
@@ -24,16 +22,16 @@ interface TorShareSectionProps {
 export function TorShareSection({ onionUrl, contentTitle, className }: TorShareSectionProps) {
   const [copied, setCopied] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
-  const isInTorBrowser = isTorBrowser();
+  const isOnionActive = isAccessingViaOnion();
 
   const handleCopy = async () => {
-    try {
-      await copyOnionUrl(onionUrl);
+    const success = await copyOnionUrl(onionUrl);
+    if (success) {
       setCopied(true);
-      toast.success("Onion URL copied to clipboard!");
-      setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
-      toast.error("Failed to copy URL");
+      toast.success("Tor v3 Onion URL copied to clipboard");
+      setTimeout(() => setCopied(false), 2200);
+    } else {
+      toast.error("Unable to copy to clipboard");
     }
   };
 
@@ -42,17 +40,17 @@ export function TorShareSection({ onionUrl, contentTitle, className }: TorShareS
   };
 
   const handleShare = () => {
-    if (navigator.share) {
+    if (typeof navigator !== 'undefined' && navigator.share) {
       navigator
         .share({
-          title: contentTitle ? `${contentTitle} - PressProtocol (Tor)` : "PressProtocol Content (Tor)",
-          text: "Access this content securely via Tor Browser",
+          title: contentTitle ? `${contentTitle} — PressProtocol (Tor)` : "PressProtocol Dispatch (Tor)",
+          text: "Access this sovereign dispatch anonymously via Tor Browser:",
           url: onionUrl,
         })
-        .then(() => toast.success("Shared successfully!"))
+        .then(() => toast.success("Shared successfully"))
         .catch((err) => {
           if (err.name !== "AbortError") {
-            toast.error("Failed to share");
+            setShareDialogOpen(true);
           }
         });
     } else {
@@ -62,44 +60,49 @@ export function TorShareSection({ onionUrl, contentTitle, className }: TorShareS
 
   return (
     <div className={className}>
-      <div className="flex items-center justify-between mb-3">
-        <Label className="flex items-center gap-2">
-          <Shield className="h-4 w-4 text-purple-500" />
-          <span>Tor Onion Address</span>
+      <div className="flex items-center justify-between mb-2.5">
+        <Label className="flex items-center gap-1.5 text-xs font-medium text-primary font-sans">
+          <Shield className="h-3.5 w-3.5 text-anonymous" />
+          <span>Tor v3 Onion Hidden Circuit</span>
         </Label>
-        {isInTorBrowser && (
-          <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
+        {isOnionActive ? (
+          <span className="text-[11px] font-mono text-verified flex items-center gap-1">
             <Check className="h-3 w-3" />
-            Using Tor Browser
+            Active Tor Circuit
+          </span>
+        ) : (
+          <span className="text-[11px] font-mono text-muted">
+            {formatOnionDisplay(onionUrl)}
           </span>
         )}
       </div>
 
-      <Alert className="mb-3 bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-800">
-        <Info className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-        <AlertDescription className="text-sm text-purple-900 dark:text-purple-100">
-          This content is accessible via the Tor network for maximum privacy and censorship resistance.
-        </AlertDescription>
-      </Alert>
+      <div className="p-3 rounded-[6px] bg-surface border border-hairline mb-3 flex items-start gap-2.5">
+        <Info className="h-4 w-4 text-anonymous shrink-0 mt-0.5" />
+        <div className="text-xs text-secondary leading-relaxed">
+          Dual-pinned to persistent Tor v3 onion services. If state-level ISPs censor clearnet DNS, readers seamlessly access this dispatch via Tor Browser.
+        </div>
+      </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2.5">
         {/* Onion URL Display */}
         <div className="flex gap-2">
           <Input
             value={onionUrl}
             readOnly
-            className="font-mono text-xs bg-muted"
+            className="font-mono text-xs bg-canvas border-hairline text-primary focus-visible:ring-0 focus-visible:border-focus"
           />
           <Button
             variant="outline"
             size="icon"
             onClick={handleCopy}
+            className="border-hairline bg-surface hover:bg-overlay text-secondary hover:text-primary shrink-0 h-9 w-9 rounded-[6px]"
             title="Copy .onion URL"
           >
             {copied ? (
-              <Check className="h-4 w-4 text-green-500" />
+              <Check className="h-3.5 w-3.5 text-verified" />
             ) : (
-              <Copy className="h-4 w-4" />
+              <Copy className="h-3.5 w-3.5" />
             )}
           </Button>
         </div>
@@ -110,64 +113,60 @@ export function TorShareSection({ onionUrl, contentTitle, className }: TorShareS
             variant="outline"
             size="sm"
             onClick={handleOpenInTor}
-            className="flex items-center gap-2"
+            className="h-8 text-xs font-sans border-hairline bg-surface hover:bg-overlay text-secondary hover:text-primary flex items-center justify-center gap-1.5 rounded-[6px]"
           >
-            <ExternalLink className="h-4 w-4" />
-            Open in Tor Browser
+            <ExternalLink className="h-3.5 w-3.5" />
+            <span>Open in Tor</span>
           </Button>
           <Button
             variant="outline"
             size="sm"
             onClick={handleShare}
-            className="flex items-center gap-2"
+            className="h-8 text-xs font-sans border-hairline bg-surface hover:bg-overlay text-secondary hover:text-primary flex items-center justify-center gap-1.5 rounded-[6px]"
           >
-            <Share2 className="h-4 w-4" />
-            Share
+            <Share2 className="h-3.5 w-3.5" />
+            <span>Share Onion</span>
           </Button>
         </div>
 
         {/* Share Dialog */}
         <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
-          <DialogContent>
+          <DialogContent className="bg-elevated border-hairline text-primary max-w-md">
             <DialogHeader>
-              <DialogTitle>Share via Tor</DialogTitle>
-              <DialogDescription>
-                Share this .onion address with others who use Tor Browser
+              <DialogTitle className="text-base font-sans font-semibold text-primary flex items-center gap-2">
+                <Shield className="h-4 w-4 text-anonymous" />
+                Sovereign Tor Access
+              </DialogTitle>
+              <DialogDescription className="text-xs text-secondary">
+                Share this cryptographic .onion address with colleagues using Tor Browser.
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4">
+            <div className="space-y-4 pt-2">
               <div>
-                <Label>Onion URL</Label>
-                <div className="mt-2 flex gap-2">
+                <Label className="text-xs text-muted">Tor v3 Address</Label>
+                <div className="mt-1.5 flex gap-2">
                   <Input
                     value={onionUrl}
                     readOnly
-                    className="font-mono text-xs"
+                    className="font-mono text-xs bg-canvas border-hairline text-primary"
                   />
                   <Button
                     variant="outline"
                     size="icon"
                     onClick={handleCopy}
+                    className="border-hairline bg-surface hover:bg-overlay h-9 w-9 shrink-0"
                   >
-                    <Copy className="h-4 w-4" />
+                    {copied ? <Check className="h-3.5 w-3.5 text-verified" /> : <Copy className="h-3.5 w-3.5" />}
                   </Button>
                 </div>
               </div>
 
-              <Alert>
-                <Shield className="h-4 w-4" />
-                <AlertDescription className="text-sm">
-                  <strong>Privacy Tip:</strong> Share this .onion address through secure channels.
-                  Recipients will need Tor Browser to access it.
-                </AlertDescription>
-              </Alert>
-
-              <div className="text-sm text-muted-foreground">
-                <p className="font-medium mb-2">How to access:</p>
-                <ol className="list-decimal list-inside space-y-1">
-                  <li>Download Tor Browser from torproject.org</li>
-                  <li>Copy the .onion URL above</li>
-                  <li>Paste and open it in Tor Browser</li>
+              <div className="p-3 rounded-[6px] bg-canvas border border-hairline text-xs space-y-2">
+                <div className="font-medium text-primary">How to open:</div>
+                <ol className="list-decimal list-inside space-y-1 text-secondary text-[11px] leading-relaxed">
+                  <li>Install Tor Browser from <span className="font-mono text-primary">torproject.org</span></li>
+                  <li>Copy the sovereign .onion URL above</li>
+                  <li>Paste into Tor Browser URL bar to view directly over onion circuits</li>
                 </ol>
               </div>
             </div>
@@ -175,18 +174,16 @@ export function TorShareSection({ onionUrl, contentTitle, className }: TorShareS
         </Dialog>
 
         {/* Download Tor Browser Link */}
-        {!isInTorBrowser && (
-          <div className="text-center pt-2">
-            <a
-              href="https://www.torproject.org/download/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-muted-foreground hover:text-foreground underline"
-            >
-              Don&apos;t have Tor Browser? Download it here
-            </a>
-          </div>
-        )}
+        <div className="text-center pt-1">
+          <a
+            href="https://www.torproject.org/download/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[11px] font-sans text-muted hover:text-secondary underline underline-offset-2 transition-colors"
+          >
+            Don&apos;t have Tor Browser? Download from torproject.org
+          </a>
+        </div>
       </div>
     </div>
   );

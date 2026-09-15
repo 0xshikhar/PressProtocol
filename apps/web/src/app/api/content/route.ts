@@ -83,7 +83,12 @@ export async function POST(req: NextRequest) {
             },
             mirrors: {
               ipfs: `https://gateway.pinata.cloud/ipfs/${cid}`,
-              tor: "",
+              tor: (() => {
+                const onionHost = process.env.TOR_ONION_GATEWAY || process.env.NEXT_PUBLIC_TOR_ONION_HOST;
+                if (!onionHost) return "";
+                const normalized = onionHost.startsWith("http") ? onionHost : `http://${onionHost}`;
+                return `${normalized.replace(/\/+$/, "")}/read/${cid}`;
+              })(),
               gateway: `https://cloudflare-ipfs.com/ipfs/${cid}`,
             },
             source: "nextjs-direct-ipfs-failover",
