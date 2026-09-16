@@ -1,45 +1,36 @@
 import { Hero } from "@/components/landing/Hero";
-import { FeaturedDispatches } from "@/components/landing/FeaturedDispatches";
-import { GatewayTelemetry } from "@/components/landing/GatewayTelemetry";
-import { ProcessStepper } from "@/components/landing/ProcessStepper";
-import { TransportNetwork } from "@/components/landing/TransportNetwork";
-import { ProtocolSandbox } from "@/components/landing/ProtocolSandbox";
-import { EcosystemBento } from "@/components/landing/EcosystemBento";
-import { PrivacyThreatModel } from "@/components/landing/PrivacyThreatModel";
+import { BrokenWebComparison } from "@/components/landing/BrokenWebComparison";
+import { FrontlinePersonas } from "@/components/landing/FrontlinePersonas";
+import { HowItWorks } from "@/components/landing/HowItWorks";
+import { IntegrationMoat } from "@/components/landing/IntegrationMoat";
+import { ProtocolBridge } from "@/components/landing/ProtocolBridge";
 import { CallToAction } from "@/components/landing/CallToAction";
 
 export default function Home() {
   return (
     <div className="relative min-h-screen bg-[#0B0A0C] text-[var(--text-primary)] selection:bg-[#7C2733]/40 selection:text-[#EEE7E1] overflow-x-hidden">
       <main className="pt-2 sm:pt-4">
-        {/* 1. Hero: Editorial Typography, Living Dispatch Card & Failover Demonstration */}
+        {/* 01 - Hero: Sovereign publishing infrastructure */}
         <Hero />
 
-        {/* 2. Featured Dispatches: Verified, unseizable investigative journalism */}
-        <FeaturedDispatches />
+        {/* 02 - Philosophy: The Broken Web vs. The Sovereign Web */}
+        <BrokenWebComparison />
 
-        {/* 3. Live Gateway & Relay Telemetry: Real-time probes across edge relays */}
-        <GatewayTelemetry />
+        {/* 03 - Audience & Purpose: Built for work that needs to endure */}
+        <FrontlinePersonas />
 
-        {/* 3. 3-Step Interactive Process Stepper: Write & Sanitize -> Ed25519 Sign -> Dual Pin */}
-        <ProcessStepper />
+        {/* 04 - Publishing Process: From draft to durable publication + Reader Experience */}
+        <HowItWorks />
 
-        {/* 4. Multi-Transport Failover Network with "Simulate ISP Gateway Block" Interactive Demo */}
-        <TransportNetwork />
+        {/* 05 - Ecosystem Moat: Keep the workflow you already have + 1-Click Importers */}
+        <IntegrationMoat />
 
-        {/* 5. Crown Jewel: Interactive Protocol Sandbox & Live Cryptographic Verifier */}
-        <ProtocolSandbox />
+        {/* 06 - Protocol Architecture & Invariants: Simple on the surface, open underneath -> /spec */}
+        <ProtocolBridge />
 
-        {/* 6. Universal Distribution Bento Grid: 1-Click Downloads & SDK Snippet */}
-        <EcosystemBento />
-
-        {/* 7. Security & Threat Model: Public Goods Threat Matrix */}
-        <PrivacyThreatModel />
-
-        {/* 8. Spotlight Call to Action: In-Memory Key Sovereign Publishing */}
+        {/* 07 - Final Call to Action: Your work deserves to last */}
         <CallToAction />
       </main>
     </div>
   );
 }
-
