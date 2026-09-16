@@ -87,7 +87,7 @@ export default function AboutPage() {
               Traditional media platforms force writers into Faustian bargains: sacrifice your anonymity, submit your IP address, or risk having your life&apos;s work erased at the whim of an administrative subpoena or denial-of-service attack.
             </p>
             <p className="text-text-muted leading-relaxed text-sm sm:text-base font-sans">
-              PressProtocol eliminates the intermediary. You type your dispatch, sign it in your browser with mathematical certainty, and broadcast it directly to the permanent Web3 swarm.
+              PressProtocol eliminates the intermediary. You type your dispatch, sign it in your browser with mathematical certainty, and preserve it directly across a decentralized, censorship-resistant network.
             </p>
           </section>
 
