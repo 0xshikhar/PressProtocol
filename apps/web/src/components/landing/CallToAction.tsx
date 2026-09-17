@@ -34,17 +34,17 @@ export function CallToAction() {
               {/* Left Content */}
               <div className="flex-1">
                 <div className="text-[11px] font-mono tracking-widest text-muted uppercase mb-4">
-                  Sovereign Publishing &bull; Zero Cloud Custody
+                  Independent Publishing
                 </div>
 
-                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-hero tracking-tight mb-5 leading-[0.98] text-primary">
-                  Ready to publish
+                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-hero tracking-tight mb-5 leading-[1.04] text-primary">
+                  Your work deserves
                   <br />
-                  <span className="text-secondary font-light">without permission?</span>
+                  <span className="text-secondary font-light">to last.</span>
                 </h2>
 
                 <p className="text-base sm:text-lg text-secondary mb-8 leading-relaxed max-w-xl font-light measure-lead">
-                  Join whistleblowers, investigative journalists, and independent researchers publishing on permanent decentralized infrastructure.
+                  Publish it your way. Keep control over how it is represented. Give readers a publication they can continue to find and verify.
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-start gap-4">
@@ -53,60 +53,58 @@ export function CallToAction() {
                       size="lg"
                       className="w-full sm:w-auto bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-primary font-medium px-7 h-12 text-sm rounded-[6px] transition-colors flex items-center justify-center gap-2 group border border-[rgba(240,232,232,0.12)]"
                     >
-                      <span>Start Writing Free</span>
+                      <span>Start Writing</span>
                       <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                     </Button>
                   </Link>
-                  <a
-                    href="https://github.com/0xshikhar/PressProtocol"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="w-full sm:w-auto"
-                  >
+                  <Link href="/spec" className="w-full sm:w-auto">
                     <Button
                       size="lg"
                       variant="outline"
                       className="w-full sm:w-auto h-12 px-6 text-sm rounded-[6px] border-hairline bg-transparent hover:bg-overlay text-secondary hover:text-primary font-mono"
                     >
-                      <Github className="w-4 h-4 mr-2 text-muted" />
-                      View Source on GitHub
+                      Explore the Protocol
                     </Button>
-                  </a>
+                  </Link>
                 </div>
 
                 <p className="text-xs text-muted mt-6 font-mono">
-                  100% Free &amp; Open Source &bull; No Accounts &bull; In-Browser Ed25519 Keys
+                  Open Source (MIT) &bull; Client-Side Signing &bull; No Account Required to Read
                 </p>
               </div>
 
-              {/* Right: Cryptographic Manifest Signer Card */}
-              <div className="hidden lg:flex flex-col justify-between p-6 rounded-[6px] border border-hairline bg-canvas w-[380px] shrink-0 font-mono shadow-sm relative overflow-hidden">
-                <div className="w-full pb-3.5 border-b border-hairline flex items-center justify-between text-xs text-muted">
+              {/* Right: Editorial Sealed Publication Card */}
+              <div className="hidden lg:flex flex-col justify-between p-6 rounded-[6px] border border-hairline bg-canvas w-[380px] shrink-0 shadow-sm relative overflow-hidden">
+                <div className="w-full pb-3.5 border-b border-hairline flex items-center justify-between text-xs font-mono text-muted">
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-verified" />
-                    <span className="text-primary font-medium text-[11px] uppercase">Protocol Verification</span>
+                    <span className="w-2 h-2 rounded-full bg-[var(--accent-primary)]" />
+                    <span className="text-primary font-medium text-[11px] uppercase tracking-wider">Sealed Publication</span>
                   </div>
-                  <span className="text-muted text-[11px]">v1.6 Swarm</span>
+                  <span className="text-verified text-[11px] font-mono">Signed &bull; Preserved</span>
                 </div>
 
-                <div className="w-full py-4 text-xs space-y-3 text-secondary">
-                  <div>
-                    <span className="text-muted block text-[10px] uppercase tracking-wider mb-0.5">Cryptography</span>
-                    <span className="text-primary text-xs">Ed25519-SHA256 (RFC 8032 in-browser)</span>
+                <div className="w-full py-5 space-y-3">
+                  <div className="text-[10px] font-mono uppercase tracking-widest text-muted">
+                    Independent Dispatch
                   </div>
-                  <div>
-                    <span className="text-muted block text-[10px] uppercase tracking-wider mb-0.5">Distribution</span>
-                    <span className="text-primary text-xs">Multi-Transport Failover (IPFS + Tor Onion)</span>
+                  <h4 className="font-sans text-xl font-semibold text-primary leading-snug tracking-tight">
+                    The Case for the Durable Essay
+                  </h4>
+                  <div className="flex items-center gap-2 text-xs font-mono text-secondary">
+                    <span className="font-medium text-primary">Maya Lindqvist</span>
+                    <span className="text-muted">&bull; 7 min read</span>
                   </div>
-                  <div>
-                    <span className="text-muted block text-[10px] uppercase tracking-wider mb-0.5">Key Custody</span>
-                    <span className="text-verified text-xs font-medium">100% Volatile Client RAM (Zero Server Storage)</span>
-                  </div>
+                  <p className="text-xs text-secondary font-light leading-relaxed">
+                    Your publishing history belongs to you. Not to an intermediary host, an algorithm, or a billing cycle.
+                  </p>
                 </div>
 
-                <div className="w-full pt-3 border-t border-hairline flex items-center justify-between text-[11px] text-muted">
-                  <span>Tamper Resistance</span>
-                  <span className="text-secondary">Deterministic CIDv1</span>
+                <div className="w-full pt-3.5 border-t border-hairline flex items-center justify-between text-[11px] font-mono text-muted">
+                  <span className="text-secondary flex items-center gap-1">
+                    <span className="text-verified">✓</span>
+                    <span>Client-side proof attached</span>
+                  </span>
+                  <span className="text-[10px] text-muted">Standard Web Link</span>
                 </div>
               </div>
             </div>

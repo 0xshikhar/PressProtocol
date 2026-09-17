@@ -135,43 +135,47 @@ export function Hero() {
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-10 xl:gap-14 items-center">
           {/* Left Column: Editorial Manifesto & Action */}
           <div className="lg:col-span-7">
-            {/* Single Restrained Eyebrow */}
+            {/* Single Restrained Eyebrow: Category Descriptor */}
             <div
               className={cn(
                 "flex items-center gap-2 mb-6 transition-all duration-700",
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
-              <span className="text-[11px] font-mono tracking-widest text-muted uppercase">
-                Sovereign Publishing Infrastructure
+              <span className="text-[11px] font-mono tracking-widest text-secondary uppercase font-medium">
+                SOVEREIGN PUBLISHING INFRASTRUCTURE
               </span>
             </div>
 
             {/* Main Headline */}
             <h1
               className={cn(
-                "font-hero text-hero tracking-tight leading-[0.98] sm:leading-[0.95] text-primary mb-6 transition-all duration-1000",
+                "font-hero text-hero tracking-tight leading-[1.0] sm:leading-[0.98] text-primary mb-4 transition-all duration-1000",
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               )}
             >
-              <span className="block">Publish content that</span>
-              <span className="block text-primary/95">
-                cannot be{" "}
-                <span className="relative inline-block font-hero text-primary">
-                  <BlurWord word={cycleWords[wordIndex]} trigger={wordIndex} />
-                </span>
-                .
-              </span>
+              <span className="block">Publish once.</span>
+              <span className="block text-primary/95">Keep your work accessible.</span>
             </h1>
 
-            {/* Subhead: "Infrastructure" per user instruction with Strict Reading Measure */}
+            {/* Supporting Brand Thesis Line */}
+            <div
+              className={cn(
+                "text-sm sm:text-base font-sans font-medium text-primary/90 mb-4 transition-all duration-1000 delay-100",
+                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+              )}
+            >
+              Independent publishing, built to endure.
+            </div>
+
+            {/* Subhead with Strict Reading Measure */}
             <p
               className={cn(
                 "text-base sm:text-lg text-secondary font-light leading-relaxed max-w-xl mb-8 measure-lead transition-all duration-1000 delay-150",
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
               )}
             >
-              The open, censorship-resistant infrastructure for investigative journalists, whistleblowers, and independent writers. Ingest from Substack, Ghost, or RSS in one click. Attest with in-browser digital signatures and distribute across IPFS and Tor.
+              PressProtocol gives writers and publishers a private, verifiable way to publish and preserve their work - without depending on a single platform, host, or identity provider.
             </p>
 
             {/* Dual Clean CTAs */}
@@ -186,48 +190,71 @@ export function Hero() {
                   size="lg"
                   className="w-full sm:w-auto bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-primary font-medium h-12 px-7 rounded-[6px] text-sm shadow-sm transition-all flex items-center justify-center gap-2 group border border-[rgba(240,232,232,0.12)]"
                 >
-                  <span>Start Writing Free</span>
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  <span>Start Writing &rarr;</span>
                 </Button>
               </Link>
-              <Link href="/import" className="w-full sm:w-auto">
+              <a href="#how-it-works" className="w-full sm:w-auto">
                 <Button
                   size="lg"
                   variant="outline"
                   className="w-full sm:w-auto h-12 px-6 rounded-[6px] text-sm text-secondary hover:text-primary border-hairline bg-transparent hover:bg-overlay transition-all font-mono group"
                 >
-                  <UploadCloud className="w-4 h-4 mr-2 text-muted group-hover:text-primary transition-colors" />
-                  Import article
+                  See How It Works
                 </Button>
-              </Link>
+              </a>
             </div>
 
-            {/* Clean Single-Row Ecosystem Strip */}
+            {/* Hero Integration Proof (Clickable Workflow Buttons) */}
             <div
               className={cn(
-                "flex flex-wrap items-center gap-2 text-xs font-mono text-muted mb-8 pt-1 transition-all duration-1000 delay-300",
+                "flex flex-col sm:flex-row sm:items-center gap-2 text-xs font-mono text-muted mb-7 pt-1 transition-all duration-1000 delay-300",
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
-              <span className="text-secondary uppercase tracking-wider text-[11px] font-medium mr-1">
-                Publish from:
+              <span className="text-secondary font-medium mr-1 text-[11px] shrink-0">
+                Bring your existing workflow with you:
               </span>
-              <Link href="/import" className="text-secondary hover:text-primary transition-colors">Substack</Link>
-              <span className="text-muted/40">&bull;</span>
-              <Link href="/import" className="text-secondary hover:text-primary transition-colors">Ghost</Link>
-              <span className="text-muted/40">&bull;</span>
-              <Link href="/import" className="text-secondary hover:text-primary transition-colors">Medium</Link>
-              <span className="text-muted/40">&bull;</span>
-              <Link href="/import/notion" className="text-secondary hover:text-primary transition-colors">Notion</Link>
-              <span className="text-muted/40">&bull;</span>
-              <Link href="/import" className="text-secondary hover:text-primary transition-colors">RSS</Link>
-              <span className="text-muted/40">&bull;</span>
-              <Link href="/downloads" className="text-secondary hover:text-primary transition-colors">WordPress Plugin</Link>
-              <span className="text-muted/40">&bull;</span>
-              <Link href="/downloads" className="text-secondary hover:text-primary transition-colors">Obsidian Plugin</Link>
+              <div className="flex flex-wrap items-center gap-1.5">
+                <Link
+                  href="/downloads"
+                  className="px-2.5 py-1 rounded-full border border-hairline bg-surface/80 hover:bg-surface-raised hover:border-focus text-secondary hover:text-primary transition-all text-[11px] font-mono shadow-xs"
+                >
+                  WordPress
+                </Link>
+                <Link
+                  href="/import"
+                  className="px-2.5 py-1 rounded-full border border-hairline bg-surface/80 hover:bg-surface-raised hover:border-focus text-secondary hover:text-primary transition-all text-[11px] font-mono shadow-xs"
+                >
+                  Medium
+                </Link>
+                <Link
+                  href="/import"
+                  className="px-2.5 py-1 rounded-full border border-hairline bg-surface/80 hover:bg-surface-raised hover:border-focus text-secondary hover:text-primary transition-all text-[11px] font-mono shadow-xs"
+                >
+                  Ghost
+                </Link>
+                <Link
+                  href="/import/notion"
+                  className="px-2.5 py-1 rounded-full border border-hairline bg-surface/80 hover:bg-surface-raised hover:border-focus text-secondary hover:text-primary transition-all text-[11px] font-mono shadow-xs"
+                >
+                  Notion
+                </Link>
+                <Link
+                  href="/downloads"
+                  className="px-2.5 py-1 rounded-full border border-hairline bg-surface/80 hover:bg-surface-raised hover:border-focus text-secondary hover:text-primary transition-all text-[11px] font-mono shadow-xs"
+                >
+                  Obsidian
+                </Link>
+                <Link
+                  href="/write"
+                  className="px-2.5 py-1 rounded-full border border-hairline bg-surface/80 hover:bg-surface-raised hover:border-focus text-secondary hover:text-primary transition-all text-[11px] font-mono shadow-xs"
+                >
+                  Markdown
+                </Link>
+              </div>
             </div>
 
-            {/* Quiet Trust Markers: Distinct non-repetitive guarantees */}
+            {/* Quiet Trust Markers */}
             <div
               className={cn(
                 "flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-secondary font-mono transition-all duration-1000 delay-350",
@@ -236,22 +263,22 @@ export function Hero() {
             >
               <span className="flex items-center gap-1.5">
                 <Lock className="w-3.5 h-3.5 text-muted" />
-                No accounts or emails required
+                No account required to read
               </span>
               <span className="text-muted/40">&bull;</span>
               <span className="flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-muted" />
-                Private keys never leave memory
+                Client-side signing
               </span>
               <span className="text-muted/40">&bull;</span>
               <span className="flex items-center gap-1.5">
                 <Radio className="w-3.5 h-3.5 text-muted" />
-                Autonomous Tor v3 failover
+                Standard web access
               </span>
             </div>
           </div>
 
-          {/* Right Column: Authentic Living Dispatch Card (Section 4.2: The Sole Raised Card) */}
+          {/* Right Column: User- & Writer-Focused Living Dispatch Reader Preview */}
           <div
             className={cn(
               "lg:col-span-5 transition-all duration-1000 delay-250",
@@ -259,133 +286,118 @@ export function Hero() {
             )}
           >
             <div className="relative rounded-[8px] border border-[rgba(240,232,232,0.12)] bg-elevated p-6 shadow-[0_12px_28px_rgba(0,0,0,0.55)] overflow-hidden">
-              {/* Card Header: Quiet Label */}
+              {/* Card Header: Quiet Verification Label & Explicit Example Badge */}
               <div className="flex items-center justify-between pb-3.5 mb-5 border-b border-hairline">
                 <div className="flex items-center gap-2">
                   <span className="h-1.5 w-1.5 rounded-full bg-verified" />
                   <span className="text-[10px] font-mono uppercase tracking-widest text-secondary font-medium">
-                    Live Resilience Preview
+                    Verified Publication Preview
                   </span>
                 </div>
-                <span className="text-[10px] font-mono text-muted">
-                  Multi-Transport Routing
-                </span>
+                <div className="flex items-center gap-2 text-[10px] font-mono">
+                  <span className="px-1.5 py-0.5 rounded-[4px] border border-hairline bg-surface text-muted">
+                    Example publication
+                  </span>
+                  <span className="text-muted">Standard Web</span>
+                </div>
+              </div>
+
+              {/* Mode Toggle: Reader View vs. Cryptographic Proof */}
+              <div className="flex items-center gap-2 mb-4 p-1 rounded-[6px] bg-canvas/80 border border-hairline">
+                <button
+                  onClick={() => setIsCensored(false)}
+                  className={cn(
+                    "flex-1 py-1.5 text-[11px] font-mono rounded-[4px] transition-all",
+                    !isCensored
+                      ? "bg-surface text-primary font-medium shadow-xs border border-focus"
+                      : "text-muted hover:text-secondary"
+                  )}
+                >
+                  Reader Experience
+                </button>
+                <button
+                  onClick={() => setIsCensored(true)}
+                  className={cn(
+                    "flex-1 py-1.5 text-[11px] font-mono rounded-[4px] transition-all",
+                    isCensored
+                      ? "bg-surface text-primary font-medium shadow-xs border border-focus"
+                      : "text-muted hover:text-secondary"
+                  )}
+                >
+                  Verifiable Proof
+                </button>
               </div>
 
               {/* Verified Dispatch Article Preview */}
-              <div className="space-y-3 mb-5">
-                {/* Human Journalist Byline (No Bare Hex Key or Fake Block #) */}
-                <div className="flex items-center justify-between text-[11px] font-mono text-secondary">
-                  <span className="flex items-center gap-1.5 text-primary">
-                    <span className="w-1.5 h-1.5 rounded-full bg-verified" />
-                    <span className="font-medium">Elena Vance (@vance_archive)</span>
-                  </span>
-                  <span className="text-muted">Verified Contributor &bull; 6 min</span>
-                </div>
-
-                {/* Section 3.1 & 10: Inter ONLY for card title (never Instrument Serif) */}
-                <h3 className="font-sans text-xl sm:text-2xl text-primary font-semibold leading-snug tracking-tight">
-                  Surveillance Architecture Memo &amp; BGP Chokepoints
-                </h3>
-
-                {/* Section 3.1 & 10: Inter ONLY for excerpt */}
-                <p className="font-sans text-sm text-secondary leading-relaxed line-clamp-3">
-                  When public transit conduits face state-level IP tampering or BGP route hijacking, traditional newsrooms go dark in minutes. By decoupling content from cloud servers and publishing over independent peer networks, this dispatch remains readable anywhere.
-                </p>
-              </div>
-
-              {/* Collapsed Clean Failover Demonstration */}
-              <div className="p-3.5 rounded-[6px] border border-hairline bg-overlay/60 space-y-2 mb-4 font-mono text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] uppercase tracking-wider text-muted">Active Delivery Route</span>
-                  {isCensored ? (
-                    <span className="inline-flex items-center gap-1.5 text-[11px] text-anonymous font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-anonymous" />
-                      Tor v3 Onion Circuit (280ms)
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1.5 text-[11px] text-verified font-medium">
+              {!isCensored ? (
+                <div className="space-y-3 mb-5">
+                  {/* Human Journalist Byline */}
+                  <div className="flex items-center justify-between text-[11px] font-mono text-secondary">
+                    <span className="flex items-center gap-1.5 text-primary">
                       <span className="w-1.5 h-1.5 rounded-full bg-verified" />
-                      Clearnet Anycast Edge (38ms)
+                      <span className="font-medium">Maya Lindqvist (@maya_archive)</span>
                     </span>
-                  )}
+                    <span className="text-muted">Essayist &bull; 7 min read</span>
+                  </div>
+
+                  {/* Editorial Card Title */}
+                  <h3 className="font-sans text-xl sm:text-2xl text-primary font-semibold leading-snug tracking-tight">
+                    The Case for the Durable Essay
+                  </h3>
+
+                  {/* Excerpt */}
+                  <p className="font-sans text-sm text-secondary leading-relaxed font-light line-clamp-3">
+                    When independent writers rely exclusively on centralized algorithms, their life&apos;s work remains hostage to corporate acquisitions, sudden terms of service changes, and unappealable account flags. By cryptographically signing and distributing over sovereign peer networks, an essay remains durable and accessible - published directly to readers without intermediary permission.
+                  </p>
+
+                  {/* Clean Reader Assurances */}
+                  <div className="pt-3 border-t border-hairline flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono text-muted">
+                    <span className="text-secondary">&bull; Direct link shareable anywhere</span>
+                    <span className="text-secondary">&bull; Zero tracking cookies</span>
+                    <span className="text-secondary">&bull; Free from paywalls</span>
+                  </div>
                 </div>
-
-                {isCensored ? (
-                  <div className="text-[11px] text-secondary font-sans leading-relaxed pt-1.5 border-t border-hairline">
-                    <span className="text-anonymous font-mono font-medium">BGP route blocked by ISP firewall.</span> Reader seamlessly rerouted through the Tor onion rendezvous network. Zero lost bytes.
+              ) : (
+                /* Cryptographic Proof Inspector View */
+                <div className="space-y-3 mb-5 font-mono text-xs">
+                  <div className="flex items-center justify-between text-[11px] pb-2 border-b border-hairline">
+                    <span className="text-muted">Attestation Standard</span>
+                    <span className="text-primary font-medium">RFC 8032 Ed25519 WebCrypto</span>
                   </div>
-                ) : (
-                  <div className="text-[11px] text-muted font-sans leading-relaxed pt-1.5 border-t border-hairline">
-                    All edge mirrors reachable. Secondary Tor onion standby circuit verified and hot.
-                  </div>
-                )}
-              </div>
 
-              {/* Quiet, Calm Neutral Failover Toggle (Section 10: Never alarm-red) */}
-              <div className="pt-1">
-                <button
-                  onClick={() => setIsCensored((prev) => !prev)}
-                  className={cn(
-                    "w-full py-2.5 px-4 rounded-[6px] border text-xs font-mono font-medium flex items-center justify-center gap-2 transition-colors",
-                    isCensored
-                      ? "bg-overlay border-focus text-primary hover:bg-surface"
-                      : "bg-overlay/50 border-hairline text-secondary hover:text-primary hover:bg-overlay"
-                  )}
+                  <div className="space-y-2 py-1 text-[11px]">
+                    <div>
+                      <span className="text-muted block text-[10px] uppercase tracking-wider mb-0.5">Publisher Key</span>
+                      <span className="text-primary truncate block">ed25519:8f9a2e7c41b09e8f...92d1 (Signed in Browser)</span>
+                    </div>
+                    <div>
+                      <span className="text-muted block text-[10px] uppercase tracking-wider mb-0.5">Immutable Content Address</span>
+                      <span className="text-verified truncate block">bafybeic52i4f7626vkyz244q56w7g63... (CIDv1)</span>
+                    </div>
+                    <div>
+                      <span className="text-muted block text-[10px] uppercase tracking-wider mb-0.5">Preservation Swarm</span>
+                      <span className="text-secondary block">Pinned across 3 independent edge daemons</span>
+                    </div>
+                  </div>
+
+                  <div className="p-2.5 rounded-[4px] bg-canvas border border-hairline text-[10px] text-muted leading-relaxed">
+                    Readers verify this signature locally in their browser. No server can alter a single sentence without invalidating the mathematical proof.
+                  </div>
+                </div>
+              )}
+
+              {/* Bottom Card Action Link */}
+              <div className="pt-2 border-t border-hairline flex items-center justify-between text-[11px] font-mono">
+                <span className="text-muted">Public Network Swarm</span>
+                <Link
+                  href="/explorer"
+                  className="text-secondary hover:text-primary transition-colors flex items-center gap-1 font-medium"
                 >
-                  <RefreshCw className={cn("w-3.5 h-3.5 text-muted", isCensored && "rotate-180 transition-transform")} />
-                  <span>{isCensored ? "Restore Direct Edge Route" : "Simulate Regional Network Block"}</span>
-                </button>
+                  <span>Explore Network Archive</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Quiet Editorial Metrics Bar (Section 3.1: JetBrains Mono with tnum) */}
-        <div
-          className={cn(
-            "mt-16 lg:mt-20 pt-8 border-t border-hairline grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-12 transition-all duration-1000 delay-400",
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          )}
-        >
-          <div className="flex flex-col gap-1">
-            <div className="font-mono text-3xl lg:text-4xl text-primary font-medium tabular-nums">
-              3
-            </div>
-            <span className="text-xs font-mono uppercase tracking-wider text-secondary">
-              Distribution Transports
-            </span>
-            <span className="text-[11px] text-muted">IPFS DHT &bull; Tor Onion &bull; Edge Anycast</span>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <div className="font-mono text-3xl lg:text-4xl text-primary font-medium tabular-nums">
-              0
-            </div>
-            <span className="text-xs font-mono uppercase tracking-wider text-secondary">
-              Centralized Servers
-            </span>
-            <span className="text-[11px] text-muted">No database tracking or central logs</span>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <div className="font-mono text-3xl lg:text-4xl text-primary font-medium tabular-nums">
-              &lt;120ms
-            </div>
-            <span className="text-xs font-mono uppercase tracking-wider text-secondary">
-              P95 Edge Read Latency
-            </span>
-            <span className="text-[11px] text-muted">Distributed anycast edge mirrors</span>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <div className="font-mono text-3xl lg:text-4xl text-primary font-medium tabular-nums">
-              100%
-            </div>
-            <span className="text-xs font-mono uppercase tracking-wider text-secondary">
-              Bit-Level Integrity
-            </span>
-            <span className="text-[11px] text-muted">RFC 8785 canonical hash verification</span>
           </div>
         </div>
       </div>

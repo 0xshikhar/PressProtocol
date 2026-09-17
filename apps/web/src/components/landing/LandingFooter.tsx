@@ -14,8 +14,8 @@ interface FooterLink {
 
 const footerLinks: Record<string, FooterLink[]> = {
   Protocol: [
-    { name: "Write Article", href: "/write" },
-    { name: "Explore Manifests", href: "/explore" },
+    { name: "Write Publication", href: "/write" },
+    { name: "Explore Archive", href: "/explore" },
     { name: "Protocol Spec", href: "/spec" },
     { name: "Documentation", href: "/docs" },
   ],
@@ -25,22 +25,23 @@ const footerLinks: Record<string, FooterLink[]> = {
     { name: "IPFS DHT Node", href: "https://ipfs.io", external: true },
     { name: "Tor v3 Onion Mirror", href: "http://pressprotocol.onion", external: true },
   ],
-  Developers: [
-    { name: "GitHub Repository", href: "https://github.com/0xshikhar/PressProtocol", external: true },
-    { name: "Ed25519 Spec (RFC 8032)", href: "/spec" },
-    { name: "WordPress Plugin", href: "#ecosystem" },
-    { name: "Chromium Extension", href: "#ecosystem" },
+  Ecosystem: [
+    { name: "WordPress Plugin", href: "/downloads" },
+    { name: "Obsidian Plugin", href: "/downloads" },
+    { name: "Browser Companion", href: "/downloads" },
+    { name: "Developer SDKs", href: "/developers" },
   ],
-  Company: [
-    { name: "Support (100% Solo-Built Public Good) ♥", href: "/support" },
-    { name: "About PressProtocol", href: "/about" },
+  Principles: [
     { name: "Public Goods Mission", href: "/about" },
+    { name: "About PressProtocol", href: "/about" },
     { name: "Architecture Spec", href: "/spec" },
+    { name: "Support Development ♥", href: "/support" },
   ],
-  Legal: [
-    { name: "Zero-Log Privacy", href: "/privacy" },
+  "Trust & Protocol": [
+    { name: "Privacy Architecture", href: "/privacy" },
+    { name: "Security & Threat Model", href: "/privacy" },
     { name: "Terms & Licensing", href: "/terms" },
-    { name: "Threat Model", href: "#security" },
+    { name: "GitHub Source (MIT)", href: "https://github.com/0xshikhar/PressProtocol", external: true },
   ],
 };
 
@@ -136,7 +137,7 @@ export function LandingFooter() {
               </Link>
 
               <p className="text-white/50 leading-relaxed mb-8 max-w-xs text-sm">
-                Open, uncensorable publishing infrastructure. Content-addressed with IPFS, anonymized with Tor, and verified with client-side Ed25519 keys.
+                Independent publishing built around privacy, verification, and distributed preservation.
               </p>
 
               {/* Social Links */}
