@@ -190,150 +190,186 @@ const Navbar = () => {
         </div>
 
         {/* Center: Desktop Navigation */}
-        <div className="hidden lg:flex items-center justify-center space-x-1 flex-1 min-w-0 px-4">
-          {/* 1. Dispatches Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className={cn(
-                  "gap-1 text-xs font-mono tracking-wide transition-all h-9 px-3 rounded-[6px]",
-                  isDispatchesActive
-                    ? "border-b-2 border-b-[var(--accent-primary)] text-[var(--text-primary)] rounded-b-none bg-transparent"
-                    : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)]"
-                )}
-              >
-                <span>Read</span>
-                <ChevronDown className="h-3 w-3 opacity-60" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="start"
-              className="w-80 bg-[var(--bg-elevated)] backdrop-blur-2xl border border-[var(--border-hairline)] p-2 shadow-2xl text-[var(--text-primary)]"
+        {pathname === "/" ? (
+          <div className="hidden lg:flex items-center space-x-1 font-mono text-xs">
+            <Link
+              href="/explore"
+              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)] px-3 py-1.5 rounded-[6px] transition-colors"
             >
-              <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-[var(--text-muted)]">
-                Editorial &amp; Dispatches
-              </div>
-              {dispatchesLinks.map((link) => {
-                const Icon = link.icon;
-                const isActive = pathname === link.href;
-                return (
-                  <DropdownMenuItem
-                    key={link.href}
-                    onClick={() => router.push(link.href)}
-                    className={cn(
-                      "flex items-start gap-2.5 p-2 rounded-[6px] cursor-pointer transition-colors",
-                      isActive ? "bg-[var(--accent-tint)] text-[var(--text-primary)]" : "hover:bg-[var(--bg-overlay)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-                    )}
-                  >
-                    <Icon className={cn("h-4 w-4 mt-0.5 shrink-0", isActive ? "text-[var(--accent-hover)]" : "text-[var(--text-muted)]")} />
-                    <div>
-                      <div className="text-xs font-mono font-medium leading-none mb-1">{link.label}</div>
-                      <div className="text-[11px] text-[var(--text-muted)] leading-snug">{link.desc}</div>
-                    </div>
-                  </DropdownMenuItem>
-                );
-              })}
-            </DropdownMenuContent>
-          </DropdownMenu>
+              Stories
+            </Link>
+            <a
+              href="#how-it-works"
+              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)] px-3 py-1.5 rounded-[6px] transition-colors"
+            >
+              How It Works
+            </a>
+            <a
+              href="#integrations"
+              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)] px-3 py-1.5 rounded-[6px] transition-colors"
+            >
+              Ecosystem
+            </a>
 
-          {/* 2. Protocol Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className={cn(
-                  "gap-1 text-xs font-mono tracking-wide transition-all h-9 px-3 rounded-[6px]",
-                  isProtocolActive
-                    ? "border-b-2 border-b-[var(--accent-primary)] text-[var(--text-primary)] rounded-b-none bg-transparent"
-                    : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)]"
-                )}
-              >
-                <span>Protocol</span>
-                <ChevronDown className="h-3 w-3 opacity-60" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="start"
-              className="w-80 bg-[var(--bg-elevated)] backdrop-blur-2xl border border-[var(--border-hairline)] p-2 shadow-2xl text-[var(--text-primary)]"
+            <Link
+              href="/spec"
+              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)] px-3 py-1.5 rounded-[6px] transition-colors"
             >
-              <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-[var(--text-muted)]">
-                Network &amp; Governance
-              </div>
-              {protocolLinks.map((link) => {
-                const Icon = link.icon;
-                const isActive = pathname === link.href;
-                return (
-                  <DropdownMenuItem
-                    key={link.href}
-                    onClick={() => router.push(link.href)}
-                    className={cn(
-                      "flex items-start gap-2.5 p-2 rounded-[6px] cursor-pointer transition-colors",
-                      isActive ? "bg-[var(--accent-tint)] text-[var(--text-primary)]" : "hover:bg-[var(--bg-overlay)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-                    )}
-                  >
-                    <Icon className={cn("h-4 w-4 mt-0.5 shrink-0", isActive ? "text-[var(--accent-hover)]" : "text-[var(--text-muted)]")} />
-                    <div>
-                      <div className="text-xs font-mono font-medium leading-none mb-1 text-[var(--text-primary)]">
-                        {link.label}
+              Protocol
+            </Link>
+            <Link
+              href="/downloads"
+              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)] px-3 py-1.5 rounded-[6px] transition-colors"
+            >
+              Downloads
+            </Link>
+          </div>
+        ) : (
+          <div className="hidden lg:flex items-center space-x-1">
+            {/* 1. Read / Editorial Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "gap-1 text-xs font-mono tracking-wide transition-all h-9 px-3 rounded-[6px]",
+                    isDispatchesActive
+                      ? "border-b-2 border-b-[var(--accent-primary)] text-[var(--text-primary)] rounded-b-none bg-transparent"
+                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)]"
+                  )}
+                >
+                  <span>Read</span>
+                  <ChevronDown className="h-3 w-3 opacity-60" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="start"
+                className="w-80 bg-[var(--bg-elevated)] backdrop-blur-2xl border border-[var(--border-hairline)] p-2 shadow-2xl text-[var(--text-primary)]"
+              >
+                <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-[var(--text-muted)]">
+                  Editorial &amp; Dispatches
+                </div>
+                {dispatchesLinks.map((link) => {
+                  const Icon = link.icon;
+                  const isActive = pathname === link.href;
+                  return (
+                    <DropdownMenuItem
+                      key={link.href}
+                      onClick={() => router.push(link.href)}
+                      className={cn(
+                        "flex items-start gap-2.5 p-2 rounded-[6px] cursor-pointer transition-colors",
+                        isActive ? "bg-[var(--accent-tint)] text-[var(--text-primary)]" : "hover:bg-[var(--bg-overlay)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                      )}
+                    >
+                      <Icon className={cn("h-4 w-4 mt-0.5 shrink-0", isActive ? "text-[var(--accent-hover)]" : "text-[var(--text-muted)]")} />
+                      <div>
+                        <div className="text-xs font-mono font-medium leading-none mb-1">{link.label}</div>
+                        <div className="text-[11px] text-[var(--text-muted)] leading-snug">{link.desc}</div>
                       </div>
-                      <div className="text-[11px] text-[var(--text-muted)] leading-snug">{link.desc}</div>
-                    </div>
-                  </DropdownMenuItem>
-                );
-              })}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                    </DropdownMenuItem>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-          {/* 3. Developers Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className={cn(
-                  "gap-1 text-xs font-mono tracking-wide transition-all h-9 px-3 rounded-[6px]",
-                  isDevelopersActive
-                    ? "border-b-2 border-b-[var(--accent-primary)] text-[var(--text-primary)] rounded-b-none bg-transparent"
-                    : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)]"
-                )}
+            {/* 2. Protocol Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "gap-1 text-xs font-mono tracking-wide transition-all h-9 px-3 rounded-[6px]",
+                    isProtocolActive
+                      ? "border-b-2 border-b-[var(--accent-primary)] text-[var(--text-primary)] rounded-b-none bg-transparent"
+                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)]"
+                  )}
+                >
+                  <span>Protocol</span>
+                  <ChevronDown className="h-3 w-3 opacity-60" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="start"
+                className="w-80 bg-[var(--bg-elevated)] backdrop-blur-2xl border border-[var(--border-hairline)] p-2 shadow-2xl text-[var(--text-primary)]"
               >
-                <span>Developers</span>
-                <ChevronDown className="h-3 w-3 opacity-60" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="start"
-              className="w-80 bg-[var(--bg-elevated)] backdrop-blur-2xl border border-[var(--border-hairline)] p-2 shadow-2xl text-[var(--text-primary)]"
-            >
-              <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-[var(--text-muted)]">
-                SDKs &amp; Infrastructure
-              </div>
-              {developerLinks.map((link) => {
-                const Icon = link.icon;
-                const isActive = pathname === link.href;
-                return (
-                  <DropdownMenuItem
-                    key={link.href}
-                    onClick={() => router.push(link.href)}
-                    className={cn(
-                      "flex items-start gap-2.5 p-2 rounded-[6px] cursor-pointer transition-colors",
-                      isActive ? "bg-[var(--accent-tint)] text-[var(--text-primary)]" : "hover:bg-[var(--bg-overlay)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-                    )}
-                  >
-                    <Icon className={cn("h-4 w-4 mt-0.5 shrink-0", isActive ? "text-[var(--accent-hover)]" : "text-[var(--text-muted)]")} />
-                    <div>
-                      <div className="text-xs font-mono font-medium leading-none mb-1">{link.label}</div>
-                      <div className="text-[11px] text-[var(--text-muted)] leading-snug">{link.desc}</div>
-                    </div>
-                  </DropdownMenuItem>
-                );
-              })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+                <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-[var(--text-muted)]">
+                  Network &amp; Governance
+                </div>
+                {protocolLinks.map((link) => {
+                  const Icon = link.icon;
+                  const isActive = pathname === link.href;
+                  return (
+                    <DropdownMenuItem
+                      key={link.href}
+                      onClick={() => router.push(link.href)}
+                      className={cn(
+                        "flex items-start gap-2.5 p-2 rounded-[6px] cursor-pointer transition-colors",
+                        isActive ? "bg-[var(--accent-tint)] text-[var(--text-primary)]" : "hover:bg-[var(--bg-overlay)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                      )}
+                    >
+                      <Icon className={cn("h-4 w-4 mt-0.5 shrink-0", isActive ? "text-[var(--accent-hover)]" : "text-[var(--text-muted)]")} />
+                      <div>
+                        <div className="text-xs font-mono font-medium leading-none mb-1 text-[var(--text-primary)]">
+                          {link.label}
+                        </div>
+                        <div className="text-[11px] text-[var(--text-muted)] leading-snug">{link.desc}</div>
+                      </div>
+                    </DropdownMenuItem>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* 3. Developers Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "gap-1 text-xs font-mono tracking-wide transition-all h-9 px-3 rounded-[6px]",
+                    isDevelopersActive
+                      ? "border-b-2 border-b-[var(--accent-primary)] text-[var(--text-primary)] rounded-b-none bg-transparent"
+                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)]"
+                  )}
+                >
+                  <span>Developers</span>
+                  <ChevronDown className="h-3 w-3 opacity-60" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="start"
+                className="w-80 bg-[var(--bg-elevated)] backdrop-blur-2xl border border-[var(--border-hairline)] p-2 shadow-2xl text-[var(--text-primary)]"
+              >
+                <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-[var(--text-muted)]">
+                  SDKs &amp; Infrastructure
+                </div>
+                {developerLinks.map((link) => {
+                  const Icon = link.icon;
+                  const isActive = pathname === link.href;
+                  return (
+                    <DropdownMenuItem
+                      key={link.href}
+                      onClick={() => router.push(link.href)}
+                      className={cn(
+                        "flex items-start gap-2.5 p-2 rounded-[6px] cursor-pointer transition-colors",
+                        isActive ? "bg-[var(--accent-tint)] text-[var(--text-primary)]" : "hover:bg-[var(--bg-overlay)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                      )}
+                    >
+                      <Icon className={cn("h-4 w-4 mt-0.5 shrink-0", isActive ? "text-[var(--accent-hover)]" : "text-[var(--text-muted)]")} />
+                      <div>
+                        <div className="text-xs font-mono font-medium leading-none mb-1">{link.label}</div>
+                        <div className="text-[11px] text-[var(--text-muted)] leading-snug">{link.desc}</div>
+                      </div>
+                    </DropdownMenuItem>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
 
         {/* Right: Search, Publish CTA, Consolidated Sovereign Account Menu */}
         <div className="flex items-center space-x-2 shrink-0">
@@ -346,7 +382,9 @@ const Navbar = () => {
                 className="hidden md:flex h-8 px-2.5 gap-2 rounded-[6px] border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-focus)] transition-all font-mono text-xs"
               >
                 <Search className="h-3.5 w-3.5 text-[var(--text-muted)]" />
-                <span className="hidden xl:inline text-[11px] text-[var(--text-muted)]">Search CIDs...</span>
+                <span className="hidden xl:inline text-[11px] text-[var(--text-muted)]">
+                  {pathname === "/" ? "Search" : "Search CIDs..."}
+                </span>
                 <kbd className="hidden xl:inline-flex items-center px-1 py-0.5 text-[9px] font-mono bg-[var(--bg-overlay)] text-[var(--text-secondary)] rounded-[4px]">⌘K</kbd>
               </Button>
             </SheetTrigger>
@@ -357,7 +395,7 @@ const Navbar = () => {
               <form onSubmit={handleSearch} className="mt-4 max-w-2xl mx-auto">
                 <Input
                   type="text"
-                  placeholder="Search by CID (bafy...), title, or Ed25519 author..."
+                  placeholder="Search by title, tag, or CID (bafy...)"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] h-11 rounded-[6px]"
@@ -379,11 +417,11 @@ const Navbar = () => {
               )}
             >
               <PenLine className="h-3.5 w-3.5 text-[var(--text-primary)]" />
-              <span>Write</span>
+              <span>{pathname === "/" ? "Start Writing" : "Write"}</span>
             </Button>
           </Link>
 
-          {/* Consolidated Sovereign Account Menu */}
+          {/* Consolidated Sovereign Account Menu: Active on all pages */}
           <DropdownMenu>
             {burnerWallet?.publicKey ? (
               <DropdownMenuTrigger asChild>
@@ -396,11 +434,10 @@ const Navbar = () => {
                       ? "border-[var(--border-focus)] bg-[var(--bg-overlay)] text-[var(--text-primary)]"
                       : "border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-focus)]"
                   )}
-                  title="Sovereign Identity Cockpit & Local Vault"
+                  title="Local Encrypted Vault"
                 >
                   <span className="h-1.5 w-1.5 rounded-full bg-[var(--verified-bright)]" />
-                  <span className="hidden sm:inline">{burnerWallet.pseudonym}</span>
-                  <User className="h-3.5 w-3.5 sm:hidden" />
+                  <span className="hidden sm:inline font-sans font-medium text-xs">Vault</span>
                   <ChevronDown className="h-3 w-3 opacity-60 ml-0.5" />
                 </Button>
               </DropdownMenuTrigger>
@@ -415,13 +452,13 @@ const Navbar = () => {
                         className="h-8 px-2.5 sm:px-3 gap-1.5 rounded-[6px] border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-overlay)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-mono text-xs transition-all"
                       >
                         <Key className="h-3.5 w-3.5 text-[var(--text-muted)]" />
-                        <span className="hidden sm:inline">Identity</span>
+                        <span className="hidden sm:inline font-sans font-medium text-xs">Vault</span>
                         <ChevronDown className="h-3 w-3 opacity-60 ml-0.5" />
                       </Button>
                     </DropdownMenuTrigger>
                   </TooltipTrigger>
                   <TooltipContent side="bottom" className="bg-[var(--bg-elevated)] border border-[var(--border-hairline)] text-xs text-[var(--text-secondary)] max-w-xs p-2.5 font-sans">
-                    Local Ed25519 cryptographic keypair in browser storage. Zero server custody.
+                    Local on-device vault in browser storage. Zero server custody.
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -436,34 +473,23 @@ const Navbar = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-primary)] font-medium flex items-center gap-1.5">
                     <Shield className="h-3 w-3 text-[var(--verified-bright)]" />
-                    <span>Sovereign Identity</span>
+                    <span>Private Vault</span>
                   </span>
                   <span className="flex items-center gap-1 text-[9px] font-mono text-[var(--verified-bright)]">
                     <span className="h-1.5 w-1.5 rounded-full bg-[var(--verified-bright)]" />
-                    Active
+                    Active (On-Device)
                   </span>
                 </div>
 
-                {burnerWallet ? (
-                  <div className="mt-1.5 flex items-center justify-between text-xs font-mono text-[var(--text-secondary)]">
-                    <span className="truncate">{burnerWallet.pseudonym}</span>
-                    <button
-                      onClick={handleCopyKey}
-                      className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1"
-                      title="Copy Public Key"
-                    >
-                      {copiedKey ? <Check className="h-3 w-3 text-[var(--verified-bright)]" /> : <Copy className="h-3 w-3" />}
-                    </button>
-                  </div>
-                ) : (
-                  <Button
-                    onClick={handleSetupLocalKey}
-                    size="sm"
-                    className="w-full mt-2 h-7 text-xs bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-[var(--text-primary)] border-none font-mono rounded-[6px]"
+                <div className="mt-2 pt-2 border-t border-[var(--border-hairline)] flex items-center justify-between text-[11px] font-mono text-[var(--text-muted)]">
+                  <span>Zero server custody</span>
+                  <Link
+                    href="/settings"
+                    className="text-[10px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] underline underline-offset-2 transition-colors font-sans"
                   >
-                    Generate Local Keypair
-                  </Button>
-                )}
+                    View Keys in Settings &rarr;
+                  </Link>
+                </div>
               </div>
 
               {/* Section 1: Content & Vault */}
@@ -509,9 +535,9 @@ const Navbar = () => {
 
               <DropdownMenuSeparator className="my-1.5 bg-[var(--border-hairline)]" />
 
-              {/* Section 2: Identity & Protocol Controls */}
+              {/* Section 2: Vault & Protocol Controls */}
               <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-[var(--text-muted)]">
-                Key Management
+                Vault &amp; Security
               </div>
 
               <DropdownMenuItem
@@ -520,8 +546,8 @@ const Navbar = () => {
               >
                 <UserCheck className="h-4 w-4 text-[var(--text-muted)] mt-0.5 shrink-0" />
                 <div>
-                  <div className="text-xs font-mono font-medium text-[var(--text-primary)]">Identity Cockpit</div>
-                  <div className="text-[10px] text-[var(--text-muted)] font-sans">Burner key rotation, backup export &amp; import</div>
+                  <div className="text-xs font-mono font-medium text-[var(--text-primary)]">Identity &amp; Keys</div>
+                  <div className="text-[10px] text-[var(--text-muted)] font-sans">Key rotation, backup export &amp; import</div>
                 </div>
               </DropdownMenuItem>
 
@@ -575,6 +601,43 @@ const Navbar = () => {
                     <span className="font-sans font-bold text-base text-[var(--text-primary)]">PressProtocol</span>
                   </SheetTitle>
                 </SheetHeader>
+
+                {/* Mobile Quick Links on Homepage */}
+                {pathname === "/" && (
+                  <div className="mb-4 pb-4 border-b border-[var(--border-hairline)] space-y-1 font-mono">
+                    <Link href="/explore" className="block">
+                      <Button variant="ghost" className="w-full justify-start text-xs font-mono h-9 text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+                        Stories
+                      </Button>
+                    </Link>
+                    <a href="#how-it-works" className="block">
+                      <Button variant="ghost" className="w-full justify-start text-xs font-mono h-9 text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+                        How It Works
+                      </Button>
+                    </a>
+                    <a href="#integrations" className="block">
+                      <Button variant="ghost" className="w-full justify-start text-xs font-mono h-9 text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+                        Ecosystem
+                      </Button>
+                    </a>
+
+                    <Link href="/spec" className="block">
+                      <Button variant="ghost" className="w-full justify-start text-xs font-mono h-9 text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+                        Protocol
+                      </Button>
+                    </Link>
+                    <Link href="/downloads" className="block">
+                      <Button variant="ghost" className="w-full justify-start text-xs font-mono h-9 text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+                        Downloads
+                      </Button>
+                    </Link>
+                    <Link href="/write" className="block pt-2">
+                      <Button className="w-full bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-[var(--text-primary)] text-xs font-sans h-9 rounded-[6px]">
+                        Start Writing
+                      </Button>
+                    </Link>
+                  </div>
+                )}
 
                 {/* Mobile Accordion */}
                 <Accordion type="single" collapsible defaultValue="dispatches" className="w-full space-y-2">
@@ -650,7 +713,7 @@ const Navbar = () => {
                   {/* 4. Sovereign Vault */}
                   <AccordionItem value="vault" className="border-[var(--border-hairline)]">
                     <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)] hover:text-[var(--text-primary)] py-3">
-                      Sovereign Vault
+                      Private Vault
                     </AccordionTrigger>
                     <AccordionContent className="space-y-1 pt-1 pb-3">
                       <Link href="/bookmarks">
@@ -674,7 +737,7 @@ const Navbar = () => {
                       <Link href="/profile">
                         <Button variant="ghost" className="w-full justify-start gap-2.5 text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)] rounded-[6px] h-9">
                           <UserCheck className="h-3.5 w-3.5 text-[var(--text-muted)]" />
-                          Identity Cockpit
+                          Identity &amp; Keys
                         </Button>
                       </Link>
                       <Link href="/settings">
