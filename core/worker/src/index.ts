@@ -331,6 +331,99 @@ app.get('/api/content', async (c) => {
   }
 });
 
+// GET /api/discovery - Alias for Discovery Feed
+app.get('/api/discovery', async (c) => {
+  const limitParam = c.req.query('limit');
+  const limit = limitParam ? Math.min(parseInt(limitParam, 10) || 20, 50) : 20;
+
+  try {
+    if (c.env.DATABASE_URL) {
+      const records = await getRecentContentFromDB(c.env, limit);
+      return c.json({
+        success: true,
+        data: records,
+      });
+    }
+
+    return c.json({
+      success: true,
+      data: [],
+      message: 'Database not attached; content discovery is decentralized via IPFS hashes.',
+    });
+  } catch (err: any) {
+    return c.json({ success: false, error: err.message }, 500);
+  }
+});
+
+// GET /api/discovery/stats - Live Discovery Statistics
+app.get('/api/discovery/stats', async (c) => {
+  try {
+    if (c.env.DATABASE_URL) {
+      const records = await getRecentContentFromDB(c.env, 100);
+      const categoryCounts: Record<string, number> = {};
+      for (const item of records) {
+        const tags = Array.isArray(item.tags) ? item.tags : [];
+        for (const tag of tags) {
+          const normalized = typeof tag === 'string' ? tag.toLowerCase().trim() : '';
+          if (normalized) {
+            categoryCounts[normalized] = (categoryCounts[normalized] || 0) + 1;
+          }
+        }
+      }
+      const categories = Object.entries(categoryCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10)
+        .map(([category, count]) => ({ category, count }));
+
+      return c.json({
+        success: true,
+        data: {
+          totalContent: records.length,
+          categories,
+        },
+      });
+    }
+
+    return c.json({
+      success: true,
+      data: { totalContent: 0, categories: [] },
+    });
+  } catch (err: any) {
+    return c.json({ success: false, error: err.message }, 500);
+  }
+});
+
+// GET /api/manifests - Ledger for Network Explorer
+app.get('/api/manifests', async (c) => {
+  const limitParam = c.req.query('limit');
+  const limit = limitParam ? Math.min(parseInt(limitParam, 10) || 20, 50) : 20;
+
+  try {
+    if (c.env.DATABASE_URL) {
+      const records = await getRecentContentFromDB(c.env, limit);
+      const mapped = records.map((item: any) => ({
+        id: item.cid,
+        cid: item.cid,
+        title: item.title,
+        tags: item.tags || [],
+        publisher: item.publisherPubKey || '',
+        publisherPubKey: item.publisherPubKey || '',
+        createdAt: item.createdAt,
+        created_at: item.createdAt,
+        mirrors: item.mirrors || [],
+      }));
+      return c.json({
+        success: true,
+        data: mapped,
+      });
+    }
+
+    return c.json({ success: true, data: [] });
+  } catch (err: any) {
+    return c.json({ success: false, error: err.message }, 500);
+  }
+});
+
 // 4. GET /api/resolve/:cid - Resolve Metadata
 app.get('/api/resolve/:cid', async (c) => {
   const cid = c.req.param('cid');
