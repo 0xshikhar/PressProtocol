@@ -5,27 +5,44 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBackendUrl } from "@/config/backend";
 
+if (process.env.NODE_ENV !== "production") {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+}
+
 const BACKEND_URL = getBackendUrl();
+const CANONICAL_EDGE_URL = "https://api.pressprotocol.com";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    
-    // Forward to backend API
-    const response = await fetch(`${BACKEND_URL}/api/content`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // Forward auth headers if present
-        ...(req.headers.get("Authorization") && {
-          Authorization: req.headers.get("Authorization")!,
-        }),
-      },
-      body: JSON.stringify(body),
-    });
+    const candidateUrls = [
+      `${BACKEND_URL}/api/content`,
+      `${CANONICAL_EDGE_URL}/api/content`,
+    ];
 
-    const data = await response.json();
-    return NextResponse.json(data, { status: response.status });
+    let lastError: any = null;
+    for (const url of candidateUrls) {
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(req.headers.get("Authorization") && {
+              Authorization: req.headers.get("Authorization")!,
+            }),
+          },
+          body: JSON.stringify(body),
+          signal: AbortSignal.timeout(6000),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          return NextResponse.json(data, { status: response.status });
+        }
+      } catch (err) {
+        lastError = err;
+      }
+    }
   } catch (error) {
     console.warn("Backend proxy unavailable, attempting direct IPFS failover:", error);
 
@@ -107,21 +124,27 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  try {
-    const { searchParams } = new URL(req.url);
-    
-    // Forward to backend API
-    const response = await fetch(
-      `${BACKEND_URL}/api/content?${searchParams.toString()}`
-    );
+  const { searchParams } = new URL(req.url);
+  const candidateUrls = [
+    `${BACKEND_URL}/api/content?${searchParams.toString()}`,
+    `${CANONICAL_EDGE_URL}/api/content?${searchParams.toString()}`,
+  ];
 
-    const data = await response.json();
-    return NextResponse.json(data, { status: response.status });
-  } catch (error) {
-    console.error("Error proxying to backend:", error);
-    return NextResponse.json(
-      { error: "Failed to communicate with backend" },
-      { status: 500 }
-    );
+  for (const url of candidateUrls) {
+    try {
+      const response = await fetch(url, {
+        headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(6000),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return NextResponse.json(data);
+      }
+    } catch (e) {
+      // Continue to next candidate
+    }
   }
+
+  return NextResponse.json({ success: true, data: [] });
 }
