@@ -162,51 +162,57 @@ export default function ExplorerPage() {
                     </td>
                   </tr>
                 ) : (
-                  manifests.map((manifest) => (
-                    <tr key={manifest.id} className="hover:bg-overlay/40 transition-colors group">
-                      <td className="px-6 py-4">
-                        <Link href={`/read/${manifest.id}`} className="font-mono text-text-primary hover:text-accent-ribbon flex items-center gap-1.5">
-                          <FileText className="h-4 w-4 shrink-0 text-text-muted" />
-                          <span>{manifest.id.slice(0, 16)}...</span>
-                        </Link>
-                      </td>
-                      <td className="px-6 py-4 text-text-muted whitespace-nowrap font-mono text-xs tnum">
-                        <div className="flex items-center gap-1.5">
-                          <Clock className="h-3.5 w-3.5 text-text-muted" />
-                          {formatDistanceToNow(new Date(manifest.created_at || Date.now()), { addSuffix: true })}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <div className="h-5 w-5 rounded-[4px] bg-overlay border border-hairline flex items-center justify-center text-[10px] text-text-secondary font-mono">
-                            {manifest.publisher?.slice(0,2) || 'An'}
+                  manifests.map((manifest) => {
+                    const cid = manifest.cid || manifest.id || "";
+                    const createdDate = manifest.createdAt || manifest.created_at || Date.now();
+                    const author = manifest.publisherPubKey || manifest.publisher || "";
+
+                    return (
+                      <tr key={cid} className="hover:bg-overlay/40 transition-colors group">
+                        <td className="px-6 py-4">
+                          <Link href={`/read/${cid}`} className="font-mono text-text-primary hover:text-accent-ribbon flex items-center gap-1.5">
+                            <FileText className="h-4 w-4 shrink-0 text-text-muted" />
+                            <span>{cid.slice(0, 16)}...</span>
+                          </Link>
+                        </td>
+                        <td className="px-6 py-4 text-text-muted whitespace-nowrap font-mono text-xs tnum">
+                          <div className="flex items-center gap-1.5">
+                            <Clock className="h-3.5 w-3.5 text-text-muted" />
+                            {formatDistanceToNow(new Date(createdDate), { addSuffix: true })}
                           </div>
-                          <span className="font-mono text-xs text-text-secondary">
-                            {manifest.publisher ? `${manifest.publisher.slice(0, 12)}...` : 'Anonymous'}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex gap-1.5 flex-wrap">
-                          {(manifest.tags || []).slice(0,3).map((tag: string) => (
-                            <Badge key={tag} variant="outline" className="border-hairline bg-overlay text-text-muted font-mono text-[10px] px-1.5 py-0">
-                              {tag}
-                            </Badge>
-                          ))}
-                          {(manifest.tags || []).length > 3 && (
-                            <span className="text-[10px] text-text-muted font-mono">+{manifest.tags.length - 3}</span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <Link href={`/read/${manifest.id}`}>
-                          <Button variant="ghost" size="sm" className="h-8 text-xs bg-overlay hover:bg-elevated text-text-secondary hover:text-text-primary border border-hairline font-mono rounded-[6px]">
-                            Read
-                          </Button>
-                        </Link>
-                      </td>
-                    </tr>
-                  ))
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <div className="h-5 w-5 rounded-[4px] bg-overlay border border-hairline flex items-center justify-center text-[10px] text-text-secondary font-mono">
+                              {author ? author.slice(0, 2) : "So"}
+                            </div>
+                            <span className="font-mono text-xs text-text-secondary">
+                              {author ? `${author.slice(0, 10)}...` : "Sovereign Author"}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex gap-1.5 flex-wrap">
+                            {(manifest.tags || []).slice(0, 3).map((tag: string) => (
+                              <Badge key={tag} variant="outline" className="border-hairline bg-overlay text-text-muted font-mono text-[10px] px-1.5 py-0">
+                                {tag}
+                              </Badge>
+                            ))}
+                            {(manifest.tags || []).length > 3 && (
+                              <span className="text-[10px] text-text-muted font-mono">+{manifest.tags.length - 3}</span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <Link href={`/read/${cid}`}>
+                            <Button variant="ghost" size="sm" className="h-8 text-xs bg-overlay hover:bg-elevated text-text-secondary hover:text-text-primary border border-hairline font-mono rounded-[6px]">
+                              Read
+                            </Button>
+                          </Link>
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>
@@ -228,45 +234,51 @@ export default function ExplorerPage() {
                 No recent publications found.
               </div>
             ) : (
-              manifests.map((manifest) => (
-                <div key={manifest.id} className="p-4 space-y-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <Link href={`/read/${manifest.id}`} className="font-mono text-xs text-text-primary hover:text-accent-ribbon flex items-center gap-1.5 break-all">
-                      <FileText className="h-3.5 w-3.5 shrink-0 text-text-muted" />
-                      <span>{manifest.id.slice(0, 18)}...</span>
-                    </Link>
-                    <div className="flex items-center gap-1 text-[11px] text-text-muted shrink-0 font-mono tnum">
-                      <Clock className="h-3 w-3 text-text-muted" />
-                      {formatDistanceToNow(new Date(manifest.created_at || Date.now()), { addSuffix: true })}
-                    </div>
-                  </div>
+              manifests.map((manifest) => {
+                const cid = manifest.cid || manifest.id || "";
+                const createdDate = manifest.createdAt || manifest.created_at || Date.now();
+                const author = manifest.publisherPubKey || manifest.publisher || "";
 
-                  <div className="flex items-center justify-between gap-2 text-xs">
-                    <div className="flex items-center gap-1.5">
-                      <div className="h-4 w-4 rounded-[4px] bg-overlay border border-hairline flex items-center justify-center text-[9px] text-text-secondary font-mono">
-                        {manifest.publisher?.slice(0,2) || 'An'}
+                return (
+                  <div key={cid} className="p-4 space-y-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <Link href={`/read/${cid}`} className="font-mono text-xs text-text-primary hover:text-accent-ribbon flex items-center gap-1.5 break-all">
+                        <FileText className="h-3.5 w-3.5 shrink-0 text-text-muted" />
+                        <span>{cid.slice(0, 18)}...</span>
+                      </Link>
+                      <div className="flex items-center gap-1 text-[11px] text-text-muted shrink-0 font-mono tnum">
+                        <Clock className="h-3 w-3 text-text-muted" />
+                        {formatDistanceToNow(new Date(createdDate), { addSuffix: true })}
                       </div>
-                      <span className="font-mono text-[11px] text-text-secondary">
-                        {manifest.publisher ? `${manifest.publisher.slice(0, 10)}...` : 'Anonymous'}
-                      </span>
                     </div>
 
-                    <div className="flex gap-1 flex-wrap justify-end">
-                      {(manifest.tags || []).slice(0,2).map((tag: string) => (
-                        <Badge key={tag} variant="outline" className="border-hairline bg-overlay text-text-muted font-mono text-[9px] px-1 py-0">
-                          {tag}
-                        </Badge>
-                      ))}
+                    <div className="flex items-center justify-between gap-2 text-xs">
+                      <div className="flex items-center gap-1.5">
+                        <div className="h-4 w-4 rounded-[4px] bg-overlay border border-hairline flex items-center justify-center text-[9px] text-text-secondary font-mono">
+                          {author ? author.slice(0, 2) : "So"}
+                        </div>
+                        <span className="font-mono text-[11px] text-text-secondary">
+                          {author ? `${author.slice(0, 10)}...` : "Sovereign Author"}
+                        </span>
+                      </div>
+
+                      <div className="flex gap-1 flex-wrap justify-end">
+                        {(manifest.tags || []).slice(0, 2).map((tag: string) => (
+                          <Badge key={tag} variant="outline" className="border-hairline bg-overlay text-text-muted font-mono text-[9px] px-1 py-0">
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
                     </div>
+
+                    <Link href={`/read/${cid}`} className="block">
+                      <Button size="sm" className="w-full h-8 text-xs bg-overlay hover:bg-elevated text-text-primary font-mono border border-hairline rounded-[6px]">
+                        Read Dispatch
+                      </Button>
+                    </Link>
                   </div>
-
-                  <Link href={`/read/${manifest.id}`} className="block">
-                    <Button size="sm" className="w-full h-8 text-xs bg-overlay hover:bg-elevated text-text-primary font-mono border border-hairline rounded-[6px]">
-                      Read Dispatch
-                    </Button>
-                  </Link>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
           

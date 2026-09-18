@@ -24,23 +24,32 @@ export default function ExplorePage() {
   }, []);
 
   const fetchCategoryStats = async () => {
-    try {
-      const response = await fetch(`${BACKEND_URL}/api/discovery/stats`);
-      const result = await response.json();
-      
-      if (result.success && result.data) {
-        const categoryList = [
-          { value: "all", label: "All Content", count: result.data.totalContent },
-          ...result.data.categories.map((cat: CategoryStats) => ({
-            value: cat.category,
-            label: cat.category.charAt(0).toUpperCase() + cat.category.slice(1),
-            count: cat.count,
-          })),
-        ];
-        setCategories(categoryList);
+    const candidateUrls = [
+      "/api/discovery/stats",
+      `${BACKEND_URL}/api/discovery/stats`,
+    ];
+
+    for (const url of candidateUrls) {
+      try {
+        const response = await fetch(url);
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && result.data) {
+            const categoryList = [
+              { value: "all", label: "All Content", count: result.data.totalContent || 0 },
+              ...(result.data.categories || []).map((cat: CategoryStats) => ({
+                value: cat.category,
+                label: cat.category.charAt(0).toUpperCase() + cat.category.slice(1),
+                count: cat.count,
+              })),
+            ];
+            setCategories(categoryList);
+            return;
+          }
+        }
+      } catch (error) {
+        // ignore and try next
       }
-    } catch (error) {
-      // ignore
     }
   };
 
