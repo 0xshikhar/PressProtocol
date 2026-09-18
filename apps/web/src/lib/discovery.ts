@@ -60,7 +60,13 @@ export interface DiscoveryContent {
 
 const DEFAULT_INDEXERS: IndexerConfig[] = [
   {
-    url: BACKEND_URL,
+    url: BACKEND_URL || "https://api.pressprotocol.com",
+    type: "official",
+    trusted: true,
+    enabled: true,
+  },
+  {
+    url: "https://api.pressprotocol.com",
     type: "official",
     trusted: true,
     enabled: true,
@@ -69,53 +75,53 @@ const DEFAULT_INDEXERS: IndexerConfig[] = [
 
 export const FALLBACK_DISCOVERY_CATALOG: DiscoveryContent[] = [
   {
-    cid: "QmZtmD2qt8fJv3CL8E4yq1nMGVC4LMDcENuWBZ8gVa9Boh",
-    title: "A Cypherpunk's Manifesto (Eric Hughes, 1993)",
-    tags: ["cryptography", "privacy", "sovereignty", "Studio"],
-    createdAt: new Date(Date.now() - 3600000 * 24 * 2).toISOString(),
+    cid: "bafkreieo7lgm6q6to3sqgbsffgrwwkywscjqmfwuy635mopy46yegvu34a",
+    title: "The future of social networking: Decentralization for user empowerment, privacy, and freedom",
+    tags: ["Desoc", "Decentralization", "Social Media", "Social Network", "Blockchain", "Studio"],
+    createdAt: "2026-09-14T11:08:31.893Z",
     publisher: {
-      username: "cypherpunk-archive",
-      publicKey: "ed25519_9bf8a473b190f8983944203795b21021469e38f9ec2ea7a09c2a8fefb09e25b1",
+      username: "decentralized-research",
+      publicKey: "63aba158debe010d7f56d6b05aee2a2aebf3f7627ed44ff93495a64fd4b3db53",
     },
   },
   {
-    cid: "QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco",
-    title: "A Declaration of the Independence of Cyberspace (John Perry Barlow, 1996)",
-    tags: ["sovereignty", "governance", "tor", "Git SSG"],
-    createdAt: new Date(Date.now() - 3600000 * 24 * 5).toISOString(),
+    cid: "bafybeich2qccjugnzigflmpsclg44awrxt7hfpuavq2yzjdtuftyjlsue4",
+    title: "The choices we make about AI now are critical",
+    tags: ["artificial intelligence", "AI", "responsible ai", "sovereignty", "Notion"],
+    createdAt: "2026-09-14T10:36:04.339Z",
     publisher: {
-      username: "eff-historical",
-      publicKey: "ed25519_3e5c9b78a4e1d3f98214bb09e25b1021469e38f9ec2ea7a09c2a8fefb098a473",
+      username: "editorial-archive",
+      publicKey: "3b319a3b2de036611d5b834a924be92070fa88dd927991be67e48405d60c786f",
     },
   },
   {
-    cid: "QmRAQB6YaCyidP37UdDnjFY5vQuiBrcqdyoW1CuDgwxkD4",
-    title: "Bitcoin: A Peer-to-Peer Electronic Cash System (Satoshi Nakamoto, 2008)",
-    tags: ["cryptography", "ipfs", "p2p", "Substack/RSS"],
-    createdAt: new Date(Date.now() - 3600000 * 24 * 8).toISOString(),
-    publisher: {
-      username: "satoshi",
-      publicKey: "ed25519_e08d6d4fa8f60f64e2e2830f5dc937cb1017ef0df5359b3917a22ef6806085a6",
-    },
-  },
-  {
-    cid: "QmSrPmbaUKA3ZodhzTnxtRghQRTRNJeDF71CcWqDYDcgFo",
-    title: "Whistleblower Protections in the Era of Ubiquitous Surveillance",
-    tags: ["whistleblower", "tor", "privacy", "WordPress"],
-    createdAt: new Date(Date.now() - 3600000 * 4).toISOString(),
+    cid: "Qmey31j9exHmqBez1bNrx4ZScP314swcB5Zoeg5w6gf8v8",
+    title: "The Fine Line Between Content Moderation and Censorship",
+    tags: ["privacy", "censorship-resistance", "free-speech", "WordPress"],
+    createdAt: "2025-10-17T01:34:13.238Z",
     publisher: {
       username: "press-freedom-defense",
-      publicKey: "ed25519_5df28e81b67e3a9689df464971c0dfb57bb3d159a6745f448c26f0ec4e1f76d4",
+      publicKey: "97101495f7109671f502cdf7f0f36eb43d9b79604170dabbd5a0ad5068325f98",
     },
   },
   {
-    cid: "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG",
-    title: "Self-Hosting and P2P Swarm Storage: A Practical Blueprint",
-    tags: ["ipfs", "sovereignty", "notion", "Notion"],
-    createdAt: new Date(Date.now() - 3600000 * 12).toISOString(),
+    cid: "QmX8BwJ1RVZGNRnw3NepBW4JQ2x2b17ac2et6Z78YL6Kof",
+    title: "The Shifting Sands of Digital Privacy",
+    tags: ["privacy", "digital-rights", "sovereignty", "WordPress"],
+    createdAt: "2025-10-17T01:13:31.858Z",
     publisher: {
-      username: "decentralized-lab",
-      publicKey: "ed25519_8c30d3e5b190f8983944203795b21021469e38f9ec2ea7a09c2a8fefb09e25b1",
+      username: "privacy-analyst",
+      publicKey: "48c97ff8c6ff33a5bc2a5f2717b40a751f0e96a7db527f04ff1c988d18f3d80b",
+    },
+  },
+  {
+    cid: "Qmejup9xJ84ebuaQjt9PEGYQaC64fCGbRTMiRhXjThpBBA",
+    title: "Privacy Wordpress Post",
+    tags: ["sovereignty", "wordpress", "whistleblower", "WordPress"],
+    createdAt: "2025-10-17T00:27:29.719Z",
+    publisher: {
+      username: "press-dispatch",
+      publicKey: "d51040817fedc8e2c69df1bf87ab00c043f456e6b141fc6524422190c9d2ed86",
     },
   },
 ];
@@ -225,26 +231,58 @@ export class DiscoveryService {
     }
     params.append("limit", limit.toString());
 
-    const url = `${indexer.url}/api/discovery?${params.toString()}`;
-    console.log(`🔍 Fetching from: ${url}`);
+    const cleanBase = indexer.url?.replace(/\/+$/, "") || "https://api.pressprotocol.com";
+    const candidateEndpoints = [
+      `${cleanBase}/api/content?${params.toString()}`,
+      `${cleanBase}/api/discovery?${params.toString()}`,
+      `/api/content?${params.toString()}`,
+      `/api/discovery?${params.toString()}`,
+      `https://api.pressprotocol.com/api/content?${params.toString()}`,
+    ];
 
-    const response = await fetch(url, {
-      signal: AbortSignal.timeout(10000), // 10 second timeout
-      headers: {
-        'Accept': 'application/json',
+    const uniqueEndpoints = Array.from(new Set(candidateEndpoints));
+
+    for (const url of uniqueEndpoints) {
+      try {
+        const response = await fetch(url, {
+          signal: AbortSignal.timeout(6000),
+          headers: {
+            Accept: "application/json",
+          },
+        });
+
+        if (!response.ok) continue;
+
+        const result = await response.json();
+        const rawItems = Array.isArray(result?.data)
+          ? result.data
+          : Array.isArray(result)
+          ? result
+          : [];
+
+        if (rawItems.length > 0) {
+          return rawItems.map((item: any) => ({
+            cid: item.cid,
+            title: item.title || "Untitled Dispatch",
+            tags: Array.isArray(item.tags) ? item.tags : [],
+            createdAt: item.createdAt || item.created_at || new Date().toISOString(),
+            publisher: {
+              publicKey: item.publisherPubKey || item.publisher?.publicKey || item.publisher?.pubkey || "",
+              walletAddress: item.walletAddress || item.publisher?.walletAddress,
+              username:
+                item.publisher?.username ||
+                (item.publisherPubKey
+                  ? `${item.publisherPubKey.slice(0, 6)}...${item.publisherPubKey.slice(-4)}`
+                  : "Sovereign Author"),
+            },
+          }));
+        }
+      } catch (e) {
+        // Try next endpoint
       }
-    });
-
-    console.log(`📥 Response status: ${response.status} from ${indexer.url}`);
-
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => 'Unknown error');
-      throw new Error(`Indexer returned ${response.status}: ${errorText}`);
     }
 
-    const result = await response.json();
-    console.log(`📦 Data received:`, { itemCount: result?.data?.length || 0 });
-    return result.data || [];
+    return [];
   }
 
   /**
@@ -257,10 +295,37 @@ export class DiscoveryService {
   ): Promise<DiscoveryContent[]> {
     console.log("🔍 Using peer catalog fallback (DHT Swarm preservation)");
     
-    let catalog = [...FALLBACK_DISCOVERY_CATALOG];
+    // Check locally saved articles in browser storage first
+    let localArticles: DiscoveryContent[] = [];
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("anonpress_burner_articles");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            localArticles = parsed.map((a: any) => ({
+              cid: a.cid,
+              title: a.title,
+              tags: ["Local Vault", "Verified"],
+              createdAt: new Date(a.publishedAt || Date.now()).toISOString(),
+              publisher: {
+                publicKey: "",
+                username: a.pseudonym || "Local Author",
+              },
+            }));
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    let catalog = [...localArticles, ...FALLBACK_DISCOVERY_CATALOG];
     if (tags && tags.length > 0) {
-      catalog = catalog.filter(item => 
-        tags.some(tag => item.tags.map(t => t.toLowerCase()).includes(tag.toLowerCase()))
+      catalog = catalog.filter((item) =>
+        tags.some((tag) =>
+          item.tags.map((t) => t.toLowerCase()).includes(tag.toLowerCase())
+        )
       );
     }
     return catalog.slice(0, limit);

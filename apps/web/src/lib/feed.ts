@@ -62,20 +62,29 @@ export async function fetchFeedArticles(tag?: string, limit: number = 30): Promi
   }
   params.set("limit", limit.toString());
 
-  try {
-    const res = await fetch(`${backendUrl}/api/discovery?${params.toString()}`, {
-      signal: AbortSignal.timeout(4000),
-      headers: {
-        Accept: "application/json",
-      },
-    });
+  const candidateUrls = [
+    `${backendUrl}/api/content?${params.toString()}`,
+    `https://api.pressprotocol.com/api/content?${params.toString()}`,
+    `${backendUrl}/api/discovery?${params.toString()}`,
+  ];
 
-    if (res.ok) {
-      const data = await res.json();
-      return Array.isArray(data.data) ? data.data : [];
+  for (const url of candidateUrls) {
+    try {
+      const res = await fetch(url, {
+        signal: AbortSignal.timeout(5000),
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const items = Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : [];
+        if (items.length > 0) return items;
+      }
+    } catch (error) {
+      // try next candidate
     }
-  } catch (error) {
-    console.warn("[Feed Engine] Backend discovery daemon unreachable:", error);
   }
 
   return [];
