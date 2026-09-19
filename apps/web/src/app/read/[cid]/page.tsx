@@ -17,6 +17,7 @@ import { TableOfContents } from "@/components/reader/TableOfContents";
 import { BookmarkButton } from "@/components/reader/BookmarkButton";
 import { EmbedDialog } from "@/components/reader/EmbedDialog";
 import { TorShareSection } from "@/components/tor/TorShareSection";
+import { getCanonicalOnionUrl, isAccessingViaOnion, copyOnionUrl } from "@/lib/tor-utils";
 import { verifyArticleSignature, type VerificationResult } from "@/lib/signature-verifier";
 import { exportPressProof, downloadPressProofFile } from "@pressprotocol/proof";
 import { CidChip } from "@/components/protocol/CidChip";
@@ -727,36 +728,51 @@ export default function ReadPage() {
                   )}
                 </div>
 
-                <div className="p-2.5 rounded-[6px] border border-hairline bg-canvas flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <MirrorHealthDot 
-                      status={content.mirrors?.tor?.available ? "healthy" : "down"} 
-                      label="Tor v3 Onion"
-                    />
-                  </div>
-                  {content.mirrors?.tor?.available && content.mirrors?.tor?.url && (
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-6 px-2 text-[10px] font-mono text-anonymous hover:text-anonymous/80"
-                      onClick={() => window.open(content.mirrors.tor.url, "_blank")}
-                    >
-                      .onion
-                    </Button>
-                  )}
-                </div>
+                {/* 3. Tor v3 Onion Mirror */}
+                {(() => {
+                  const resolvedOnionUrl = getCanonicalOnionUrl(content.cid, content.mirrors?.tor?.url);
+                  const isTorActive = !!(content.mirrors?.tor?.available || (typeof window !== "undefined" && isAccessingViaOnion()));
+                  
+                  return (
+                    <div className="p-2.5 rounded-[6px] border border-hairline bg-canvas flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <MirrorHealthDot 
+                          status={isTorActive ? "healthy" : "ready"} 
+                          label={isTorActive ? "Tor Circuit Active" : "Tor Onion Mirror"}
+                        />
+                      </div>
+                      {resolvedOnionUrl && (
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-6 px-2 text-[10px] font-mono text-anonymous hover:text-anonymous/80"
+                          onClick={() => {
+                            copyOnionUrl(resolvedOnionUrl);
+                            toast.success("Tor .onion address copied! Paste in Tor Browser to read.");
+                          }}
+                          title="Copy Tor .onion URL for Tor Browser"
+                        >
+                          Copy .onion
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
             </div>
 
-            {/* Tor Share Section if available */}
-            {content.mirrors?.tor?.available && content.mirrors?.tor?.url && (
-              <div className="border-t border-hairline pt-4">
-                <TorShareSection
-                  onionUrl={content.mirrors.tor.url}
-                  contentTitle={content.title}
-                />
-              </div>
-            )}
+            {/* Tor Share Section */}
+            {(() => {
+              const resolvedOnionUrl = getCanonicalOnionUrl(content.cid, content.mirrors?.tor?.url);
+              return resolvedOnionUrl ? (
+                <div className="border-t border-hairline pt-4">
+                  <TorShareSection
+                    onionUrl={resolvedOnionUrl}
+                    contentTitle={content.title}
+                  />
+                </div>
+              ) : null;
+            })()}
 
             {/* Embed CTA Link */}
             <div className="border-t border-hairline pt-4 flex items-center justify-between text-xs text-muted">

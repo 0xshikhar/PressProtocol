@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 interface MirrorHealthDotProps {
   label?: string;
-  status?: "healthy" | "degraded" | "down" | "syncing";
+  status?: "healthy" | "degraded" | "down" | "syncing" | "ready" | "standby";
   latencyMs?: number;
   showPulse?: boolean;
   className?: string;
@@ -42,7 +42,24 @@ export function MirrorHealthDot({
       bg: "bg-[var(--anonymous-tint)]",
       text: "text-[var(--anonymous-bright)]",
     },
-  }[status];
+    ready: {
+      dot: "bg-[var(--anonymous-bright)]",
+      border: "border-[var(--anonymous)]/30",
+      bg: "bg-[var(--anonymous-tint)]",
+      text: "text-[var(--text-primary)]",
+    },
+    standby: {
+      dot: "bg-[var(--text-muted)]",
+      border: "border-[var(--border-hairline)]",
+      bg: "bg-[var(--bg-surface)]",
+      text: "text-[var(--text-secondary)]",
+    },
+  }[status] || {
+    dot: "bg-[var(--text-muted)]",
+    border: "border-[var(--border-hairline)]",
+    bg: "bg-[var(--bg-surface)]",
+    text: "text-[var(--text-secondary)]",
+  };
 
   return (
     <div

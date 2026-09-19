@@ -16,7 +16,6 @@ interface ComparisonItem {
   pressProtocol: {
     summary: string;
     guarantee: string;
-    techTag: string;
   };
 }
 
@@ -33,7 +32,6 @@ const COMPARISONS: ComparisonItem[] = [
     pressProtocol: {
       summary: "Choose how your publication is identified and keep the signing keys under your control.",
       guarantee: "Your publication is authenticated directly by you, independent of any account provider or platform profile.",
-      techTag: "Client-side Ed25519 signing",
     },
   },
   {
@@ -48,7 +46,6 @@ const COMPARISONS: ComparisonItem[] = [
     pressProtocol: {
       summary: "Preserved independently of any single host, accessible to readers across decentralized networks.",
       guarantee: "Anyone can reference or replicate the archive without depending on the platform you originally used.",
-      techTag: "Content-addressed storage (CIDv1)",
     },
   },
   {
@@ -63,7 +60,6 @@ const COMPARISONS: ComparisonItem[] = [
     pressProtocol: {
       summary: "Share direct, verifiable web links that resolve cleanly on any standard browser.",
       guarantee: "Readers access your publication directly. No algorithmic feeds, paywalls, or intermediate censorship.",
-      techTag: "Direct peer resolution & standard URLs",
     },
   },
   {
@@ -77,8 +73,7 @@ const COMPARISONS: ComparisonItem[] = [
     },
     pressProtocol: {
       summary: "Preserve your work independently so readers and researchers can continue to find and verify it.",
-      guarantee: "Deterministic multihashes ensure durable provenance with multi-transport failover across gateways.",
-      techTag: "Multi-transport failover (IPFS + Tor)",
+      guarantee: "Content addressing ensures permanent preservation so articles remain resolvable even if original hosts go offline.",
     },
   },
 ];
@@ -174,9 +169,6 @@ export function BrokenWebComparison() {
                       <p className="text-xs text-secondary font-light leading-relaxed">
                         {item.pressProtocol.guarantee}
                       </p>
-                      <span className="inline-block text-[10px] font-mono text-verified px-1.5 py-0.5 rounded-[4px] bg-canvas border border-hairline">
-                        {item.pressProtocol.techTag}
-                      </span>
                     </div>
                   </div>
                 </div>

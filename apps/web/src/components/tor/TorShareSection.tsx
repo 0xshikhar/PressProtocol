@@ -36,7 +36,17 @@ export function TorShareSection({ onionUrl, contentTitle, className }: TorShareS
   };
 
   const handleOpenInTor = () => {
-    openInTorBrowser(onionUrl);
+    const res = openInTorBrowser(onionUrl);
+    if (res.openedInNativeTor) {
+      toast.success("Opening native Tor onion circuit...");
+    } else {
+      setCopied(true);
+      toast.info("Tor .onion address copied! Open Tor Browser to view over onion circuits.", {
+        duration: 4000,
+      });
+      setShareDialogOpen(true);
+      setTimeout(() => setCopied(false), 2200);
+    }
   };
 
   const handleShare = () => {
@@ -164,10 +174,13 @@ export function TorShareSection({ onionUrl, contentTitle, className }: TorShareS
               <div className="p-3 rounded-[6px] bg-canvas border border-hairline text-xs space-y-2">
                 <div className="font-medium text-primary">How to open:</div>
                 <ol className="list-decimal list-inside space-y-1 text-secondary text-[11px] leading-relaxed">
-                  <li>Install Tor Browser from <span className="font-mono text-primary">torproject.org</span></li>
+                  <li>Install Tor Browser from <span className="font-mono text-primary">torproject.org</span> (or use Brave Private Window with Tor)</li>
                   <li>Copy the sovereign .onion URL above</li>
-                  <li>Paste into Tor Browser URL bar to view directly over onion circuits</li>
+                  <li>Paste into the Tor Browser URL bar to browse privately without central DNS</li>
                 </ol>
+                <div className="text-[10px] text-muted pt-1 border-t border-hairline">
+                  Note: Standard browsers (Chrome, Safari, Edge) cannot resolve .onion domains.
+                </div>
               </div>
             </div>
           </DialogContent>

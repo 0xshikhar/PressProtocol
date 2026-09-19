@@ -195,7 +195,7 @@ export function LandingFooter() {
         {/* Bottom Bar */}
         <div className="py-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs font-mono text-white/40">
-            &copy; 2026 PressProtocol. Open censorship-resistant infrastructure under MIT License.
+            &copy; 2026 PressProtocol. Soverign publishing infrastructure
           </p>
 
           <div className="flex flex-wrap items-center gap-6 text-xs font-mono text-white/50">

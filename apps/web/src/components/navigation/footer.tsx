@@ -97,7 +97,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-xs text-[var(--text-secondary)] leading-relaxed font-sans">
-              Autonomous censorship-resistant publishing infrastructure. Decentralized syndicated dispatch across IPFS swarms, Tor hidden services, and air-gapped cryptographic proofs.
+              Open publishing infrastructure designed to endure. Content is signed client-side, preserved across decentralized networks, and verifiable without central platforms.
             </p>
           </div>
 
@@ -179,7 +179,7 @@ export default function Footer() {
           <div className="flex items-center gap-3">
             <span>© {new Date().getFullYear()} PressProtocol.</span>
             <span className="hidden sm:inline text-[var(--border-focus)]">•</span>
-            <span className="hidden sm:inline text-[var(--text-muted)]">Pure sovereign, zero-custody publishing.</span>
+            <span className="hidden sm:inline text-[var(--text-muted)]">Open-source, zero-custody publishing.</span>
           </div>
 
           <div className="flex items-center gap-4 flex-wrap text-[var(--text-muted)]">
