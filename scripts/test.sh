@@ -72,131 +72,43 @@ echo ""
 echo "2️⃣  Subsystem Automated Verification Suites"
 echo "------------------------------------------"
 
-echo -n "Running Surveillance Stripper & CMS Cleaner... "
-if pnpm --filter pressprotocol-web exec tsx ../../scripts/test-cms-scrubber.ts > /dev/null 2>&1; then
-    echo -e "${GREEN}✅ PASS (28/28 tests)${NC}"
-    TESTS_PASSED=$((TESTS_PASSED + 1))
-else
-    echo -e "${RED}❌ FAIL${NC}"
-    TESTS_FAILED=$((TESTS_FAILED + 1))
+# Ensure Prisma client is initialized if core/node is present
+if [ -d "core/node" ] && [ ! -d "core/node/node_modules/.prisma/client" ]; then
+    pnpm --dir core/node exec prisma generate > /dev/null 2>&1 || true
 fi
 
-echo -n "Running Multi-Transport Telemetry & Live Gateway Probes... "
-if pnpm --filter pressprotocol-web exec tsx ../../scripts/test-transport-telemetry.ts > /dev/null 2>&1; then
-    echo -e "${GREEN}✅ PASS (40/40 tests)${NC}"
-    TESTS_PASSED=$((TESTS_PASSED + 1))
-else
-    echo -e "${RED}❌ FAIL${NC}"
-    TESTS_FAILED=$((TESTS_FAILED + 1))
-fi
+run_suite() {
+    local name="$1"
+    local count="$2"
+    shift 2
+    echo -n "Running $name... "
+    local output
+    if output=$("$@" 2>&1); then
+        echo -e "${GREEN}✅ PASS ($count)${NC}"
+        TESTS_PASSED=$((TESTS_PASSED + 1))
+    else
+        echo -e "${RED}❌ FAIL${NC}"
+        echo -e "${RED}--- Failure Output ($name) ---${NC}"
+        echo "$output" | tail -n 25
+        echo -e "${RED}-------------------------------${NC}"
+        TESTS_FAILED=$((TESTS_FAILED + 1))
+    fi
+}
 
-echo -n "Running Air-Gapped Proofs & Offline Verification... "
-if pnpm --filter pressprotocol-web exec tsx ../../scripts/test-airgap-proof.ts > /dev/null 2>&1; then
-    echo -e "${GREEN}✅ PASS (26/26 tests)${NC}"
-    TESTS_PASSED=$((TESTS_PASSED + 1))
-else
-    echo -e "${RED}❌ FAIL${NC}"
-    TESTS_FAILED=$((TESTS_FAILED + 1))
-fi
-
-echo -n "Running Optical QR Codec & Delay-Tolerant Mesh... "
-if pnpm --filter pressprotocol-web exec tsx ../../scripts/test-optical-qr-mesh.ts > /dev/null 2>&1; then
-    echo -e "${GREEN}✅ PASS (22/22 tests)${NC}"
-    TESTS_PASSED=$((TESTS_PASSED + 1))
-else
-    echo -e "${RED}❌ FAIL${NC}"
-    TESTS_FAILED=$((TESTS_FAILED + 1))
-fi
-
-echo -n "Running Sovereign Web Clipper (Chromium MV3 Extension)... "
-if pnpm --filter pressprotocol-web exec tsx ../../scripts/test-web-clipper.ts > /dev/null 2>&1; then
-    echo -e "${GREEN}✅ PASS (37/37 tests)${NC}"
-    TESTS_PASSED=$((TESTS_PASSED + 1))
-else
-    echo -e "${RED}❌ FAIL${NC}"
-    TESTS_FAILED=$((TESTS_FAILED + 1))
-fi
-
-echo -n "Running Bulk RSS Publication Archive Importer... "
-if pnpm --filter pressprotocol-web exec tsx ../../scripts/test-bulk-rss.ts > /dev/null 2>&1; then
-    echo -e "${GREEN}✅ PASS (32/32 tests)${NC}"
-    TESTS_PASSED=$((TESTS_PASSED + 1))
-else
-    echo -e "${RED}❌ FAIL${NC}"
-    TESTS_FAILED=$((TESTS_FAILED + 1))
-fi
-
-echo -n "Running Notion 1-Click Sovereign Importer... "
-if pnpm --filter pressprotocol-web exec tsx ../../scripts/test-notion-import.ts > /dev/null 2>&1; then
-    echo -e "${GREEN}✅ PASS (32/32 tests)${NC}"
-    TESTS_PASSED=$((TESTS_PASSED + 1))
-else
-    echo -e "${RED}❌ FAIL${NC}"
-    TESTS_FAILED=$((TESTS_FAILED + 1))
-fi
-
-echo -n "Running Developer Publishing Rails (GitHub Action)... "
-if pnpm --filter pressprotocol-web exec tsx ../../scripts/test-publish-action.ts > /dev/null 2>&1; then
-    echo -e "${GREEN}✅ PASS (53/53 tests)${NC}"
-    TESTS_PASSED=$((TESTS_PASSED + 1))
-else
-    echo -e "${RED}❌ FAIL${NC}"
-    TESTS_FAILED=$((TESTS_FAILED + 1))
-fi
-
-echo -n "Running Offline-First Local Vault & Bookmarks... "
-if pnpm --filter pressprotocol-web exec tsx ../../scripts/test-offline-vault.ts > /dev/null 2>&1; then
-    echo -e "${GREEN}✅ PASS (32/32 tests)${NC}"
-    TESTS_PASSED=$((TESTS_PASSED + 1))
-else
-    echo -e "${RED}❌ FAIL${NC}"
-    TESTS_FAILED=$((TESTS_FAILED + 1))
-fi
-
-echo -n "Running Autonomous Community Node & P2P Federation... "
-if pnpm --dir core/node exec tsx ../../scripts/test-autonomous-node.ts > /dev/null 2>&1; then
-    echo -e "${GREEN}✅ PASS (34/34 tests)${NC}"
-    TESTS_PASSED=$((TESTS_PASSED + 1))
-else
-    echo -e "${RED}❌ FAIL${NC}"
-    TESTS_FAILED=$((TESTS_FAILED + 1))
-fi
-
-echo -n "Running Self-Sovereign Private Node & Zero-Permission Daemon... "
-if pnpm --dir core/node exec tsx ../../scripts/test-private-node.ts > /dev/null 2>&1; then
-    echo -e "${GREEN}✅ PASS (31/31 tests)${NC}"
-    TESTS_PASSED=$((TESTS_PASSED + 1))
-else
-    echo -e "${RED}❌ FAIL${NC}"
-    TESTS_FAILED=$((TESTS_FAILED + 1))
-fi
-
-echo -n "Running Universal Publishing Rails for Any Website & CMS... "
-if pnpm --dir core/node exec tsx ../../scripts/test-universal-rails.ts > /dev/null 2>&1; then
-    echo -e "${GREEN}✅ PASS (23/23 tests)${NC}"
-    TESTS_PASSED=$((TESTS_PASSED + 1))
-else
-    echo -e "${RED}❌ FAIL${NC}"
-    TESTS_FAILED=$((TESTS_FAILED + 1))
-fi
-
-echo -n "Running Open Infrastructure API & Enterprise Gateway... "
-if pnpm --dir core/node exec tsx ../../scripts/test-enterprise-gateway.ts > /dev/null 2>&1; then
-    echo -e "${GREEN}✅ PASS (12/12 tests)${NC}"
-    TESTS_PASSED=$((TESTS_PASSED + 1))
-else
-    echo -e "${RED}❌ FAIL${NC}"
-    TESTS_FAILED=$((TESTS_FAILED + 1))
-fi
-
-echo -n "Running Outbound Real-Time Webhook Subscriptions & Event Bus... "
-if pnpm --dir core/node exec tsx ../../scripts/test-webhook-subscriptions.ts > /dev/null 2>&1; then
-    echo -e "${GREEN}✅ PASS (17/17 tests)${NC}"
-    TESTS_PASSED=$((TESTS_PASSED + 1))
-else
-    echo -e "${RED}❌ FAIL${NC}"
-    TESTS_FAILED=$((TESTS_FAILED + 1))
-fi
+run_suite "Surveillance Stripper & CMS Cleaner" "28/28 tests" pnpm --filter pressprotocol-web exec tsx ../../scripts/test-cms-scrubber.ts
+run_suite "Multi-Transport Telemetry & Live Gateway Probes" "40/40 tests" pnpm --filter pressprotocol-web exec tsx ../../scripts/test-transport-telemetry.ts
+run_suite "Air-Gapped Proofs & Offline Verification" "26/26 tests" pnpm --filter pressprotocol-web exec tsx ../../scripts/test-airgap-proof.ts
+run_suite "Optical QR Codec & Delay-Tolerant Mesh" "22/22 tests" pnpm --filter pressprotocol-web exec tsx ../../scripts/test-optical-qr-mesh.ts
+run_suite "Sovereign Web Clipper (Chromium MV3 Extension)" "37/37 tests" pnpm --filter pressprotocol-web exec tsx ../../scripts/test-web-clipper.ts
+run_suite "Bulk RSS Publication Archive Importer" "32/32 tests" pnpm --filter pressprotocol-web exec tsx ../../scripts/test-bulk-rss.ts
+run_suite "Notion 1-Click Sovereign Importer" "32/32 tests" pnpm --filter pressprotocol-web exec tsx ../../scripts/test-notion-import.ts
+run_suite "Developer Publishing Rails (GitHub Action)" "53/53 tests" pnpm --filter pressprotocol-web exec tsx ../../scripts/test-publish-action.ts
+run_suite "Offline-First Local Vault & Bookmarks" "32/32 tests" pnpm --filter pressprotocol-web exec tsx ../../scripts/test-offline-vault.ts
+run_suite "Autonomous Community Node & P2P Federation" "34/34 tests" pnpm --dir core/node exec tsx ../../scripts/test-autonomous-node.ts
+run_suite "Self-Sovereign Private Node & Zero-Permission Daemon" "31/31 tests" pnpm --dir core/node exec tsx ../../scripts/test-private-node.ts
+run_suite "Universal Publishing Rails for Any Website & CMS" "23/23 tests" pnpm --dir core/node exec tsx ../../scripts/test-universal-rails.ts
+run_suite "Open Infrastructure API & Enterprise Gateway" "12/12 tests" pnpm --dir core/node exec tsx ../../scripts/test-enterprise-gateway.ts
+run_suite "Outbound Real-Time Webhook Subscriptions & Event Bus" "17/17 tests" pnpm --dir core/node exec tsx ../../scripts/test-webhook-subscriptions.ts
 
 
 echo ""

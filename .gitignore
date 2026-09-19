@@ -5,9 +5,10 @@
 .env.local
 .env.*.local
 
-# Docker files (use backend/docker-compose.yml instead)
-docker-compose.yml
-docker-compose.override.yml
+# Docker files (root-level only, preserve core/node/docker-compose.yml)
+/docker-compose.yml
+/docker-compose.override.yml
+!core/node/docker-compose.yml
 
 node_modules
 
