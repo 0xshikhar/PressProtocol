@@ -90,6 +90,7 @@ jobs:
       - name: Build Workspace Packages
         run: |
           pnpm --filter "@pressprotocol/*" run build
+          pnpm --dir core/node build
           pnpm --dir integrations/browser-extension build
 
       - name: Run Test Harness

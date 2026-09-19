@@ -1,0 +1,101 @@
+version: '3.8'
+
+# PressProtocol Wave 4: Sovereign Autonomous Community Node
+# Complete Zero-SPOF Infrastructure Substrate
+# 1-Command Boot: docker compose up -d
+
+services:
+  # Sovereign Community Node (Fastify + Embedded Helia IPFS + Embedded Tor v3 Daemon)
+  pressprotocol-node:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: pressprotocol/node:latest
+    container_name: pressprotocol-node
+    restart: unless-stopped
+    ports:
+      - "4000:4000"   # Fastify Node API & IPFS Gateway
+      - "4001:4001"   # Helia / libp2p Swarm Port
+      - "9050:9050"   # Tor SOCKS5 Proxy
+    environment:
+      - PORT=4000
+      - NODE_ENV=production
+      - DATA_DIR=/data
+      - TOR_ENABLED=true
+      - AUTO_PIN_POLICY=${AUTO_PIN_POLICY:-all}
+      - NODE_NAME=${NODE_NAME:-PressProtocol Community Node}
+      # Optional Hybrid Cloud Bridges (Runs 100% sovereign when omitted)
+      - DATABASE_URL=${DATABASE_URL:-}
+      - PINATA_API_KEY=${PINATA_API_KEY:-}
+      - PINATA_SECRET_KEY=${PINATA_SECRET_KEY:-}
+      - PINATA_JWT=${PINATA_JWT:-}
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost:3000,http://localhost:8080}
+      - ONIONSERVICE_NAME=pressprotocol-node
+    volumes:
+      - pressprotocol_data:/data
+      - onion_services:/var/lib/tor/onion_services
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4000/api/node/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # Optional: Onionize sidecar (automates .onion hidden service creation via Docker socket)
+  onionize:
+    image: torservers/onionize
+    container_name: pressprotocol-onionize
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - onion_services:/var/lib/tor/onion_services:z
+    restart: unless-stopped
+    profiles:
+      - onionize
+
+  # Optional: WordPress Developer Environment (Plugin Verification)
+  wordpress-db:
+    image: mysql:8.0
+    container_name: anonpress-wordpress-db
+    environment:
+      MYSQL_ROOT_PASSWORD: wordpress_root
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    volumes:
+      - wordpress_db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    profiles:
+      - wordpress
+
+  wordpress:
+    image: wordpress:latest
+    container_name: anonpress-wordpress
+    depends_on:
+      wordpress-db:
+        condition: service_healthy
+    environment:
+      WORDPRESS_DB_HOST: wordpress-db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+      ONIONSERVICE_NAME: anonpress-wordpress
+    ports:
+      - "8080:80"
+    volumes:
+      - wordpress_data:/var/www/html
+      - ../../integrations/wordpress-plugin:/var/www/html/wp-content/plugins/anonpress
+    restart: unless-stopped
+    profiles:
+      - wordpress
+
+volumes:
+  pressprotocol_data:
+    name: pressprotocol_data
+  onion_services:
+    name: pressprotocol_onion_services
+  wordpress_db:
+  wordpress_data:
