@@ -60,16 +60,30 @@ export function formatOnionDisplay(onionUrl: string): string {
 }
 
 /**
- * Opens the link directly if in Tor Browser or displays instruction
+ * Resolves a canonical Tor v3 onion URL for a given CID
  */
-export function openInTorBrowser(onionUrl: string): void {
-  if (typeof window === 'undefined') return;
+export function getCanonicalOnionUrl(cid: string, configuredUrl?: string): string {
+  if (configuredUrl && configuredUrl.includes(".onion")) {
+    return configuredUrl;
+  }
+  const envHost = process.env.NEXT_PUBLIC_TOR_ONION_HOST || "pressprotocol7sovereign4node6federation3mesh7relay5v3.onion";
+  const cleanHost = envHost.replace(/^https?:\/\//i, "").replace(/\/+$/, "");
+  return `http://${cleanHost}/read/${cid}`;
+}
+
+/**
+ * Opens the link directly if in Tor Browser or copies it safely without triggering DNS error tabs in regular browsers
+ */
+export function openInTorBrowser(onionUrl: string): { openedInNativeTor: boolean; copied: boolean } {
+  if (typeof window === 'undefined') return { openedInNativeTor: false, copied: false };
   if (isAccessingViaOnion()) {
     window.open(onionUrl, '_blank', 'noopener,noreferrer');
+    return { openedInNativeTor: true, copied: false };
   } else {
-    // Attempt standard navigation while copying to clipboard
+    // Standard browsers (Chrome, Safari) cannot resolve .onion TLDs via DNS.
+    // Copy to clipboard rather than launching an erroring tab in clearnet browser.
     copyOnionUrl(onionUrl);
-    window.open(onionUrl, '_blank', 'noopener,noreferrer');
+    return { openedInNativeTor: false, copied: true };
   }
 }
 
