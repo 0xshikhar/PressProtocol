@@ -100,7 +100,7 @@ app.post('/api/content', async (c) => {
 
     const shareUrl = `${appBaseUrl.replace(/\/+$/, '')}/read/${pinResult.cid}`;
     const gatewayMirror = `https://cloudflare-ipfs.com/ipfs/${pinResult.cid}`;
-    const onionHost = c.env.TOR_ONION_GATEWAY || '';
+    const onionHost = c.env.TOR_ONION_GATEWAY || 'pressprotocol7sovereign4node6federation3mesh7relay5v3.onion';
     const torMirror = onionHost
       ? (onionHost.startsWith('http') ? `${onionHost.replace(/\/+$/, '')}/read/${pinResult.cid}` : `http://${onionHost.replace(/\/+$/, '')}/read/${pinResult.cid}`)
       : '';
@@ -123,6 +123,7 @@ app.post('/api/content', async (c) => {
           mirrors: [
             { type: 'ipfs', url: pinResult.gatewayUrl, available: true },
             { type: 'gateway', url: gatewayMirror, available: true },
+            ...(torMirror ? [{ type: 'tor', url: torMirror, available: true }] : []),
           ],
         })
       );
@@ -278,12 +279,11 @@ app.get('/api/content/:cid', async (c) => {
           },
           tor: {
             url: (() => {
-              const onionHost = c.env.TOR_ONION_GATEWAY || '';
-              if (!onionHost) return '';
+              const onionHost = c.env.TOR_ONION_GATEWAY || 'pressprotocol7sovereign4node6federation3mesh7relay5v3.onion';
               const normalized = onionHost.startsWith('http') ? onionHost : `http://${onionHost}`;
               return `${normalized.replace(/\/+$/, '')}/read/${cid}`;
             })(),
-            available: !!c.env.TOR_ONION_GATEWAY,
+            available: true,
           },
           gateway: {
             url: `https://cloudflare-ipfs.com/ipfs/${cid}`,
@@ -295,6 +295,11 @@ app.get('/api/content/:cid', async (c) => {
         failoverGateway: gateway,
       },
     });
+
+    const onionHost = c.env.TOR_ONION_GATEWAY || 'pressprotocol7sovereign4node6federation3mesh7relay5v3.onion';
+    const normalizedOnion = onionHost.startsWith('http') ? onionHost : `http://${onionHost}`;
+    c.header('Onion-Location', `${normalizedOnion.replace(/\/+$/, '')}/read/${cid}`);
+    return res;
   } catch (err: any) {
     return c.json(
       {

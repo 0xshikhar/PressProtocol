@@ -54,6 +54,8 @@ export class TorService {
 
     // 2. Candidate paths in autonomous container or onionize volume
     const candidatePaths = [
+      `${env.DATA_DIR}/tor_hostname`,
+      `/data/tor_hostname`,
       `${env.DATA_DIR}/tor/onion_service/hostname`,
       `/data/tor/onion_service/hostname`,
       `/data/tor/hostname`,
