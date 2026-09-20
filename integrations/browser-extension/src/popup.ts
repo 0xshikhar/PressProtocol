@@ -15,7 +15,7 @@ let activeTabUrl: string = "";
 let activeTabTitle: string = "";
 let currentIdentity: BurnerIdentity | null = null;
 let currentSettings: ExtensionSettings = {
-  apiUrl: "http://localhost:4000",
+  apiUrl: "https://api.pressprotocol.com",
   webAppUrl: "https://pressprotocol.com",
   autoCopyPermalink: true,
   signWithBurnerKey: true,
@@ -49,6 +49,7 @@ const stepBroadcast = document.getElementById("stepBroadcast")!;
 const publishedCid = document.getElementById("publishedCid")!;
 const btnCopyCid = document.getElementById("btnCopyCid") as HTMLButtonElement;
 const btnOpenReader = document.getElementById("btnOpenReader") as HTMLAnchorElement;
+const btnCopyOnion = document.getElementById("btnCopyOnion") as HTMLButtonElement;
 const btnCopyEmbedCode = document.getElementById("btnCopyEmbedCode") as HTMLButtonElement;
 
 // Tab 2 Elements
@@ -123,7 +124,7 @@ async function loadSettings() {
   const res = await chrome.runtime.sendMessage({ action: "getSettings" });
   if (res?.success && res.data) {
     currentSettings = res.data;
-    inputApiUrl.value = currentSettings.apiUrl || "http://localhost:4000";
+    inputApiUrl.value = currentSettings.apiUrl || "https://api.pressprotocol.com";
     inputWebAppUrl.value = currentSettings.webAppUrl || "https://pressprotocol.com";
   }
 }
@@ -329,6 +330,18 @@ btnClipNow.addEventListener("click", async () => {
       // Copy permalink to clipboard
       navigator.clipboard.writeText(readUrl).catch(() => {});
 
+      // Setup Onion URL copy
+      const onionUrl =
+        data?.mirrors?.tor ||
+        `http://pressprotocol7sovereign4node6federation3mesh7relay5v3.onion/read/${data.cid}`;
+      btnCopyOnion.onclick = () => {
+        navigator.clipboard.writeText(onionUrl);
+        btnCopyOnion.textContent = "✓ .onion Copied!";
+        setTimeout(() => {
+          btnCopyOnion.textContent = "🧅 Copy .onion";
+        }, 2000);
+      };
+
       // Setup embed code
       const embedCode = `<iframe src="${currentSettings.webAppUrl}/embed/${data.cid}?theme=cyber" width="100%" height="600" frameborder="0" loading="lazy" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>`;
       btnCopyEmbedCode.onclick = () => {
@@ -495,7 +508,7 @@ btnCopyPubKey.addEventListener("click", () => {
  * Save Node & Gateway Configuration
  */
 btnSaveSettings.addEventListener("click", async () => {
-  currentSettings.apiUrl = inputApiUrl.value.trim() || "http://localhost:4000";
+  currentSettings.apiUrl = inputApiUrl.value.trim() || "https://api.pressprotocol.com";
   currentSettings.webAppUrl = inputWebAppUrl.value.trim() || "https://pressprotocol.com";
 
   await chrome.runtime.sendMessage({
