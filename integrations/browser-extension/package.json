@@ -1,6 +1,6 @@
 {
   "name": "pressprotocol-extension",
-  "version": "1.0.6",
+  "version": "2.1.0",
   "description": "Browser extension for censorship-resistant content access and sovereign web clipping",
   "scripts": {
     "build": "tsc --noEmit && esbuild src/background.ts src/popup.ts src/clipper.ts --bundle --outdir=dist --target=chrome100 --format=esm && esbuild src/content.ts --bundle --outdir=dist --target=chrome100 --format=iife && pnpm run copy",

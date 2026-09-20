@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "PressProtocol Sovereign Web Clipper",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Preserve and syndicate articles, blogs, and highlighted quotes from anywhere on the web directly into PressProtocol with client-side Ed25519 signing.",
   "icons": {
     "16": "icons/icon-16.png",
