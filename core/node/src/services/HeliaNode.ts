@@ -27,6 +27,19 @@ export class HeliaNode {
       console.log('🚀 Attempting to initialize Helia IPFS node...');
       console.log('⚠️  Note: Helia requires native dependencies. If this fails, Pinata fallback will be used.');
 
+      // Polyfill Promise.withResolvers if needed
+      if (typeof (Promise as any).withResolvers === 'undefined') {
+        (Promise as any).withResolvers = function <T>() {
+          let resolve!: (value: T | PromiseLike<T>) => void;
+          let reject!: (reason?: any) => void;
+          const promise = new Promise<T>((res, rej) => {
+            resolve = res;
+            reject = rej;
+          });
+          return { promise, resolve, reject };
+        };
+      }
+
       // Dynamic import to avoid loading at startup
       const { createHelia } = await import('helia');
       const { unixfs } = await import('@helia/unixfs');

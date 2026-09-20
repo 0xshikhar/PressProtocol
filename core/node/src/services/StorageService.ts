@@ -161,7 +161,8 @@ export class StorageService {
   async getContentFromIPFS(cid: string): Promise<ContentData> {
     // 1. Check local disk cache first (sub-millisecond instant hit)
     try {
-      const cacheFile = path.resolve(process.cwd(), `.data/content-cache/${cid}.json`);
+      const cacheDir = path.resolve(process.env.DATA_DIR || process.cwd(), '.data/content-cache');
+      const cacheFile = path.join(cacheDir, `${cid}.json`);
       if (fs.existsSync(cacheFile)) {
         const raw = fs.readFileSync(cacheFile, 'utf-8');
         const parsed = JSON.parse(raw);
@@ -174,28 +175,81 @@ export class StorageService {
       // Continue to network fetch
     }
 
-    // 2. Fetch from IPFS gateways
-    try {
-      const response = await fetch(`${this.gatewayUrl}/${cid}`);
-      
-      if (response.ok) {
-        const contentData = await response.json() as ContentData;
-        console.log(`✅ Fetched content from IPFS: ${cid}`);
-        
-        // Save to cache for subsequent reads
-        try {
-          const cacheDir = path.resolve(process.cwd(), '.data/content-cache');
-          if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
-          fs.writeFileSync(path.join(cacheDir, `${cid}.json`), JSON.stringify(contentData, null, 2), 'utf-8');
-        } catch {}
+    // 2. Fetch from IPFS gateways concurrently
+    const gateways = Array.from(
+      new Set([
+        this.gatewayUrl ? this.gatewayUrl.replace(/\/+$/, '') : null,
+        'https://ipfs.filebase.io/ipfs',
+        'https://cloudflare-ipfs.com/ipfs',
+        'https://ipfs.io/ipfs',
+        'https://dweb.link/ipfs',
+        'https://4everland.io/ipfs',
+        'https://gateway.pinata.cloud/ipfs',
+      ].filter(Boolean) as string[])
+    );
 
-        return contentData;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 9000);
+
+    const fetchPromises = gateways.map(async (gw) => {
+      let targetUrl = `${gw}/${cid}`;
+      const headers: Record<string, string> = {
+        Accept: 'application/json, text/html, text/plain, */*',
+        'User-Agent': 'PressProtocol-Node/1.0.0 (+https://pressprotocol.com)',
+      };
+
+      if (this.pinataJWT && gw.includes('pinata.cloud')) {
+        headers['Authorization'] = `Bearer ${this.pinataJWT}`;
       }
-    } catch (error) {
-      console.error('Error fetching from IPFS:', error);
-    }
 
-    throw new Error(`Failed to fetch content from IPFS for CID: ${cid}`);
+      const res = await fetch(targetUrl, {
+        signal: controller.signal,
+        headers,
+      });
+
+      if (!res.ok) {
+        throw new Error(`Gateway ${gw} returned HTTP ${res.status}`);
+      }
+
+      const text = await res.text();
+      let parsed: any;
+      try {
+        parsed = JSON.parse(text);
+      } catch {
+        parsed = {
+          title: 'Preserved Sovereign Document',
+          content: text,
+          tags: ['ipfs-raw'],
+          timestamp: new Date().toISOString(),
+          publisher: {
+            pubkey: '',
+            signature: 'unsigned',
+          },
+        };
+      }
+
+      return parsed as ContentData;
+    });
+
+    try {
+      const contentData = await Promise.any(fetchPromises);
+      clearTimeout(timeoutId);
+      controller.abort();
+
+      console.log(`✅ Fetched content from IPFS swarm: ${cid}`);
+
+      // Save to cache for subsequent reads
+      try {
+        const cacheDir = path.resolve(process.env.DATA_DIR || process.cwd(), '.data/content-cache');
+        if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
+        fs.writeFileSync(path.join(cacheDir, `${cid}.json`), JSON.stringify(contentData, null, 2), 'utf-8');
+      } catch {}
+
+      return contentData;
+    } catch (err: any) {
+      clearTimeout(timeoutId);
+      throw new Error(`Failed to fetch content from IPFS gateways for CID ${cid}: ${err.message}`);
+    }
   }
 
   /**

@@ -6,11 +6,13 @@ version: '3.8'
 
 services:
   # Sovereign Community Node (Fastify + Embedded Helia IPFS + Embedded Tor v3 Daemon)
+  # Prebuilt standalone image: 100% zero-configuration self-hosted node
   pressprotocol-node:
-    build:
-      context: .
-      dockerfile: Dockerfile
     image: pressprotocol/node:latest
+    # To build from source instead of pulling prebuilt image, uncomment:
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
     container_name: pressprotocol-node
     restart: unless-stopped
     ports:

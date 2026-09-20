@@ -9,14 +9,14 @@ WORKDIR /app
 # Install build essentials & core tools
 RUN apk add --no-cache curl wget bash python3 make g++
 
-# Enable pnpm via Corepack
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Enable pnpm via Corepack pinned to v9
+RUN corepack enable && corepack prepare pnpm@9 --activate
 
 # Copy manifest files
-COPY package.json pnpm-lock.yaml* tsconfig.json ./
+COPY package.json tsconfig.json ./
 
 # Install dependencies with pnpm
-RUN pnpm install --frozen-lockfile || pnpm install
+RUN pnpm install --no-frozen-lockfile
 
 # Copy source and prisma definitions
 COPY src ./src
@@ -42,17 +42,17 @@ RUN apk add --no-cache tor su-exec bash curl wget ca-certificates
 RUN addgroup -g 10001 -S pressprotocol && \
     adduser -u 10001 -S pressprotocol -G pressprotocol
 
-# Enable pnpm in production runner
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Enable pnpm in production runner pinned to v9
+RUN corepack enable && corepack prepare pnpm@9 --activate
 
 # Copy production package descriptors and install prod-only dependencies
-COPY package.json pnpm-lock.yaml* tsconfig.json ./
-RUN pnpm install --prod --frozen-lockfile || pnpm install --prod
+COPY package.json tsconfig.json ./
+RUN pnpm install --prod --no-frozen-lockfile
 
-# Copy built application and prisma client from builder stage
+# Copy built application and prisma definitions from builder stage
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma 2>/dev/null || true
 COPY prisma ./prisma
+RUN npx prisma generate --no-engine || true
 
 # Copy entrypoint script
 COPY docker-entrypoint.sh /app/docker-entrypoint.sh

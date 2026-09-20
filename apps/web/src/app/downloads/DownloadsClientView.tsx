@@ -157,11 +157,11 @@ const ECOSYSTEM_REGISTRY: EcosystemItem[] = [
     actionUrl: "/downloads/docker-compose.yml",
     actionLabel: "Download docker-compose.yml",
     actionSnippet: "docker compose up -d",
-    sourceUrl: "https://github.com/0xshikhar/PressProtocol/tree/master/apps/node",
+    sourceUrl: "https://github.com/0xshikhar/PressProtocol/tree/master/core/node",
     installSteps: [
       "Download docker-compose.yml via button or curl -O https://pressprotocol.com/downloads/docker-compose.yml",
       "Run: docker compose up -d",
-      "Verify health: curl http://localhost:4001/metrics"
+      "Verify health: curl http://localhost:4000/api/node/health"
     ],
     icon: "server"
   },
