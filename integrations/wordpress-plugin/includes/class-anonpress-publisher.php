@@ -279,6 +279,10 @@ class AnonPress_Publisher {
             update_post_meta($post_id, '_pressprotocol_embed_code', $embed_code);
         }
 
+        if (!empty($result['mirrors']['tor'])) {
+            update_post_meta($post_id, '_pressprotocol_tor_url', esc_url_raw($result['mirrors']['tor']));
+        }
+
         if (isset($result['publisher'])) {
             update_post_meta($post_id, '_anonpress_public_key', $result['publisher']['publicKey']);
             update_post_meta($post_id, '_anonpress_is_anonymous', $result['publisher']['isAnonymous'] ? '1' : '0');

@@ -11,7 +11,7 @@ echo ""
 
 # Configuration
 PLUGIN_NAME="anonpress"
-VERSION="1.0.0"
+VERSION="1.1.0"
 OUTPUT_DIR="dist"
 ZIP_NAME="${PLUGIN_NAME}-${VERSION}.zip"
 
@@ -21,9 +21,13 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
+# Determine plugin root directory
+PLUGIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$PLUGIN_DIR"
+
 # Check if we're in the right directory
 if [ ! -f "anonpress.php" ]; then
-    echo -e "${RED}Error: anonpress.php not found. Run this script from the plugin directory.${NC}"
+    echo -e "${RED}Error: anonpress.php not found in $PLUGIN_DIR.${NC}"
     exit 1
 fi
 

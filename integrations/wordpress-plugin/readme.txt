@@ -3,7 +3,7 @@ Contributors: pressprotocol
 Tags: decentralized, ipfs, tor, censorship-resistant, publishing, blockchain
 Requires at least: 6.0
 Tested up to: 6.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 Requires PHP: 8.0
 License: MIT
 License URI: https://opensource.org/licenses/MIT
@@ -150,6 +150,12 @@ The plugin is free and open source (MIT license). You'll need:
 5. Beautiful standalone HTML output on IPFS
 
 == Changelog ==
+
+= 1.1.0 =
+* Tor v3 Onion integration: direct circuit persistence in post meta and live Tor link in sovereign badge
+* Updated default API endpoint to production PressProtocol gateway (https://api.pressprotocol.com)
+* Enhanced censorship-resistant syndication with RFC 8032 Ed25519 signing validation
+* Multi-transport fallback and health probe reliability improvements
 
 = 1.0.0 - 2024-10-14 =
 * Initial release
