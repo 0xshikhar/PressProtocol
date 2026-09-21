@@ -6,6 +6,9 @@ on:
       - 'v*.*.*'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   publish-npm:
     name: Publish TypeScript Packages to NPM
