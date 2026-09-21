@@ -3,7 +3,10 @@
  * Standalone Headless Publishing & Multi-Transport Resolution SDK
  */
 
-export { PressProtocolClient } from "./client.js";
+export {
+  PressProtocolClient,
+  PressProtocolClient as PressProtocol,
+} from "./client.js";
 
 export {
   generateKeypair,
