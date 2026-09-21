@@ -9,7 +9,7 @@
     "clean": "rm -rf dist"
   },
   "devDependencies": {
-    "@types/chrome": "^0.0.268",
+    "@types/chrome": "^0.3.0",
     "esbuild": "^0.28.2",
     "typescript": "^5.6.3"
   },
