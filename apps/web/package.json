@@ -61,7 +61,7 @@
     "tailwindcss-animate": "^1.0.7",
     "tsx": "^4.19.3",
     "viem": "^2.38.0",
-    "wagmi": "^2.14.12",
+    "wagmi": "^3.7.7",
     "zod": "^3.23.4"
   },
   "devDependencies": {
