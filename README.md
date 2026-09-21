@@ -46,7 +46,8 @@ All core developer libraries, client SDKs, and offline browser/CMS integrations 
 | **NPM (Proof Codec)** | [**NPM Packages (View All 3)**](https://www.npmjs.com/search?q=pressprotocol) | [`@pressprotocol/proof`](https://www.npmjs.com/package/@pressprotocol/proof) | `pnpm add @pressprotocol/proof` |
 | **NPM (Web Widget)** | [**NPM Packages (View All 3)**](https://www.npmjs.com/search?q=pressprotocol) | [`@pressprotocol/widget`](https://www.npmjs.com/package/@pressprotocol/widget) | `pnpm add @pressprotocol/widget` |
 | **Rust** | [**Crates.io Registry**](https://crates.io/crates/pressprotocol-rs/1.0.7) | `pressprotocol-rs` (v1.0.7) | `cargo add pressprotocol-rs` |
-| **Go** | [**Go Packages (pkg.go.dev)**](https://pkg.go.dev/github.com/0xshikhar/PressProtocol/sdks/go) | `github.com/0xshikhar/PressProtocol/sdks/go` | `go get github.com/0xshikhar/PressProtocol/sdks/go@v1.0.7` |
+| **Go** | [**Go Packages (pkg.go.dev)**](https://pkg.go.dev/github.com/0xshikhar/PressProtocol/sdks/go) | `github.com/0xshikhar/PressProtocol/sdks/go` | `go get github.com/0xshikhar/PressProtocol/sdks/go@v1.0.8` |
+| **Docker (GHCR)** | [**GitHub Packages (GHCR)**](https://github.com/0xshikhar/PressProtocol/pkgs/container/pressprotocol-node) | `ghcr.io/0xshikhar/pressprotocol-node` | `docker pull ghcr.io/0xshikhar/pressprotocol-node:latest` |
 
 ### 2. Ready-to-Use Native Extensions & Standalone Downloads
 
