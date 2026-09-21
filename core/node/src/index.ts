@@ -186,6 +186,7 @@ signals.forEach((signal) => {
       if (env.DATABASE_URL) {
         await prisma.$disconnect();
       }
+      await ipfsDHTService.shutdown();
       await fastify.close();
       process.exit(0);
     } catch (error) {
