@@ -48,7 +48,7 @@
     "@noble/hashes": "^2.4.0"
   },
   "devDependencies": {
-    "@types/node": "^20.12.7",
+    "@types/node": "^26.6.1",
     "tsx": "^4.19.3",
     "typescript": "^5.4.5"
   }

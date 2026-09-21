@@ -16,7 +16,7 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^20.11.24",
+    "@types/node": "^26.6.1",
     "obsidian": "latest",
     "typescript": "^5.3.3"
   }
