@@ -31,7 +31,8 @@ FROM node:20-alpine AS runner
 
 LABEL org.opencontainers.image.title="PressProtocol Sovereign Community Node"
 LABEL org.opencontainers.image.description="Autonomous, zero-SPOF censorship-resistant publishing node with embedded Helia IPFS and Tor v3"
-LABEL org.opencontainers.image.version="1.0.0-sovereign"
+LABEL org.opencontainers.image.version="1.1.0"
+LABEL org.opencontainers.image.source="https://github.com/0xshikhar/PressProtocol"
 
 WORKDIR /app
 

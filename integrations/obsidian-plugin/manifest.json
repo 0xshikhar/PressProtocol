@@ -1,7 +1,7 @@
 {
   "id": "pressprotocol-obsidian",
   "name": "PressProtocol Sovereign Publisher",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "minAppVersion": "0.15.0",
   "description": "Cryptographically sign and publish sovereign articles to IPFS and Tor directly from Obsidian.",
   "author": "OxShikhar",
