@@ -2,9 +2,14 @@ name: PressProtocol CI
 
 on:
   push:
-    branches: [ main, master, develop ]
+    branches: [ "**" ]
   pull_request:
     branches: [ main, master, develop ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
