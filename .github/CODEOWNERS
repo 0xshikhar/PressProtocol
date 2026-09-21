@@ -1,0 +1,15 @@
+# PressProtocol Global Code Ownership
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+* @0xshikhar
+
+# Core Infrastructure & Daemon
+/core/ @0xshikhar
+/deploy/ @0xshikhar
+/.github/ @0xshikhar
+
+# Web Applications & Developer SDKs
+/apps/ @0xshikhar
+/packages/ @0xshikhar
+/sdks/ @0xshikhar
+/integrations/ @0xshikhar
