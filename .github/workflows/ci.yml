@@ -76,7 +76,7 @@ jobs:
         run: pnpm --dir core/node build
 
   subsystem-tests:
-    name: Run Automated Subsystem Verification (14 Suites)
+    name: Run Automated Subsystem Verification (15 Suites)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
