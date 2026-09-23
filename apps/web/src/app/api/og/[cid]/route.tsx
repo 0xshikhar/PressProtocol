@@ -1,73 +1,9 @@
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
-import { getBackendUrl } from "@/config/backend";
+import { fetchArticleMetadata } from "@/lib/article-metadata";
+import { PRESS_LOGO_BASE64 } from "@/config/logo-base64";
 
 export const runtime = "edge";
-
-interface ResolvedContent {
-  title: string;
-  tags?: string[];
-  publisher?: {
-    pubkey?: string;
-    publicKey?: string;
-    walletAddress?: string;
-  };
-  createdAt?: string;
-}
-
-async function fetchArticleMetadata(cid: string): Promise<ResolvedContent> {
-  const backendUrl = getBackendUrl();
-
-  // 1. Try backend daemon
-  try {
-    const res = await fetch(`${backendUrl}/api/content/${cid}`, {
-      signal: AbortSignal.timeout(2200),
-      headers: { Accept: "application/json" },
-    });
-    if (res.ok) {
-      const json = await res.json();
-      if (json.data) {
-        return json.data;
-      }
-    }
-  } catch (e) {
-    // Backend unreachable, fallback to public IPFS gateways
-  }
-
-  // 2. Try fast public gateways
-  const gateways = [
-    "https://gateway.pinata.cloud/ipfs",
-    "https://cloudflare-ipfs.com/ipfs",
-    "https://ipfs.io/ipfs",
-  ];
-
-  for (const gw of gateways) {
-    try {
-      const res = await fetch(`${gw}/${cid}`, {
-        signal: AbortSignal.timeout(2500),
-        headers: { Accept: "application/json" },
-      });
-      if (res.ok) {
-        const raw = await res.json();
-        return {
-          title: raw.title || "Sovereign Document",
-          tags: raw.tags || [],
-          publisher: raw.publisher || {},
-          createdAt: raw.timestamp || raw.createdAt,
-        };
-      }
-    } catch (e) {
-      // Try next gateway
-    }
-  }
-
-  // 3. Fallback placeholder
-  return {
-    title: "Sovereign Censorship-Resistant Publication",
-    tags: ["sovereign", "ipfs", "pressprotocol"],
-    publisher: {},
-  };
-}
 
 export async function GET(
   request: NextRequest,
@@ -76,15 +12,21 @@ export async function GET(
   const { cid } = params;
   const article = await fetchArticleMetadata(cid);
 
-  const rawTitle = article.title || "Sovereign Document";
-  const title = rawTitle.length > 90 ? `${rawTitle.slice(0, 88)}...` : rawTitle;
-  const tags = Array.isArray(article.tags) ? article.tags.slice(0, 3) : [];
-  const pubkey = article.publisher?.pubkey || article.publisher?.publicKey || "";
+  const rawTitle = article.title || "Sovereign Publication";
+  const title = rawTitle.length > 80 ? `${rawTitle.slice(0, 77)}...` : rawTitle;
+  const excerpt =
+    article.excerpt ||
+    "Immutable, cryptographically verified publication preserved on PressProtocol decentralized infrastructure.";
+  const displayExcerpt =
+    excerpt.length > 155 ? `${excerpt.slice(0, 152)}...` : excerpt;
+
+  const tags = Array.isArray(article.tags) ? article.tags.slice(0, 2) : [];
+  const pubkey = article.pubkey || "";
   const pubkeySnippet = pubkey
-    ? `${pubkey.slice(0, 8)}...${pubkey.slice(-8)}`
+    ? `${pubkey.slice(0, 6)}...${pubkey.slice(-6)}`
     : "Sovereign Author";
 
-  const titleFontSize = title.length > 70 ? 42 : title.length > 40 ? 48 : 54;
+  const titleFontSize = title.length > 65 ? 40 : title.length > 35 ? 46 : 52;
 
   return new ImageResponse(
     (
@@ -95,17 +37,31 @@ export async function GET(
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          backgroundColor: "#060911",
+          backgroundColor: "#0B0A0C",
           backgroundImage:
-            "radial-gradient(circle at 15% 15%, rgba(16, 185, 129, 0.18), transparent 45%), radial-gradient(circle at 85% 85%, rgba(59, 130, 246, 0.16), transparent 45%)",
-          padding: "54px 60px",
+            "radial-gradient(circle at 10% 12%, rgba(124, 39, 51, 0.28), transparent 45%), radial-gradient(circle at 90% 88%, rgba(62, 156, 114, 0.12), transparent 45%)",
+          padding: "50px 60px",
           fontFamily: "sans-serif",
-          color: "#ffffff",
-          border: "2px solid rgba(255, 255, 255, 0.08)",
+          color: "#EEE7E1",
+          border: "2px solid rgba(240, 232, 232, 0.08)",
           boxSizing: "border-box",
+          position: "relative",
         }}
       >
-        {/* Top Header Bar */}
+        {/* Top Press Burgundy Accent Stripe */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: "3px",
+            background:
+              "linear-gradient(90deg, #7C2733 0%, #B44A54 40%, rgba(62, 156, 114, 0.4) 100%)",
+          }}
+        />
+
+        {/* 1. Header Bar: Logo, Name, and Transport Pill */}
         <div
           style={{
             display: "flex",
@@ -114,58 +70,56 @@ export async function GET(
             width: "100%",
           }}
         >
-          {/* Logo & Brand */}
-          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+          {/* Logo & Brand Identity */}
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             <div
               style={{
                 width: "48px",
                 height: "48px",
-                borderRadius: "14px",
-                backgroundColor: "rgba(16, 185, 129, 0.15)",
-                border: "1.5px solid rgba(16, 185, 129, 0.4)",
+                borderRadius: "10px",
+                backgroundColor: "#141216",
+                border: "1.5px solid rgba(240, 232, 232, 0.12)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                overflow: "hidden",
+                padding: "4px",
               }}
             >
-              <svg
-                width="26"
-                height="26"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#10b981"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                <polyline points="14 2 14 8 20 8" />
-                <line x1="16" y1="13" x2="8" y2="13" />
-                <line x1="16" y1="17" x2="8" y2="17" />
-                <polyline points="10 9 9 9 8 9" />
-              </svg>
+              {/* Official Brand Logo */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={PRESS_LOGO_BASE64}
+                alt="PressProtocol Logo"
+                width={40}
+                height={40}
+                style={{ objectFit: "contain" }}
+              />
             </div>
+
             <div style={{ display: "flex", flexDirection: "column" }}>
               <span
                 style={{
                   fontSize: "24px",
                   fontWeight: 800,
-                  letterSpacing: "-0.01em",
-                  color: "#ffffff",
+                  letterSpacing: "-0.02em",
+                  color: "#EEE7E1",
+                  lineHeight: 1.1,
                 }}
               >
                 PressProtocol
               </span>
               <span
                 style={{
-                  fontSize: "12px",
-                  fontWeight: 600,
-                  letterSpacing: "0.08em",
-                  color: "#10b981",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  letterSpacing: "0.1em",
+                  color: "#B44A54",
                   textTransform: "uppercase",
+                  marginTop: "3px",
                 }}
               >
-                Sovereign Publishing Layer
+                SOVEREIGN JOURNALISM • VERIFIED ARCHIVE
               </span>
             </div>
           </div>
@@ -176,27 +130,27 @@ export async function GET(
               display: "flex",
               alignItems: "center",
               gap: "8px",
-              padding: "8px 16px",
+              padding: "7px 16px",
               borderRadius: "999px",
-              backgroundColor: "rgba(16, 185, 129, 0.1)",
-              border: "1px solid rgba(16, 185, 129, 0.3)",
+              backgroundColor: "rgba(20, 18, 22, 0.8)",
+              border: "1px solid rgba(62, 156, 114, 0.35)",
             }}
           >
             <div
               style={{
-                width: "8px",
-                height: "8px",
+                width: "7px",
+                height: "7px",
                 borderRadius: "50%",
-                backgroundColor: "#10b981",
+                backgroundColor: "#59B98C",
               }}
             />
             <span
               style={{
-                fontSize: "13px",
+                fontSize: "12px",
                 fontWeight: 600,
-                color: "#6ee7b7",
+                color: "#59B98C",
                 fontFamily: "monospace",
-                letterSpacing: "0.02em",
+                letterSpacing: "0.04em",
               }}
             >
               IPFS + TOR MULTI-TRANSPORT
@@ -204,13 +158,13 @@ export async function GET(
           </div>
         </div>
 
-        {/* Center Section: Title & Multihash CID Box */}
+        {/* 2. Middle Section: Title, Real Excerpt, and Multihash CID Pill */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: "20px",
-            margin: "24px 0",
+            gap: "14px",
+            margin: "18px 0",
           }}
         >
           {/* Article Title */}
@@ -219,12 +173,27 @@ export async function GET(
               display: "flex",
               fontSize: `${titleFontSize}px`,
               fontWeight: 800,
-              lineHeight: 1.18,
-              letterSpacing: "-0.03em",
-              color: "#ffffff",
+              lineHeight: 1.14,
+              letterSpacing: "-0.025em",
+              color: "#EEE7E1",
             }}
           >
             {title}
+          </div>
+
+          {/* Real Article Excerpt */}
+          <div
+            style={{
+              display: "flex",
+              fontSize: "19px",
+              lineHeight: 1.45,
+              fontWeight: 400,
+              color: "#A79E96",
+              maxHeight: "56px",
+              overflow: "hidden",
+            }}
+          >
+            &ldquo;{displayExcerpt}&rdquo;
           </div>
 
           {/* CID Multihash Box */}
@@ -233,19 +202,20 @@ export async function GET(
               display: "flex",
               alignItems: "center",
               gap: "10px",
-              padding: "10px 18px",
-              borderRadius: "12px",
-              backgroundColor: "rgba(15, 23, 42, 0.7)",
-              border: "1px solid rgba(148, 163, 184, 0.15)",
+              padding: "8px 16px",
+              borderRadius: "8px",
+              backgroundColor: "rgba(20, 18, 22, 0.9)",
+              border: "1px solid rgba(240, 232, 232, 0.08)",
               alignSelf: "flex-start",
+              marginTop: "4px",
             }}
           >
             <svg
-              width="16"
-              height="16"
+              width="15"
+              height="15"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#34d399"
+              stroke="#59B98C"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -256,9 +226,9 @@ export async function GET(
             </svg>
             <span
               style={{
-                fontSize: "14px",
+                fontSize: "13px",
                 fontFamily: "monospace",
-                color: "#34d399",
+                color: "#59B98C",
                 letterSpacing: "0.01em",
               }}
             >
@@ -267,36 +237,37 @@ export async function GET(
           </div>
         </div>
 
-        {/* Bottom Bar: Verification, Author, and Security Specs */}
+        {/* 3. Bottom Bar: Cryptographic Proof Badges & Provenance */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            paddingTop: "22px",
-            borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+            paddingTop: "20px",
+            borderTop: "1px solid rgba(240, 232, 232, 0.09)",
             width: "100%",
           }}
         >
-          {/* Sovereign Author Verification Badge */}
-          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          {/* Left: Verification Badges */}
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            {/* Sealed Badge */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "8px",
-                padding: "8px 16px",
-                borderRadius: "10px",
-                backgroundColor: "rgba(16, 185, 129, 0.15)",
-                border: "1px solid rgba(16, 185, 129, 0.4)",
+                gap: "7px",
+                padding: "6px 14px",
+                borderRadius: "6px",
+                backgroundColor: "rgba(62, 156, 114, 0.12)",
+                border: "1px solid rgba(62, 156, 114, 0.35)",
               }}
             >
               <svg
-                width="18"
-                height="18"
+                width="16"
+                height="16"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#10b981"
+                stroke="#59B98C"
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -306,13 +277,14 @@ export async function GET(
               </svg>
               <span
                 style={{
-                  fontSize: "14px",
+                  fontSize: "13px",
                   fontWeight: 700,
-                  color: "#10b981",
-                  letterSpacing: "0.01em",
+                  color: "#59B98C",
+                  fontFamily: "monospace",
+                  letterSpacing: "0.02em",
                 }}
               >
-                Verified Sovereign Author
+                CRYPTOGRAPHICALLY SEALED
               </span>
             </div>
 
@@ -322,42 +294,42 @@ export async function GET(
                 display: "flex",
                 alignItems: "center",
                 gap: "6px",
-                padding: "8px 14px",
-                borderRadius: "10px",
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
-                border: "1px solid rgba(255, 255, 255, 0.1)",
+                padding: "6px 12px",
+                borderRadius: "6px",
+                backgroundColor: "rgba(240, 232, 232, 0.04)",
+                border: "1px solid rgba(240, 232, 232, 0.08)",
                 fontFamily: "monospace",
-                fontSize: "13px",
-                color: "#cbd5e1",
+                fontSize: "12px",
+                color: "#A79E96",
               }}
             >
               <span>Ed25519:</span>
-              <span style={{ color: "#38bdf8", fontWeight: 600 }}>{pubkeySnippet}</span>
+              <span style={{ color: "#EEE7E1", fontWeight: 600 }}>
+                {pubkeySnippet}
+              </span>
             </div>
 
-            {/* Tags */}
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              {tags.map((tag) => (
-                <div
-                  key={tag}
-                  style={{
-                    display: "flex",
-                    padding: "6px 12px",
-                    borderRadius: "8px",
-                    backgroundColor: "rgba(255, 255, 255, 0.04)",
-                    border: "1px solid rgba(255, 255, 255, 0.08)",
-                    fontSize: "12px",
-                    fontFamily: "monospace",
-                    color: "#94a3b8",
-                  }}
-                >
-                  #{tag}
-                </div>
-              ))}
-            </div>
+            {/* Tags (if present) */}
+            {tags.map((tag) => (
+              <div
+                key={tag}
+                style={{
+                  display: "flex",
+                  padding: "6px 10px",
+                  borderRadius: "6px",
+                  backgroundColor: "rgba(240, 232, 232, 0.04)",
+                  border: "1px solid rgba(240, 232, 232, 0.08)",
+                  fontSize: "12px",
+                  fontFamily: "monospace",
+                  color: "#6F675F",
+                }}
+              >
+                #{tag}
+              </div>
+            ))}
           </div>
 
-          {/* Cryptographic Standard Guarantee */}
+          {/* Right: Immutability Standards */}
           <div
             style={{
               display: "flex",
@@ -365,12 +337,14 @@ export async function GET(
               gap: "8px",
               fontFamily: "monospace",
               fontSize: "12px",
-              color: "#64748b",
+              color: "#6F675F",
             }}
           >
-            <span>Ed25519 RFC 8032</span>
+            <span>RFC 8785 CANONICAL</span>
             <span>•</span>
-            <span>SHA-512</span>
+            <span style={{ color: "#B44A54", fontWeight: 600 }}>
+              pressprotocol.com
+            </span>
           </div>
         </div>
       </div>
