@@ -1,6 +1,9 @@
 ## Description
 Provide a concise summary of the changes made and the problem being solved.
 
+## 🔗 Related Issues
+- Fixes #
+
 ## Type of Change
 - [ ] 🐛 Bug fix (non-breaking change fixing an issue)
 - [ ] ✨ New feature (non-breaking change adding functionality)
