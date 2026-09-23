@@ -23,6 +23,8 @@ import {
   KeyRound,
   Network,
   HelpCircle,
+  Clock,
+  Mail,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -34,42 +36,35 @@ import {
   type TraditionalMethod,
 } from "@/config/donation-chains";
 
-// Transparent Infrastructure Ledger Data
-const INFRASTRUCTURE_LEDGER = [
+// Transparent Treasury Allocation Model
+const TREASURY_ALLOCATION = [
   {
-    category: "Permanent IPFS Pinning Cluster",
-    purpose: "Dedicated Pinata cluster, Helia IPFS node seeders, and multi-region blockstores ensuring published CIDs never decay.",
-    monthlyCost: "$140 / mo",
-    allocation: "35%",
-    status: "Active (Global)",
+    category: "Permanent IPFS & Decentralized Storage",
+    purpose: "Scaling from bootstrap tiers to dedicated multi-region IPFS pinning clusters, Helia node seeders, and permanent CID permanence as publication volume grows.",
+    share: "35%",
+    priority: "Core Infrastructure",
+    status: "Active Swarm",
   },
   {
-    category: "Tor v3 Hidden Onion Relays",
-    purpose: "Dedicated unmetered European & offshore nodes running Tor v3 hidden services and SOCKS5 bridges for firewall-proof access.",
-    monthlyCost: "$95 / mo",
-    allocation: "25%",
+    category: "Tor v3 Onion Relays & Anycast Gateways",
+    purpose: "Dedicated offshore Tor v3 hidden services, SOCKS5 relays, and anti-censorship bridges guaranteeing unblockable reader access through national firewalls.",
+    share: "25%",
+    priority: "Censorship Resistance",
     status: "Active (Dual-Homed)",
   },
   {
-    category: "Anycast Edge Compute & Gateways",
-    purpose: "Global edge caching, fallback gateway probes, and client-side proof verification routing.",
-    monthlyCost: "$45 / mo",
-    allocation: "12%",
-    status: "Active (Anycast)",
+    category: "Open-Source Contributor & Maintainer Stipends",
+    purpose: "Direct community grants to onboard 2–3 active co-maintainers, review pull requests, and permanently eliminate single-developer bus factor.",
+    share: "25%",
+    priority: "Governance & Longevity",
+    status: "Expanding",
   },
   {
     category: "Independent Cryptographic Security Audit",
-    purpose: "Earmarked fund for an independent, third-party audit of our Ed25519 WebCrypto signing, RFC 8785 canonicalizer, and QR air-gap codec.",
-    monthlyCost: "$8,500 target",
-    allocation: "One-time milestone",
-    status: "Fundraising",
-  },
-  {
-    category: "Secondary Maintainer Stipend Pool",
-    purpose: "Direct support to onboard 2–3 active open-source contributors, review pull requests, and permanently eliminate single-developer bus factor.",
-    monthlyCost: "$1,200 / mo target",
-    allocation: "28%",
-    status: "Expanding",
+    purpose: "Earmarked milestone reserve for independent third-party audits of WebCrypto Ed25519 signing, RFC 8785 canonicalizer, and QR air-gap codecs.",
+    share: "15%",
+    priority: "Security Assurance",
+    status: "Milestone Target",
   },
 ];
 
@@ -237,7 +232,7 @@ export default function SupportPage() {
 
             <div className="space-y-4 text-sm sm:text-base text-secondary leading-relaxed font-sans font-light">
               <p>
-                PressProtocol was not built by a venture-backed startup, an advertising agency, or an incubator. It was architected, written, and deployed end-to-end by a single independent developer with a singular conviction: <strong className="text-primary font-normal">publishing truth, investigative journalism, and historical records must never depend on corporate permission or administrative benevolence.</strong>
+                PressProtocol was not built by a venture-backed startup, an advertising agency, or an incubator. It was architected, written, and deployed from first principles as an independent cypherpunk digital public good: <strong className="text-primary font-normal">publishing truth, investigative journalism, and historical records must never depend on corporate permission or administrative benevolence.</strong>
               </p>
               
               <div className="grid sm:grid-cols-2 gap-3 pt-2">
@@ -263,7 +258,7 @@ export default function SupportPage() {
               </div>
 
               <p className="text-muted text-sm leading-relaxed pt-1">
-                By staying independent, there are no shareholders to appease, no user data to monetize, and no administrative backdoors to negotiate. The protocol belongs entirely to the public domain.
+                By staying independent, there are no shareholders to appease, no user data to monetize, and no administrative backdoors to negotiate. Through open public goods grants and community support, we are expanding from our sovereign core into a resilient, multi-maintainer open collective that permanently belongs to the public domain.
               </p>
             </div>
           </div>
@@ -365,7 +360,7 @@ export default function SupportPage() {
           {activeCategory === "crypto" && (
             <div className="space-y-6 animate-in fade-in duration-300">
               {/* Chain Selector Tabs */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
                 {DONATION_CHAINS.map((chain) => {
                   const isSelected = selectedChain.id === chain.id;
                   return (
@@ -422,7 +417,7 @@ export default function SupportPage() {
                 </div>
 
                 {/* Address Box */}
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label className="text-xs font-mono uppercase tracking-wider text-muted flex items-center justify-between">
                     <span>Direct Destination Address</span>
                     <span className="text-[11px] text-muted">Click address or button to copy</span>
@@ -438,7 +433,7 @@ export default function SupportPage() {
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0">
-                      {/* Section 2.3 Single Primary CTA: Burgundy fill for copy action */}
+                      {/* Single Primary CTA: Accent fill for copy action */}
                       <Button
                         onClick={() => handleCopy(selectedChain.address, true)}
                         className="h-11 px-5 rounded-[6px] font-mono text-xs font-medium bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-primary transition-all flex items-center gap-2 flex-1 sm:flex-initial justify-center shadow-sm"
@@ -464,8 +459,33 @@ export default function SupportPage() {
                         <QrCode className="h-4 w-4 text-muted" />
                         <span>QR</span>
                       </Button>
+
+                      <a
+                        href={selectedChain.explorerUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shrink-0"
+                      >
+                        <Button
+                          variant="outline"
+                          className="h-11 px-4 rounded-[6px] border-hairline bg-surface hover:bg-overlay text-secondary hover:text-primary font-mono text-xs flex items-center gap-2"
+                        >
+                          <ExternalLink className="h-4 w-4 text-muted" />
+                          <span>Explorer</span>
+                        </Button>
+                      </a>
                     </div>
                   </div>
+
+                  {/* Multi-Chain EVM Compatibility Notice */}
+                  {(selectedChain.id === "evm" || selectedChain.id === "bsc") && (
+                    <div className="p-3 rounded-[6px] bg-surface-raised border border-hairline flex items-center gap-2 text-xs font-mono text-muted">
+                      <span className="text-secondary font-semibold">Universal EVM Support:</span>
+                      <span>
+                        This address accepts all native tokens &amp; tokens on Ethereum, BSC, Arbitrum, Optimism, Base, Polygon, Avalanche, and other EVM L2s.
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -511,28 +531,69 @@ export default function SupportPage() {
           {/* VIEW B: Traditional Methods */}
           {activeCategory === "traditional" && (
             <div className="space-y-6 animate-in fade-in duration-300">
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Verification in Progress Alert */}
+              <div className="p-4 rounded-[6px] bg-surface border border-hairline flex items-start gap-3">
+                <div className="h-8 w-8 rounded-[4px] bg-warning/10 border border-warning/30 flex items-center justify-center text-warning shrink-0 mt-0.5">
+                  <Clock className="h-4 w-4" />
+                </div>
+                <div className="space-y-1">
+                  <div className="font-sans text-xs font-semibold text-primary">
+                    Payment Gateway &amp; Entity Setup In Progress
+                  </div>
+                  <p className="text-xs text-muted leading-relaxed font-sans">
+                    Institutional merchant accounts and payment gateway verification are currently underway for <span className="text-secondary font-mono">pressprotocol.com</span>. We are adding PayPal, card processors, and Payoneer soon. GitHub Sponsors and all on-chain crypto networks are fully live.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-4">
                 {TRADITIONAL_METHODS.map((method: TraditionalMethod) => {
                   const isCopied = copiedIdentifier === method.identifier;
+                  const isComingSoon = method.status === "coming_soon";
                   return (
                     <div
                       key={method.id}
-                      className="p-5 sm:p-6 rounded-[6px] border border-hairline bg-surface hover:border-focus transition-all flex flex-col justify-between space-y-4 group"
+                      className={`p-5 sm:p-6 rounded-[6px] border bg-surface transition-all flex flex-col justify-between space-y-4 group ${
+                        isComingSoon
+                          ? "border-hairline opacity-80"
+                          : "border-hairline hover:border-focus"
+                      }`}
                     >
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <span className="font-mono text-xs uppercase tracking-wider text-secondary font-medium">
                             {method.name}
                           </span>
-                          <span className="text-[11px] font-mono text-muted px-2.5 py-0.5 rounded-[6px] bg-surface-raised border border-hairline">
+                          <span
+                            className={`text-[11px] font-mono px-2.5 py-0.5 rounded-[6px] border ${
+                              isComingSoon
+                                ? "bg-warning/10 text-warning border-warning/30"
+                                : "bg-surface-raised border-hairline text-muted"
+                            }`}
+                          >
                             {method.badge}
                           </span>
                         </div>
                         <p className="text-xs text-secondary leading-relaxed font-sans">{method.description}</p>
+
+                        {isComingSoon && method.statusNotice && (
+                          <div className="p-2.5 rounded-[4px] bg-surface-raised border border-hairline text-[11px] font-mono text-muted flex items-start gap-1.5 mt-2">
+                            <Clock className="w-3.5 h-3.5 text-warning shrink-0 mt-0.5" />
+                            <span>{method.statusNotice}</span>
+                          </div>
+                        )}
                       </div>
 
                       <div className="pt-2 flex items-center gap-2">
-                        {method.link ? (
+                        {isComingSoon ? (
+                          <Button
+                            disabled
+                            className="w-full h-10 rounded-[6px] font-mono text-xs font-medium bg-overlay text-muted border border-hairline cursor-not-allowed opacity-60 flex items-center justify-center gap-2"
+                          >
+                            <Clock className="h-3.5 w-3.5" />
+                            <span>Adding Soon</span>
+                          </Button>
+                        ) : method.link ? (
                           <a
                             href={method.link}
                             target="_blank"
@@ -569,39 +630,52 @@ export default function SupportPage() {
               </div>
 
               {/* Direct Inquiries Box */}
-              <div className="p-5 sm:p-6 rounded-[6px] border border-hairline bg-surface flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="p-5 sm:p-6 rounded-[6px] border border-hairline bg-surface flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div className="space-y-1">
-                  <h4 className="font-sans text-sm font-semibold text-primary">Need a bank wire, invoice, or foundation grant route?</h4>
-                  <p className="text-xs text-muted font-sans">
-                    Reach out directly on GitHub or Twitter/X if you want to support infrastructure operations via institutional wire or donor-advised funds.
+                  <h4 className="font-sans text-sm font-semibold text-primary">Need an institutional wire, invoice, or foundation grant route?</h4>
+                  <p className="text-xs text-muted font-sans max-w-xl">
+                    Reach out confidentially via Proton Mail (<span className="text-secondary font-mono">pressprotocol@proton.me</span>) or open an inquiry on GitHub for foundation grants, donor-advised funds (DAFs), or institutional wire instructions.
                   </p>
                 </div>
-                <a
-                  href="https://github.com/0xshikhar/PressProtocol/issues"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button variant="outline" size="sm" className="font-mono text-xs h-9 px-4 rounded-[6px] border-hairline bg-surface hover:bg-overlay text-primary shrink-0">
-                    Open Inquiry on GitHub
-                  </Button>
-                </a>
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                  <a href="mailto:pressprotocol@proton.me">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="font-mono text-xs h-9 px-3.5 rounded-[6px] border-hairline bg-surface hover:bg-overlay text-primary flex items-center gap-1.5"
+                    >
+                      <Mail className="h-3.5 w-3.5 text-muted" />
+                      <span>pressprotocol@proton.me</span>
+                    </Button>
+                  </a>
+                  <a
+                    href="https://github.com/0xshikhar/PressProtocol/issues"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Button variant="outline" size="sm" className="font-mono text-xs h-9 px-3.5 rounded-[6px] border-hairline bg-surface hover:bg-overlay text-primary flex items-center gap-1.5">
+                      <Github className="h-3.5 w-3.5 text-muted" />
+                      <span>Open GitHub Inquiry</span>
+                    </Button>
+                  </a>
+                </div>
               </div>
             </div>
           )}
         </div>
 
-        {/* Section 4: Transparent Infrastructure Ledger & Monthly Costs */}
+        {/* Section 4: Transparent Infrastructure Ledger & Treasury Allocation */}
         <div className="space-y-6 pt-4">
           <div>
             <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-[6px] bg-surface border border-hairline text-xs font-mono text-muted mb-3">
               <Server className="w-3.5 h-3.5 text-muted" />
-              <span>Expense audit</span>
+              <span>Treasury transparency</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-hero font-normal text-primary">
               Where 100% of Community Support Goes
             </h2>
             <p className="text-xs sm:text-sm text-muted font-mono mt-1">
-              Zero executive overhead or marketing burn. Pure infrastructure survivability and open-source maintenance.
+              Zero executive overhead or marketing burn. All community contributions and grant awards are programmatically budgeted across decentralized infrastructure, cryptographic audits, and maintainer stipends.
             </p>
           </div>
 
@@ -611,23 +685,27 @@ export default function SupportPage() {
               <table className="w-full text-left text-xs font-mono">
                 <thead>
                   <tr className="border-b border-hairline bg-overlay/30 text-muted">
-                    <th className="p-4 uppercase tracking-wider font-semibold">Infrastructure Component</th>
-                    <th className="p-4 uppercase tracking-wider font-semibold">Operational Role</th>
-                    <th className="p-4 uppercase tracking-wider font-semibold">Running Cost</th>
+                    <th className="p-4 uppercase tracking-wider font-semibold">Allocation Focus</th>
+                    <th className="p-4 uppercase tracking-wider font-semibold">Operational Scope</th>
+                    <th className="p-4 uppercase tracking-wider font-semibold">Treasury Share</th>
                     <th className="p-4 uppercase tracking-wider font-semibold text-right">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-hairline">
-                  {INFRASTRUCTURE_LEDGER.map((item, idx) => (
+                  {TREASURY_ALLOCATION.map((item, idx) => (
                     <tr key={idx} className="hover:bg-overlay/20 transition-colors">
-                      <td className="p-4 font-sans font-semibold text-primary text-sm">
-                        {item.category}
+                      <td className="p-4">
+                        <div className="font-sans font-semibold text-primary text-sm">{item.category}</div>
+                        <div className="text-[10px] text-muted uppercase font-mono mt-0.5">{item.priority}</div>
                       </td>
                       <td className="p-4 font-sans text-secondary text-xs leading-relaxed max-w-xs">
                         {item.purpose}
                       </td>
-                      <td className="p-4 font-mono font-bold text-primary whitespace-nowrap">
-                        {item.monthlyCost}
+                      <td className="p-4 font-mono whitespace-nowrap">
+                        <div className="flex items-baseline gap-1.5">
+                          <span className="font-bold text-primary text-base">{item.share}</span>
+                          <span className="text-[10px] text-muted uppercase">of incoming pool</span>
+                        </div>
                       </td>
                       <td className="p-4 text-right whitespace-nowrap">
                         <span
@@ -649,10 +727,13 @@ export default function SupportPage() {
 
             {/* Mobile Card List View (< sm) */}
             <div className="sm:hidden divide-y divide-hairline p-2">
-              {INFRASTRUCTURE_LEDGER.map((item, idx) => (
+              {TREASURY_ALLOCATION.map((item, idx) => (
                 <div key={idx} className="p-3.5 space-y-2">
                   <div className="flex items-start justify-between gap-2">
-                    <div className="font-sans font-bold text-sm text-primary">{item.category}</div>
+                    <div>
+                      <div className="font-sans font-bold text-sm text-primary">{item.category}</div>
+                      <div className="text-[10px] text-muted uppercase font-mono">{item.priority}</div>
+                    </div>
                     <span
                       className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[6px] text-[10px] font-mono shrink-0 ${
                         item.status.includes("Active")
@@ -666,8 +747,8 @@ export default function SupportPage() {
                   </div>
                   <p className="text-xs text-muted font-sans leading-relaxed">{item.purpose}</p>
                   <div className="flex items-center justify-between text-xs font-mono pt-1">
-                    <span className="text-muted uppercase text-[10px]">Monthly Allocation:</span>
-                    <span className="text-primary font-bold">{item.monthlyCost}</span>
+                    <span className="text-muted uppercase text-[10px]">Treasury Allocation:</span>
+                    <span className="text-primary font-bold">{item.share}</span>
                   </div>
                 </div>
               ))}
@@ -796,7 +877,7 @@ export default function SupportPage() {
         <div className="border-t border-hairline pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-muted">
           <div className="flex items-center gap-2">
             <Shield className="h-4 w-4 text-verified" />
-            <span>MIT Licensed Open Source &bull; 100% Solo-Built Public Good &bull; Zero Custody</span>
+            <span>MIT Licensed Open Source &bull; Sovereign Digital Public Good &bull; Zero Custody</span>
           </div>
           <div>
             <span>PressProtocol &bull; Built with defiance and conviction</span>
