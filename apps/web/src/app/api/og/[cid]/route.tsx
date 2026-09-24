@@ -5,6 +5,14 @@ import { PRESS_LOGO_BASE64 } from "@/config/logo-base64";
 
 export const runtime = "edge";
 
+/**
+ * Edge runtime endpoint to dynamically generate high-resolution OpenGraph and Twitter card images.
+ * Supports both standard sovereign publication previews and contextual verified quote cards.
+ *
+ * @param request - Incoming Next.js HTTP request containing URL search params.
+ * @param context - Route parameters containing the publication IPFS CID.
+ * @returns ImageResponse containing the rendered 1200x630 PNG preview card.
+ */
 export async function GET(
   request: NextRequest,
   { params }: { params: { cid: string } }
@@ -32,8 +40,10 @@ export async function GET(
 
   // If a quote parameter is present, render the Verified Quote Card
   if (quote) {
-    const displayQuote = quote.length > 210 ? `${quote.slice(0, 207)}...` : quote;
-    const quoteFontSize = displayQuote.length > 130 ? 32 : displayQuote.length > 70 ? 38 : 46;
+    const displayQuote = quote.length > 220 ? `${quote.slice(0, 217).trim()}...` : quote;
+    const quoteCardTitle = rawTitle.length > 55 ? `${rawTitle.slice(0, 52).trim()}...` : rawTitle;
+    const quoteFontSize =
+      displayQuote.length > 160 ? 28 : displayQuote.length > 100 ? 32 : displayQuote.length > 50 ? 36 : 40;
 
     return new ImageResponse(
       (
@@ -160,88 +170,77 @@ export async function GET(
                   letterSpacing: "0.04em",
                 }}
               >
-                ED25519 VERIFIED QUOTE
+                VERIFIED QUOTE
               </span>
             </div>
           </div>
 
-          {/* 2. Middle Section: Article Heading + Quotation Box + In-Image Description */}
+          {/* 2. Middle Section: Quotation Card with Integrated Attribution & Multihash */}
           <div
             style={{
               display: "flex",
               flexDirection: "column",
-              gap: "12px",
+              justifyContent: "space-between",
+              padding: "28px 34px",
+              borderRadius: "16px",
+              backgroundColor: "rgba(20, 18, 22, 0.85)",
+              border: "1px solid rgba(124, 39, 51, 0.45)",
               margin: "6px 0",
               width: "100%",
+              maxHeight: "385px",
+              overflow: "hidden",
             }}
           >
-            {/* Prominent Article Heading */}
+            {/* The Quote Text */}
             <div
               style={{
                 display: "flex",
-                fontSize: "36px",
-                fontWeight: 800,
-                lineHeight: 1.15,
-                letterSpacing: "-0.025em",
+                fontSize: `${quoteFontSize}px`,
+                fontWeight: 600,
+                lineHeight: 1.36,
+                letterSpacing: "-0.015em",
                 color: "#EEE7E1",
+                fontStyle: "italic",
               }}
             >
-              {title}
+              &ldquo;{displayQuote}&rdquo;
             </div>
 
-            {/* The Quotation Box */}
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "10px",
-                padding: "20px 24px",
-                borderRadius: "12px",
-                backgroundColor: "rgba(20, 18, 22, 0.8)",
-                border: "1px solid rgba(124, 39, 51, 0.4)",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  fontSize: `${quoteFontSize}px`,
-                  fontWeight: 600,
-                  lineHeight: 1.34,
-                  letterSpacing: "-0.015em",
-                  color: "#EEE7E1",
-                  fontStyle: "italic",
-                }}
-              >
-                &ldquo;{displayQuote}&rdquo;
-              </div>
-            </div>
-
-            {/* In-Image Article Context Description & Multihash */}
+            {/* Integrated Attribution & Decentralized Multihash */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
                 width: "100%",
-                paddingTop: "2px",
+                paddingTop: "16px",
+                borderTop: "1px solid rgba(240, 232, 232, 0.08)",
+                marginTop: "12px",
               }}
             >
-              <span
-                style={{
-                  fontSize: "16px",
-                  lineHeight: 1.4,
-                  color: "#A79E96",
-                }}
-              >
-                Immutable, cryptographically verified publication preserved on PressProtocol.
-              </span>
-
-              {/* Multihash pill */}
+              {/* Attribution */}
               <div
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: "7px",
+                  gap: "8px",
+                  fontSize: "17px",
+                  color: "#A79E96",
+                }}
+              >
+                <span style={{ color: "#6F675F" }}>—</span>
+                <span style={{ color: "#6F675F" }}>From</span>
+                <span style={{ color: "#EEE7E1", fontWeight: 600 }}>
+                  {quoteCardTitle}
+                </span>
+              </div>
+
+              {/* IPFS Multihash badge */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
                   padding: "4px 12px",
                   borderRadius: "6px",
                   backgroundColor: "rgba(11, 10, 12, 0.9)",
@@ -351,20 +350,25 @@ export async function GET(
               ))}
             </div>
 
-            {/* Right: Immutability Standards */}
+            {/* Right: Clean Protocol Brand Link */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
                 gap: "8px",
                 fontFamily: "monospace",
-                fontSize: "12px",
-                color: "#6F675F",
+                fontSize: "13px",
               }}
             >
-              <span>RFC 8785 CANONICAL</span>
-              <span>•</span>
-              <span style={{ color: "#B44A54", fontWeight: 600 }}>
+              <div
+                style={{
+                  width: "6px",
+                  height: "6px",
+                  borderRadius: "50%",
+                  backgroundColor: "#59B98C",
+                }}
+              />
+              <span style={{ color: "#B44A54", fontWeight: 700, letterSpacing: "0.02em" }}>
                 pressprotocol.com
               </span>
             </div>
@@ -686,20 +690,25 @@ export async function GET(
             ))}
           </div>
 
-          {/* Right: Immutability Standards */}
+          {/* Right: Clean Protocol Brand Link */}
           <div
             style={{
               display: "flex",
               alignItems: "center",
               gap: "8px",
               fontFamily: "monospace",
-              fontSize: "12px",
-              color: "#6F675F",
+              fontSize: "13px",
             }}
           >
-            <span>RFC 8785 CANONICAL</span>
-            <span>•</span>
-            <span style={{ color: "#B44A54", fontWeight: 600 }}>
+            <div
+              style={{
+                width: "6px",
+                height: "6px",
+                borderRadius: "50%",
+                backgroundColor: "#59B98C",
+              }}
+            />
+            <span style={{ color: "#B44A54", fontWeight: 700, letterSpacing: "0.02em" }}>
               pressprotocol.com
             </span>
           </div>

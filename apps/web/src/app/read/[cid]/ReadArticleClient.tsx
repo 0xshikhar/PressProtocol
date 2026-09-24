@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ExternalLink, Download, Shield, BookOpen, ShieldCheck, ShieldAlert, Loader2, FileCheck, Archive, Moon, Sun, Coffee, ArrowRight, Twitter, Share2 } from "lucide-react";
+import { ExternalLink, Download, Shield, BookOpen, ShieldCheck, ShieldAlert, Loader2, FileCheck, Archive, Moon, Sun, Coffee, ArrowRight } from "lucide-react";
 import { apiClient, type ResolveContentResponse } from "@/lib/api-client";
 import { toast } from "sonner";
 import { calculateReadingTime } from "@/lib/reading-time";
@@ -35,6 +35,14 @@ import {
 import { CryptographicProvenanceModal } from "@/components/reader/CryptographicProvenanceModal";
 import { QuoteSharePill } from "@/components/reader/QuoteSharePill";
 
+/**
+ * Interactive client-side reader component for PressProtocol publications.
+ * Handles cryptographic signature verification, offline caching, typography settings,
+ * offline proof export, and contextual quote selection.
+ *
+ * @param props - Component properties containing an optional initial publication CID.
+ * @returns Interactive article reader UI with sovereign verification status.
+ */
 export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
   const params = useParams();
   const cid = initialCid || (params?.cid as string);
@@ -285,6 +293,7 @@ export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
         cid={cid}
         articleTitle={content.title}
         authorName={content.publisher?.username || (content.publisher?.pubkey ? `Anon-${content.publisher.pubkey.slice(0, 4)}` : undefined)}
+        isVerified={verificationResult?.isValid === true}
         containerRef={contentRef}
       />
       
@@ -501,35 +510,6 @@ export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
               >
                 <FileCheck className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">Export Proof</span>
-              </Button>
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`"${content.title}"\n\nVerified sovereign dispatch on @pressprotocol:\nhttps://pressprotocol.com/read/${cid}`)}`;
-                  window.open(url, "_blank", "noopener,noreferrer");
-                }}
-                className="h-8 gap-1.5 text-xs font-mono border-hairline text-secondary hover:text-primary hover:bg-overlay rounded-[6px]"
-                title="Share article on X / Twitter"
-              >
-                <Twitter className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Tweet</span>
-              </Button>
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const text = `"${content.title}"\n\nVerified cryptographic publication on PressProtocol:`;
-                  const url = `https://warpcast.com/~/compose?text=${encodeURIComponent(text)}&embeds[]=${encodeURIComponent(`https://pressprotocol.com/read/${cid}`)}`;
-                  window.open(url, "_blank", "noopener,noreferrer");
-                }}
-                className="h-8 gap-1.5 text-xs font-mono border-hairline text-secondary hover:text-primary hover:bg-overlay rounded-[6px]"
-                title="Cast article on Warpcast / Farcaster"
-              >
-                <Share2 className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Cast</span>
               </Button>
 
               <Button
