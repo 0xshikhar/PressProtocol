@@ -1,5 +1,6 @@
 import * as ed from "@noble/ed25519";
 import { sha512, sha256 } from "@noble/hashes/sha2.js";
+import { sha3_256 } from "@noble/hashes/sha3.js";
 import type { KeyPair } from "./types.js";
 
 // Bind SHA-512 for @noble/ed25519 v2
@@ -279,4 +280,158 @@ export function calculateDeterministicCIDv1(content: string | Uint8Array): strin
 
   return "b" + base32Encode(cidBytes);
 }
+
+/**
+ * Decodes an RFC 4648 Base32 string into a Uint8Array.
+ */
+export function base32Decode(str: string): Uint8Array {
+  const clean = str.toLowerCase();
+  const bytes: number[] = [];
+  let bits = 0;
+  let value = 0;
+
+  for (let i = 0; i < clean.length; i++) {
+    const idx = BASE32_ALPHABET.indexOf(clean[i]);
+    if (idx === -1) {
+      throw new Error(`Invalid Base32 character: ${clean[i]}`);
+    }
+    value = (value << 5) | idx;
+    bits += 5;
+    if (bits >= 8) {
+      bytes.push((value >>> (bits - 8)) & 255);
+      bits -= 8;
+    }
+  }
+
+  return new Uint8Array(bytes);
+}
+
+export interface TorV3ValidationResult {
+  isValid: boolean;
+  version?: number;
+  publicKeyHex?: string;
+  checksumHex?: string;
+  error?: string;
+}
+
+/**
+ * Cryptographically verifies a Tor v3 onion address according to the official Tor v3 specification:
+ * Address = base32(PUBKEY [32B] + CHECKSUM [2B] + VERSION [1B]) + ".onion"
+ * where CHECKSUM = SHA3-256(".onion checksum" + PUBKEY + 0x03)[0..1]
+ */
+export function validateTorV3Address(address: string): TorV3ValidationResult {
+  try {
+    let clean = address.toLowerCase().trim();
+
+    // Remove scheme if present
+    if (clean.startsWith("http://")) {
+      clean = clean.slice(7);
+    } else if (clean.startsWith("https://")) {
+      clean = clean.slice(8);
+    }
+
+    // Remove any path suffix without polynomial regex backtracking
+    const slashIdx = clean.indexOf("/");
+    if (slashIdx !== -1) {
+      clean = clean.slice(0, slashIdx);
+    }
+
+    // Strip trailing .onion suffix
+    if (clean.endsWith(".onion")) {
+      clean = clean.slice(0, -6);
+    }
+
+    clean = clean.trim();
+
+    if (clean.length !== 56) {
+      return {
+        isValid: false,
+        error: `Invalid address length: expected exactly 56 base32 characters, got ${clean.length}`,
+      };
+    }
+
+    const decoded = base32Decode(clean);
+    if (decoded.length !== 35) {
+      return {
+        isValid: false,
+        error: `Decoded payload length is ${decoded.length} bytes (expected 35 bytes)`,
+      };
+    }
+
+    const pubkey = decoded.subarray(0, 32);
+    const checksum = decoded.subarray(32, 34);
+    const version = decoded[34];
+
+    if (version !== 3) {
+      return {
+        isValid: false,
+        error: `Unsupported Tor onion version: ${version} (expected version 3)`,
+      };
+    }
+
+    const prefix = new TextEncoder().encode(".onion checksum");
+    const toHash = new Uint8Array(prefix.length + 32 + 1);
+    toHash.set(prefix, 0);
+    toHash.set(pubkey, prefix.length);
+    toHash[prefix.length + 32] = version;
+
+    const fullHash = sha3_256(toHash);
+    const expectedChecksum = fullHash.subarray(0, 2);
+
+    if (checksum[0] !== expectedChecksum[0] || checksum[1] !== expectedChecksum[1]) {
+      return {
+        isValid: false,
+        error: `Cryptographic checksum mismatch: address public key does not match SHA3-256 checksum`,
+      };
+    }
+
+    return {
+      isValid: true,
+      version: 3,
+      publicKeyHex: bytesToHex(pubkey),
+      checksumHex: bytesToHex(checksum),
+    };
+  } catch (err: any) {
+    return {
+      isValid: false,
+      error: err.message || 'Malformed Tor v3 address',
+    };
+  }
+}
+
+/**
+ * Derives a valid Tor v3 onion address from an Ed25519 public key.
+ */
+export function deriveTorV3Address(publicKey: Uint8Array | string): string {
+  let pubkeyBytes: Uint8Array;
+  if (typeof publicKey === "string") {
+    if (!isValidHex(publicKey, 32)) {
+      throw new Error("Invalid Ed25519 public key hex: expected 64 hex characters (32 bytes)");
+    }
+    pubkeyBytes = hexToBytes(publicKey);
+  } else {
+    pubkeyBytes = publicKey;
+  }
+
+  if (pubkeyBytes.length !== 32) {
+    throw new Error(`Invalid Ed25519 public key length: expected 32 bytes, got ${pubkeyBytes.length}`);
+  }
+
+  const version = 3;
+  const prefix = new TextEncoder().encode(".onion checksum");
+  const toHash = new Uint8Array(prefix.length + 32 + 1);
+  toHash.set(prefix, 0);
+  toHash.set(pubkeyBytes, prefix.length);
+  toHash[prefix.length + 32] = version;
+
+  const checksum = sha3_256(toHash).subarray(0, 2);
+
+  const fullBytes = new Uint8Array(35);
+  fullBytes.set(pubkeyBytes, 0);
+  fullBytes.set(checksum, 32);
+  fullBytes[34] = version;
+
+  return `${base32Encode(fullBytes)}.onion`;
+}
+
 
