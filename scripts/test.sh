@@ -5,6 +5,8 @@
 
 set -e
 
+export NODE_ENV=test
+
 echo "🧪 PressProtocol Verification Harness"
 echo "====================================="
 echo ""

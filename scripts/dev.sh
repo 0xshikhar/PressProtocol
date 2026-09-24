@@ -15,11 +15,13 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
+TOR_SPAWNED_BY_SCRIPT=false
+
 # Cleanup on exit
 cleanup() {
     echo ""
     echo "🛑 Stopping services..."
-    if [ -f "core/node/.data/tor/tor.pid" ]; then
+    if [ "$TOR_SPAWNED_BY_SCRIPT" = true ] && [ -f "core/node/.data/tor/tor.pid" ]; then
         TOR_PID=$(cat "core/node/.data/tor/tor.pid" 2>/dev/null || true)
         if [ -n "$TOR_PID" ] && kill -0 "$TOR_PID" 2>/dev/null; then
             echo "🧅 Stopping local Tor daemon (PID $TOR_PID)..."
@@ -67,6 +69,7 @@ EOF
         if [ "$TOR_RUNNING" = false ]; then
             echo "🧅 Starting local Tor v3 Hidden Service daemon..."
             tor -f core/node/.data/tor/torrc --runasdaemon 1
+            TOR_SPAWNED_BY_SCRIPT=true
         else
             echo "🧅 Tor hidden service daemon already active on port 9052"
         fi
@@ -81,6 +84,7 @@ EOF
 # Start Node Service
 start_node() {
     start_tor
+    export TOR_PROXY_PORT=${TOR_PROXY_PORT:-9052}
     if [ ! -f core/node/.env ]; then
         echo -e "${YELLOW}⚠️ core/node/.env file not found. Creating from .env.example if available...${NC}"
         if [ -f core/node/.env.example ]; then

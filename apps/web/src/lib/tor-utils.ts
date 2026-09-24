@@ -69,7 +69,7 @@ export function formatOnionDisplay(onionUrl: string): string {
 export function getCanonicalOnionUrl(cid: string, configuredUrl?: string): string {
   // 1. Check configured URL from API / mirror probe
   if (configuredUrl && configuredUrl.includes(".onion")) {
-    const rawHost = extractOnionAddress(configuredUrl);
+    const rawHost = extractOnionAddress(configuredUrl).trim().toLowerCase();
     const validation = validateTorV3Address(rawHost);
     if (validation.isValid) {
       const normalizedHost = rawHost.endsWith(".onion") ? rawHost : `${rawHost}.onion`;
@@ -80,7 +80,7 @@ export function getCanonicalOnionUrl(cid: string, configuredUrl?: string): strin
   // 2. Check dynamic environment host
   const envHost = process.env.NEXT_PUBLIC_TOR_ONION_HOST;
   if (envHost) {
-    const rawHost = extractOnionAddress(envHost);
+    const rawHost = extractOnionAddress(envHost).trim().toLowerCase();
     const validation = validateTorV3Address(rawHost);
     if (validation.isValid) {
       const normalizedHost = rawHost.endsWith(".onion") ? rawHost : `${rawHost}.onion`;

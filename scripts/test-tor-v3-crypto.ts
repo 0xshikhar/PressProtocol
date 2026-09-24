@@ -116,12 +116,20 @@ async function runTorCryptoTests() {
     "Canonical URL normalizes path and preserves /read/${cid}"
   );
 
-  // Fallback URL
-  const fallbackUrl = getCanonicalOnionUrl(cid);
-  assert(
-    fallbackUrl === `http://jcqyihxqjobepnfit2u7qwmo6e4hvhxphujkw7qwx7abugvfjqm3jnqd.onion/read/${cid}`,
-    "Fallback URL uses verified canonical seed host"
-  );
+  // Fallback URL (isolated from environment)
+  const prevEnvHost = process.env.NEXT_PUBLIC_TOR_ONION_HOST;
+  try {
+    delete process.env.NEXT_PUBLIC_TOR_ONION_HOST;
+    const fallbackUrl = getCanonicalOnionUrl(cid);
+    assert(
+      fallbackUrl === `http://jcqyihxqjobepnfit2u7qwmo6e4hvhxphujkw7qwx7abugvfjqm3jnqd.onion/read/${cid}`,
+      "Fallback URL uses verified canonical seed host"
+    );
+  } finally {
+    if (prevEnvHost !== undefined) {
+      process.env.NEXT_PUBLIC_TOR_ONION_HOST = prevEnvHost;
+    }
+  }
 
   // Display formatting
   const display = formatOnionDisplay("http://jcqyihxqjobepnfit2u7qwmo6e4hvhxphujkw7qwx7abugvfjqm3jnqd.onion/read/bafy");
