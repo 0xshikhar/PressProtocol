@@ -18,9 +18,8 @@ export async function GET(
   { params }: { params: { cid: string } }
 ) {
   const { cid } = params;
-  const { searchParams } = request.nextUrl;
-  const rawQuote = searchParams.get("quote") || searchParams.get("q") || "";
-  const quote = rawQuote.trim();
+  const rawQuote = searchParams.get("q") || searchParams.get("quote") || "";
+  const quote = rawQuote.replace(/\+/g, " ").trim();
 
   const article = await fetchArticleMetadata(cid);
 

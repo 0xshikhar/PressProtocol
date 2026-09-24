@@ -22,19 +22,19 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
   const { cid } = params;
   const rawQuote =
-    typeof searchParams.quote === "string"
-      ? searchParams.quote
-      : typeof searchParams.q === "string"
+    typeof searchParams.q === "string"
       ? searchParams.q
+      : typeof searchParams.quote === "string"
+      ? searchParams.quote
       : "";
-  const quote = rawQuote.trim();
+  const quote = rawQuote.replace(/\+/g, " ").trim();
 
   const baseUrl = (siteConfig.url.base || "https://pressprotocol.com").replace(/\/+$/, "");
 
   // If a quote was selected and shared, generate a dedicated verified quote card
   // If sharing standard article, add ?v=2 to bust Twitter's stale crawler cache
   const ogImageUrl = quote
-    ? `${baseUrl}/api/og/${cid}?quote=${encodeURIComponent(quote.slice(0, 180))}`
+    ? `${baseUrl}/api/og/${cid}?q=${encodeURIComponent(quote.slice(0, 180)).replace(/%20/g, "+")}`
     : `${baseUrl}/api/og/${cid}?v=2`;
 
   try {

@@ -94,8 +94,20 @@ export function QuoteSharePill({
   const appOrigin = rawOrigin.includes("localhost") ? "https://pressprotocol.com" : rawOrigin;
   const cleanQuote = selectedText.trim();
   
-  // Clean canonical article URL without ugly, bloated query parameters
-  const articleUrl = `${appOrigin}/read/${cid}`;
+  // Normalize smart quotes and whitespace for clean, compact URL parameter
+  const sanitizedForUrl = cleanQuote
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/[\u2014\u2013]/g, "-")
+    .replace(/\s+/g, " ");
+
+  // Retain compact quote parameter so metadata generates the dynamic quote card image on social previews
+  const urlSnippet =
+    sanitizedForUrl.length > 120
+      ? `${sanitizedForUrl.slice(0, 117).trim()}...`
+      : sanitizedForUrl;
+  const quoteParam = encodeURIComponent(urlSnippet).replace(/%20/g, "+");
+  const quoteShareUrl = `${appOrigin}/read/${cid}?q=${quoteParam}`;
 
   // Twitter shortens all URLs to 23 chars via t.co.
   // Overhead: quotes (2) + "\n\nVerified on @pressprotocol:\n" (30) + URL (23) = 55 chars.
@@ -105,17 +117,25 @@ export function QuoteSharePill({
       ? cleanQuote.slice(0, 212).replace(/\s+\S*$/, "") + "..."
       : cleanQuote;
 
-  const citation = `"${cleanQuote}"\n\n— From "${articleTitle}"${authorName ? ` by ${authorName}` : ""}\nVerified on PressProtocol: ${articleUrl}`;
+  const citationLabel = isVerified ? "Verified on PressProtocol" : "Preserved on PressProtocol";
+  const tweetLabel = isVerified ? "Verified on @pressprotocol" : "Preserved on @pressprotocol";
+  const castLabel = isVerified ? "Verified on PressProtocol:" : "Preserved on PressProtocol:";
+
+  const citation = `"${cleanQuote}"\n\n— From "${articleTitle}"${authorName ? ` by ${authorName}` : ""}\n${citationLabel}: ${quoteShareUrl}`;
 
   const handleCopyQuote = () => {
     navigator.clipboard.writeText(citation);
     setCopied(true);
-    toast.success("Quote & verification citation copied to clipboard");
+    toast.success(
+      isVerified
+        ? "Quote & verification citation copied to clipboard"
+        : "Quote & citation copied to clipboard"
+    );
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleShareTwitter = () => {
-    const tweetText = `"${tweetQuote}"\n\nVerified on @pressprotocol:\n${articleUrl}`;
+    const tweetText = `"${tweetQuote}"\n\n${tweetLabel}:\n${quoteShareUrl}`;
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
     window.open(url, "_blank", "noopener,noreferrer");
   };
@@ -125,14 +145,13 @@ export function QuoteSharePill({
       cleanQuote.length > 230
         ? cleanQuote.slice(0, 227).replace(/\s+\S*$/, "") + "..."
         : cleanQuote;
-    const castText = `"${castQuote}"\n\nVerified on PressProtocol:`;
-    const url = `https://warpcast.com/~/compose?text=${encodeURIComponent(castText)}&embeds[]=${encodeURIComponent(articleUrl)}`;
+    const castText = `"${castQuote}"\n\n${castLabel}`;
+    const url = `https://warpcast.com/~/compose?text=${encodeURIComponent(castText)}&embeds[]=${encodeURIComponent(quoteShareUrl)}`;
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
   const handleOpenCard = () => {
-    const quoteParam = encodeURIComponent(cleanQuote.slice(0, 200));
-    window.open(`${appOrigin}/api/og/${cid}?quote=${quoteParam}`, "_blank");
+    window.open(`${appOrigin}/api/og/${cid}?q=${quoteParam}`, "_blank");
   };
 
   return (
