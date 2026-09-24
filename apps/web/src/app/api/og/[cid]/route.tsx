@@ -10,6 +10,10 @@ export async function GET(
   { params }: { params: { cid: string } }
 ) {
   const { cid } = params;
+  const { searchParams } = request.nextUrl;
+  const rawQuote = searchParams.get("quote") || searchParams.get("q") || "";
+  const quote = rawQuote.trim();
+
   const article = await fetchArticleMetadata(cid);
 
   const rawTitle = article.title || "Sovereign Publication";
@@ -26,6 +30,344 @@ export async function GET(
     ? `${pubkey.slice(0, 6)}...${pubkey.slice(-6)}`
     : "Sovereign Author";
 
+  // If a quote parameter is present, render the Verified Quote Card
+  if (quote) {
+    const displayQuote = quote.length > 210 ? `${quote.slice(0, 207)}...` : quote;
+    const quoteFontSize = displayQuote.length > 130 ? 32 : displayQuote.length > 70 ? 38 : 46;
+
+    return new ImageResponse(
+      (
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            backgroundColor: "#0B0A0C",
+            backgroundImage:
+              "radial-gradient(circle at 10% 12%, rgba(124, 39, 51, 0.40), transparent 48%), radial-gradient(circle at 90% 88%, rgba(62, 156, 114, 0.16), transparent 48%)",
+            padding: "50px 60px",
+            fontFamily: "sans-serif",
+            color: "#EEE7E1",
+            border: "2px solid rgba(240, 232, 232, 0.08)",
+            boxSizing: "border-box",
+            position: "relative",
+          }}
+        >
+          {/* Top Press Burgundy Accent Stripe */}
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: "4px",
+              background:
+                "linear-gradient(90deg, #7C2733 0%, #B44A54 40%, rgba(62, 156, 114, 0.5) 100%)",
+            }}
+          />
+
+          {/* 1. Header Bar: Logo, Name, and Verified Citation Badge */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+            }}
+          >
+            {/* Logo & Brand Identity */}
+            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+              <div
+                style={{
+                  width: "48px",
+                  height: "48px",
+                  borderRadius: "10px",
+                  backgroundColor: "#141216",
+                  border: "1.5px solid rgba(240, 232, 232, 0.12)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  overflow: "hidden",
+                  padding: "4px",
+                }}
+              >
+                {/* Official Brand Logo */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={PRESS_LOGO_BASE64}
+                  alt="PressProtocol Logo"
+                  width={40}
+                  height={40}
+                  style={{ objectFit: "contain" }}
+                />
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <span
+                  style={{
+                    fontSize: "24px",
+                    fontWeight: 800,
+                    letterSpacing: "-0.02em",
+                    color: "#EEE7E1",
+                    lineHeight: 1.1,
+                  }}
+                >
+                  PressProtocol
+                </span>
+                <span
+                  style={{
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    letterSpacing: "0.1em",
+                    color: "#B44A54",
+                    textTransform: "uppercase",
+                    marginTop: "3px",
+                  }}
+                >
+                  SOVEREIGN CITATION • VERIFIED ARCHIVE
+                </span>
+              </div>
+            </div>
+
+            {/* Verified Citation Pill */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "7px 16px",
+                borderRadius: "999px",
+                backgroundColor: "rgba(20, 18, 22, 0.85)",
+                border: "1px solid rgba(124, 39, 51, 0.5)",
+              }}
+            >
+              <div
+                style={{
+                  width: "7px",
+                  height: "7px",
+                  borderRadius: "50%",
+                  backgroundColor: "#B44A54",
+                }}
+              />
+              <span
+                style={{
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  color: "#EEE7E1",
+                  fontFamily: "monospace",
+                  letterSpacing: "0.04em",
+                }}
+              >
+                ED25519 VERIFIED QUOTE
+              </span>
+            </div>
+          </div>
+
+          {/* 2. Middle Section: The Quotation Box */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "16px",
+              margin: "12px 0",
+              padding: "24px 28px",
+              borderRadius: "14px",
+              backgroundColor: "rgba(20, 18, 22, 0.75)",
+              border: "1px solid rgba(240, 232, 232, 0.08)",
+              position: "relative",
+            }}
+          >
+            {/* Selected Quote Content */}
+            <div
+              style={{
+                display: "flex",
+                fontSize: `${quoteFontSize}px`,
+                fontWeight: 600,
+                lineHeight: 1.34,
+                letterSpacing: "-0.015em",
+                color: "#EEE7E1",
+                fontStyle: "italic",
+              }}
+            >
+              &ldquo;{displayQuote}&rdquo;
+            </div>
+
+            {/* Source Attribution & CID */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                paddingTop: "14px",
+                borderTop: "1px solid rgba(240, 232, 232, 0.08)",
+                width: "100%",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  fontSize: "16px",
+                  color: "#A79E96",
+                  fontWeight: 500,
+                }}
+              >
+                <span>&mdash; From</span>
+                <span style={{ color: "#EEE7E1", fontWeight: 700 }}>
+                  {title}
+                </span>
+              </div>
+
+              {/* Multihash pill */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "7px",
+                  padding: "5px 12px",
+                  borderRadius: "6px",
+                  backgroundColor: "rgba(11, 10, 12, 0.9)",
+                  border: "1px solid rgba(240, 232, 232, 0.08)",
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: "12px",
+                    fontFamily: "monospace",
+                    color: "#59B98C",
+                  }}
+                >
+                  ipfs://{cid.slice(0, 12)}...{cid.slice(-6)}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* 3. Bottom Bar: Cryptographic Proof Badges */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              paddingTop: "18px",
+              borderTop: "1px solid rgba(240, 232, 232, 0.09)",
+              width: "100%",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              {/* Sealed Badge */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "7px",
+                  padding: "6px 14px",
+                  borderRadius: "6px",
+                  backgroundColor: "rgba(62, 156, 114, 0.12)",
+                  border: "1px solid rgba(62, 156, 114, 0.35)",
+                }}
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#59B98C"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  <polyline points="9 12 11 14 15 10" />
+                </svg>
+                <span
+                  style={{
+                    fontSize: "13px",
+                    fontWeight: 700,
+                    color: "#59B98C",
+                    fontFamily: "monospace",
+                    letterSpacing: "0.02em",
+                  }}
+                >
+                  CRYPTOGRAPHICALLY SEALED
+                </span>
+              </div>
+
+              {/* Author Key Snippet */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "6px 12px",
+                  borderRadius: "6px",
+                  backgroundColor: "rgba(240, 232, 232, 0.04)",
+                  border: "1px solid rgba(240, 232, 232, 0.08)",
+                  fontFamily: "monospace",
+                  fontSize: "12px",
+                  color: "#A79E96",
+                }}
+              >
+                <span>Ed25519:</span>
+                <span style={{ color: "#EEE7E1", fontWeight: 600 }}>
+                  {pubkeySnippet}
+                </span>
+              </div>
+
+              {tags.map((tag) => (
+                <div
+                  key={tag}
+                  style={{
+                    display: "flex",
+                    padding: "6px 10px",
+                    borderRadius: "6px",
+                    backgroundColor: "rgba(240, 232, 232, 0.04)",
+                    border: "1px solid rgba(240, 232, 232, 0.08)",
+                    fontSize: "12px",
+                    fontFamily: "monospace",
+                    color: "#6F675F",
+                  }}
+                >
+                  #{tag}
+                </div>
+              ))}
+            </div>
+
+            {/* Right: Immutability Standards */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                fontFamily: "monospace",
+                fontSize: "12px",
+                color: "#6F675F",
+              }}
+            >
+              <span>RFC 8785 CANONICAL</span>
+              <span>•</span>
+              <span style={{ color: "#B44A54", fontWeight: 600 }}>
+                pressprotocol.com
+              </span>
+            </div>
+          </div>
+        </div>
+      ),
+      {
+        width: 1200,
+        height: 630,
+        headers: {
+          "Cache-Control":
+            "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800",
+        },
+      }
+    );
+  }
+
+  // Standard Article Card
   const titleFontSize = title.length > 65 ? 40 : title.length > 35 ? 46 : 52;
 
   return new ImageResponse(
