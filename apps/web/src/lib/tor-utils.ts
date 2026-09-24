@@ -1,3 +1,7 @@
+import { validateTorV3Address, deriveTorV3Address, type TorV3ValidationResult } from "@pressprotocol/sdk";
+
+export { validateTorV3Address, deriveTorV3Address, type TorV3ValidationResult };
+
 /**
  * Sovereign Tor v3 Onion Routing Utilities
  */
@@ -49,7 +53,7 @@ export function extractOnionAddress(onionUrl: string): string {
 
 /**
  * Formats a 56-character v3 onion address for compact editorial display
- * Example: "pressprotocol7sovereign4node6federation3mesh7relay5v3.onion" -> "pressproto...5v3.onion"
+ * Example: "jcqyihxqjobepnfit2u7qwmo6e4hvhxphujkw7qwx7abugvfjqm3jnqd.onion" -> "jcqyihxqjo...m3jnqd.onion"
  */
 export function formatOnionDisplay(onionUrl: string): string {
   const host = extractOnionAddress(onionUrl);
@@ -60,15 +64,31 @@ export function formatOnionDisplay(onionUrl: string): string {
 }
 
 /**
- * Resolves a canonical Tor v3 onion URL for a given CID
+ * Resolves a canonical Tor v3 onion URL for a given CID with cryptographic v3 validation
  */
 export function getCanonicalOnionUrl(cid: string, configuredUrl?: string): string {
+  // 1. Check configured URL from API / mirror probe
   if (configuredUrl && configuredUrl.includes(".onion")) {
-    return configuredUrl;
+    const rawHost = extractOnionAddress(configuredUrl);
+    const validation = validateTorV3Address(rawHost);
+    if (validation.isValid) {
+      return configuredUrl;
+    }
   }
-  const envHost = process.env.NEXT_PUBLIC_TOR_ONION_HOST || "pressprotocol7sovereign4node6federation3mesh7relay5v3.onion";
-  const cleanHost = envHost.replace(/^https?:\/\//i, "").replace(/\/+$/, "");
-  return `http://${cleanHost}/read/${cid}`;
+
+  // 2. Check dynamic environment host
+  const envHost = process.env.NEXT_PUBLIC_TOR_ONION_HOST;
+  if (envHost) {
+    const cleanHost = envHost.replace(/^https?:\/\//i, "").replace(/\/+$/, "");
+    const validation = validateTorV3Address(cleanHost);
+    if (validation.isValid) {
+      return `http://${cleanHost}/read/${cid}`;
+    }
+  }
+
+  // 3. Fallback to verified canonical Ed25519 Tor v3 address seed
+  const canonicalSeedHost = "jcqyihxqjobepnfit2u7qwmo6e4hvhxphujkw7qwx7abugvfjqm3jnqd.onion";
+  return `http://${canonicalSeedHost}/read/${cid}`;
 }
 
 /**
