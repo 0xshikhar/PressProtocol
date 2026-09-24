@@ -8,40 +8,49 @@ interface PageProps {
   searchParams: { quote?: string; q?: string; v?: string; [key: string]: string | string[] | undefined };
 }
 
+/**
+ * Asynchronously generates OpenGraph and Twitter card metadata for the article reader page.
+ * Dynamically constructs canonical preview images including contextual quote card images
+ * when a snippet query parameter is present.
+ *
+ * @param props - Next.js page properties containing route params (cid) and search parameters.
+ * @returns Resolves to Next.js Metadata object configured for decentralized article sharing.
+ */
 export async function generateMetadata({
   params,
   searchParams,
 }: PageProps): Promise<Metadata> {
   const { cid } = params;
   const rawQuote =
-    typeof searchParams.quote === "string"
-      ? searchParams.quote
-      : typeof searchParams.q === "string"
+    typeof searchParams.q === "string"
       ? searchParams.q
+      : typeof searchParams.quote === "string"
+      ? searchParams.quote
       : "";
-  const quote = rawQuote.trim();
+  const quote = rawQuote.replace(/\+/g, " ").trim();
 
   const baseUrl = (siteConfig.url.base || "https://pressprotocol.com").replace(/\/+$/, "");
 
   // If a quote was selected and shared, generate a dedicated verified quote card
   // If sharing standard article, add ?v=2 to bust Twitter's stale crawler cache
   const ogImageUrl = quote
-    ? `${baseUrl}/api/og/${cid}?quote=${encodeURIComponent(quote.slice(0, 180))}`
+    ? `${baseUrl}/api/og/${cid}?q=${encodeURIComponent(quote.slice(0, 180)).replace(/%20/g, "+")}`
     : `${baseUrl}/api/og/${cid}?v=2`;
 
   try {
     const meta = await fetchArticleMetadata(cid);
 
-    const displayTitle = quote
-      ? `"${quote.length > 60 ? `${quote.slice(0, 57)}...` : quote}" — ${meta.title || "Sovereign Article"} | PressProtocol`
-      : meta.title && meta.title !== "Sovereign Document"
-      ? `${meta.title} | PressProtocol`
-      : `Sovereign Article | PressProtocol`;
+    const articleTitle =
+      meta.title && meta.title !== "Sovereign Document"
+        ? meta.title
+        : "Sovereign Article";
+
+    const displayTitle = `${articleTitle} | PressProtocol`;
 
     const displayDescription = quote
-      ? `Verified sovereign quote from "${meta.title || "Article"}" preserved on PressProtocol (CID: ${cid}).`
+      ? "Click to read this verified sovereign dispatch on PressProtocol."
       : meta.excerpt ||
-        `Decentralized, cryptographically verified publication preserved on PressProtocol (CID: ${cid}).`;
+        "Immutable, cryptographically verified publication preserved on PressProtocol decentralized infrastructure.";
 
     return {
       title: displayTitle,
@@ -67,15 +76,14 @@ export async function generateMetadata({
       },
     };
   } catch {
-    const fallbackTitle = quote
-      ? `"${quote.slice(0, 50)}..." | PressProtocol`
-      : `Sovereign Article | PressProtocol`;
+    const fallbackTitle = "Sovereign Article | PressProtocol";
+    const fallbackDescription = "Click to read this verified sovereign dispatch on PressProtocol.";
     return {
       title: fallbackTitle,
-      description: `Decentralized, cryptographically verified sovereign publication on PressProtocol.`,
+      description: fallbackDescription,
       openGraph: {
         title: fallbackTitle,
-        description: `Decentralized, cryptographically verified sovereign publication on PressProtocol.`,
+        description: fallbackDescription,
         images: [
           {
             url: ogImageUrl,
@@ -88,13 +96,19 @@ export async function generateMetadata({
       twitter: {
         card: "summary_large_image",
         title: fallbackTitle,
-        description: `Decentralized, cryptographically verified sovereign publication on PressProtocol.`,
+        description: fallbackDescription,
         images: [ogImageUrl],
       },
     };
   }
 }
 
+/**
+ * Server component entry point for reading an immutable publication by its IPFS CID.
+ *
+ * @param props - Page properties containing the dynamic route CID parameter.
+ * @returns React Server Component rendering the interactive client reader.
+ */
 export default function Page({ params }: PageProps) {
   return <ReadArticleClient cid={params.cid} />;
 }

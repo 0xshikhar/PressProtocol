@@ -35,6 +35,14 @@ import {
 import { CryptographicProvenanceModal } from "@/components/reader/CryptographicProvenanceModal";
 import { QuoteSharePill } from "@/components/reader/QuoteSharePill";
 
+/**
+ * Interactive client-side reader component for PressProtocol publications.
+ * Handles cryptographic signature verification, offline caching, typography settings,
+ * offline proof export, and contextual quote selection.
+ *
+ * @param props - Component properties containing an optional initial publication CID.
+ * @returns Interactive article reader UI with sovereign verification status.
+ */
 export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
   const params = useParams();
   const cid = initialCid || (params?.cid as string);
@@ -285,6 +293,7 @@ export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
         cid={cid}
         articleTitle={content.title}
         authorName={content.publisher?.username || (content.publisher?.pubkey ? `Anon-${content.publisher.pubkey.slice(0, 4)}` : undefined)}
+        isVerified={verificationResult?.isValid === true}
         containerRef={contentRef}
       />
       
