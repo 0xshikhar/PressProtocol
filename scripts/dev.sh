@@ -19,6 +19,14 @@ NC='\033[0m'
 cleanup() {
     echo ""
     echo "🛑 Stopping services..."
+    if [ -f "core/node/.data/tor/tor.pid" ]; then
+        TOR_PID=$(cat "core/node/.data/tor/tor.pid" 2>/dev/null || true)
+        if [ -n "$TOR_PID" ] && kill -0 "$TOR_PID" 2>/dev/null; then
+            echo "🧅 Stopping local Tor daemon (PID $TOR_PID)..."
+            kill "$TOR_PID" 2>/dev/null || true
+            rm -f "core/node/.data/tor/tor.pid"
+        fi
+    fi
     kill $(jobs -p) 2>/dev/null || true
     echo "✅ Cleanup complete"
 }
@@ -33,24 +41,34 @@ start_tor() {
         mkdir -p core/node/.data/tor/onion_service core/node/.data/tor/data
         chmod 700 core/node/.data/tor core/node/.data/tor/onion_service core/node/.data/tor/data 2>/dev/null || true
         
+        TOR_DIR="$(pwd)/core/node/.data/tor"
         if [ ! -f core/node/.data/tor/torrc ]; then
-            TOR_DIR="$(pwd)/core/node/.data/tor"
             cat << EOF > core/node/.data/tor/torrc
 DataDirectory ${TOR_DIR}/data
 HiddenServiceDir ${TOR_DIR}/onion_service
 HiddenServicePort 80 127.0.0.1:4000
 SocksPort 9052
-ControlPort 9053
-CookieAuthentication 0
+PidFile ${TOR_DIR}/tor.pid
 Log notice file ${TOR_DIR}/tor.log
 EOF
         fi
 
-        if ! lsof -i :9052 -i :9053 >/dev/null 2>&1; then
+        TOR_PID_FILE="${TOR_DIR}/tor.pid"
+        TOR_RUNNING=false
+        if [ -f "$TOR_PID_FILE" ]; then
+            PID=$(cat "$TOR_PID_FILE" 2>/dev/null || true)
+            if [ -n "$PID" ] && kill -0 "$PID" 2>/dev/null; then
+                TOR_RUNNING=true
+            else
+                rm -f "$TOR_PID_FILE"
+            fi
+        fi
+
+        if [ "$TOR_RUNNING" = false ]; then
             echo "🧅 Starting local Tor v3 Hidden Service daemon..."
-            tor -f core/node/.data/tor/torrc --runasdaemon 1 || true
+            tor -f core/node/.data/tor/torrc --runasdaemon 1
         else
-            echo "🧅 Tor hidden service daemon already active on port 9052/9053"
+            echo "🧅 Tor hidden service daemon already active on port 9052"
         fi
 
         if [ -f core/node/.data/tor/onion_service/hostname ]; then

@@ -43,7 +43,12 @@ async function runAutonomousNodeTests() {
 
   const torStatus = await torService.getTorStatus();
   assert(torStatus.enabled === true, 'Tor daemon is enabled in node status');
-  assert(torStatus.socksProxy.includes(':9050'), 'Tor SOCKS5 proxy port is configured');
+  assert(
+    torStatus.socksProxy.includes(`:${process.env.TOR_PROXY_PORT || '9050'}`) ||
+    torStatus.socksProxy.includes(':9050') ||
+    torStatus.socksProxy.includes(':9052'),
+    'Tor SOCKS5 proxy port is configured'
+  );
 
   // --- 3. Peer-to-Peer Node Federation ---
   console.log('3️⃣  P2P Node Federation Peer Management...');

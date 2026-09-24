@@ -87,11 +87,7 @@ export class TorService {
       }
     }
 
-    // 3. In dev / test / fallback: Return cryptographic Tor v3 address (56 characters)
-    if (env.NODE_ENV === 'test' || env.NODE_ENV === 'development') {
-      return 'jcqyihxqjobepnfit2u7qwmo6e4hvhxphujkw7qwx7abugvfjqm3jnqd.onion';
-    }
-
+    // 3. Fallback: return null if no Tor hostname file or environment override is available
     return null;
   }
 

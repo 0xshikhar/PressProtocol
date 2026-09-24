@@ -119,12 +119,12 @@ export function TorShareSection({ onionUrl, contentTitle, className }: TorShareS
           </Button>
         </div>
 
-        {/* Cryptographic Tor v3 Provenance */}
+        {/* Cryptographic Tor v3 Address Checksum */}
         {torValidation?.isValid && (
           <div className="flex items-center justify-between text-[11px] font-mono text-muted bg-canvas/60 px-2.5 py-1.5 rounded-[4px] border border-hairline">
             <span className="flex items-center gap-1.5 text-verified">
               <ShieldCheck className="h-3.5 w-3.5 text-verified" />
-              <span>Ed25519 Tor v3 Verified</span>
+              <span>Tor v3 address checksum valid</span>
             </span>
             <span className="text-[10px] text-secondary">
               Key: {torValidation.publicKeyHex?.slice(0, 8)}...{torValidation.publicKeyHex?.slice(-6)}
