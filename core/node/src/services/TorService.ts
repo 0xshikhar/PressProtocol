@@ -1,6 +1,7 @@
 import { SocksProxyAgent } from 'socks-proxy-agent';
 import { readFile } from 'fs/promises';
 import { existsSync } from 'fs';
+import path from 'path';
 import { env } from '../config/env.js';
 
 export interface OnionServiceResult {
@@ -52,8 +53,12 @@ export class TorService {
       return env.TOR_ONION_ADDRESS.trim();
     }
 
-    // 2. Candidate paths in autonomous container or onionize volume
+    // 2. Candidate paths in autonomous container, local dev or onionize volume
     const candidatePaths = [
+      path.resolve(process.cwd(), 'core/node/.data/tor/onion_service/hostname'),
+      path.resolve(process.cwd(), '.data/tor/onion_service/hostname'),
+      path.resolve(process.cwd(), 'core/node/.data/tor_hostname'),
+      path.resolve(process.cwd(), '.data/tor_hostname'),
       `${env.DATA_DIR}/tor_hostname`,
       `/data/tor_hostname`,
       `${env.DATA_DIR}/tor/onion_service/hostname`,
@@ -82,11 +87,9 @@ export class TorService {
       }
     }
 
-    // 3. In dev / test / fallback: Return deterministic fallback
+    // 3. In dev / test / fallback: Return cryptographic Tor v3 address (56 characters)
     if (env.NODE_ENV === 'test' || env.NODE_ENV === 'development') {
-      const fallbackHash = 'pressprotocol7sovereign4node6federation3mesh7relay5v3';
-      const padded = (fallbackHash + '234567abcdefghijklmnopqrstuvwxyz').slice(0, 56);
-      return `${padded}.onion`;
+      return 'jcqyihxqjobepnfit2u7qwmo6e4hvhxphujkw7qwx7abugvfjqm3jnqd.onion';
     }
 
     return null;

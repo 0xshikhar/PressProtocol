@@ -180,7 +180,7 @@ async function handlePublish(positionals: string[], flags: Record<string, any>) 
     const signature = await signPayload(canonicalPayload, keypair.privateKey);
 
     // Check if local node or Tor daemon is running on 127.0.0.1:4000
-    let onionHost = "pressprotocol7sovereign4node6federation3mesh7relay5v3.onion";
+    let onionHost = "jcqyihxqjobepnfit2u7qwmo6e4hvhxphujkw7qwx7abugvfjqm3jnqd.onion";
     let localGateway = `http://127.0.0.1:4000/read/${cid}`;
     try {
       const controller = new AbortController();

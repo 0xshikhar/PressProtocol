@@ -217,7 +217,7 @@ class AnonPress {
         $embed_url = 'https://pressprotocol.com/embed/' . esc_attr($cid) . '?theme=cyber';
         $tor_url = get_post_meta($post->ID, '_pressprotocol_tor_url', true);
         if (empty($tor_url)) {
-            $tor_url = 'http://pressprotocol7sovereign4node6federation3mesh7relay5v3.onion/read/' . esc_attr($cid);
+            $tor_url = 'http://jcqyihxqjobepnfit2u7qwmo6e4hvhxphujkw7qwx7abugvfjqm3jnqd.onion/read/' . esc_attr($cid);
         }
 
         $badge_html = '
