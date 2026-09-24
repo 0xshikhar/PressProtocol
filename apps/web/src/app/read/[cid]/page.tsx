@@ -8,6 +8,14 @@ interface PageProps {
   searchParams: { quote?: string; q?: string; v?: string; [key: string]: string | string[] | undefined };
 }
 
+/**
+ * Asynchronously generates OpenGraph and Twitter card metadata for the article reader page.
+ * Dynamically constructs canonical preview images including contextual quote card images
+ * when a snippet query parameter is present.
+ *
+ * @param props - Next.js page properties containing route params (cid) and search parameters.
+ * @returns Resolves to Next.js Metadata object configured for decentralized article sharing.
+ */
 export async function generateMetadata({
   params,
   searchParams,
@@ -95,6 +103,12 @@ export async function generateMetadata({
   }
 }
 
+/**
+ * Server component entry point for reading an immutable publication by its IPFS CID.
+ *
+ * @param props - Page properties containing the dynamic route CID parameter.
+ * @returns React Server Component rendering the interactive client reader.
+ */
 export default function Page({ params }: PageProps) {
   return <ReadArticleClient cid={params.cid} />;
 }
