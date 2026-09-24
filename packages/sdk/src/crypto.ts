@@ -321,12 +321,27 @@ export interface TorV3ValidationResult {
  */
 export function validateTorV3Address(address: string): TorV3ValidationResult {
   try {
-    const clean = address
-      .toLowerCase()
-      .replace(/^https?:\/\//, '')
-      .replace(/\/.*$/, '')
-      .replace(/\.onion$/, '')
-      .trim();
+    let clean = address.toLowerCase().trim();
+
+    // Remove scheme if present
+    if (clean.startsWith("http://")) {
+      clean = clean.slice(7);
+    } else if (clean.startsWith("https://")) {
+      clean = clean.slice(8);
+    }
+
+    // Remove any path suffix without polynomial regex backtracking
+    const slashIdx = clean.indexOf("/");
+    if (slashIdx !== -1) {
+      clean = clean.slice(0, slashIdx);
+    }
+
+    // Strip trailing .onion suffix
+    if (clean.endsWith(".onion")) {
+      clean = clean.slice(0, -6);
+    }
+
+    clean = clean.trim();
 
     if (clean.length !== 56) {
       return {
@@ -388,7 +403,16 @@ export function validateTorV3Address(address: string): TorV3ValidationResult {
  * Derives a valid Tor v3 onion address from an Ed25519 public key.
  */
 export function deriveTorV3Address(publicKey: Uint8Array | string): string {
-  const pubkeyBytes = typeof publicKey === 'string' ? hexToBytes(publicKey) : publicKey;
+  let pubkeyBytes: Uint8Array;
+  if (typeof publicKey === "string") {
+    if (!isValidHex(publicKey, 32)) {
+      throw new Error("Invalid Ed25519 public key hex: expected 64 hex characters (32 bytes)");
+    }
+    pubkeyBytes = hexToBytes(publicKey);
+  } else {
+    pubkeyBytes = publicKey;
+  }
+
   if (pubkeyBytes.length !== 32) {
     throw new Error(`Invalid Ed25519 public key length: expected 32 bytes, got ${pubkeyBytes.length}`);
   }

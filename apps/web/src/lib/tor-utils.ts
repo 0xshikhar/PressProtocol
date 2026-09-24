@@ -72,17 +72,19 @@ export function getCanonicalOnionUrl(cid: string, configuredUrl?: string): strin
     const rawHost = extractOnionAddress(configuredUrl);
     const validation = validateTorV3Address(rawHost);
     if (validation.isValid) {
-      return configuredUrl;
+      const normalizedHost = rawHost.endsWith(".onion") ? rawHost : `${rawHost}.onion`;
+      return `http://${normalizedHost}/read/${cid}`;
     }
   }
 
   // 2. Check dynamic environment host
   const envHost = process.env.NEXT_PUBLIC_TOR_ONION_HOST;
   if (envHost) {
-    const cleanHost = envHost.replace(/^https?:\/\//i, "").replace(/\/+$/, "");
-    const validation = validateTorV3Address(cleanHost);
+    const rawHost = extractOnionAddress(envHost);
+    const validation = validateTorV3Address(rawHost);
     if (validation.isValid) {
-      return `http://${cleanHost}/read/${cid}`;
+      const normalizedHost = rawHost.endsWith(".onion") ? rawHost : `${rawHost}.onion`;
+      return `http://${normalizedHost}/read/${cid}`;
     }
   }
 
