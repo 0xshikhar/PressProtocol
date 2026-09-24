@@ -58,6 +58,7 @@ ${colors.bold}OPTIONS:${colors.reset}
   --verify                 Verify Ed25519 signature during resolution (default: true)
   --no-verify              Skip signature verification
   --json                   Output machine-readable JSON
+  --version, -v            Show the installed SDK version
   --help, -h               Show this help message
 
 ${colors.bold}EXAMPLES:${colors.reset}
@@ -100,7 +101,7 @@ function parseArgs(args: string[]) {
       const key = arg.slice(2);
       if (key === "no-verify") {
         flags.verify = false;
-      } else if (key === "json" || key === "verify" || key === "help") {
+      } else if (key === "json" || key === "verify" || key === "help" || key === "version") {
         flags[key] = true;
       } else if (i + 1 < args.length && !args[i + 1].startsWith("--")) {
         flags[key] = args[i + 1];
@@ -110,6 +111,8 @@ function parseArgs(args: string[]) {
       }
     } else if (arg === "-h") {
       flags.help = true;
+    } else if (arg === "-v") {
+      flags.version = true;
     } else {
       positionals.push(arg);
     }
@@ -463,6 +466,12 @@ ${colors.reset}
 
 async function main() {
   const { command, positionals, flags } = parseArgs(process.argv.slice(2));
+
+  if (flags.version) {
+    const { version } = JSON.parse(fs.readFileSync(new URL("../../package.json", import.meta.url), "utf8"));
+    console.log(`pressprotocol v${version}`);
+    return;
+  }
 
   if (flags.help || !command) {
     printHelp();

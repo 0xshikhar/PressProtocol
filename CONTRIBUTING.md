@@ -52,7 +52,7 @@ pnpm install
 
 ## Running the Automated Test Harness
 
-Before opening a pull request, you must ensure that all 14 automated subsystem test suites pass:
+Before opening a pull request, you must ensure that all 15 automated subsystem test suites pass:
 
 ```bash
 bash scripts/test.sh
@@ -74,6 +74,7 @@ This script verifies:
 13. Universal Publishing Rails for Any Website & CMS (`scripts/test-universal-rails.ts`)
 14. Open Infrastructure API & Enterprise Gateway (`scripts/test-enterprise-gateway.ts`)
 15. Outbound Real-Time Webhook Subscriptions & Event Bus (`scripts/test-webhook-subscriptions.ts`)
+16. SDK CLI Version Flags (`scripts/test-sdk-cli.ts`)
 
 ---
 
