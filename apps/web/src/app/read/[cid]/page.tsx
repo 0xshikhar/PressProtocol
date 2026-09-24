@@ -32,16 +32,17 @@ export async function generateMetadata({
   try {
     const meta = await fetchArticleMetadata(cid);
 
-    const displayTitle = quote
-      ? `"${quote.length > 60 ? `${quote.slice(0, 57)}...` : quote}" — ${meta.title || "Sovereign Article"} | PressProtocol`
-      : meta.title && meta.title !== "Sovereign Document"
-      ? `${meta.title} | PressProtocol`
-      : `Sovereign Article | PressProtocol`;
+    const articleTitle =
+      meta.title && meta.title !== "Sovereign Document"
+        ? meta.title
+        : "Sovereign Article";
+
+    const displayTitle = `${articleTitle} | PressProtocol`;
 
     const displayDescription = quote
-      ? `Verified sovereign quote from "${meta.title || "Article"}" preserved on PressProtocol (CID: ${cid}).`
+      ? "Click to read this verified sovereign dispatch on PressProtocol."
       : meta.excerpt ||
-        `Decentralized, cryptographically verified publication preserved on PressProtocol (CID: ${cid}).`;
+        "Immutable, cryptographically verified publication preserved on PressProtocol decentralized infrastructure.";
 
     return {
       title: displayTitle,
@@ -67,15 +68,14 @@ export async function generateMetadata({
       },
     };
   } catch {
-    const fallbackTitle = quote
-      ? `"${quote.slice(0, 50)}..." | PressProtocol`
-      : `Sovereign Article | PressProtocol`;
+    const fallbackTitle = "Sovereign Article | PressProtocol";
+    const fallbackDescription = "Click to read this verified sovereign dispatch on PressProtocol.";
     return {
       title: fallbackTitle,
-      description: `Decentralized, cryptographically verified sovereign publication on PressProtocol.`,
+      description: fallbackDescription,
       openGraph: {
         title: fallbackTitle,
-        description: `Decentralized, cryptographically verified sovereign publication on PressProtocol.`,
+        description: fallbackDescription,
         images: [
           {
             url: ogImageUrl,
@@ -88,7 +88,7 @@ export async function generateMetadata({
       twitter: {
         card: "summary_large_image",
         title: fallbackTitle,
-        description: `Decentralized, cryptographically verified sovereign publication on PressProtocol.`,
+        description: fallbackDescription,
         images: [ogImageUrl],
       },
     };

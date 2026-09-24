@@ -72,10 +72,14 @@ export function QuoteSharePill({
   const rawOrigin = typeof window !== "undefined" ? window.location.origin : "https://pressprotocol.com";
   const appOrigin = rawOrigin.includes("localhost") ? "https://pressprotocol.com" : rawOrigin;
   const cleanQuote = selectedText.trim();
-  const quoteParam = encodeURIComponent(cleanQuote.slice(0, 160));
+  const quoteSnippet =
+    cleanQuote.length > 110
+      ? cleanQuote.slice(0, 107).replace(/\s+\S*$/, "") + "..."
+      : cleanQuote;
+  const quoteParam = encodeURIComponent(quoteSnippet);
   const quoteShareUrl = `${appOrigin}/read/${cid}?quote=${quoteParam}`;
 
-  const citation = `"${cleanQuote}"\n\n- From "${articleTitle}"${authorName ? ` by ${authorName}` : ""}\nVerified via PressProtocol (${cid.slice(0, 8)}...)\n${quoteShareUrl}`;
+  const citation = `"${cleanQuote}"\n\n— From "${articleTitle}"${authorName ? ` by ${authorName}` : ""}\nVerified on PressProtocol: ${quoteShareUrl}`;
 
   const handleCopyQuote = () => {
     navigator.clipboard.writeText(citation);
@@ -85,7 +89,6 @@ export function QuoteSharePill({
   };
 
   const handleShareTwitter = () => {
-    const quoteSnippet = cleanQuote.length > 130 ? `${cleanQuote.slice(0, 127)}...` : cleanQuote;
     const tweetText = `"${quoteSnippet}"\n\nVerified on @pressprotocol:\n${quoteShareUrl}`;
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
     window.open(url, "_blank", "noopener,noreferrer");

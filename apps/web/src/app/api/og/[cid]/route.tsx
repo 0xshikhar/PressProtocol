@@ -165,61 +165,76 @@ export async function GET(
             </div>
           </div>
 
-          {/* 2. Middle Section: The Quotation Box */}
+          {/* 2. Middle Section: Article Heading + Quotation Box + In-Image Description */}
           <div
             style={{
               display: "flex",
               flexDirection: "column",
-              gap: "16px",
-              margin: "12px 0",
-              padding: "24px 28px",
-              borderRadius: "14px",
-              backgroundColor: "rgba(20, 18, 22, 0.75)",
-              border: "1px solid rgba(240, 232, 232, 0.08)",
-              position: "relative",
+              gap: "12px",
+              margin: "6px 0",
+              width: "100%",
             }}
           >
-            {/* Selected Quote Content */}
+            {/* Prominent Article Heading */}
             <div
               style={{
                 display: "flex",
-                fontSize: `${quoteFontSize}px`,
-                fontWeight: 600,
-                lineHeight: 1.34,
-                letterSpacing: "-0.015em",
+                fontSize: "36px",
+                fontWeight: 800,
+                lineHeight: 1.15,
+                letterSpacing: "-0.025em",
                 color: "#EEE7E1",
-                fontStyle: "italic",
               }}
             >
-              &ldquo;{displayQuote}&rdquo;
+              {title}
             </div>
 
-            {/* Source Attribution & CID */}
+            {/* The Quotation Box */}
             <div
               style={{
                 display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                paddingTop: "14px",
-                borderTop: "1px solid rgba(240, 232, 232, 0.08)",
-                width: "100%",
+                flexDirection: "column",
+                gap: "10px",
+                padding: "20px 24px",
+                borderRadius: "12px",
+                backgroundColor: "rgba(20, 18, 22, 0.8)",
+                border: "1px solid rgba(124, 39, 51, 0.4)",
               }}
             >
               <div
                 style={{
                   display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  fontSize: "16px",
-                  color: "#A79E96",
-                  fontWeight: 500,
+                  fontSize: `${quoteFontSize}px`,
+                  fontWeight: 600,
+                  lineHeight: 1.34,
+                  letterSpacing: "-0.015em",
+                  color: "#EEE7E1",
+                  fontStyle: "italic",
                 }}
               >
-                <span>&mdash; From</span>
-                <span style={{ color: "#EEE7E1", fontWeight: 700 }}>
-                  {title}
-                </span>
+                &ldquo;{displayQuote}&rdquo;
               </div>
+            </div>
+
+            {/* In-Image Article Context Description & Multihash */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+                paddingTop: "2px",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "16px",
+                  lineHeight: 1.4,
+                  color: "#A79E96",
+                }}
+              >
+                Immutable, cryptographically verified publication preserved on PressProtocol.
+              </span>
 
               {/* Multihash pill */}
               <div
@@ -227,7 +242,7 @@ export async function GET(
                   display: "flex",
                   alignItems: "center",
                   gap: "7px",
-                  padding: "5px 12px",
+                  padding: "4px 12px",
                   borderRadius: "6px",
                   backgroundColor: "rgba(11, 10, 12, 0.9)",
                   border: "1px solid rgba(240, 232, 232, 0.08)",
