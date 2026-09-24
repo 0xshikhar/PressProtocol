@@ -69,8 +69,13 @@ export function QuoteSharePill({
 
   if (!selectedText || !position) return null;
 
-  const articleUrl = typeof window !== "undefined" ? window.location.href : `https://pressprotocol.com/read/${cid}`;
-  const citation = `"${selectedText}"\n\n- From "${articleTitle}"${authorName ? ` by ${authorName}` : ""}\nVerified via PressProtocol (${cid.slice(0, 8)}...)\n${articleUrl}`;
+  const rawOrigin = typeof window !== "undefined" ? window.location.origin : "https://pressprotocol.com";
+  const appOrigin = rawOrigin.includes("localhost") ? "https://pressprotocol.com" : rawOrigin;
+  const cleanQuote = selectedText.trim();
+  const quoteParam = encodeURIComponent(cleanQuote.slice(0, 160));
+  const quoteShareUrl = `${appOrigin}/read/${cid}?quote=${quoteParam}`;
+
+  const citation = `"${cleanQuote}"\n\n- From "${articleTitle}"${authorName ? ` by ${authorName}` : ""}\nVerified via PressProtocol (${cid.slice(0, 8)}...)\n${quoteShareUrl}`;
 
   const handleCopyQuote = () => {
     navigator.clipboard.writeText(citation);
@@ -80,15 +85,21 @@ export function QuoteSharePill({
   };
 
   const handleShareTwitter = () => {
-    const tweetText = `"${selectedText.slice(0, 180)}${selectedText.length > 180 ? "..." : ""}"\n\nVerified on @pressprotocol: ${articleUrl}`;
+    const quoteSnippet = cleanQuote.length > 130 ? `${cleanQuote.slice(0, 127)}...` : cleanQuote;
+    const tweetText = `"${quoteSnippet}"\n\nVerified on @pressprotocol:\n${quoteShareUrl}`;
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
   const handleShareWarpcast = () => {
-    const castText = `"${selectedText.slice(0, 220)}${selectedText.length > 220 ? "..." : ""}"\n\nVerified cryptographic publication:`;
-    const url = `https://warpcast.com/~/compose?text=${encodeURIComponent(castText)}&embeds[]=${encodeURIComponent(articleUrl)}`;
+    const castSnippet = cleanQuote.length > 160 ? `${cleanQuote.slice(0, 157)}...` : cleanQuote;
+    const castText = `"${castSnippet}"\n\nVerified cryptographic publication:`;
+    const url = `https://warpcast.com/~/compose?text=${encodeURIComponent(castText)}&embeds[]=${encodeURIComponent(quoteShareUrl)}`;
     window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  const handleOpenCard = () => {
+    window.open(`${appOrigin}/api/og/${cid}?quote=${quoteParam}`, "_blank");
   };
 
   return (
@@ -119,7 +130,7 @@ export function QuoteSharePill({
       <button
         onClick={handleShareTwitter}
         className="p-1.5 rounded-full hover:bg-overlay text-secondary hover:text-primary transition-colors"
-        title="Share quote to X / Twitter"
+        title="Share quote card to X / Twitter"
       >
         <Twitter className="h-3 w-3" />
       </button>
@@ -131,6 +142,14 @@ export function QuoteSharePill({
       >
         <Share2 className="h-3 w-3" />
         <span className="text-[10px]">Cast</span>
+      </button>
+
+      <button
+        onClick={handleOpenCard}
+        className="p-1.5 rounded-full hover:bg-overlay text-muted hover:text-primary transition-colors text-[10px] font-mono"
+        title="Open cryptographic quote card image"
+      >
+        Card
       </button>
     </div>
   );
