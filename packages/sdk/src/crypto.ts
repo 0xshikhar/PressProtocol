@@ -41,6 +41,14 @@ export function isValidHex(str: string, expectedByteLength: number): boolean {
 }
 
 /**
+ * Computes SHA-256 hash as a lowercase hex string.
+ */
+export function sha256Hex(content: string | Uint8Array): string {
+  const bytes = typeof content === "string" ? new TextEncoder().encode(content) : content;
+  return bytesToHex(sha256(bytes));
+}
+
+/**
  * Generates an authentic RFC 8032 Ed25519 keypair in hex format.
  */
 export async function generateKeypair(): Promise<KeyPair> {
