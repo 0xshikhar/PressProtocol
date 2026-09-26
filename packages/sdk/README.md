@@ -126,6 +126,9 @@ npx @pressprotocol/sdk resolve bafkreibm7...
 
 # Verify cryptographic signature of any CID
 npx @pressprotocol/sdk verify bafkreibm7...
+
+# Verify offline air-gapped .pressproof.json manifest
+npx @pressprotocol/sdk verify ./investigation.pressproof.json
 ```
 
 ---

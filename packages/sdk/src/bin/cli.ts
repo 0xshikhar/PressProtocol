@@ -14,6 +14,10 @@ import {
   signPayload,
   createCanonicalPayload,
   calculateDeterministicCIDv1,
+  verifyArticle,
+  verifySignature,
+  isValidHex,
+  sha256Hex,
 } from "../crypto.js";
 
 // ANSI Color Helpers
@@ -44,6 +48,7 @@ function printHelp() {
 ${colors.bold}COMMANDS:${colors.reset}
   ${colors.green}publish${colors.reset} <file.md>         Publish an article to decentralized swarms (or pipe via stdin)
   ${colors.green}resolve${colors.reset} <cid>             Multi-transport resolve article & verify Ed25519 signature
+  ${colors.green}verify${colors.reset} <cid | file.json>   Verify cryptographic signature & integrity of CID or proof file
   ${colors.green}health${colors.reset} <cid>              Probe latency and availability across all network mirrors
   ${colors.green}keygen${colors.reset}                    Generate a fresh sovereign Ed25519 keypair
   ${colors.green}daemon${colors.reset}                    Inspect or run local sovereign headless micro-daemon
@@ -57,6 +62,7 @@ ${colors.bold}OPTIONS:${colors.reset}
   --endpoint <url>         PressProtocol node daemon endpoint
   --verify                 Verify Ed25519 signature during resolution (default: true)
   --no-verify              Skip signature verification
+  --strict                 Enforce strict signature requirement (exit code 1 if unsigned)
   --json                   Output machine-readable JSON
   --version, -v            Show the installed SDK version
   --help, -h               Show this help message
@@ -66,6 +72,8 @@ ${colors.bold}EXAMPLES:${colors.reset}
   $ pressprotocol publish article.md --tags privacy,leaks
   $ pressprotocol daemon
   $ pressprotocol resolve bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi --verify
+  $ pressprotocol verify bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi
+  $ pressprotocol verify ./investigation.pressproof.json
 `);
 }
 
@@ -101,7 +109,7 @@ function parseArgs(args: string[]) {
       const key = arg.slice(2);
       if (key === "no-verify") {
         flags.verify = false;
-      } else if (key === "json" || key === "verify" || key === "help" || key === "version") {
+      } else if (key === "json" || key === "verify" || key === "help" || key === "version" || key === "strict") {
         flags[key] = true;
       } else if (i + 1 < args.length && !args[i + 1].startsWith("--")) {
         flags[key] = args[i + 1];
@@ -220,6 +228,10 @@ async function handlePublish(positionals: string[], flags: Record<string, any>) 
         ipfs: `ipfs://${cid}`,
         tor: onionMirror,
         gateway: localGateway,
+      },
+      checksum: {
+        sha256: sha256Hex(content),
+        byteSize: new TextEncoder().encode(content).length,
       },
       offlinePreservedAt: timestamp,
     };
@@ -399,6 +411,289 @@ ${colors.dim}------------------------------------------------------------${color
   }
 }
 
+async function handleVerify(positionals: string[], flags: Record<string, any>) {
+  const target = positionals[0];
+  if (!target) {
+    console.error(`${colors.red}Error: Missing required argument <cid | file.json>.${colors.reset}`);
+    printHelp();
+    process.exit(1);
+  }
+
+  const resolvedPath = path.resolve(process.cwd(), target);
+  const isFile = fs.existsSync(resolvedPath);
+
+  if (!isFile && (target.endsWith(".json") || target.includes("/") || target.includes("\\"))) {
+    console.error(`${colors.red}Error: File not found: ${resolvedPath}${colors.reset}`);
+    process.exit(1);
+  }
+
+  // 1. Local Air-Gapped Proof / Manifest Verification Mode
+  if (isFile) {
+    let fileContent: string;
+    try {
+      fileContent = fs.readFileSync(resolvedPath, "utf8");
+    } catch (err: any) {
+      console.error(`${colors.red}Error reading file ${resolvedPath}:${colors.reset} ${err.message}`);
+      process.exit(1);
+    }
+
+    let manifest: any;
+    try {
+      manifest = JSON.parse(fileContent);
+    } catch (err: any) {
+      console.error(`${colors.red}Error: Invalid JSON in ${resolvedPath}:${colors.reset} ${err.message}`);
+      process.exit(1);
+    }
+
+    const start = performance.now();
+    const content = manifest.content || "";
+    const title = manifest.title || "Untitled Sovereign Document";
+    const tags = Array.isArray(manifest.tags) ? manifest.tags : [];
+    const timestamp = manifest.timestamp || manifest.createdAt || manifest.offlinePreservedAt;
+    const publicKey =
+      manifest.publisher?.publicKey ||
+      manifest.publisher?.pubkey ||
+      manifest.publicKey ||
+      manifest.pubkey ||
+      "";
+    const signature =
+      manifest.publisher?.signature ||
+      manifest.signature ||
+      "";
+
+    // 1. Check SHA-256 integrity (if checksum field present)
+    const contentBytes = new TextEncoder().encode(content);
+    const computedSha256 = sha256Hex(contentBytes);
+    const expectedSha256 = manifest.checksum?.sha256;
+    const checksumMatches = expectedSha256
+      ? computedSha256.toLowerCase() === expectedSha256.toLowerCase()
+      : true;
+
+    // 2. Deterministic CIDv1 recalculation
+    const computedCid = calculateDeterministicCIDv1(content);
+    const manifestCid = manifest.cid;
+    const cidMatches = manifestCid ? computedCid === manifestCid : true;
+
+    // 3. Cryptographic Signature verification
+    let signatureValid = false;
+    let verificationStatus: "verified" | "invalid" | "unsigned" | "malformed" = "unsigned";
+    let verificationAlgorithm = "None";
+
+    if (!signature || signature === "unsigned" || !publicKey) {
+      verificationStatus = "unsigned";
+    } else if (!isValidHex(publicKey, 32) || !isValidHex(signature, 64)) {
+      verificationStatus = "malformed";
+    } else {
+      // Canonical payload verification (standard RFC 8032 format used by publish --local-only and SDK)
+      if (timestamp) {
+        const canonicalPayload = createCanonicalPayload(title, tags, timestamp);
+        if (await verifySignature(canonicalPayload, signature, publicKey)) {
+          signatureValid = true;
+          verificationStatus = "verified";
+          verificationAlgorithm = "Ed25519 (RFC 8032 / SHA-512)";
+        }
+      }
+
+      // Fallback candidate checks across content/article representations
+      if (!signatureValid) {
+        const vResult = await verifyArticle({
+          title,
+          content,
+          tags,
+          createdAt: timestamp,
+          publisher: { publicKey, pubkey: publicKey, signature },
+          signature,
+        });
+        signatureValid = vResult.isValid;
+        verificationStatus = vResult.isValid ? "verified" : vResult.status;
+        verificationAlgorithm = vResult.algorithm;
+      }
+    }
+
+    const isTampered = !checksumMatches || !cidMatches;
+    const isStrict = Boolean(flags.strict);
+    const isFullyVerified = !isTampered && signatureValid;
+    const isPassing = isStrict ? isFullyVerified : (!isTampered && (signatureValid || verificationStatus === "unsigned"));
+
+    const elapsed = Math.round((performance.now() - start) * 100) / 100;
+
+    if (flags.json) {
+      console.log(
+        JSON.stringify(
+          {
+            valid: isPassing,
+            verified: signatureValid,
+            type: "file",
+            file: resolvedPath,
+            protocol: manifest.protocol || "PressProtocol",
+            cid: manifestCid || computedCid,
+            computedCid,
+            cidMatches,
+            contentSha256: computedSha256,
+            manifestSha256: expectedSha256,
+            checksumMatches,
+            title,
+            tags,
+            timestamp,
+            publicKey,
+            signature,
+            signatureValid,
+            status: isTampered
+              ? (!checksumMatches ? "checksum_mismatch" : "cid_mismatch")
+              : verificationStatus,
+            algorithm: verificationAlgorithm,
+            latencyMs: elapsed,
+          },
+          null,
+          2
+        )
+      );
+      if (!isPassing || (isStrict && !signatureValid)) {
+        process.exit(1);
+      }
+      return;
+    }
+
+    const relativePath = path.relative(process.cwd(), resolvedPath);
+    const displayFile = relativePath.startsWith("..") ? resolvedPath : `./${relativePath}`;
+
+    console.log(`
+${
+  isFullyVerified
+    ? `${colors.green}${colors.bold}✓ Cryptographically Verified Sovereign Proof${colors.reset}`
+    : isTampered
+    ? `${colors.red}${colors.bold}✗ Proof Tampering Detected${colors.reset}`
+    : verificationStatus === "unsigned"
+    ? `${colors.yellow}${colors.bold}⚠ Unsigned Proof Manifest${colors.reset}`
+    : `${colors.red}${colors.bold}✗ Cryptographic Signature Invalid${colors.reset}`
+} ${colors.dim}(${elapsed}ms)${colors.reset}
+
+${colors.bold}Manifest Target:${colors.reset}
+  File:       ${colors.bold}${displayFile}${colors.reset}
+  Protocol:   ${manifest.protocol || "PressProtocol"} ${manifest.version ? `v${manifest.version}` : ""}
+  Title:      ${colors.bold}${title}${colors.reset}
+  Tags:       ${tags.length > 0 ? tags.map((t: string) => `#${t}`).join(" ") : "none"}
+  Date:       ${timestamp || "unknown"}
+
+${colors.bold}Integrity & Multihash:${colors.reset}
+  CIDv1:      ${colors.cyan}${manifestCid || computedCid}${colors.reset} ${
+      cidMatches
+        ? `${colors.green}(✓ Matches deterministic CID)${colors.reset}`
+        : `${colors.red}(✗ CID mismatch: expected ${computedCid})${colors.reset}`
+    }
+  SHA-256:    ${colors.dim}${computedSha256}${colors.reset} ${
+      expectedSha256
+        ? checksumMatches
+          ? `${colors.green}(✓ Checksum intact)${colors.reset}`
+          : `${colors.red}(✗ Checksum mismatch: manifest specifies ${expectedSha256})${colors.reset}`
+        : `${colors.dim}(computed)${colors.reset}`
+    }
+  Size:       ${contentBytes.length} bytes
+
+${colors.bold}Cryptographic Identity:${colors.reset}
+  Status:     ${
+      signatureValid
+        ? `${colors.green}${colors.bold}✓ Authentic Author Signature (${verificationAlgorithm})${colors.reset}`
+        : verificationStatus === "unsigned"
+        ? `${colors.yellow}⚠ Unsigned Manifest${colors.reset}`
+        : `${colors.red}✗ Invalid Signature (Failed RFC 8032 check)${colors.reset}`
+    }
+  Author Key: ${colors.dim}${publicKey || "Anonymous"}${colors.reset}
+  Signature:  ${colors.dim}${signature ? `${signature.slice(0, 32)}...${signature.slice(-16)}` : "none"}${colors.reset}
+`);
+
+    if (!isPassing || (isStrict && !signatureValid)) {
+      process.exit(1);
+    }
+    return;
+  }
+
+  // 2. Decentralized Network CID Verification Mode
+  console.log(`${colors.cyan}Resolving and verifying CID ${target} across decentralized transports...${colors.reset}`);
+  const start = performance.now();
+  const endpoint = flags.endpoint as string | undefined;
+  const client = new PressProtocolClient({ endpoint });
+
+  try {
+    const article = await client.resolve(target, { verify: true });
+    const elapsed = Math.round((performance.now() - start) * 100) / 100;
+
+    const computedCid = article.content ? calculateDeterministicCIDv1(article.content) : null;
+    const cidMatches = computedCid ? computedCid === target : undefined;
+    const isStrict = Boolean(flags.strict);
+    const isValid = article.verified;
+    const isPassing = isStrict ? isValid : (isValid || article.verificationStatus === "unsigned");
+
+    if (flags.json) {
+      console.log(
+        JSON.stringify(
+          {
+            valid: isPassing,
+            verified: article.verified,
+            type: "network",
+            cid: target,
+            computedCid,
+            cidMatches,
+            title: article.title,
+            tags: article.tags,
+            createdAt: article.createdAt,
+            source: article.source,
+            publicKey: article.publisher.publicKey || article.publisher.pubkey,
+            signature: article.signature,
+            signatureValid: article.verified,
+            status: article.verificationStatus,
+            algorithm: article.verificationAlgorithm,
+            latencyMs: elapsed,
+            mirrors: article.mirrors,
+          },
+          null,
+          2
+        )
+      );
+      if (!isPassing || (isStrict && !article.verified)) {
+        process.exit(1);
+      }
+      return;
+    }
+
+    console.log(`
+${
+  isValid
+    ? `${colors.green}${colors.bold}✓ Cryptographically Verified Sovereign Article${colors.reset}`
+    : article.verificationStatus === "unsigned"
+    ? `${colors.yellow}${colors.bold}⚠ Unsigned Article${colors.reset}`
+    : `${colors.red}${colors.bold}✗ Verification Audit Failed${colors.reset}`
+} ${colors.dim}(${elapsed}ms via ${article.source})${colors.reset}
+
+${colors.bold}Article Details:${colors.reset}
+  CID:        ${colors.cyan}${target}${colors.reset} ${
+      cidMatches === true ? `${colors.green}(✓ Matches deterministic CID)${colors.reset}` : ""
+    }
+  Title:      ${colors.bold}${article.title}${colors.reset}
+  Date:       ${article.createdAt}
+  Tags:       ${article.tags.length > 0 ? article.tags.map((t: string) => `#${t}`).join(" ") : "none"}
+
+${colors.bold}Cryptographic Integrity:${colors.reset}
+  Status:     ${
+      article.verified
+        ? `${colors.green}${colors.bold}✓ Verified (${article.verificationAlgorithm})${colors.reset} ${colors.dim}(${article.verificationLatencyMs}ms)${colors.reset}`
+        : article.verificationStatus === "unsigned"
+        ? `${colors.yellow}⚠ Unsigned Article${colors.reset}`
+        : `${colors.red}✗ Invalid Cryptographic Signature${colors.reset}`
+    }
+  Author Key: ${colors.dim}${article.publisher.publicKey || article.publisher.pubkey || "Anonymous"}${colors.reset}
+  Signature:  ${colors.dim}${article.signature ? `${article.signature.slice(0, 32)}...${article.signature.slice(-16)}` : "none"}${colors.reset}
+`);
+
+    if (!isPassing || (isStrict && !article.verified)) {
+      process.exit(1);
+    }
+  } catch (error: any) {
+    console.error(`\n${colors.red}✗ Verification failed:${colors.reset} ${error.message}`);
+    process.exit(1);
+  }
+}
+
 async function handleHealth(positionals: string[], flags: Record<string, any>) {
   const cid = positionals[0];
   if (!cid) {
@@ -484,6 +779,9 @@ async function main() {
       break;
     case "resolve":
       await handleResolve(positionals, flags);
+      break;
+    case "verify":
+      await handleVerify(positionals, flags);
       break;
     case "health":
       await handleHealth(positionals, flags);
