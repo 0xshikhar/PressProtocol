@@ -350,9 +350,14 @@ export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
       {/* Table of Contents (hidden in focus mode) */}
       {!readerSettings.distractionFree && <TableOfContents contentRef={contentRef} />}
 
-      {/* Floating Exit Pill for Distraction-Free Focus Mode */}
+      {/* Floating Controls for Distraction-Free Focus Mode */}
       {readerSettings.distractionFree && (
-        <div className="fixed top-4 right-4 z-50 animate-in fade-in duration-200">
+        <div className="fixed top-4 right-4 z-50 flex items-center gap-2 animate-in fade-in duration-200">
+          <ReaderTypographyDrawer
+            settings={readerSettings}
+            onSettingsChange={setReaderSettings}
+            triggerClassName={isEink ? "bg-white text-black border-2 border-black font-bold shadow-lg" : "shadow-lg backdrop-blur-md"}
+          />
           <button
             type="button"
             onClick={() => setReaderSettings({ ...readerSettings, distractionFree: false })}

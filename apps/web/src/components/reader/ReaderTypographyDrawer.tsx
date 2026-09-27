@@ -26,6 +26,7 @@ import {
   AlignJustify,
   Columns,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import {
   type ReaderSettings,
   type ReaderTheme,
@@ -49,11 +50,13 @@ export { useReaderSettings, useReaderPreferences, DEFAULT_READER_SETTINGS };
 interface ReaderTypographyDrawerProps {
   settings: ReaderSettings;
   onSettingsChange: (settings: ReaderSettings) => void;
+  triggerClassName?: string;
 }
 
 export function ReaderTypographyDrawer({
   settings,
   onSettingsChange,
+  triggerClassName,
 }: ReaderTypographyDrawerProps) {
   const [open, setOpen] = useState(false);
 
@@ -92,7 +95,10 @@ export function ReaderTypographyDrawer({
         <Button
           variant="outline"
           size="sm"
-          className="h-8 gap-1.5 text-xs font-mono border-border/70 bg-surface hover:bg-surface-raised rounded-[6px] shadow-sm transition-all"
+          className={cn(
+            "h-8 gap-1.5 text-xs font-mono border-border/70 bg-surface hover:bg-surface-raised rounded-[6px] shadow-sm transition-all",
+            triggerClassName
+          )}
           title="Reader Typography, Themes & Accessibility (The 'Aa' Drawer)"
         >
           <Type className="h-3.5 w-3.5 text-secondary" />
