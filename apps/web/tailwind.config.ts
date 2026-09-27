@@ -27,6 +27,7 @@ const config = {
 				charter: ['Charter', 'Bitstream Charter', 'var(--font-source-serif)', 'Sitka Text', 'Cambria', 'Georgia', 'Times New Roman', 'serif'],
 				serif: ['Charter', 'Bitstream Charter', 'var(--font-source-serif)', 'Sitka Text', 'Cambria', 'Georgia', 'Times New Roman', 'serif'],
 				mono: ['var(--font-jetbrains)', 'Menlo', 'Monaco', 'Consolas', 'Courier New', 'monospace'],
+				dyslexic: ['OpenDyslexic', 'Comic Sans MS', 'sans-serif'],
 			},
 			colors: {
 				// Design System v2 Surfaces (Warm-undertone matte charcoal) §2.1

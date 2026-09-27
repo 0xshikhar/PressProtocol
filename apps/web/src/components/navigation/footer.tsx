@@ -76,7 +76,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="border-t border-[var(--border-hairline)] bg-[var(--bg-canvas)] text-[var(--text-primary)]">
+    <footer className="global-site-chrome border-t border-[var(--border-hairline)] bg-[var(--bg-canvas)] text-[var(--text-primary)]">
       <div className="container mx-auto px-4 py-12 max-w-7xl">
         {/* Top Tier: Brand Identity & Telemetry */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-10 border-b border-[var(--border-hairline)]">

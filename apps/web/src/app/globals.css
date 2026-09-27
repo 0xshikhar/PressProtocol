@@ -534,6 +534,203 @@
   }
 }
 
+/* OpenDyslexic Accessibility Font */
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('https://cdn.jsdelivr.net/npm/opendyslexic@1.0.3/open-dyslexic/open-dyslexic-regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('https://cdn.jsdelivr.net/npm/opendyslexic@1.0.3/open-dyslexic/open-dyslexic-bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* E-Ink High-Contrast Accessibility Mode (Zero animation, pure monochrome, sharp borders) */
+.theme-eink {
+  --bg-canvas: #ffffff !important;
+  --bg-surface: #ffffff !important;
+  --bg-surface-raised: #ffffff !important;
+  --bg-elevated: #f4f4f4 !important;
+  --bg-overlay: #ffffff !important;
+  --text-primary: #000000 !important;
+  --text-secondary: #000000 !important;
+  --text-muted: #262626 !important;
+  --border-hairline: #000000 !important;
+  --border-subtle: #000000 !important;
+  --border-focus: #000000 !important;
+  --border-border: #000000 !important;
+  --accent-primary: #000000 !important;
+  --accent-ribbon: #000000 !important;
+  --accent-tint: #eeeeee !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.theme-eink * {
+  animation: none !important;
+  transition: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/* Ensure all headings, text, and labels in E-Ink are solid jet-black */
+.theme-eink h1,
+.theme-eink h2,
+.theme-eink h3,
+.theme-eink h4,
+.theme-eink h5,
+.theme-eink h6,
+.theme-eink p,
+.theme-eink span,
+.theme-eink time,
+.theme-eink div,
+.theme-eink .text-primary,
+.theme-eink .text-secondary,
+.theme-eink .text-muted,
+.theme-eink .font-hero {
+  color: #000000 !important;
+}
+
+/* Sharp monochrome borders */
+.theme-eink button,
+.theme-eink [role="button"],
+.theme-eink input,
+.theme-eink select,
+.theme-eink .border,
+.theme-eink .border-t,
+.theme-eink .border-b,
+.theme-eink .border-l,
+.theme-eink .border-r,
+.theme-eink .border-hairline,
+.theme-eink .border-border {
+  border-color: #000000 !important;
+  border-radius: 0px !important;
+}
+
+/* Buttons in E-Ink: crisp outline with white fill */
+.theme-eink button {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #000000 !important;
+}
+
+.theme-eink button:hover {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+.theme-eink button:hover * {
+  color: #ffffff !important;
+}
+
+/* Saved/Active status buttons in E-Ink: inverted solid black with white text */
+.theme-eink button[class*="bg-verified"],
+.theme-eink button[class*="default"] {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #000000 !important;
+}
+
+.theme-eink button[class*="bg-verified"] *,
+.theme-eink button[class*="default"] * {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* Tag chips in E-Ink: white fill, 1px black border, solid black text */
+.theme-eink .badge,
+.theme-eink [class*="Badge"] {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #000000 !important;
+}
+
+/* Article prose styling for E-Ink */
+.theme-eink .article-content {
+  border: 0 !important;
+  border-width: 0 !important;
+}
+
+.theme-eink .article-content,
+.theme-eink .article-content * {
+  color: #000000 !important;
+}
+
+.theme-eink .article-content a {
+  color: #000000 !important;
+  text-decoration: underline !important;
+  text-decoration-thickness: 1.5px !important;
+  text-underline-offset: 3px !important;
+}
+
+.theme-eink .article-content blockquote {
+  border-left: 3px solid #000000 !important;
+  color: #000000 !important;
+  font-style: italic !important;
+  background-color: #f7f7f7 !important;
+  padding: 0.75rem 1rem !important;
+}
+
+.theme-eink .article-content pre,
+.theme-eink .article-content code {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #000000 !important;
+  border-radius: 0px !important;
+}
+
+.theme-eink .article-content img {
+  filter: grayscale(100%) contrast(120%) !important;
+  border: 1px solid #000000 !important;
+  border-radius: 0px !important;
+}
+
+/* Material icon text fallback fix: hide raw icon ligatures leaking as text */
+.article-content i.material-icons,
+.article-content span.material-icons,
+.article-content i[class*="material-symbols"],
+.article-content span[class*="material-symbols"] {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  vertical-align: middle;
+}
+
+/* Distraction-Free Focus Mode: Hide global site chrome */
+html.focus-mode .global-site-chrome,
+body.focus-mode .global-site-chrome {
+  display: none !important;
+}
+
+/* Synchronize global navbar/header with E-Ink monochrome when active */
+html.theme-eink-active nav,
+html.theme-eink-active header {
+  background-color: #ffffff !important;
+  border-bottom: 2px solid #000000 !important;
+  color: #000000 !important;
+}
+
+html.theme-eink-active nav *,
+html.theme-eink-active header * {
+  color: #000000 !important;
+  border-color: #000000 !important;
+}
+
+html.theme-eink-active nav button,
+html.theme-eink-active nav a[role="button"],
+html.theme-eink-active nav input {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #000000 !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
     animation-duration: 0.01ms !important;

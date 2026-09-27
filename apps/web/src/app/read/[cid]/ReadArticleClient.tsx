@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ExternalLink, Download, Shield, BookOpen, ShieldCheck, ShieldAlert, Loader2, FileCheck, Archive, Moon, Sun, Coffee, ArrowRight } from "lucide-react";
+import { ExternalLink, Download, Shield, BookOpen, ShieldCheck, ShieldAlert, Loader2, FileCheck, Archive, Moon, Sun, Coffee, ArrowRight, Contrast, Maximize2, Minimize2 } from "lucide-react";
 import { apiClient, type ResolveContentResponse } from "@/lib/api-client";
 import { toast } from "sonner";
 import { calculateReadingTime } from "@/lib/reading-time";
@@ -123,6 +123,38 @@ export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cid]);
+
+  // Synchronize distraction-free focus mode with document root and body
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (readerSettings.distractionFree) {
+      document.documentElement.classList.add("focus-mode");
+      document.body.classList.add("focus-mode");
+    } else {
+      document.documentElement.classList.remove("focus-mode");
+      document.body.classList.remove("focus-mode");
+    }
+    return () => {
+      document.documentElement.classList.remove("focus-mode");
+      document.body.classList.remove("focus-mode");
+    };
+  }, [readerSettings.distractionFree]);
+
+  // Synchronize E-Ink monochrome accessibility theme with document root
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (readerSettings.theme === "eink") {
+      document.documentElement.classList.add("theme-eink-active");
+      document.body.classList.add("theme-eink-active");
+    } else {
+      document.documentElement.classList.remove("theme-eink-active");
+      document.body.classList.remove("theme-eink-active");
+    }
+    return () => {
+      document.documentElement.classList.remove("theme-eink-active");
+      document.body.classList.remove("theme-eink-active");
+    };
+  }, [readerSettings.theme]);
 
   const loadContent = async () => {
     try {
@@ -249,6 +281,8 @@ export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
   // Section 2.1 & 3.1: Tone-tailored background and text
   const getThemeClass = () => {
     switch (readerSettings.theme) {
+      case "eink":
+        return "theme-eink bg-white text-black selection:bg-black selection:text-white !transition-none";
       case "sepia":
         return "bg-[#F7F3EB] text-[#2C2724] selection:bg-[#E2D5C3]";
       case "paper":
@@ -263,6 +297,8 @@ export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
 
   const getTypefaceClass = () => {
     switch (readerSettings.typeface) {
+      case "dyslexic":
+        return "font-dyslexic";
       case "sans":
         return "font-sans";
       case "editorial":
@@ -276,17 +312,66 @@ export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
     }
   };
 
+  const getLineHeightPx = () => {
+    const size = readerSettings.fontSize;
+    switch (readerSettings.lineHeight) {
+      case "compact":
+        return Math.round(size * 1.45);
+      case "loose":
+        return Math.round(size * 2.05);
+      case "normal":
+      default:
+        return Math.round(size * 1.72);
+    }
+  };
+
+  const getContentWidthClass = () => {
+    switch (readerSettings.contentWidth) {
+      case "narrow":
+        return "max-w-[620px]";
+      case "wide":
+        return "max-w-[860px]";
+      case "normal":
+      default:
+        return "max-w-[720px]";
+    }
+  };
+
+  const isEink = readerSettings.theme === "eink";
   const isSepia = readerSettings.theme === "sepia";
   const isPaper = readerSettings.theme === "paper";
-  const isLight = isSepia || isPaper;
+  const isLight = isSepia || isPaper || isEink;
 
   return (
     <>
       {/* Reading Progress Bar */}
       <ReadingProgressBar />
       
-      {/* Table of Contents */}
-      <TableOfContents contentRef={contentRef} />
+      {/* Table of Contents (hidden in focus mode) */}
+      {!readerSettings.distractionFree && <TableOfContents contentRef={contentRef} />}
+
+      {/* Floating Controls for Distraction-Free Focus Mode */}
+      {readerSettings.distractionFree && (
+        <div className="fixed top-4 right-4 z-50 flex items-center gap-2 animate-in fade-in duration-200">
+          <ReaderTypographyDrawer
+            settings={readerSettings}
+            onSettingsChange={setReaderSettings}
+            triggerClassName={isEink ? "bg-white text-black border-2 border-black font-bold shadow-lg" : "shadow-lg backdrop-blur-md"}
+          />
+          <button
+            type="button"
+            onClick={() => setReaderSettings({ ...readerSettings, distractionFree: false })}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-mono border shadow-lg flex items-center gap-2 backdrop-blur-md transition-all ${
+              isEink
+                ? "bg-white text-black border-2 border-black font-bold"
+                : "bg-surface/90 text-primary border-hairline hover:bg-elevated hover:border-focus"
+            }`}
+          >
+            <Minimize2 className="w-3.5 h-3.5 text-accent" />
+            <span>Exit Focus Mode (Esc)</span>
+          </button>
+        </div>
+      )}
 
       {/* Quote-to-Share Contextual Selection Pill */}
       <QuoteSharePill
@@ -298,129 +383,181 @@ export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
       />
       
       <div className={`min-h-screen transition-colors duration-300 ${getThemeClass()}`}>
-        {/* Intentional Reading Mode Switcher Bar */}
-        <div className={`sticky top-16 z-30 border-b backdrop-blur-xl transition-all duration-300 ${
-          readerSettings.theme === 'sepia'
-            ? 'bg-[#F7F3EB]/90 border-amber-900/15 text-[#2C2724] shadow-sm'
-            : readerSettings.theme === 'paper'
-            ? 'bg-[#FAFAFA]/95 border-neutral-200 text-[#1A1817] shadow-sm'
-            : 'bg-canvas/90 border-hairline text-primary shadow-sm'
-        }`}>
-          <div className="container mx-auto max-w-4xl px-4 py-2.5 flex items-center justify-between gap-3 flex-wrap">
-            {/* Reading Mode Segmented Controls */}
-            <div className="flex items-center gap-1 p-1 rounded-[6px] bg-black/5 dark:bg-overlay border border-black/5 dark:border-hairline">
-              <button
-                type="button"
-                onClick={() => setReaderSettings({ ...readerSettings, theme: "dark" })}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-mono transition-all ${
-                  readerSettings.theme === "dark"
-                    ? "bg-elevated text-primary shadow-sm border border-hairline font-semibold"
-                    : "text-muted hover:text-primary opacity-70 hover:opacity-100"
-                }`}
-                title="Onyx Dark"
-              >
-                <Moon className="h-3.5 w-3.5 text-secondary" />
-                <span>Onyx Dark</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setReaderSettings({ ...readerSettings, theme: "sepia" })}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-mono transition-all ${
-                  readerSettings.theme === "sepia"
-                    ? "bg-[#F7F3EB] text-[#2C2724] shadow-sm border border-amber-700/30 font-semibold"
-                    : isLight
-                    ? "text-[#57534E] hover:text-[#1C1917] font-medium"
-                    : "text-muted hover:text-primary opacity-70 hover:opacity-100"
-                }`}
-                title="Warm Sepia"
-              >
-                <Coffee className="h-3.5 w-3.5 text-amber-700" />
-                <span>Warm Sepia</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setReaderSettings({ ...readerSettings, theme: "paper" })}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-mono transition-all ${
-                  readerSettings.theme === "paper"
-                    ? "bg-white text-neutral-900 shadow-sm border border-neutral-300 font-semibold"
-                    : isLight
-                    ? "text-neutral-600 hover:text-neutral-950 font-medium"
-                    : "text-muted hover:text-primary opacity-70 hover:opacity-100"
-                }`}
-                title="Clean Paper"
-              >
-                <Sun className="h-3.5 w-3.5 text-amber-600" />
-                <span>Clean Paper</span>
-              </button>
-            </div>
-
-            {/* Quick Font Size Controls & Typeface Indicator */}
-            <div className="flex items-center gap-2">
-              <div className={`flex items-center gap-1 px-1.5 py-1 rounded-[6px] border text-xs font-mono ${
-                isSepia
-                  ? 'border-amber-900/15 bg-amber-900/5 text-[#2C2724]'
-                  : isPaper
-                  ? 'border-neutral-200 bg-neutral-100 text-[#1A1817]'
-                  : 'border-hairline bg-overlay text-primary'
+        {/* Intentional Reading Mode Switcher Bar (Hidden in Distraction-Free Focus Mode) */}
+        {!readerSettings.distractionFree && (
+          <div className={`sticky top-16 z-30 border-b backdrop-blur-xl transition-all duration-300 ${
+            isEink
+              ? 'bg-white border-b-2 border-black text-black shadow-none !transition-none'
+              : readerSettings.theme === 'sepia'
+              ? 'bg-[#F7F3EB]/90 border-amber-900/15 text-[#2C2724] shadow-sm'
+              : readerSettings.theme === 'paper'
+              ? 'bg-[#FAFAFA]/95 border-neutral-200 text-[#1A1817] shadow-sm'
+              : 'bg-canvas/90 border-hairline text-primary shadow-sm'
+          }`}>
+            <div className="container mx-auto max-w-4xl px-4 py-2.5 flex items-center justify-between gap-3 flex-wrap">
+              {/* Reading Mode Segmented Controls */}
+              <div className={`flex items-center gap-1 p-1 rounded-[6px] border ${
+                isEink
+                  ? 'bg-white border-2 border-black'
+                  : 'bg-black/5 dark:bg-overlay border-black/5 dark:border-hairline'
               }`}>
                 <button
                   type="button"
-                  onClick={() => setReaderSettings({ ...readerSettings, fontSize: Math.max(15, readerSettings.fontSize - 1) })}
-                  className="px-2 py-0.5 hover:bg-black/10 dark:hover:bg-overlay rounded transition-colors"
-                  title="Decrease font size"
+                  onClick={() => setReaderSettings({ ...readerSettings, theme: "dark" })}
+                  className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-[4px] text-xs font-mono transition-all ${
+                    readerSettings.theme === "dark"
+                      ? "bg-elevated text-primary shadow-sm border border-hairline font-semibold"
+                      : "text-muted hover:text-primary opacity-70 hover:opacity-100"
+                  }`}
+                  title="Onyx Dark"
                 >
-                  A-
+                  <Moon className="h-3.5 w-3.5 text-secondary" />
+                  <span>Onyx Dark</span>
                 </button>
-                <span className="text-[11px] font-semibold px-1 tabular-nums">{readerSettings.fontSize}px</span>
+
                 <button
                   type="button"
-                  onClick={() => setReaderSettings({ ...readerSettings, fontSize: Math.min(26, readerSettings.fontSize + 1) })}
-                  className="px-2 py-0.5 hover:bg-black/10 dark:hover:bg-overlay rounded transition-colors font-bold"
-                  title="Increase font size"
+                  onClick={() => setReaderSettings({ ...readerSettings, theme: "sepia" })}
+                  className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-[4px] text-xs font-mono transition-all ${
+                    readerSettings.theme === "sepia"
+                      ? "bg-[#F7F3EB] text-[#2C2724] shadow-sm border border-amber-700/30 font-semibold"
+                      : isLight && !isEink
+                      ? "text-[#57534E] hover:text-[#1C1917] font-medium"
+                      : "text-muted hover:text-primary opacity-70 hover:opacity-100"
+                  }`}
+                  title="Warm Sepia"
                 >
-                  A+
+                  <Coffee className="h-3.5 w-3.5 text-amber-700" />
+                  <span>Warm Sepia</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setReaderSettings({ ...readerSettings, theme: "paper" })}
+                  className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-[4px] text-xs font-mono transition-all ${
+                    readerSettings.theme === "paper"
+                      ? "bg-white text-neutral-900 shadow-sm border border-neutral-300 font-semibold"
+                      : isLight && !isEink
+                      ? "text-neutral-600 hover:text-neutral-950 font-medium"
+                      : "text-muted hover:text-primary opacity-70 hover:opacity-100"
+                  }`}
+                  title="Clean Paper"
+                >
+                  <Sun className="h-3.5 w-3.5 text-amber-600" />
+                  <span>Clean Paper</span>
+                </button>
+
+                {/* E-Ink Monochrome High Contrast Mode */}
+                <button
+                  type="button"
+                  onClick={() => setReaderSettings({ ...readerSettings, theme: "eink" })}
+                  className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-[4px] text-xs font-mono transition-all ${
+                    isEink
+                      ? "bg-black text-white font-bold border border-black shadow-sm"
+                      : "text-muted hover:text-primary opacity-70 hover:opacity-100"
+                  }`}
+                  title="Pure monochrome E-Ink mode (High contrast, sharp borders, zero flicker)"
+                >
+                  <Contrast className="h-3.5 w-3.5" />
+                  <span>E-Ink</span>
                 </button>
               </div>
 
-              <ReaderTypographyDrawer
-                settings={readerSettings}
-                onSettingsChange={setReaderSettings}
-              />
+              {/* Quick Font Size Controls, Focus Mode & Typeface Indicator */}
+              <div className="flex items-center gap-2">
+                {/* Distraction Free Toggle Button */}
+                <button
+                  type="button"
+                  onClick={() => setReaderSettings({ ...readerSettings, distractionFree: !readerSettings.distractionFree })}
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-[6px] border text-xs font-mono transition-all ${
+                    readerSettings.distractionFree
+                      ? "bg-accent/20 border-accent text-primary font-bold shadow-sm"
+                      : isEink
+                      ? "border-black text-black hover:bg-neutral-100"
+                      : "border-hairline bg-surface hover:bg-surface-raised text-secondary hover:text-primary"
+                  }`}
+                  title={readerSettings.distractionFree ? "Exit Distraction-Free Focus Mode (Esc)" : "Enter Distraction-Free Focus Mode"}
+                >
+                  {readerSettings.distractionFree ? (
+                    <Minimize2 className="h-3.5 w-3.5 text-accent" />
+                  ) : (
+                    <Maximize2 className="h-3.5 w-3.5 text-secondary" />
+                  )}
+                  <span className="hidden sm:inline">
+                    {readerSettings.distractionFree ? "Exit Focus" : "Focus"}
+                  </span>
+                </button>
+
+                <div className={`flex items-center gap-1 px-1.5 py-1 rounded-[6px] border text-xs font-mono ${
+                  isEink
+                    ? 'border-black bg-white text-black'
+                    : isSepia
+                    ? 'border-amber-900/15 bg-amber-900/5 text-[#2C2724]'
+                    : isPaper
+                    ? 'border-neutral-200 bg-neutral-100 text-[#1A1817]'
+                    : 'border-hairline bg-overlay text-primary'
+                }`}>
+                  <button
+                    type="button"
+                    onClick={() => setReaderSettings({ ...readerSettings, fontSize: Math.max(15, readerSettings.fontSize - 1) })}
+                    className="px-2 py-0.5 hover:bg-black/10 dark:hover:bg-overlay rounded transition-colors"
+                    title="Decrease font size"
+                  >
+                    A-
+                  </button>
+                  <span className="text-[11px] font-semibold px-1 tabular-nums">{readerSettings.fontSize}px</span>
+                  <button
+                    type="button"
+                    onClick={() => setReaderSettings({ ...readerSettings, fontSize: Math.min(26, readerSettings.fontSize + 1) })}
+                    className="px-2 py-0.5 hover:bg-black/10 dark:hover:bg-overlay rounded transition-colors font-bold"
+                    title="Increase font size"
+                  >
+                    A+
+                  </button>
+                </div>
+
+                <ReaderTypographyDrawer
+                  settings={readerSettings}
+                  onSettingsChange={setReaderSettings}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Extension Install Banner */}
-        <div className={`border-b transition-colors ${
-          isSepia
-            ? 'bg-[#F0E8DA] border-amber-900/15 text-[#451A03]'
-            : isPaper
-            ? 'bg-neutral-100 border-neutral-200 text-neutral-800'
-            : 'bg-surface/50 border-hairline text-secondary'
-        }`}>
-          <div className="container mx-auto max-w-4xl px-4 py-2.5">
-            <div className="flex items-center gap-2 text-xs font-mono">
-              <Download className={`h-4 w-4 shrink-0 ${isSepia ? 'text-amber-800' : isPaper ? 'text-neutral-700' : 'text-primary'}`} />
-              <span className={isSepia ? 'text-[#451A03]' : isPaper ? 'text-neutral-800' : 'text-secondary'}>
-                Install the PressProtocol browser extension for automatic multi-network failover routing.
-              </span>
-              <Button
-                variant="link"
-                asChild
-                className={`ml-1 h-auto p-0 text-xs font-mono font-semibold underline underline-offset-2 ${
-                  isSepia ? 'text-[#78350F] hover:text-[#451A03]' : isPaper ? 'text-blue-700 hover:text-blue-900' : 'text-primary hover:text-primary/80'
-                }`}
-              >
-                <Link href="/downloads">Install Extension</Link>
-              </Button>
+        {/* Extension Install Banner (Hidden in Distraction-Free Focus Mode) */}
+        {!readerSettings.distractionFree && (
+          <div className={`border-b transition-colors ${
+            isEink
+              ? 'bg-neutral-100 border-black text-black'
+              : isSepia
+              ? 'bg-[#F0E8DA] border-amber-900/15 text-[#451A03]'
+              : isPaper
+              ? 'bg-neutral-100 border-neutral-200 text-neutral-800'
+              : 'bg-surface/50 border-hairline text-secondary'
+          }`}>
+            <div className="container mx-auto max-w-4xl px-4 py-2.5">
+              <div className="flex items-center gap-2 text-xs font-mono">
+                <Download className={`h-4 w-4 shrink-0 ${isEink ? 'text-black' : isSepia ? 'text-amber-800' : isPaper ? 'text-neutral-700' : 'text-primary'}`} />
+                <span className={isEink ? 'text-black' : isSepia ? 'text-[#451A03]' : isPaper ? 'text-neutral-800' : 'text-secondary'}>
+                  Install the PressProtocol browser extension for automatic multi-network failover routing.
+                </span>
+                <Button
+                  variant="link"
+                  asChild
+                  className={`ml-1 h-auto p-0 text-xs font-mono font-semibold underline underline-offset-2 ${
+                    isEink ? 'text-black hover:text-black/80 font-bold' : isSepia ? 'text-[#78350F] hover:text-[#451A03]' : isPaper ? 'text-blue-700 hover:text-blue-900' : 'text-primary hover:text-primary/80'
+                  }`}
+                >
+                  <Link href="/downloads">Install Extension</Link>
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Article Content - Section 3.1 & 3.2: 65-75ch Isolated Reading Pane with Source Serif 4 */}
-        <article className="mx-auto max-w-[720px] px-6 py-12 dispatch-prose">
+        {/* Article Content - Isolated Reading Pane with configurable width */}
+        <article className={`mx-auto ${getContentWidthClass()} px-6 py-12 dispatch-prose transition-all duration-200`}>
           {/* Offline Mode Banner */}
           {isOfflineMode && (
             <div className={`mb-8 p-4 rounded-[6px] border flex items-center justify-between gap-4 transition-all ${
@@ -450,21 +587,25 @@ export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
           )}
 
           {/* Section 3.2: Title in Instrument Serif per dispatch-prose rules */}
-          <h1 className="font-hero text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight leading-[1.15] mb-6 text-primary">
+          <h1 className={`font-hero text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight leading-[1.15] mb-6 ${
+            isEink ? '!text-black font-semibold' : isSepia ? 'text-[#1C1917]' : isPaper ? 'text-neutral-950' : 'text-primary'
+          }`}>
             {content.title}
           </h1>
           
           {/* Meta Information: Enforcing 2-Badge Budget (Section 3.3) */}
-          <div className="flex items-center justify-between mb-8 flex-wrap gap-3 border-b border-hairline pb-4 font-mono text-xs text-muted">
+          <div className={`flex items-center justify-between mb-8 flex-wrap gap-3 border-b pb-4 font-mono text-xs ${
+            isEink ? 'border-black !text-black' : 'border-hairline text-muted'
+          }`}>
             <div className="flex items-center gap-3 flex-wrap">
               {readingStats && (
-                <span className="flex items-center gap-1 tabular-nums">
+                <span className={`flex items-center gap-1 tabular-nums ${isEink ? 'text-black font-semibold' : ''}`}>
                   <BookOpen className="h-3.5 w-3.5" />
                   {readingStats.formattedTime}
                 </span>
               )}
               <span>&bull;</span>
-              <time className="tabular-nums">{new Date(content.createdAt).toLocaleDateString('en-US', { 
+              <time className={`tabular-nums ${isEink ? 'text-black font-semibold' : ''}`}>{new Date(content.createdAt).toLocaleDateString('en-US', { 
                 year: 'numeric', 
                 month: 'short', 
                 day: 'numeric' 
@@ -477,22 +618,26 @@ export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
                 title="Click to inspect zero-trust cryptographic provenance"
               >
                 {isVerifying ? (
-                  <span className="flex items-center gap-1 text-xs text-muted animate-pulse">
+                  <span className={`flex items-center gap-1 text-xs ${isEink ? 'text-black font-semibold' : 'text-muted'} animate-pulse`}>
                     <Loader2 className="h-3 w-3 animate-spin" /> Verifying...
                   </span>
                 ) : verificationResult?.isValid ? (
-                  <span className="flex items-center gap-1 text-xs font-medium text-verified">
-                    <ShieldCheck className="h-3.5 w-3.5 text-verified" />
+                  <span className={`flex items-center gap-1 text-xs font-medium ${
+                    isEink ? 'text-black font-bold border border-black px-1.5 py-0.5' : 'text-verified'
+                  }`}>
+                    <ShieldCheck className={`h-3.5 w-3.5 ${isEink ? 'text-black' : 'text-verified'}`} />
                     Ed25519 Verified ({verificationResult.latencyMs}ms)
                   </span>
                 ) : verificationResult?.status === "unsigned" ? (
-                  <span className="flex items-center gap-1 text-xs text-muted">
+                  <span className={`flex items-center gap-1 text-xs ${isEink ? 'text-black font-semibold' : 'text-muted'}`}>
                     <Shield className="h-3.5 w-3.5" />
                     Unsigned
                   </span>
                 ) : (
-                  <span className="flex items-center gap-1 text-xs font-medium text-warning">
-                    <ShieldAlert className="h-3.5 w-3.5" />
+                  <span className={`flex items-center gap-1 text-xs font-medium ${
+                    isEink ? 'text-black font-bold border border-black px-1.5 py-0.5' : 'text-warning'
+                  }`}>
+                    <ShieldAlert className={`h-3.5 w-3.5 ${isEink ? 'text-black' : 'text-warning'}`} />
                     Unverified
                   </span>
                 )}
@@ -505,7 +650,11 @@ export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
                 variant="outline"
                 size="sm"
                 onClick={handleExportProof}
-                className="h-8 gap-1.5 text-xs font-mono border-hairline text-secondary hover:text-primary hover:bg-overlay rounded-[6px]"
+                className={`h-8 gap-1.5 text-xs font-mono rounded-[6px] ${
+                  isEink
+                    ? '!border-black !bg-white !text-black hover:!bg-black hover:!text-white !rounded-none font-semibold'
+                    : 'border-hairline text-secondary hover:text-primary hover:bg-overlay'
+                }`}
                 title="Export offline cryptographic proof (.pressproof.json)"
               >
                 <FileCheck className="h-3.5 w-3.5" />
@@ -517,7 +666,11 @@ export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
                 size="sm"
                 onClick={handleArchiveWayback}
                 disabled={isArchiving}
-                className="h-8 gap-1.5 text-xs font-mono border-hairline text-secondary hover:text-primary hover:bg-overlay rounded-[6px]"
+                className={`h-8 gap-1.5 text-xs font-mono rounded-[6px] ${
+                  isEink
+                    ? '!border-black !bg-white !text-black hover:!bg-black hover:!text-white !rounded-none font-semibold'
+                    : 'border-hairline text-secondary hover:text-primary hover:bg-overlay'
+                }`}
                 title="Preserve snapshot on Internet Archive / Wayback Machine"
               >
                 <Archive className={`h-3.5 w-3.5 ${isArchiving ? "animate-spin text-primary" : ""}`} />
@@ -534,6 +687,7 @@ export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
                 signature={content.publisher?.signature}
                 publicKey={content.publisher?.pubkey}
                 mirrors={content.mirrors}
+                className={isEink ? "!border-black !rounded-none font-semibold" : ""}
               />
             </div>
           </div>
@@ -545,7 +699,11 @@ export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
                 <Badge
                   key={tag}
                   variant="outline"
-                  className="text-xs px-2.5 py-0.5 rounded-[4px] border-hairline bg-overlay/50 text-secondary"
+                  className={`text-xs px-2.5 py-0.5 ${
+                    isEink
+                      ? '!border-black !bg-white !text-black font-mono font-bold !rounded-none'
+                      : 'rounded-[4px] border-hairline bg-overlay/50 text-secondary'
+                  }`}
                 >
                   #{tag}
                 </Badge>
@@ -558,7 +716,7 @@ export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
             ref={contentRef}
             style={{
               fontSize: `${readerSettings.fontSize}px`,
-              lineHeight: `${Math.round(readerSettings.fontSize * 1.65)}px`,
+              lineHeight: `${getLineHeightPx()}px`,
             }}
             className={`article-content
                        prose prose-lg max-w-none
@@ -581,6 +739,8 @@ export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
                            ? 'prose-invert'
                            : isSepia
                            ? 'prose-headings:text-[#1C1917] prose-p:text-[#2C2724] prose-strong:text-[#1C1917] prose-blockquote:text-[#57534E]'
+                           : isEink
+                           ? 'prose-headings:text-black prose-p:text-black prose-strong:text-black prose-blockquote:text-black prose-blockquote:border-black'
                            : 'prose-headings:text-neutral-950 prose-p:text-neutral-900 prose-strong:text-neutral-950 prose-blockquote:text-neutral-600'
                        }`}
             dangerouslySetInnerHTML={{
@@ -592,7 +752,7 @@ export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
         </article>
 
         {/* Unified Protocol Verification Block (Card Elevation, No Neon Glows) */}
-        <div className="mx-auto max-w-[720px] px-6 pb-16">
+        <div className={`mx-auto ${getContentWidthClass()} px-6 pb-16 transition-all duration-200`}>
           <div className="rounded-[6px] border border-hairline bg-surface p-6 sm:p-7 space-y-6 shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-hairline pb-4">

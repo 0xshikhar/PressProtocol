@@ -168,7 +168,7 @@ const Navbar = () => {
   const isProfileActive = pathname === "/profile" || pathname === "/bookmarks" || pathname === "/dashboard";
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-[var(--border-hairline)] bg-[var(--bg-canvas)]/95 backdrop-blur-2xl text-[var(--text-primary)] shadow-sm transition-colors">
+    <nav className="global-site-chrome sticky top-0 z-50 w-full border-b border-[var(--border-hairline)] bg-[var(--bg-canvas)]/95 backdrop-blur-2xl text-[var(--text-primary)] shadow-sm transition-colors">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 max-w-7xl">
         {/* Left: Brand Identity */}
         <div className="flex items-center gap-5 shrink-0">
