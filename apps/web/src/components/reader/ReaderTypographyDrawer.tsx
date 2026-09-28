@@ -1,7 +1,7 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
 import {
   Sheet,
   SheetContent,
@@ -28,15 +28,15 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
-  type ReaderSettings,
-  type ReaderTheme,
-  type ReaderTypeface,
-  type ReaderLineHeight,
-  type ReaderContentWidth,
   DEFAULT_READER_SETTINGS,
   useReaderPreferences,
   useReaderSettings,
-} from "./ReaderPreferencesContext";
+  type ReaderContentWidth,
+  type ReaderLineHeight,
+  type ReaderSettings,
+  type ReaderTheme,
+  type ReaderTypeface,
+} from "./ReaderPreferencesContext"
 
 export type {
   ReaderSettings,
@@ -44,8 +44,8 @@ export type {
   ReaderTypeface,
   ReaderLineHeight,
   ReaderContentWidth,
-};
-export { useReaderSettings, useReaderPreferences, DEFAULT_READER_SETTINGS };
+}
+export { useReaderSettings, useReaderPreferences, DEFAULT_READER_SETTINGS }
 
 interface ReaderTypographyDrawerProps {
   settings: ReaderSettings;
@@ -58,36 +58,39 @@ export function ReaderTypographyDrawer({
   onSettingsChange,
   triggerClassName,
 }: ReaderTypographyDrawerProps) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false)
 
   const setTypeface = (typeface: ReaderTypeface) => {
-    onSettingsChange({ ...settings, typeface });
-  };
+    onSettingsChange({ ...settings, typeface })
+  }
 
   const setTheme = (theme: ReaderTheme) => {
-    onSettingsChange({ ...settings, theme });
-  };
+    onSettingsChange({ ...settings, theme })
+  }
 
   const setFontSize = (fontSize: number) => {
-    const clamped = Math.max(15, Math.min(26, fontSize));
-    onSettingsChange({ ...settings, fontSize: clamped });
-  };
+    const clamped = Math.max(15, Math.min(26, fontSize))
+    onSettingsChange({ ...settings, fontSize: clamped })
+  }
 
   const setLineHeight = (lineHeight: ReaderLineHeight) => {
-    onSettingsChange({ ...settings, lineHeight });
-  };
+    onSettingsChange({ ...settings, lineHeight })
+  }
 
   const setContentWidth = (contentWidth: ReaderContentWidth) => {
-    onSettingsChange({ ...settings, contentWidth });
-  };
+    onSettingsChange({ ...settings, contentWidth })
+  }
 
   const toggleDistractionFree = () => {
-    onSettingsChange({ ...settings, distractionFree: !settings.distractionFree });
-  };
+    onSettingsChange({
+      ...settings,
+      distractionFree: !settings.distractionFree,
+    })
+  }
 
   const resetDefaults = () => {
-    onSettingsChange(DEFAULT_READER_SETTINGS);
-  };
+    onSettingsChange(DEFAULT_READER_SETTINGS)
+  }
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -102,26 +105,26 @@ export function ReaderTypographyDrawer({
           title="Reader Typography, Themes & Accessibility (The 'Aa' Drawer)"
         >
           <Type className="h-3.5 w-3.5 text-secondary" />
-          <span className="font-serif font-bold text-sm">Aa</span>
+          <span className="font-serif text-sm font-bold">Aa</span>
         </Button>
       </SheetTrigger>
       <SheetContent
         side="right"
-        className="w-84 sm:w-96 p-6 bg-surface border-border/80 shadow-2xl space-y-6 flex flex-col justify-between font-sans text-primary overflow-y-auto max-h-screen"
+        className="w-84 flex max-h-screen flex-col justify-between space-y-6 overflow-y-auto border-border/80 bg-surface p-6 font-sans text-primary shadow-2xl sm:w-96"
       >
         <div className="space-y-6">
           {/* Header */}
           <SheetHeader className="border-b border-border/60 pb-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-[6px] bg-overlay text-secondary border border-hairline">
+                <div className="rounded-[6px] border border-hairline bg-overlay p-1.5 text-secondary">
                   <Type className="h-4 w-4" />
                 </div>
                 <div>
-                  <SheetTitle className="text-base font-semibold tracking-tight text-primary font-sans">
+                  <SheetTitle className="font-sans text-base font-semibold tracking-tight text-primary">
                     Reading Display
                   </SheetTitle>
-                  <SheetDescription className="text-xs text-muted mt-0.5 font-sans">
+                  <SheetDescription className="mt-0.5 font-sans text-xs text-muted">
                     Customize typography, sizing &amp; accessibility
                   </SheetDescription>
                 </div>
@@ -129,7 +132,7 @@ export function ReaderTypographyDrawer({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7 text-muted hover:text-primary rounded-[4px]"
+                className="h-7 w-7 rounded-[4px] text-muted hover:text-primary"
                 onClick={resetDefaults}
                 title="Reset to default typography"
               >
@@ -140,7 +143,7 @@ export function ReaderTypographyDrawer({
 
           {/* Theme Presets */}
           <div className="space-y-2.5">
-            <div className="text-xs font-mono font-medium text-muted">
+            <div className="font-mono text-xs font-medium text-muted">
               Reading Theme
             </div>
             <div className="grid grid-cols-2 gap-2">
@@ -148,18 +151,19 @@ export function ReaderTypographyDrawer({
               <button
                 type="button"
                 onClick={() => setTheme("dark")}
-                className={`p-2.5 rounded-[6px] border text-left transition-all flex items-center gap-2.5 ${
-                  settings.theme === "dark"
+                className={`flex items-center gap-2.5 rounded-[6px] border p-2.5 text-left transition-all ${settings.theme === "dark"
                     ? "border-focus bg-overlay text-primary"
-                    : "border-border/60 bg-surface-raised hover:border-border text-muted hover:text-primary"
-                }`}
+                    : "bg-surface-raised border-border/60 text-muted hover:border-border hover:text-primary"
+                  }`}
               >
-                <div className="p-1.5 rounded-[4px] bg-background">
+                <div className="rounded-[4px] bg-background p-1.5">
                   <Moon className="h-3.5 w-3.5 text-secondary" />
                 </div>
                 <div>
                   <div className="text-xs font-semibold">Onyx Dark</div>
-                  <div className="text-[10px] text-muted">Leather &amp; Ivory</div>
+                  <div className="text-[10px] text-muted">
+                    Leather &amp; Ivory
+                  </div>
                 </div>
               </button>
 
@@ -167,13 +171,12 @@ export function ReaderTypographyDrawer({
               <button
                 type="button"
                 onClick={() => setTheme("sepia")}
-                className={`p-2.5 rounded-[6px] border text-left transition-all flex items-center gap-2.5 ${
-                  settings.theme === "sepia"
+                className={`flex items-center gap-2.5 rounded-[6px] border p-2.5 text-left transition-all ${settings.theme === "sepia"
                     ? "border-amber-700 bg-[#f4ece1] text-[#2d2b28]"
-                    : "border-amber-900/30 bg-[#fbf7ee] hover:border-amber-700/50 text-[#5c4a38]"
-                }`}
+                    : "border-amber-900/30 bg-[#fbf7ee] text-[#5c4a38] hover:border-amber-700/50"
+                  }`}
               >
-                <div className="p-1.5 rounded-[4px] bg-amber-200/60">
+                <div className="rounded-[4px] bg-amber-200/60 p-1.5">
                   <Coffee className="h-3.5 w-3.5 text-amber-900" />
                 </div>
                 <div>
@@ -186,18 +189,19 @@ export function ReaderTypographyDrawer({
               <button
                 type="button"
                 onClick={() => setTheme("paper")}
-                className={`p-2.5 rounded-[6px] border text-left transition-all flex items-center gap-2.5 ${
-                  settings.theme === "paper"
+                className={`flex items-center gap-2.5 rounded-[6px] border p-2.5 text-left transition-all ${settings.theme === "paper"
                     ? "border-neutral-500 bg-white text-neutral-900 shadow-sm"
-                    : "border-neutral-300 bg-neutral-100 hover:border-neutral-400 text-neutral-800"
-                }`}
+                    : "border-neutral-300 bg-neutral-100 text-neutral-800 hover:border-neutral-400"
+                  }`}
               >
-                <div className="p-1.5 rounded-[4px] bg-neutral-200">
+                <div className="rounded-[4px] bg-neutral-200 p-1.5">
                   <Sun className="h-3.5 w-3.5 text-neutral-800" />
                 </div>
                 <div>
                   <div className="text-xs font-semibold">Clean Paper</div>
-                  <div className="text-[10px] text-neutral-600">Daylight clarity</div>
+                  <div className="text-[10px] text-neutral-600">
+                    Daylight clarity
+                  </div>
                 </div>
               </button>
 
@@ -205,14 +209,13 @@ export function ReaderTypographyDrawer({
               <button
                 type="button"
                 onClick={() => setTheme("eink")}
-                className={`p-2.5 rounded-[6px] border text-left transition-all flex items-center gap-2.5 ${
-                  settings.theme === "eink"
-                    ? "border-black bg-white text-black ring-2 ring-black font-bold shadow-sm"
-                    : "border-neutral-400 bg-neutral-50 hover:border-black text-neutral-900"
-                }`}
+                className={`flex items-center gap-2.5 rounded-[6px] border p-2.5 text-left transition-all ${settings.theme === "eink"
+                    ? "border-black bg-white font-bold text-black shadow-sm ring-2 ring-black"
+                    : "border-neutral-400 bg-neutral-50 text-neutral-900 hover:border-black"
+                  }`}
                 title="Pure monochrome E-Ink mode: 100% contrast, zero animations, sharp borders"
               >
-                <div className="p-1.5 rounded-[4px] bg-black text-white">
+                <div className="rounded-[4px] bg-black p-1.5 text-white">
                   <Contrast className="h-3.5 w-3.5" />
                 </div>
                 <div>
@@ -225,18 +228,19 @@ export function ReaderTypographyDrawer({
               <button
                 type="button"
                 onClick={() => setTheme("cyber")}
-                className={`p-2.5 rounded-[6px] border text-left transition-all flex items-center gap-2.5 col-span-2 ${
-                  settings.theme === "cyber"
-                    ? "border-verified bg-verified/10 text-verified"
-                    : "border-verified/20 bg-canvas hover:border-verified/40 text-verified/70"
-                }`}
+                className={`col-span-2 flex items-center gap-2.5 rounded-[6px] border p-2.5 text-left transition-all ${settings.theme === "cyber"
+                    ? "border-[#00FF66] bg-[#00FF66]/15 font-semibold text-[#00FF66] shadow-[0_0_12px_rgba(0,255,102,0.25)]"
+                    : "border-[#00FF66]/30 bg-[#061409] text-[#00FF66]/80 hover:border-[#00FF66]/60"
+                  }`}
               >
-                <div className="p-1.5 rounded-[4px] bg-verified/10">
-                  <Terminal className="h-3.5 w-3.5 text-verified" />
+                <div className="rounded-[4px] bg-[#00FF66]/20 p-1.5">
+                  <Terminal className="h-3.5 w-3.5 text-[#00FF66]" />
                 </div>
                 <div>
                   <div className="text-xs font-semibold">Matrix Terminal</div>
-                  <div className="text-[10px] opacity-80">Retro phosphor green</div>
+                  <div className="text-[10px] opacity-80">
+                    Retro phosphor green
+                  </div>
                 </div>
               </button>
             </div>
@@ -244,7 +248,7 @@ export function ReaderTypographyDrawer({
 
           {/* Typeface Family */}
           <div className="space-y-2.5">
-            <div className="text-xs font-mono font-medium text-muted">
+            <div className="font-mono text-xs font-medium text-muted">
               Typeface Family
             </div>
             <div className="grid grid-cols-2 gap-2">
@@ -252,82 +256,98 @@ export function ReaderTypographyDrawer({
               <button
                 type="button"
                 onClick={() => setTypeface("charter")}
-                className={`py-2 px-2.5 rounded-[6px] border text-left transition-all flex flex-col gap-0.5 ${
-                  settings.typeface === "charter" || settings.typeface === "serif"
-                    ? "bg-overlay text-primary border-focus font-semibold"
-                    : "bg-surface-raised hover:bg-surface border-border/60 text-secondary hover:text-primary"
-                }`}
+                className={`flex flex-col gap-0.5 rounded-[6px] border px-2.5 py-2 text-left transition-all ${settings.typeface === "charter" ||
+                    settings.typeface === "serif"
+                    ? "border-focus bg-overlay font-semibold text-primary"
+                    : "bg-surface-raised border-border/60 text-secondary hover:bg-surface hover:text-primary"
+                  }`}
               >
-                <div className="flex items-center justify-between w-full">
-                  <span className="font-charter text-sm font-bold">Charter</span>
-                  <span className="text-[10px] uppercase font-mono tracking-wider opacity-70">Default</span>
+                <div className="flex w-full items-center justify-between">
+                  <span className="font-charter text-sm font-bold">
+                    Charter
+                  </span>
+                  <span className="font-mono text-[10px] uppercase tracking-wider opacity-70">
+                    Default
+                  </span>
                 </div>
-                <span className="text-[10px] opacity-80 font-sans">Medium standard</span>
+                <span className="font-sans text-[10px] opacity-80">
+                  Medium standard
+                </span>
               </button>
 
               {/* Modern Sans - Inter */}
               <button
                 type="button"
                 onClick={() => setTypeface("sans")}
-                className={`py-2 px-2.5 rounded-[6px] border text-left transition-all flex flex-col gap-0.5 ${
-                  settings.typeface === "sans"
-                    ? "bg-overlay text-primary border-focus font-semibold"
-                    : "bg-surface-raised hover:bg-surface border-border/60 text-secondary hover:text-primary"
-                }`}
+                className={`flex flex-col gap-0.5 rounded-[6px] border px-2.5 py-2 text-left transition-all ${settings.typeface === "sans"
+                    ? "border-focus bg-overlay font-semibold text-primary"
+                    : "bg-surface-raised border-border/60 text-secondary hover:bg-surface hover:text-primary"
+                  }`}
               >
-                <div className="flex items-center justify-between w-full">
-                  <span className="font-sans text-sm font-bold">Inter Sans</span>
+                <div className="flex w-full items-center justify-between">
+                  <span className="font-sans text-sm font-bold">
+                    Inter Sans
+                  </span>
                 </div>
-                <span className="text-[10px] opacity-80 font-sans">Clean &amp; neutral</span>
+                <span className="font-sans text-[10px] opacity-80">
+                  Clean &amp; neutral
+                </span>
               </button>
 
               {/* Editorial Serif - Instrument Serif */}
               <button
                 type="button"
                 onClick={() => setTypeface("editorial")}
-                className={`py-2 px-2.5 rounded-[6px] border text-left transition-all flex flex-col gap-0.5 ${
-                  settings.typeface === "editorial"
-                    ? "bg-overlay text-primary border-focus font-semibold"
-                    : "bg-surface-raised hover:bg-surface border-border/60 text-secondary hover:text-primary"
-                }`}
+                className={`flex flex-col gap-0.5 rounded-[6px] border px-2.5 py-2 text-left transition-all ${settings.typeface === "editorial"
+                    ? "border-focus bg-overlay font-semibold text-primary"
+                    : "bg-surface-raised border-border/60 text-secondary hover:bg-surface hover:text-primary"
+                  }`}
               >
-                <div className="flex items-center justify-between w-full">
+                <div className="flex w-full items-center justify-between">
                   <span className="font-hero text-sm">Display Serif</span>
                 </div>
-                <span className="text-[10px] opacity-80 font-sans">Instrument Serif</span>
+                <span className="font-sans text-[10px] opacity-80">
+                  Instrument Serif
+                </span>
               </button>
 
               {/* Code Monospace */}
               <button
                 type="button"
                 onClick={() => setTypeface("mono")}
-                className={`py-2 px-2.5 rounded-[6px] border text-left transition-all flex flex-col gap-0.5 ${
-                  settings.typeface === "mono"
-                    ? "bg-overlay text-primary border-focus font-semibold"
-                    : "bg-surface-raised hover:bg-surface border-border/60 text-secondary hover:text-primary"
-                }`}
+                className={`flex flex-col gap-0.5 rounded-[6px] border px-2.5 py-2 text-left transition-all ${settings.typeface === "mono"
+                    ? "border-focus bg-overlay font-semibold text-primary"
+                    : "bg-surface-raised border-border/60 text-secondary hover:bg-surface hover:text-primary"
+                  }`}
               >
-                <div className="flex items-center justify-between w-full">
+                <div className="flex w-full items-center justify-between">
                   <span className="font-mono text-sm font-bold">Code Mono</span>
                 </div>
-                <span className="text-[10px] opacity-80 font-mono">JetBrains / Menlo</span>
+                <span className="font-mono text-[10px] opacity-80">
+                  JetBrains / Menlo
+                </span>
               </button>
 
               {/* OpenDyslexic Accessibility Typeface */}
               <button
                 type="button"
                 onClick={() => setTypeface("dyslexic")}
-                className={`py-2 px-2.5 rounded-[6px] border text-left transition-all flex flex-col gap-0.5 col-span-2 ${
-                  settings.typeface === "dyslexic"
-                    ? "bg-overlay text-primary border-focus font-semibold ring-1 ring-amber-500/40"
-                    : "bg-surface-raised hover:bg-surface border-border/60 text-secondary hover:text-primary"
-                }`}
+                className={`col-span-2 flex flex-col gap-0.5 rounded-[6px] border px-2.5 py-2 text-left transition-all ${settings.typeface === "dyslexic"
+                    ? "border-focus bg-overlay font-semibold text-primary ring-1 ring-amber-500/40"
+                    : "bg-surface-raised border-border/60 text-secondary hover:bg-surface hover:text-primary"
+                  }`}
               >
-                <div className="flex items-center justify-between w-full">
-                  <span className="font-dyslexic text-sm font-bold text-amber-400">OpenDyslexic</span>
-                  <span className="text-[10px] uppercase font-mono tracking-wider opacity-80 text-amber-300">Accessibility</span>
+                <div className="flex w-full items-center justify-between">
+                  <span className="font-dyslexic text-sm font-bold text-amber-400">
+                    OpenDyslexic
+                  </span>
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-amber-300 opacity-80">
+                    Accessibility
+                  </span>
                 </div>
-                <span className="text-[10px] opacity-80 font-sans">Weighted letterforms for dyslexia support</span>
+                <span className="font-sans text-[10px] opacity-80">
+                  Weighted letterforms for dyslexia support
+                </span>
               </button>
             </div>
           </div>
@@ -336,66 +356,76 @@ export function ReaderTypographyDrawer({
           <div className="grid grid-cols-2 gap-3">
             {/* Line Height */}
             <div className="space-y-1.5">
-              <div className="text-xs font-mono font-medium text-muted flex items-center gap-1">
-                <AlignJustify className="w-3 h-3" />
+              <div className="flex items-center gap-1 font-mono text-xs font-medium text-muted">
+                <AlignJustify className="h-3 w-3" />
                 <span>Line Spacing</span>
               </div>
-              <div className="grid grid-cols-3 gap-1 p-1 rounded-[6px] bg-surface-raised border border-border/60">
-                {(["compact", "normal", "loose"] as ReaderLineHeight[]).map((lh) => (
-                  <button
-                    key={lh}
-                    type="button"
-                    onClick={() => setLineHeight(lh)}
-                    className={`py-1 text-[11px] font-mono capitalize rounded-[4px] transition-colors ${
-                      settings.lineHeight === lh
-                        ? "bg-overlay text-primary font-bold shadow-sm"
-                        : "text-muted hover:text-primary"
-                    }`}
-                  >
-                    {lh === "compact" ? "Tight" : lh === "normal" ? "Mid" : "Loose"}
-                  </button>
-                ))}
+              <div className="bg-surface-raised grid grid-cols-3 gap-1 rounded-[6px] border border-border/60 p-1">
+                {(["compact", "normal", "loose"] as ReaderLineHeight[]).map(
+                  (lh) => (
+                    <button
+                      key={lh}
+                      type="button"
+                      onClick={() => setLineHeight(lh)}
+                      className={`rounded-[4px] py-1 font-mono text-[11px] capitalize transition-colors ${settings.lineHeight === lh
+                          ? "bg-overlay font-bold text-primary shadow-sm"
+                          : "text-muted hover:text-primary"
+                        }`}
+                    >
+                      {lh === "compact"
+                        ? "Tight"
+                        : lh === "normal"
+                          ? "Mid"
+                          : "Loose"}
+                    </button>
+                  )
+                )}
               </div>
             </div>
 
             {/* Reading Width */}
             <div className="space-y-1.5">
-              <div className="text-xs font-mono font-medium text-muted flex items-center gap-1">
-                <Columns className="w-3 h-3" />
+              <div className="flex items-center gap-1 font-mono text-xs font-medium text-muted">
+                <Columns className="h-3 w-3" />
                 <span>Reading Width</span>
               </div>
-              <div className="grid grid-cols-3 gap-1 p-1 rounded-[6px] bg-surface-raised border border-border/60">
-                {(["narrow", "normal", "wide"] as ReaderContentWidth[]).map((cw) => (
-                  <button
-                    key={cw}
-                    type="button"
-                    onClick={() => setContentWidth(cw)}
-                    className={`py-1 text-[11px] font-mono capitalize rounded-[4px] transition-colors ${
-                      settings.contentWidth === cw
-                        ? "bg-overlay text-primary font-bold shadow-sm"
-                        : "text-muted hover:text-primary"
-                    }`}
-                  >
-                    {cw === "narrow" ? "Slim" : cw === "normal" ? "Std" : "Wide"}
-                  </button>
-                ))}
+              <div className="bg-surface-raised grid grid-cols-3 gap-1 rounded-[6px] border border-border/60 p-1">
+                {(["narrow", "normal", "wide"] as ReaderContentWidth[]).map(
+                  (cw) => (
+                    <button
+                      key={cw}
+                      type="button"
+                      onClick={() => setContentWidth(cw)}
+                      className={`rounded-[4px] py-1 font-mono text-[11px] capitalize transition-colors ${settings.contentWidth === cw
+                          ? "bg-overlay font-bold text-primary shadow-sm"
+                          : "text-muted hover:text-primary"
+                        }`}
+                    >
+                      {cw === "narrow"
+                        ? "Slim"
+                        : cw === "normal"
+                          ? "Std"
+                          : "Wide"}
+                    </button>
+                  )
+                )}
               </div>
             </div>
           </div>
 
           {/* Font Sizing Stepper */}
           <div className="space-y-2.5">
-            <div className="flex items-center justify-between text-xs font-mono font-medium text-muted">
+            <div className="flex items-center justify-between font-mono text-xs font-medium text-muted">
               <span>Text scale</span>
-              <span className="font-mono text-sm text-primary font-bold">
+              <span className="font-mono text-sm font-bold text-primary">
                 {settings.fontSize}px
               </span>
             </div>
-            <div className="flex items-center gap-3 p-3 rounded-[6px] bg-surface-raised border border-border/60">
+            <div className="bg-surface-raised flex items-center gap-3 rounded-[6px] border border-border/60 p-3">
               <Button
                 variant="outline"
                 size="icon"
-                className="h-8 w-8 rounded-[4px] border-border/70 bg-surface shrink-0"
+                className="h-8 w-8 shrink-0 rounded-[4px] border-border/70 bg-surface"
                 onClick={() => setFontSize(settings.fontSize - 1)}
                 disabled={settings.fontSize <= 15}
               >
@@ -413,7 +443,7 @@ export function ReaderTypographyDrawer({
               <Button
                 variant="outline"
                 size="icon"
-                className="h-8 w-8 rounded-[4px] border-border/70 bg-surface shrink-0"
+                className="h-8 w-8 shrink-0 rounded-[4px] border-border/70 bg-surface"
                 onClick={() => setFontSize(settings.fontSize + 1)}
                 disabled={settings.fontSize >= 26}
               >
@@ -427,31 +457,30 @@ export function ReaderTypographyDrawer({
             <button
               type="button"
               onClick={toggleDistractionFree}
-              className={`w-full p-2.5 rounded-[6px] border text-xs font-mono transition-all flex items-center justify-between ${
-                settings.distractionFree
-                  ? "bg-accent/15 border-accent text-primary font-semibold shadow-sm"
-                  : "bg-surface-raised border-border/60 text-secondary hover:text-primary hover:border-border"
-              }`}
+              className={`flex w-full items-center justify-between rounded-[6px] border p-2.5 font-mono text-xs transition-all ${settings.distractionFree
+                  ? "border-accent bg-accent/15 font-semibold text-primary shadow-sm"
+                  : "bg-surface-raised border-border/60 text-secondary hover:border-border hover:text-primary"
+                }`}
             >
               <span className="flex items-center gap-2">
                 {settings.distractionFree ? (
-                  <Minimize2 className="w-4 h-4 text-accent" />
+                  <Minimize2 className="h-4 w-4 text-accent" />
                 ) : (
-                  <Maximize2 className="w-4 h-4 text-muted" />
+                  <Maximize2 className="h-4 w-4 text-muted" />
                 )}
                 <span>Distraction-Free Focus Mode</span>
               </span>
-              <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-overlay border border-hairline">
+              <span className="rounded border border-hairline bg-overlay px-1.5 py-0.5 text-[10px] uppercase tracking-wider">
                 {settings.distractionFree ? "ON" : "OFF"}
               </span>
             </button>
           </div>
         </div>
 
-        <div className="pt-4 border-t border-border/60 text-[11px] font-mono text-muted text-center">
+        <div className="border-t border-border/60 pt-4 text-center font-mono text-[11px] text-muted">
           Preferences preserved in browser local storage
         </div>
       </SheetContent>
     </Sheet>
-  );
+  )
 }

@@ -3,41 +3,42 @@
 @tailwind utilities;
 
 @layer base {
-  :root, .dark {
+  :root,
+  .dark {
     /* Design System v2: Editorial Sovereign Identity (Wax seal on a leather ledger) */
-    
+
     /* Surfaces — warm-undertone matte charcoal */
-    --bg-canvas: #0B0A0C;
+    --bg-canvas: #0b0a0c;
     --bg-surface: #141216;
-    --bg-elevated: #1C181D;
+    --bg-elevated: #1c181d;
     --bg-overlay: #262024;
     --border-hairline: rgba(240, 232, 232, 0.07);
     --border-focus: rgba(240, 232, 232, 0.16);
 
     /* Text — warm ivory scale */
-    --text-primary: #EEE7E1;
-    --text-secondary: #A79E96;
-    --text-muted: #6F675F;
+    --text-primary: #eee7e1;
+    --text-secondary: #a79e96;
+    --text-muted: #6f675f;
 
     /* Brand Accent — Press Burgundy */
-    --accent-primary: #7C2733;
-    --accent-hover: #98333F;
-    --accent-deep: #571A22;
+    --accent-primary: #7c2733;
+    --accent-hover: #98333f;
+    --accent-deep: #571a22;
     --accent-tint: rgba(124, 39, 51, 0.14);
-    --accent-ribbon: #B44A54;
+    --accent-ribbon: #b44a54;
 
     /* Semantic Locks */
-    --verified: #3E9C72;
-    --verified-bright: #59B98C;
+    --verified: #3e9c72;
+    --verified-bright: #59b98c;
     --verified-tint: rgba(62, 156, 114, 0.14);
-    --warning: #C97A2E;
-    --warning-bright: #DE9750;
+    --warning: #c97a2e;
+    --warning-bright: #de9750;
     --warning-tint: rgba(201, 122, 46, 0.14);
-    --error: #D65C4A;
-    --error-bright: #E37B6B;
+    --error: #d65c4a;
+    --error-bright: #e37b6b;
     --error-tint: rgba(214, 92, 74, 0.14);
-    --anonymous: #8770C4;
-    --anonymous-bright: #A18CDA;
+    --anonymous: #8770c4;
+    --anonymous-bright: #a18cda;
     --anonymous-tint: rgba(135, 112, 196, 0.14);
 
     /* Component compatibility variables */
@@ -69,28 +70,28 @@
   * {
     @apply border-border;
   }
-  
+
   body {
     background-color: var(--bg-canvas);
     color: var(--text-primary);
     @apply font-sans antialiased;
   }
-  
+
   /* Custom Scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
-  
+
   ::-webkit-scrollbar-track {
     background-color: var(--bg-canvas);
   }
-  
+
   ::-webkit-scrollbar-thumb {
     background-color: var(--bg-elevated);
     border-radius: 9999px;
   }
-  
+
   ::-webkit-scrollbar-thumb:hover {
     background-color: var(--bg-overlay);
   }
@@ -99,16 +100,20 @@
 @layer utilities {
   /* Fluid Hero Typography - Section 3.2 & Edge Case 2 */
   .font-hero {
-    font-family: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
+    font-family:
+      var(--font-instrument-serif), "Instrument Serif", Georgia, serif;
     font-size: clamp(2.5rem, 5vw + 1rem, 3.8125rem);
     line-height: 1.04;
     letter-spacing: -0.025em;
   }
 
   /* Micro-Typography Tabular Figures - Section 3.1a */
-  .font-mono, .metric-counter {
+  .font-mono,
+  .metric-counter {
     font-family: var(--font-jetbrains), Menlo, Monaco, Consolas, monospace;
-    font-feature-settings: "tnum" 1, "zero" 1;
+    font-feature-settings:
+      "tnum" 1,
+      "zero" 1;
     letter-spacing: -0.02em;
   }
 
@@ -117,7 +122,8 @@
     hanging-punctuation: first allow-end;
     text-rendering: optimizeLegibility;
     font-variant-ligatures: common-ligatures;
-    font-family: 'Charter', 'Bitstream Charter', var(--font-source-serif), serif;
+    font-family:
+      "Charter", "Bitstream Charter", var(--font-source-serif), serif;
     max-width: 75ch;
   }
 
@@ -138,9 +144,10 @@
     background-color: var(--bg-surface);
     border: 1px solid var(--border-hairline);
     border-radius: 8px;
-    box-shadow: 
-      inset 0 1px 0 0 rgba(240, 232, 232, 0.06), /* subtle overhead light rim / physical ledger edge */
-      0 12px 32px -4px rgba(0, 0, 0, 0.6);
+    box-shadow:
+      inset 0 1px 0 0 rgba(240, 232, 232, 0.06),
+      /* subtle overhead light rim / physical ledger edge */ 0 12px 32px -4px
+        rgba(0, 0, 0, 0.6);
   }
 
   /* Buttons - Section 8 & Edge Case 1 */
@@ -150,9 +157,11 @@
     border-radius: 6px;
     transition: background-color 0.2s ease;
   }
+
   .btn-primary:hover {
     background-color: var(--accent-hover);
   }
+
   .btn-primary:active {
     background-color: var(--accent-deep);
   }
@@ -164,6 +173,7 @@
     border-radius: 6px;
     transition: all 0.2s ease;
   }
+
   .btn-secondary:hover {
     border-color: var(--border-focus);
     background-color: var(--bg-overlay);
@@ -178,6 +188,7 @@
     border-radius: 6px;
     transition: all 0.2s ease;
   }
+
   .btn-simulation:hover {
     border-color: var(--border-focus);
     color: var(--text-primary);
@@ -185,23 +196,24 @@
   }
 
   .font-display {
-    font-family: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
+    font-family:
+      var(--font-instrument-serif), "Instrument Serif", Georgia, serif;
   }
 
   /* Scoped Reader Palettes */
   .reader-onyx {
-    background-color: #0B0A0C;
-    color: #EEE7E1;
+    background-color: #0b0a0c;
+    color: #eee7e1;
   }
 
   .reader-sepia {
-    background-color: #F4ECD8;
-    color: #3A2E1F;
+    background-color: #f4ecd8;
+    color: #3a2e1f;
   }
 
   .reader-paper {
-    background-color: #FAFAF8;
-    color: #1A1A1E;
+    background-color: #fafaf8;
+    color: #1a1a1e;
   }
 
   .surface-card {
@@ -217,30 +229,39 @@
   .text-primary {
     color: var(--text-primary);
   }
+
   .text-secondary {
     color: var(--text-secondary);
   }
+
   .text-muted {
     color: var(--text-muted);
   }
+
   .text-accent-primary {
     color: var(--accent-primary);
   }
+
   .bg-canvas {
     background-color: var(--bg-canvas);
   }
+
   .bg-surface {
     background-color: var(--bg-surface);
   }
+
   .bg-elevated {
     background-color: var(--bg-elevated);
   }
+
   .bg-overlay {
     background-color: var(--bg-overlay);
   }
+
   .border-hairline {
     border-color: var(--border-hairline);
   }
+
   .border-focus {
     border-color: var(--border-focus);
   }
@@ -267,7 +288,7 @@
 
   .hairline-grid {
     background-size: 60px 60px;
-    background-image: 
+    background-image:
       linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   }
@@ -280,19 +301,29 @@
   .marquee {
     animation: marquee 30s linear infinite;
   }
-  
+
   .marquee-reverse {
     animation: marquee-reverse 25s linear infinite;
   }
 
   @keyframes marquee {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+    0% {
+      transform: translateX(0);
+    }
+
+    100% {
+      transform: translateX(-50%);
+    }
   }
-  
+
   @keyframes marquee-reverse {
-    0% { transform: translateX(-50%); }
-    100% { transform: translateX(0); }
+    0% {
+      transform: translateX(-50%);
+    }
+
+    100% {
+      transform: translateX(0);
+    }
   }
 
   /* TipTap Editor & Callout Styles */
@@ -340,15 +371,20 @@
      ========================================================================= */
 
   .font-charter {
-    font-family: 'Charter', 'Bitstream Charter', var(--font-source-serif), 'Sitka Text', 'Cambria', 'Georgia', 'Times New Roman', serif;
+    font-family:
+      "Charter", "Bitstream Charter", var(--font-source-serif), "Sitka Text",
+      "Cambria", "Georgia", "Times New Roman", serif;
   }
 
   .font-editorial {
-    font-family: var(--font-instrument-serif), 'Instrument Serif', 'Georgia', serif;
+    font-family:
+      var(--font-instrument-serif), "Instrument Serif", "Georgia", serif;
   }
 
   .article-content {
-    font-family: 'Charter', 'Bitstream Charter', var(--font-source-serif), 'Sitka Text', 'Cambria', 'Georgia', 'Times New Roman', serif;
+    font-family:
+      "Charter", "Bitstream Charter", var(--font-source-serif), "Sitka Text",
+      "Cambria", "Georgia", "Times New Roman", serif;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     word-break: break-word;
@@ -361,29 +397,50 @@
   .article-content h4,
   .article-content h5,
   .article-content h6 {
-    font-family: var(--font-sans), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+    font-family:
+      var(--font-sans),
+      "Inter",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      Helvetica,
+      Arial,
+      sans-serif !important;
   }
 
   /* Code Snippets: Monospace Stacks (Menlo, Monaco, Consolas, JetBrains) */
   .article-content code,
   .article-content pre {
-    font-family: var(--font-jetbrains), Menlo, Monaco, Consolas, 'Courier New', monospace !important;
+    font-family:
+      var(--font-jetbrains), Menlo, Monaco, Consolas, "Courier New", monospace !important;
   }
 
   /* Typeface Overrides from Aa Drawer */
   .font-sans.article-content,
   .font-sans .article-content {
-    font-family: var(--font-sans), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+    font-family:
+      var(--font-sans),
+      "Inter",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      Helvetica,
+      Arial,
+      sans-serif !important;
   }
 
   .font-editorial.article-content,
   .font-editorial .article-content {
-    font-family: var(--font-instrument-serif), 'Instrument Serif', 'Georgia', serif !important;
+    font-family:
+      var(--font-instrument-serif), "Instrument Serif", "Georgia", serif !important;
   }
 
   .font-mono.article-content,
   .font-mono .article-content {
-    font-family: var(--font-jetbrains), Menlo, Monaco, Consolas, monospace !important;
+    font-family:
+      var(--font-jetbrains), Menlo, Monaco, Consolas, monospace !important;
   }
 
   /* Headings: Generous breathing room and distinct hierarchical rhythm */
@@ -411,6 +468,7 @@
   .reader-sepia .article-content h2 {
     border-bottom-color: rgba(69, 26, 3, 0.12);
   }
+
   .reader-paper .article-content h2 {
     border-bottom-color: rgba(0, 0, 0, 0.08);
   }
@@ -529,6 +587,7 @@
   .measure-reading {
     max-width: 68ch;
   }
+
   .measure-lead {
     max-width: 62ch;
   }
@@ -536,16 +595,18 @@
 
 /* OpenDyslexic Accessibility Font */
 @font-face {
-  font-family: 'OpenDyslexic';
-  src: url('https://cdn.jsdelivr.net/npm/opendyslexic@1.0.3/open-dyslexic/open-dyslexic-regular.woff') format('woff');
+  font-family: "OpenDyslexic";
+  src: url("https://cdn.jsdelivr.net/npm/opendyslexic@1.0.3/open-dyslexic/open-dyslexic-regular.woff")
+    format("woff");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'OpenDyslexic';
-  src: url('https://cdn.jsdelivr.net/npm/opendyslexic@1.0.3/open-dyslexic/open-dyslexic-bold.woff') format('woff');
+  font-family: "OpenDyslexic";
+  src: url("https://cdn.jsdelivr.net/npm/opendyslexic@1.0.3/open-dyslexic/open-dyslexic-bold.woff")
+    format("woff");
   font-weight: bold;
   font-style: normal;
   font-display: swap;
@@ -709,30 +770,144 @@ body.focus-mode .global-site-chrome {
   display: none !important;
 }
 
-/* Synchronize global navbar/header with E-Ink monochrome when active */
-html.theme-eink-active nav,
-html.theme-eink-active header {
-  background-color: #ffffff !important;
-  border-bottom: 2px solid #000000 !important;
-  color: #000000 !important;
+/* ==========================================================================
+   Cyber Matrix Theme (Retro Phosphor Terminal Green & CRT Aesthetic)
+   ========================================================================== */
+.theme-cyber {
+  --bg-canvas: #030804 !important;
+  --bg-surface: #061208 !important;
+  --bg-surface-raised: #0b1e0f !important;
+  --bg-elevated: #0f2b15 !important;
+  --bg-overlay: #133a1d !important;
+
+  --text-primary: #00ff66 !important;
+  --text-secondary: #00cc52 !important;
+  --text-muted: #1f8740 !important;
+
+  --border-hairline: rgba(0, 255, 102, 0.22) !important;
+  --border-subtle: rgba(0, 255, 102, 0.38) !important;
+  --border-focus: #00ff66 !important;
+  --border-border: rgba(0, 255, 102, 0.28) !important;
+
+  --accent-primary: #00ff66 !important;
+  --accent-hover: #33ff85 !important;
+  --accent-deep: #00993d !important;
+  --accent-tint: rgba(0, 255, 102, 0.15) !important;
+  --accent-ribbon: #50fa7b !important;
+
+  --verified: #00ff66 !important;
+  --verified-bright: #33ff85 !important;
+  --verified-tint: rgba(0, 255, 102, 0.18) !important;
+  --warning: #a3e635 !important;
+  --warning-bright: #bef264 !important;
+  --warning-tint: rgba(163, 230, 53, 0.15) !important;
+
+  --background: var(--bg-canvas) !important;
+  --foreground: var(--text-primary) !important;
+  --card: var(--bg-surface) !important;
+  --card-foreground: var(--text-primary) !important;
+  --popover: var(--bg-elevated) !important;
+  --popover-foreground: var(--text-primary) !important;
+
+  background-color: #030804 !important;
+  color: #00ff66 !important;
+  background-image:
+    linear-gradient(rgba(0, 255, 102, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 102, 0.035) 1px, transparent 1px),
+    radial-gradient(
+      ellipse at 50% 0%,
+      rgba(0, 255, 102, 0.1) 0%,
+      transparent 65%
+    );
+  background-size:
+    32px 32px,
+    32px 32px,
+    100% 100%;
 }
 
-html.theme-eink-active nav *,
-html.theme-eink-active header * {
-  color: #000000 !important;
-  border-color: #000000 !important;
+/* Headings in Cyber Matrix: glowing neon phosphor green */
+.theme-cyber h1,
+.theme-cyber .font-hero {
+  color: #00ff66 !important;
+  text-shadow:
+    0 0 16px rgba(0, 255, 102, 0.4),
+    0 0 35px rgba(0, 255, 102, 0.15);
 }
 
-html.theme-eink-active nav button,
-html.theme-eink-active nav a[role="button"],
-html.theme-eink-active nav input {
-  background-color: #ffffff !important;
-  color: #000000 !important;
-  border: 1px solid #000000 !important;
+.theme-cyber h2,
+.theme-cyber h3,
+.theme-cyber h4 {
+  color: #33ff85 !important;
+  text-shadow: 0 0 12px rgba(0, 255, 102, 0.3);
+}
+
+/* Prose text in Cyber Matrix */
+.theme-cyber .article-content,
+.theme-cyber .article-content p,
+.theme-cyber .article-content li {
+  color: #00e65c !important;
+}
+
+.theme-cyber .article-content strong {
+  color: #50fa7b !important;
+  text-shadow: 0 0 8px rgba(80, 250, 123, 0.4);
+}
+
+.theme-cyber .article-content a {
+  color: #50fa7b !important;
+  text-decoration: underline !important;
+  text-decoration-color: #00ff66 !important;
+  text-underline-offset: 3px;
+  text-shadow: 0 0 8px rgba(0, 255, 102, 0.45);
+}
+
+.theme-cyber .article-content a:hover {
+  color: #a3e635 !important;
+  text-shadow: 0 0 12px rgba(163, 230, 53, 0.6);
+}
+
+.theme-cyber .article-content blockquote {
+  border-left: 3px solid #00ff66 !important;
+  background-color: rgba(0, 255, 102, 0.06) !important;
+  color: #33ff85 !important;
+  box-shadow: inset 0 0 20px rgba(0, 255, 102, 0.04);
+}
+
+.theme-cyber .article-content pre,
+.theme-cyber .article-content code {
+  background-color: #020703 !important;
+  color: #00ff66 !important;
+  border: 1px solid rgba(0, 255, 102, 0.45) !important;
+  box-shadow: 0 0 12px rgba(0, 255, 102, 0.12);
+}
+
+/* Buttons in Cyber Matrix */
+.theme-cyber button,
+.theme-cyber [role="button"] {
+  background-color: #061409 !important;
+  color: #00ff66 !important;
+  border: 1px solid rgba(0, 255, 102, 0.4) !important;
+}
+
+.theme-cyber button:hover {
+  background-color: rgba(0, 255, 102, 0.18) !important;
+  border-color: #00ff66 !important;
+  box-shadow: 0 0 14px rgba(0, 255, 102, 0.35);
+}
+
+/* Tags in Cyber Matrix */
+.theme-cyber .badge,
+.theme-cyber [class*="Badge"] {
+  background-color: #05140a !important;
+  color: #00ff66 !important;
+  border: 1px solid rgba(0, 255, 102, 0.45) !important;
+  text-shadow: 0 0 6px rgba(0, 255, 102, 0.3);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
+  *,
+  ::before,
+  ::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
