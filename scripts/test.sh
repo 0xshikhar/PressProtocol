@@ -5,6 +5,8 @@
 
 set -e
 
+export NODE_ENV=test
+
 echo "🧪 PressProtocol Verification Harness"
 echo "====================================="
 echo ""
@@ -109,6 +111,7 @@ run_suite "Self-Sovereign Private Node & Zero-Permission Daemon" "31/31 tests" p
 run_suite "Universal Publishing Rails for Any Website & CMS" "23/23 tests" pnpm --dir core/node exec tsx ../../scripts/test-universal-rails.ts
 run_suite "Open Infrastructure API & Enterprise Gateway" "12/12 tests" pnpm --dir core/node exec tsx ../../scripts/test-enterprise-gateway.ts
 run_suite "Outbound Real-Time Webhook Subscriptions & Event Bus" "17/17 tests" pnpm --dir core/node exec tsx ../../scripts/test-webhook-subscriptions.ts
+run_suite "Tor v3 Cryptographic Onion Routing & Derivation" "25/25 tests" pnpm --filter pressprotocol-web exec tsx ../../scripts/test-tor-v3-crypto.ts
 run_suite "SDK CLI Version Flags" "3/3 tests" pnpm --filter @pressprotocol/sdk exec tsx ../../scripts/test-sdk-cli.ts
 
 

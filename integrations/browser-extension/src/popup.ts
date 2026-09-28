@@ -333,7 +333,7 @@ btnClipNow.addEventListener("click", async () => {
       // Setup Onion URL copy
       const onionUrl =
         data?.mirrors?.tor ||
-        `http://pressprotocol7sovereign4node6federation3mesh7relay5v3.onion/read/${data.cid}`;
+        `http://jcqyihxqjobepnfit2u7qwmo6e4hvhxphujkw7qwx7abugvfjqm3jnqd.onion/read/${data.cid}`;
       btnCopyOnion.onclick = () => {
         navigator.clipboard.writeText(onionUrl);
         btnCopyOnion.textContent = "✓ .onion Copied!";

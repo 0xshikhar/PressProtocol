@@ -8,7 +8,7 @@ IPFS_GATEWAY_URL = "https://ipfs.filebase.io/ipfs"
 CORS_ORIGIN = "*"
 ENVIRONMENT = "production"
 PUBLIC_APP_URL = "https://pressprotocol.com"
-TOR_ONION_GATEWAY = "pressprotocol7sovereign4node6federation3mesh7relay5v3.onion"
+TOR_ONION_GATEWAY = "jcqyihxqjobepnfit2u7qwmo6e4hvhxphujkw7qwx7abugvfjqm3jnqd.onion"
 
 [observability.logs]
 enabled = true

@@ -9,9 +9,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Copy, Check, Share2, ExternalLink, Shield, Info } from "lucide-react";
+import { Copy, Check, Share2, ExternalLink, Shield, ShieldCheck, Info } from "lucide-react";
 import { toast } from "sonner";
-import { copyOnionUrl, openInTorBrowser, isAccessingViaOnion, formatOnionDisplay } from "@/lib/tor-utils";
+import { copyOnionUrl, openInTorBrowser, isAccessingViaOnion, formatOnionDisplay, extractOnionAddress, validateTorV3Address } from "@/lib/tor-utils";
 
 interface TorShareSectionProps {
   onionUrl: string;
@@ -23,6 +23,8 @@ export function TorShareSection({ onionUrl, contentTitle, className }: TorShareS
   const [copied, setCopied] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const isOnionActive = isAccessingViaOnion();
+  const host = extractOnionAddress(onionUrl);
+  const torValidation = validateTorV3Address(host);
 
   const handleCopy = async () => {
     const success = await copyOnionUrl(onionUrl);
@@ -116,6 +118,19 @@ export function TorShareSection({ onionUrl, contentTitle, className }: TorShareS
             )}
           </Button>
         </div>
+
+        {/* Cryptographic Tor v3 Address Checksum */}
+        {torValidation?.isValid && (
+          <div className="flex items-center justify-between text-[11px] font-mono text-muted bg-canvas/60 px-2.5 py-1.5 rounded-[4px] border border-hairline">
+            <span className="flex items-center gap-1.5 text-verified">
+              <ShieldCheck className="h-3.5 w-3.5 text-verified" />
+              <span>Tor v3 address checksum valid</span>
+            </span>
+            <span className="text-[10px] text-secondary">
+              Key: {torValidation.publicKeyHex?.slice(0, 8)}...{torValidation.publicKeyHex?.slice(-6)}
+            </span>
+          </div>
+        )}
 
         {/* Action Buttons */}
         <div className="grid grid-cols-2 gap-2">

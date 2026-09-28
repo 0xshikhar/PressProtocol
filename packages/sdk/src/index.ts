@@ -20,7 +20,11 @@ export {
   hexToBytes,
   isValidHex,
   calculateDeterministicCIDv1,
+  validateTorV3Address,
+  deriveTorV3Address,
+  base32Decode,
   type VerificationResult,
+  type TorV3ValidationResult,
 } from "./crypto.js";
 
 export {

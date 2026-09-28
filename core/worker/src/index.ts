@@ -100,7 +100,7 @@ app.post('/api/content', async (c) => {
 
     const shareUrl = `${appBaseUrl.replace(/\/+$/, '')}/read/${pinResult.cid}`;
     const gatewayMirror = `https://cloudflare-ipfs.com/ipfs/${pinResult.cid}`;
-    const onionHost = c.env.TOR_ONION_GATEWAY || 'pressprotocol7sovereign4node6federation3mesh7relay5v3.onion';
+    const onionHost = c.env.TOR_ONION_GATEWAY || 'jcqyihxqjobepnfit2u7qwmo6e4hvhxphujkw7qwx7abugvfjqm3jnqd.onion';
     const torMirror = onionHost
       ? (onionHost.startsWith('http') ? `${onionHost.replace(/\/+$/, '')}/read/${pinResult.cid}` : `http://${onionHost.replace(/\/+$/, '')}/read/${pinResult.cid}`)
       : '';
@@ -279,7 +279,7 @@ app.get('/api/content/:cid', async (c) => {
           },
           tor: {
             url: (() => {
-              const onionHost = c.env.TOR_ONION_GATEWAY || 'pressprotocol7sovereign4node6federation3mesh7relay5v3.onion';
+              const onionHost = c.env.TOR_ONION_GATEWAY || 'jcqyihxqjobepnfit2u7qwmo6e4hvhxphujkw7qwx7abugvfjqm3jnqd.onion';
               const normalized = onionHost.startsWith('http') ? onionHost : `http://${onionHost}`;
               return `${normalized.replace(/\/+$/, '')}/read/${cid}`;
             })(),
@@ -296,7 +296,7 @@ app.get('/api/content/:cid', async (c) => {
       },
     });
 
-    const onionHost = c.env.TOR_ONION_GATEWAY || 'pressprotocol7sovereign4node6federation3mesh7relay5v3.onion';
+    const onionHost = c.env.TOR_ONION_GATEWAY || 'jcqyihxqjobepnfit2u7qwmo6e4hvhxphujkw7qwx7abugvfjqm3jnqd.onion';
     const normalizedOnion = onionHost.startsWith('http') ? onionHost : `http://${onionHost}`;
     c.header('Onion-Location', `${normalizedOnion.replace(/\/+$/, '')}/read/${cid}`);
     return res;
