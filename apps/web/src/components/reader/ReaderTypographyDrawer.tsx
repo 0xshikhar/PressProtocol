@@ -1,22 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import {
-  AlignJustify,
-  Coffee,
-  Columns,
-  Contrast,
-  Maximize2,
-  Minimize2,
-  Minus,
-  Moon,
-  Plus,
-  RotateCcw,
-  Sun,
-  Terminal,
-  Type,
-} from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import {
   Sheet,
@@ -167,11 +151,10 @@ export function ReaderTypographyDrawer({
               <button
                 type="button"
                 onClick={() => setTheme("dark")}
-                className={`flex items-center gap-2.5 rounded-[6px] border p-2.5 text-left transition-all ${
-                  settings.theme === "dark"
+                className={`flex items-center gap-2.5 rounded-[6px] border p-2.5 text-left transition-all ${settings.theme === "dark"
                     ? "border-focus bg-overlay text-primary"
                     : "bg-surface-raised border-border/60 text-muted hover:border-border hover:text-primary"
-                }`}
+                  }`}
               >
                 <div className="rounded-[4px] bg-background p-1.5">
                   <Moon className="h-3.5 w-3.5 text-secondary" />
@@ -188,11 +171,10 @@ export function ReaderTypographyDrawer({
               <button
                 type="button"
                 onClick={() => setTheme("sepia")}
-                className={`flex items-center gap-2.5 rounded-[6px] border p-2.5 text-left transition-all ${
-                  settings.theme === "sepia"
+                className={`flex items-center gap-2.5 rounded-[6px] border p-2.5 text-left transition-all ${settings.theme === "sepia"
                     ? "border-amber-700 bg-[#f4ece1] text-[#2d2b28]"
                     : "border-amber-900/30 bg-[#fbf7ee] text-[#5c4a38] hover:border-amber-700/50"
-                }`}
+                  }`}
               >
                 <div className="rounded-[4px] bg-amber-200/60 p-1.5">
                   <Coffee className="h-3.5 w-3.5 text-amber-900" />
@@ -207,11 +189,10 @@ export function ReaderTypographyDrawer({
               <button
                 type="button"
                 onClick={() => setTheme("paper")}
-                className={`flex items-center gap-2.5 rounded-[6px] border p-2.5 text-left transition-all ${
-                  settings.theme === "paper"
+                className={`flex items-center gap-2.5 rounded-[6px] border p-2.5 text-left transition-all ${settings.theme === "paper"
                     ? "border-neutral-500 bg-white text-neutral-900 shadow-sm"
                     : "border-neutral-300 bg-neutral-100 text-neutral-800 hover:border-neutral-400"
-                }`}
+                  }`}
               >
                 <div className="rounded-[4px] bg-neutral-200 p-1.5">
                   <Sun className="h-3.5 w-3.5 text-neutral-800" />
@@ -228,11 +209,10 @@ export function ReaderTypographyDrawer({
               <button
                 type="button"
                 onClick={() => setTheme("eink")}
-                className={`flex items-center gap-2.5 rounded-[6px] border p-2.5 text-left transition-all ${
-                  settings.theme === "eink"
+                className={`flex items-center gap-2.5 rounded-[6px] border p-2.5 text-left transition-all ${settings.theme === "eink"
                     ? "border-black bg-white font-bold text-black shadow-sm ring-2 ring-black"
                     : "border-neutral-400 bg-neutral-50 text-neutral-900 hover:border-black"
-                }`}
+                  }`}
                 title="Pure monochrome E-Ink mode: 100% contrast, zero animations, sharp borders"
               >
                 <div className="rounded-[4px] bg-black p-1.5 text-white">
@@ -248,11 +228,10 @@ export function ReaderTypographyDrawer({
               <button
                 type="button"
                 onClick={() => setTheme("cyber")}
-                className={`col-span-2 flex items-center gap-2.5 rounded-[6px] border p-2.5 text-left transition-all ${
-                  settings.theme === "cyber"
+                className={`col-span-2 flex items-center gap-2.5 rounded-[6px] border p-2.5 text-left transition-all ${settings.theme === "cyber"
                     ? "border-[#00FF66] bg-[#00FF66]/15 font-semibold text-[#00FF66] shadow-[0_0_12px_rgba(0,255,102,0.25)]"
                     : "border-[#00FF66]/30 bg-[#061409] text-[#00FF66]/80 hover:border-[#00FF66]/60"
-                }`}
+                  }`}
               >
                 <div className="rounded-[4px] bg-[#00FF66]/20 p-1.5">
                   <Terminal className="h-3.5 w-3.5 text-[#00FF66]" />
@@ -277,12 +256,11 @@ export function ReaderTypographyDrawer({
               <button
                 type="button"
                 onClick={() => setTypeface("charter")}
-                className={`flex flex-col gap-0.5 rounded-[6px] border px-2.5 py-2 text-left transition-all ${
-                  settings.typeface === "charter" ||
-                  settings.typeface === "serif"
+                className={`flex flex-col gap-0.5 rounded-[6px] border px-2.5 py-2 text-left transition-all ${settings.typeface === "charter" ||
+                    settings.typeface === "serif"
                     ? "border-focus bg-overlay font-semibold text-primary"
                     : "bg-surface-raised border-border/60 text-secondary hover:bg-surface hover:text-primary"
-                }`}
+                  }`}
               >
                 <div className="flex w-full items-center justify-between">
                   <span className="font-charter text-sm font-bold">
@@ -301,11 +279,10 @@ export function ReaderTypographyDrawer({
               <button
                 type="button"
                 onClick={() => setTypeface("sans")}
-                className={`flex flex-col gap-0.5 rounded-[6px] border px-2.5 py-2 text-left transition-all ${
-                  settings.typeface === "sans"
+                className={`flex flex-col gap-0.5 rounded-[6px] border px-2.5 py-2 text-left transition-all ${settings.typeface === "sans"
                     ? "border-focus bg-overlay font-semibold text-primary"
                     : "bg-surface-raised border-border/60 text-secondary hover:bg-surface hover:text-primary"
-                }`}
+                  }`}
               >
                 <div className="flex w-full items-center justify-between">
                   <span className="font-sans text-sm font-bold">
@@ -321,11 +298,10 @@ export function ReaderTypographyDrawer({
               <button
                 type="button"
                 onClick={() => setTypeface("editorial")}
-                className={`flex flex-col gap-0.5 rounded-[6px] border px-2.5 py-2 text-left transition-all ${
-                  settings.typeface === "editorial"
+                className={`flex flex-col gap-0.5 rounded-[6px] border px-2.5 py-2 text-left transition-all ${settings.typeface === "editorial"
                     ? "border-focus bg-overlay font-semibold text-primary"
                     : "bg-surface-raised border-border/60 text-secondary hover:bg-surface hover:text-primary"
-                }`}
+                  }`}
               >
                 <div className="flex w-full items-center justify-between">
                   <span className="font-hero text-sm">Display Serif</span>
@@ -339,11 +315,10 @@ export function ReaderTypographyDrawer({
               <button
                 type="button"
                 onClick={() => setTypeface("mono")}
-                className={`flex flex-col gap-0.5 rounded-[6px] border px-2.5 py-2 text-left transition-all ${
-                  settings.typeface === "mono"
+                className={`flex flex-col gap-0.5 rounded-[6px] border px-2.5 py-2 text-left transition-all ${settings.typeface === "mono"
                     ? "border-focus bg-overlay font-semibold text-primary"
                     : "bg-surface-raised border-border/60 text-secondary hover:bg-surface hover:text-primary"
-                }`}
+                  }`}
               >
                 <div className="flex w-full items-center justify-between">
                   <span className="font-mono text-sm font-bold">Code Mono</span>
@@ -357,11 +332,10 @@ export function ReaderTypographyDrawer({
               <button
                 type="button"
                 onClick={() => setTypeface("dyslexic")}
-                className={`col-span-2 flex flex-col gap-0.5 rounded-[6px] border px-2.5 py-2 text-left transition-all ${
-                  settings.typeface === "dyslexic"
+                className={`col-span-2 flex flex-col gap-0.5 rounded-[6px] border px-2.5 py-2 text-left transition-all ${settings.typeface === "dyslexic"
                     ? "border-focus bg-overlay font-semibold text-primary ring-1 ring-amber-500/40"
                     : "bg-surface-raised border-border/60 text-secondary hover:bg-surface hover:text-primary"
-                }`}
+                  }`}
               >
                 <div className="flex w-full items-center justify-between">
                   <span className="font-dyslexic text-sm font-bold text-amber-400">
@@ -393,11 +367,10 @@ export function ReaderTypographyDrawer({
                       key={lh}
                       type="button"
                       onClick={() => setLineHeight(lh)}
-                      className={`rounded-[4px] py-1 font-mono text-[11px] capitalize transition-colors ${
-                        settings.lineHeight === lh
+                      className={`rounded-[4px] py-1 font-mono text-[11px] capitalize transition-colors ${settings.lineHeight === lh
                           ? "bg-overlay font-bold text-primary shadow-sm"
                           : "text-muted hover:text-primary"
-                      }`}
+                        }`}
                     >
                       {lh === "compact"
                         ? "Tight"
@@ -423,11 +396,10 @@ export function ReaderTypographyDrawer({
                       key={cw}
                       type="button"
                       onClick={() => setContentWidth(cw)}
-                      className={`rounded-[4px] py-1 font-mono text-[11px] capitalize transition-colors ${
-                        settings.contentWidth === cw
+                      className={`rounded-[4px] py-1 font-mono text-[11px] capitalize transition-colors ${settings.contentWidth === cw
                           ? "bg-overlay font-bold text-primary shadow-sm"
                           : "text-muted hover:text-primary"
-                      }`}
+                        }`}
                     >
                       {cw === "narrow"
                         ? "Slim"
@@ -485,11 +457,10 @@ export function ReaderTypographyDrawer({
             <button
               type="button"
               onClick={toggleDistractionFree}
-              className={`flex w-full items-center justify-between rounded-[6px] border p-2.5 font-mono text-xs transition-all ${
-                settings.distractionFree
+              className={`flex w-full items-center justify-between rounded-[6px] border p-2.5 font-mono text-xs transition-all ${settings.distractionFree
                   ? "border-accent bg-accent/15 font-semibold text-primary shadow-sm"
                   : "bg-surface-raised border-border/60 text-secondary hover:border-border hover:text-primary"
-              }`}
+                }`}
             >
               <span className="flex items-center gap-2">
                 {settings.distractionFree ? (
