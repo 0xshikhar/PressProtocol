@@ -764,13 +764,9 @@
   vertical-align: middle;
 }
 
-/* Distraction-Free Focus Mode: Hide global navbar, headers, footers */
-html.focus-mode nav,
-html.focus-mode header,
-html.focus-mode footer,
-body.focus-mode nav,
-body.focus-mode header,
-body.focus-mode footer {
+/* Distraction-Free Focus Mode: Hide global site chrome */
+html.focus-mode .global-site-chrome,
+body.focus-mode .global-site-chrome {
   display: none !important;
 }
 

@@ -25,9 +25,24 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet"
-import { Slider } from "@/components/ui/slider"
-
+} from "@/components/ui/sheet";
+import { Slider } from "@/components/ui/slider";
+import {
+  Type,
+  Sun,
+  Moon,
+  Coffee,
+  Terminal,
+  Minus,
+  Plus,
+  RotateCcw,
+  Contrast,
+  Maximize2,
+  Minimize2,
+  AlignJustify,
+  Columns,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 import {
   DEFAULT_READER_SETTINGS,
   useReaderPreferences,
@@ -49,13 +64,15 @@ export type {
 export { useReaderSettings, useReaderPreferences, DEFAULT_READER_SETTINGS }
 
 interface ReaderTypographyDrawerProps {
-  settings: ReaderSettings
-  onSettingsChange: (settings: ReaderSettings) => void
+  settings: ReaderSettings;
+  onSettingsChange: (settings: ReaderSettings) => void;
+  triggerClassName?: string;
 }
 
 export function ReaderTypographyDrawer({
   settings,
   onSettingsChange,
+  triggerClassName,
 }: ReaderTypographyDrawerProps) {
   const [open, setOpen] = useState(false)
 
@@ -97,7 +114,10 @@ export function ReaderTypographyDrawer({
         <Button
           variant="outline"
           size="sm"
-          className="hover:bg-surface-raised h-8 gap-1.5 rounded-[6px] border-border/70 bg-surface font-mono text-xs shadow-sm transition-all"
+          className={cn(
+            "h-8 gap-1.5 text-xs font-mono border-border/70 bg-surface hover:bg-surface-raised rounded-[6px] shadow-sm transition-all",
+            triggerClassName
+          )}
           title="Reader Typography, Themes & Accessibility (The 'Aa' Drawer)"
         >
           <Type className="h-3.5 w-3.5 text-secondary" />

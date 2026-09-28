@@ -27,6 +27,47 @@ export const DEFAULT_READER_SETTINGS: ReaderSettings = {
 
 const STORAGE_KEY = "pressprotocol_reader_prefs_v3";
 
+const VALID_TYPEFACES = new Set<string>(["charter", "sans", "editorial", "mono", "dyslexic", "serif"]);
+const VALID_THEMES = new Set<string>(["dark", "sepia", "paper", "cyber", "eink"]);
+const VALID_LINE_HEIGHTS = new Set<string>(["compact", "normal", "loose"]);
+const VALID_CONTENT_WIDTHS = new Set<string>(["narrow", "normal", "wide"]);
+
+function sanitizeReaderSettings(parsed: unknown): Partial<ReaderSettings> {
+  if (!parsed || typeof parsed !== "object") return {};
+
+  const clean: Partial<ReaderSettings> = {};
+  const data = parsed as Record<string, unknown>;
+
+  // Validate fontSize: must be finite number, clamped between 15 and 26
+  if (typeof data.fontSize === "number" && Number.isFinite(data.fontSize)) {
+    clean.fontSize = Math.min(26, Math.max(15, Math.round(data.fontSize)));
+  }
+
+  // Validate typeface: legacy 'serif' maps to 'charter'
+  if (data.typeface === "serif") {
+    clean.typeface = "charter";
+  } else if (typeof data.typeface === "string" && VALID_TYPEFACES.has(data.typeface)) {
+    clean.typeface = data.typeface as ReaderTypeface;
+  }
+
+  // Validate theme
+  if (typeof data.theme === "string" && VALID_THEMES.has(data.theme)) {
+    clean.theme = data.theme as ReaderTheme;
+  }
+
+  // Validate lineHeight
+  if (typeof data.lineHeight === "string" && VALID_LINE_HEIGHTS.has(data.lineHeight)) {
+    clean.lineHeight = data.lineHeight as ReaderLineHeight;
+  }
+
+  // Validate contentWidth
+  if (typeof data.contentWidth === "string" && VALID_CONTENT_WIDTHS.has(data.contentWidth)) {
+    clean.contentWidth = data.contentWidth as ReaderContentWidth;
+  }
+
+  return clean;
+}
+
 interface ReaderPreferencesContextType {
   settings: ReaderSettings;
   updateSettings: (newSettings: Partial<ReaderSettings> | ((prev: ReaderSettings) => ReaderSettings)) => void;
@@ -36,11 +77,12 @@ interface ReaderPreferencesContextType {
 
 const ReaderPreferencesContext = createContext<ReaderPreferencesContextType | undefined>(undefined);
 
-export function useStandaloneReaderSettings() {
+export function useStandaloneReaderSettings(enabled: boolean = true) {
   const [settings, setSettings] = useState<ReaderSettings>(DEFAULT_READER_SETTINGS);
 
   // Initialize from localStorage
   useEffect(() => {
+    if (!enabled) return;
     try {
       if (typeof window === "undefined") return;
       const saved =
@@ -50,13 +92,11 @@ export function useStandaloneReaderSettings() {
 
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed.typeface === "serif") {
-          parsed.typeface = "charter";
-        }
+        const sanitized = sanitizeReaderSettings(parsed);
         setSettings((prev) => ({
           ...DEFAULT_READER_SETTINGS,
           ...prev,
-          ...parsed,
+          ...sanitized,
           // Always launch with distractionFree false on initial page load
           distractionFree: false,
         }));
@@ -64,7 +104,7 @@ export function useStandaloneReaderSettings() {
     } catch {
       // Gracefully fall back to defaults
     }
-  }, []);
+  }, [enabled]);
 
   const updateSettings = useCallback(
     (newSettings: Partial<ReaderSettings> | ((prev: ReaderSettings) => ReaderSettings)) => {
@@ -102,6 +142,7 @@ export function useStandaloneReaderSettings() {
 
   // Listen for Escape key to exit distraction-free mode
   useEffect(() => {
+    if (!enabled) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setSettings((prev) => (prev.distractionFree ? { ...prev, distractionFree: false } : prev));
@@ -109,7 +150,7 @@ export function useStandaloneReaderSettings() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [enabled]);
 
   return {
     settings,
@@ -137,7 +178,7 @@ export function useReaderPreferences() {
 // Backwards-compatible hook signature matching existing code - works standalone or with Provider
 export function useReaderSettings() {
   const context = useContext(ReaderPreferencesContext);
-  const standalone = useStandaloneReaderSettings();
+  const standalone = useStandaloneReaderSettings(!context);
   
   if (context) {
     return {
