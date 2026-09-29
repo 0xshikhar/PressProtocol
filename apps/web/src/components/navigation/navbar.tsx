@@ -144,7 +144,7 @@ const Navbar = () => {
 
   // 2. Protocol Header Cluster (Public Goods & Support placed FIRST)
   const protocolLinks = [
-    { href: "/support", label: "Support Our Mission ♥", icon: Heart, desc: "100% solo-built public good - support sovereign infrastructure" },
+    { href: "/support", label: "Support Our Mission ♥", icon: Heart, desc: "Independent public good — support open sovereign infrastructure" },
     { href: "/about", label: "Public Goods Manifesto", icon: Heart, desc: "Our mission, architecture, and public good charter" },
     { href: "/explorer", label: "Network Explorer", icon: Globe, desc: "Live DHT peers, swarm health, real-time ledger" },
     { href: "/privacy", label: "Threat Model", icon: Shield, desc: "Formal security guarantees, attack-by-attack" },

@@ -17,6 +17,11 @@ const publishContentSchema = z.object({
   publicKey: z.string().optional(), // Optional - client-provided Ed25519 public key
   signature: z.string().optional(), // Optional - client-provided Ed25519 signature
   timestamp: z.string().optional(), // Optional - client-signed timestamp
+  author: z.string().optional(),
+  sourceUrl: z.string().optional(),
+  excerpt: z.string().optional(),
+  readingTime: z.number().optional(),
+  wordCount: z.number().optional(),
 });
 
 const getContentQuerySchema = z.object({
@@ -107,13 +112,23 @@ export async function contentRoutes(fastify: FastifyInstance) {
           : 'unsigned';
       }
 
-      // 3. Upload FULL content to IPFS (source of truth) with synchronized timestamp
+      // Metadata passed through from client (e.g. browser extension)
+      const publicationMetadata = {
+        author: body.author,
+        sourceUrl: body.sourceUrl,
+        excerpt: body.excerpt,
+        readingTime: body.readingTime,
+        wordCount: body.wordCount,
+      };
+
+      // 3. Upload FULL content to IPFS (source of truth) with synchronized timestamp and metadata
       const ipfsResult = await storageService.uploadContent(
         body.title,
         body.content,
         body.tags,
         { pubkey: publicKey, signature },
-        publishedTimestamp
+        publishedTimestamp,
+        publicationMetadata
       );
 
       // 4. Create Tor onion service
@@ -160,7 +175,7 @@ export async function contentRoutes(fastify: FastifyInstance) {
       console.log('✅ [PUBLISH] Mirrors created successfully');
 
       // 7. Announce to IPFS DHT for decentralized discovery (Phase 2B)
-      // Creates manifest with excerpt, word count, reading time
+      // Creates manifest with excerpt, word count, reading time and client metadata
       const dhtResult = await discoveryService.announceContent(
         ipfsResult.cid,
         body.title,
@@ -171,7 +186,8 @@ export async function contentRoutes(fastify: FastifyInstance) {
           ipfs: ipfsResult.gatewayUrl,
           tor: onionResult.onionUrl,
           gateway: webGatewayUrl,
-        }
+        },
+        publicationMetadata
       );
 
       // 8. Get mirrors for response

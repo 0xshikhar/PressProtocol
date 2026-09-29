@@ -32,6 +32,8 @@ export interface ContentManifest {
     tor?: string;
     gateway?: string;
   };
+  author?: string;
+  sourceUrl?: string;
   wordCount?: number;
   readingTime?: number;
 }
