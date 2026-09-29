@@ -21,6 +21,17 @@ let activeTabTitle: string = "";
 let currentIdentity: BurnerIdentity | null = null;
 let currentSettings: ExtensionSettings = { ...DEFAULT_SETTINGS };
 let preloadedArticle: ClippedArticle | null = null;
+let lastPublishedCid: string = "";
+
+function toSafeHttpUrl(urlStr: string, fallback: string): string {
+  try {
+    const parsed = new URL(urlStr);
+    if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+      return parsed.toString();
+    }
+  } catch {}
+  return fallback;
+}
 
 // Header DOM Elements
 const headerPseudonym = document.getElementById("headerPseudonym")!;
@@ -47,7 +58,7 @@ const stepBroadcast = document.getElementById("stepBroadcast")!;
 
 const publishedCid = document.getElementById("publishedCid")!;
 const btnCopyCid = document.getElementById("btnCopyCid") as HTMLButtonElement;
-const btnOpenReader = document.getElementById("btnOpenReader") as HTMLAnchorElement;
+const btnOpenReader = document.getElementById("btnOpenReader") as HTMLButtonElement;
 const btnCopyOnion = document.getElementById("btnCopyOnion") as HTMLButtonElement;
 const btnCopyEmbedCode = document.getElementById("btnCopyEmbedCode") as HTMLButtonElement;
 
@@ -266,17 +277,24 @@ btnClipNow.addEventListener("click", async () => {
       clipSuccessCard.classList.remove("hidden");
       btnClipNow.disabled = false;
 
+      lastPublishedCid = data.cid;
       publishedCid.textContent = data.cid;
-      const readUrl = `${currentSettings.webAppUrl}/read/${data.cid}`;
-      btnOpenReader.href = readUrl;
+
+      const cleanCid = encodeURIComponent(String(data.cid || "").trim());
+      const baseWebUrl = toSafeHttpUrl(currentSettings.webAppUrl, DEFAULT_SETTINGS.webAppUrl).replace(/\/+$/, "");
+      const safeReadUrl = `${baseWebUrl}/read/${cleanCid}`;
+
+      btnOpenReader.onclick = () => {
+        chrome.tabs.create({ url: safeReadUrl });
+      };
 
       // Copy permalink to clipboard
-      navigator.clipboard.writeText(readUrl).catch(() => {});
+      navigator.clipboard.writeText(safeReadUrl).catch(() => {});
 
       // Setup Onion URL copy
       const onionUrl =
         data?.mirrors?.tor ||
-        `http://${CANONICAL_ONION_HOST}/read/${data.cid}`;
+        `http://${CANONICAL_ONION_HOST}/read/${cleanCid}`;
 
       btnCopyOnion.onclick = () => {
         navigator.clipboard.writeText(onionUrl);
@@ -288,7 +306,7 @@ btnClipNow.addEventListener("click", async () => {
       };
 
       // Setup embed code (clean editorial embed without legacy theme param)
-      const embedCode = `<iframe src="${currentSettings.webAppUrl}/embed/${data.cid}" width="100%" height="600" frameborder="0" loading="lazy" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>`;
+      const embedCode = `<iframe src="${baseWebUrl}/embed/${cleanCid}" width="100%" height="600" frameborder="0" loading="lazy" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>`;
       btnCopyEmbedCode.onclick = () => {
         navigator.clipboard.writeText(embedCode);
         const originalHtml = btnCopyEmbedCode.innerHTML;
@@ -310,7 +328,7 @@ btnClipNow.addEventListener("click", async () => {
  * Copy CID Button with Checkmark Feedback
  */
 btnCopyCid.addEventListener("click", () => {
-  const cid = publishedCid.textContent || "";
+  const cid = lastPublishedCid || publishedCid.textContent || "";
   navigator.clipboard.writeText(cid);
   const origHtml = btnCopyCid.innerHTML;
   btnCopyCid.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;

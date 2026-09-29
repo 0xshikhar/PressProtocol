@@ -37,7 +37,7 @@ export function SupportPrompt() {
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2 text-accent-ribbon font-mono text-xs font-semibold">
             <Heart className="h-4 w-4 fill-accent-ribbon text-accent-ribbon" />
-            <span>100% Solo-Built Public Good</span>
+            <span>Independent Public Good</span>
           </div>
           <button
             onClick={handleDismiss}
@@ -49,7 +49,7 @@ export function SupportPrompt() {
         </div>
 
         <p className="text-xs text-secondary mt-2 leading-relaxed font-sans">
-          PressProtocol is self-funded and built by an independent solo developer. 100% of all contributions fund our Tor relays, IPFS nodes, and open-source infrastructure.
+          PressProtocol is an independent public good with zero venture capture or surveillance. 100% of all contributions fund our Tor relays, IPFS nodes, and open-source infrastructure.
         </p>
 
         <div className="flex flex-wrap items-center gap-2 mt-3.5 pt-2 border-t border-hairline">

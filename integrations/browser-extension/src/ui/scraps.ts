@@ -49,8 +49,15 @@ export async function renderScrapsList(
   container.innerHTML = scraps
     .map((scrap) => {
       let hostname = "";
+      let safeUrl = "#";
       try {
-        hostname = new URL(scrap.url).hostname.replace("www.", "");
+        const parsed = new URL(scrap.url);
+        if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+          safeUrl = parsed.toString();
+          hostname = parsed.hostname.replace("www.", "");
+        } else {
+          hostname = "external-source";
+        }
       } catch {
         hostname = "external-source";
       }
@@ -59,13 +66,13 @@ export async function renderScrapsList(
         <div class="scrap-card" data-id="${scrap.id}">
           <div class="scrap-quote">"${escapeHtml(scrap.quote)}"</div>
           <div class="scrap-meta">
-            <a href="${scrap.url}" target="_blank" class="scrap-source text-truncate mono" title="${escapeHtml(scrap.pageTitle)}">
+            <a href="${escapeAttr(safeUrl)}" target="_blank" rel="noopener noreferrer" class="scrap-source text-truncate mono" title="${escapeHtml(scrap.pageTitle)}">
               ${escapeHtml(hostname)}
             </a>
             <span class="mono">${formatTimeAgo(scrap.timestamp)}</span>
           </div>
           <div class="scrap-actions">
-            <button class="btn-scrap-action btn-copy-scrap" data-quote="${escapeAttr(scrap.quote)}" data-title="${escapeAttr(scrap.pageTitle)}" data-url="${escapeAttr(scrap.url)}">
+            <button class="btn-scrap-action btn-copy-scrap" data-quote="${escapeAttr(scrap.quote)}" data-title="${escapeAttr(scrap.pageTitle)}" data-url="${escapeAttr(safeUrl)}">
               Copy Markdown
             </button>
             <button class="btn-scrap-action btn-delete-scrap" data-id="${scrap.id}">
