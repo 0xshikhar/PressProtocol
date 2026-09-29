@@ -255,7 +255,7 @@ app.get('/api/content/:cid', async (c) => {
   try {
     const { raw, gateway } = await raceIPFSGateways(cid, c.env.IPFS_GATEWAY_URL, c.env.PINATA_JWT);
 
-    return c.json({
+    const res = c.json({
       success: true,
       data: {
         cid,

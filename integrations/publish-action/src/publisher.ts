@@ -203,10 +203,15 @@ export function transpileMarkdown(markdown: string): { html: string; wordCount: 
   }
 
   const rawHtml = htmlParts.join("\n");
-  const sanitized = rawHtml
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-    .replace(/\s*on\w+\s*=\s*(?:"[^"]*"|'[^']*'|&quot;.*?&quot;|[^\s>]+)/gi, "")
-    .replace(/\b(onload|onclick|onerror|onmouseover|onfocus)\b\s*=\s*(?:"[^"]*"|'[^']*'|&quot;.*?&quot;|[^\s>]+)/gi, "");
+  let sanitized = rawHtml;
+  let previous = "";
+  while (sanitized !== previous) {
+    previous = sanitized;
+    sanitized = sanitized
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+      .replace(/\s*on\w+\s*=\s*(?:"[^"]*"|'[^']*'|&quot;.*?&quot;|[^\s>]+)/gi, "")
+      .replace(/\b(onload|onclick|onerror|onmouseover|onfocus)\b\s*=\s*(?:"[^"]*"|'[^']*'|&quot;.*?&quot;|[^\s>]+)/gi, "");
+  }
 
   const words = markdown.trim().split(/\s+/).filter(Boolean).length;
   const readingTimeMinutes = Math.max(1, Math.ceil(words / 200));
