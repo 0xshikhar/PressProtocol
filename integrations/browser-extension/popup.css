@@ -1023,7 +1023,13 @@ body {
 }
 
 .form-input:focus {
-  border-color: var(--border-focus);
+  border-color: var(--accent-ribbon);
+}
+
+.form-input:focus-visible {
+  outline: 2px solid var(--accent-ribbon);
+  outline-offset: 2px;
+  border-color: var(--accent-ribbon);
 }
 
 .save-toast {
