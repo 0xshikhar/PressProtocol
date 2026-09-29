@@ -37,7 +37,21 @@ export function calculateDeterministicCIDv1(content: string | Uint8Array): strin
   cidBytes[1] = 0x55; // multicodec: raw
   cidBytes[2] = 0x12; // multihash: sha2-256
   cidBytes[3] = 0x20; // digest length: 32 bytes
-  cidBytes.set(digest, 4);
-
   return 'b' + base32Encode(cidBytes);
+}
+
+/**
+ * Strictly validates an IPFS CID format (v0 Base58 or v1 Base32 multibase).
+ * Blocks directory traversal, protocol injection, query params, and non-alphanumeric chars.
+ */
+export function isValidCID(cid: unknown): cid is string {
+  if (!cid || typeof cid !== 'string') return false;
+  return /^(Qm[1-9A-HJ-NP-Za-km-z]{44}|baf[0-9a-z]{40,120}|[a-zA-Z0-9]{40,128})$/.test(cid.trim());
+}
+
+export function assertValidCID(cid: unknown): string {
+  if (!isValidCID(cid)) {
+    throw new Error(`Invalid IPFS CID format: '${cid}'`);
+  }
+  return cid.trim();
 }

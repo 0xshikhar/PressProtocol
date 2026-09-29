@@ -3,6 +3,14 @@ import { storageService } from './StorageService.js';
 import { torService } from './TorService.js';
 import { calculateDeterministicCIDv1 } from '../lib/cid.js';
 
+function stripHtmlTags(input: string): string {
+  let text = input;
+  while (/<[^>]*>/.test(text)) {
+    text = text.replace(/<[^>]*>/g, '');
+  }
+  return text.trim();
+}
+
 export interface MediumIngestInput {
   url?: string;
   title?: string;
@@ -136,7 +144,7 @@ export class SovereignMirrorService {
     if (!title) {
       const h1Match = input.content.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
       if (h1Match) {
-        title = h1Match[1].replace(/<[^>]+>/g, '').trim();
+        title = stripHtmlTags(h1Match[1]);
       } else {
         title = 'Medium Sovereign Archive';
       }
@@ -221,7 +229,7 @@ export class SovereignMirrorService {
     let title = input.title;
     if (!title) {
       const h1Match = input.content.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
-      title = h1Match ? h1Match[1].replace(/<[^>]+>/g, '').trim() : 'Substack Sovereign Archive';
+      title = h1Match ? stripHtmlTags(h1Match[1]) : 'Substack Sovereign Archive';
     }
 
     const tags = input.tags && input.tags.length > 0 ? input.tags : ['substack-mirror', 'sovereign'];

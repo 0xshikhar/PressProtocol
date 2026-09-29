@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { env } from '../config/env.js';
-import { calculateDeterministicCIDv1 } from '../lib/cid.js';
+import { calculateDeterministicCIDv1, isValidCID, assertValidCID } from '../lib/cid.js';
 
 export interface PinataUploadResult {
   IpfsHash: string;
@@ -159,15 +159,17 @@ export class StorageService {
    * Database is just a cache - always fetch from IPFS for authoritative content
    */
   async getContentFromIPFS(cid: string): Promise<ContentData> {
+    const safeCid = assertValidCID(cid);
+
     // 1. Check local disk cache first (sub-millisecond instant hit)
     try {
       const cacheDir = path.resolve(process.env.DATA_DIR || process.cwd(), '.data/content-cache');
-      const cacheFile = path.join(cacheDir, `${cid}.json`);
+      const cacheFile = path.join(cacheDir, `${safeCid}.json`);
       if (fs.existsSync(cacheFile)) {
         const raw = fs.readFileSync(cacheFile, 'utf-8');
         const parsed = JSON.parse(raw);
         if (parsed && (parsed.content || parsed.title)) {
-          console.log(`⚡ [CACHE HIT] Loaded content locally: ${cid}`);
+          console.log(`⚡ [CACHE HIT] Loaded content locally: ${safeCid}`);
           return parsed;
         }
       }
@@ -192,7 +194,7 @@ export class StorageService {
     const timeoutId = setTimeout(() => controller.abort(), 9000);
 
     const fetchPromises = gateways.map(async (gw) => {
-      let targetUrl = `${gw}/${cid}`;
+      let targetUrl = `${gw}/${safeCid}`;
       const headers: Record<string, string> = {
         Accept: 'application/json, text/html, text/plain, */*',
         'User-Agent': 'PressProtocol-Node/1.0.0 (+https://pressprotocol.com)',
@@ -293,7 +295,9 @@ export class StorageService {
    */
   async getContent(cid: string): Promise<any> {
     try {
-      const response = await fetch(`${this.gatewayUrl}/${cid}`);
+      const safeCid = assertValidCID(cid);
+      const gw = (this.gatewayUrl || 'https://ipfs.io/ipfs').replace(/\/+$/, '');
+      const response = await fetch(`${gw}/${safeCid}`);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch content from IPFS: ${response.status}`);
@@ -311,8 +315,12 @@ export class StorageService {
    */
   async isPinned(cid: string): Promise<boolean> {
     try {
+      if (!isValidCID(cid)) {
+        return false;
+      }
+      const safeCid = encodeURIComponent(cid.trim());
       const response = await fetch(
-        `https://api.pinata.cloud/data/pinList?hashContains=${cid}`,
+        `https://api.pinata.cloud/data/pinList?hashContains=${safeCid}`,
         {
           headers: {
             'pinata_api_key': this.pinataApiKey,
