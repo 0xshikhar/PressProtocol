@@ -24,6 +24,11 @@ export interface ContentData {
     pubkey: string;
     signature: string;
   };
+  author?: string;
+  sourceUrl?: string;
+  excerpt?: string;
+  readingTime?: number;
+  wordCount?: number;
 }
 
 export class StorageService {
@@ -49,7 +54,14 @@ export class StorageService {
     content: string,
     tags: string[],
     publisher?: { pubkey: string; signature: string },
-    timestamp?: string
+    timestamp?: string,
+    metadata?: {
+      author?: string;
+      sourceUrl?: string;
+      excerpt?: string;
+      readingTime?: number;
+      wordCount?: number;
+    }
   ): Promise<UploadContentResult> {
     try {
       // Create a JSON object with the FULL content
@@ -60,6 +72,11 @@ export class StorageService {
         tags,
         timestamp: timestamp || new Date().toISOString(),
         publisher,
+        ...(metadata?.author ? { author: metadata.author } : {}),
+        ...(metadata?.sourceUrl ? { sourceUrl: metadata.sourceUrl } : {}),
+        ...(metadata?.excerpt ? { excerpt: metadata.excerpt } : {}),
+        ...(metadata?.readingTime !== undefined ? { readingTime: metadata.readingTime } : {}),
+        ...(metadata?.wordCount !== undefined ? { wordCount: metadata.wordCount } : {}),
       };
 
       // If no Pinata credentials configured (Pure Sovereign / CI / Offline Mode), store directly in local blockstore

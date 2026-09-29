@@ -18,7 +18,7 @@ export interface ContentManifest {
   cid: string; // Content CID
   manifestCid?: string; // Self-reference
   title: string;
-  excerpt: string; // First 200 chars
+  excerpt: string; // First 200 chars or supplied excerpt
   tags: string[];
   timestamp: number;
   publisher: {
@@ -30,6 +30,8 @@ export interface ContentManifest {
     tor?: string;
     gateway?: string;
   };
+  author?: string;
+  sourceUrl?: string;
   wordCount?: number;
   readingTime?: number; // minutes
 }
@@ -82,27 +84,36 @@ export class IPFSDHTService {
     content: string,
     tags: string[],
     publisher: { pubkey: string; signature: string },
-    mirrors: { ipfs: string; tor?: string; gateway?: string }
+    mirrors: { ipfs: string; tor?: string; gateway?: string },
+    metadata?: {
+      author?: string;
+      sourceUrl?: string;
+      excerpt?: string;
+      readingTime?: number;
+      wordCount?: number;
+    }
   ): Promise<ContentManifest> {
     // Create excerpt (first 200 chars of text content)
     const textContent = content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-    const excerpt = textContent.substring(0, 200) + (textContent.length > 200 ? '...' : '');
+    const derivedExcerpt = textContent.substring(0, 200) + (textContent.length > 200 ? '...' : '');
     
     // Calculate reading stats
-    const wordCount = textContent.split(/\s+/).length;
-    const readingTime = Math.ceil(wordCount / 200); // 200 WPM
+    const derivedWordCount = textContent.split(/\s+/).filter(Boolean).length;
+    const derivedReadingTime = Math.ceil(derivedWordCount / 200); // 200 WPM
 
     const manifest: ContentManifest = {
       version: '1.0',
       cid: contentCid,
       title,
-      excerpt,
+      excerpt: metadata?.excerpt || derivedExcerpt,
       tags,
       timestamp: Date.now(),
       publisher,
       mirrors,
-      wordCount,
-      readingTime,
+      ...(metadata?.author ? { author: metadata.author } : {}),
+      ...(metadata?.sourceUrl ? { sourceUrl: metadata.sourceUrl } : {}),
+      wordCount: metadata?.wordCount !== undefined ? metadata.wordCount : derivedWordCount,
+      readingTime: metadata?.readingTime !== undefined ? metadata.readingTime : derivedReadingTime,
     };
 
     return manifest;

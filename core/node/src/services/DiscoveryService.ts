@@ -257,7 +257,14 @@ export class DiscoveryService {
     content: string,
     tags: string[],
     publisher: { pubkey: string; signature: string },
-    mirrors: { ipfs: string; tor?: string; gateway?: string }
+    mirrors: { ipfs: string; tor?: string; gateway?: string },
+    metadata?: {
+      author?: string;
+      sourceUrl?: string;
+      excerpt?: string;
+      readingTime?: number;
+      wordCount?: number;
+    }
   ): Promise<{ dhtAnnounced: boolean; manifestCid?: string }> {
     try {
       // Initialize DHT service if not already done
@@ -272,7 +279,8 @@ export class DiscoveryService {
         content,
         tags,
         publisher,
-        mirrors
+        mirrors,
+        metadata
       );
 
       // Announce to DHT (uploads manifest to IPFS)
