@@ -3,40 +3,21 @@
  * Manages context menus, passage clipping, burner signing, and gateway broadcasting.
  */
 import { getOrCreateBurnerIdentity, signPayload } from "./crypto";
-import type { ClippedArticle } from "./clipper";
-
-export interface SovereignScrap {
-  id: string;
-  quote: string;
-  url: string;
-  pageTitle: string;
-  timestamp: number;
-}
-
-export interface ExtensionSettings {
-  apiUrl: string;
-  webAppUrl: string;
-  autoCopyPermalink: boolean;
-  signWithBurnerKey: boolean;
-}
-
-const DEFAULT_SETTINGS: ExtensionSettings = {
-  apiUrl: "https://api.pressprotocol.com",
-  webAppUrl: "https://pressprotocol.com",
-  autoCopyPermalink: true,
-  signWithBurnerKey: true,
-};
-
-const SCRAPS_KEY = "pressprotocol_scraps";
-const SETTINGS_KEY = "pressprotocol_settings";
+import type { ClippedArticle, SovereignScrap, ExtensionSettings } from "./types";
+import {
+  DEFAULT_SETTINGS,
+  SCRAPS_STORAGE_KEY,
+  SETTINGS_STORAGE_KEY,
+  CANDIDATE_API_ENDPOINTS,
+} from "./config";
 
 /**
  * Retrieves configuration settings with sensible defaults.
  */
 async function getSettings(): Promise<ExtensionSettings> {
   return new Promise((resolve) => {
-    chrome.storage.local.get([SETTINGS_KEY], (res) => {
-      resolve({ ...DEFAULT_SETTINGS, ...(res[SETTINGS_KEY] || {}) });
+    chrome.storage.local.get([SETTINGS_STORAGE_KEY], (res) => {
+      resolve({ ...DEFAULT_SETTINGS, ...(res[SETTINGS_STORAGE_KEY] || {}) });
     });
   });
 }
@@ -46,8 +27,8 @@ async function getSettings(): Promise<ExtensionSettings> {
  */
 async function getScraps(): Promise<SovereignScrap[]> {
   return new Promise((resolve) => {
-    chrome.storage.local.get([SCRAPS_KEY], (res) => {
-      resolve(res[SCRAPS_KEY] || []);
+    chrome.storage.local.get([SCRAPS_STORAGE_KEY], (res) => {
+      resolve(res[SCRAPS_STORAGE_KEY] || []);
     });
   });
 }
@@ -59,7 +40,7 @@ async function saveScrap(scrap: SovereignScrap): Promise<void> {
   const current = await getScraps();
   const updated = [scrap, ...current.filter((s) => s.id !== scrap.id)].slice(0, 100);
   await new Promise<void>((resolve) => {
-    chrome.storage.local.set({ [SCRAPS_KEY]: updated }, () => resolve());
+    chrome.storage.local.set({ [SCRAPS_STORAGE_KEY]: updated }, () => resolve());
   });
 }
 
@@ -70,7 +51,7 @@ async function deleteScrap(id: string): Promise<void> {
   const current = await getScraps();
   const updated = current.filter((s) => s.id !== id);
   await new Promise<void>((resolve) => {
-    chrome.storage.local.set({ [SCRAPS_KEY]: updated }, () => resolve());
+    chrome.storage.local.set({ [SCRAPS_STORAGE_KEY]: updated }, () => resolve());
   });
 }
 
@@ -79,7 +60,7 @@ async function deleteScrap(id: string): Promise<void> {
  */
 async function clearScraps(): Promise<void> {
   await new Promise<void>((resolve) => {
-    chrome.storage.local.set({ [SCRAPS_KEY]: [] }, () => resolve());
+    chrome.storage.local.set({ [SCRAPS_STORAGE_KEY]: [] }, () => resolve());
   });
 }
 
@@ -90,9 +71,9 @@ chrome.runtime.onInstalled.addListener(async () => {
   console.log("PressProtocol Sovereign Web Clipper active.");
 
   // Initialize default settings if not set
-  chrome.storage.local.get([SETTINGS_KEY], (res) => {
-    if (!res[SETTINGS_KEY]) {
-      chrome.storage.local.set({ [SETTINGS_KEY]: DEFAULT_SETTINGS });
+  chrome.storage.local.get([SETTINGS_STORAGE_KEY], (res) => {
+    if (!res[SETTINGS_STORAGE_KEY]) {
+      chrome.storage.local.set({ [SETTINGS_STORAGE_KEY]: DEFAULT_SETTINGS });
     }
   });
 
@@ -147,9 +128,9 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
     await saveScrap(scrap);
 
-    // Visual feedback: green badge on extension icon
+    // Visual feedback: Press Burgundy badge on extension icon
     chrome.action.setBadgeText({ text: "✓" });
-    chrome.action.setBadgeBackgroundColor({ color: "#10b981" });
+    chrome.action.setBadgeBackgroundColor({ color: "#7C2733" });
     setTimeout(() => {
       chrome.action.setBadgeText({ text: "" });
     }, 2200);
@@ -203,7 +184,7 @@ async function publishArticle(article: ClippedArticle): Promise<any> {
 
   const { signature } = await signPayload(signable, identity.privateKey);
 
-  // Payload for backend /api/content
+  // Payload for backend /api/content with full provenance metadata
   const body = {
     title: article.title,
     content: article.contentHtml,
@@ -211,16 +192,17 @@ async function publishArticle(article: ClippedArticle): Promise<any> {
     publicKey: identity.publicKey,
     signature,
     timestamp,
+    author: article.author || identity.pseudonym,
+    sourceUrl: article.canonicalUrl,
+    excerpt: article.excerpt,
+    readingTime: article.readingTimeMinutes,
+    wordCount: article.wordCount,
   };
 
   const candidateEndpoints = [
     settings.apiUrl,
-    "https://api.pressprotocol.com",
-    "https://pressprotocol-api.newsofficework.workers.dev",
-    "https://pressprotocol.com",
     settings.webAppUrl,
-    "http://localhost:3000",
-    "http://localhost:4000",
+    ...CANDIDATE_API_ENDPOINTS,
   ].filter(Boolean);
 
   const uniqueEndpoints = Array.from(new Set(candidateEndpoints));
@@ -278,7 +260,7 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
 
       case "saveSettings":
         await new Promise<void>((resolve) => {
-          chrome.storage.local.set({ [SETTINGS_KEY]: request.settings }, () => resolve());
+          chrome.storage.local.set({ [SETTINGS_STORAGE_KEY]: request.settings }, () => resolve());
         });
         return { success: true };
 

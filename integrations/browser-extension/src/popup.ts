@@ -2,29 +2,28 @@
  * PressProtocol Sovereign Web Clipper - Interactive Popup Controller
  * Manages 1-click sovereign archival, scrap vault, and transport health telemetry.
  */
-import { extractPageContent, type ClippedArticle } from "./clipper";
+import { extractPageContent } from "./clipper";
 import {
   getOrCreateBurnerIdentity,
   burnCurrentIdentity,
   type BurnerIdentity,
 } from "./crypto";
-import type { SovereignScrap, ExtensionSettings } from "./background";
+import type { ClippedArticle, SovereignScrap, ExtensionSettings } from "./types";
+import { DEFAULT_SETTINGS, CANONICAL_ONION_HOST } from "./config";
+import { initTabs } from "./ui/tabs";
+import { renderScrapsList } from "./ui/scraps";
+import { displayReaderDiagnostics } from "./ui/diagnostics";
+import { updatePipelineStep } from "./ui/pipeline";
 
 let activeTabId: number | null = null;
 let activeTabUrl: string = "";
 let activeTabTitle: string = "";
 let currentIdentity: BurnerIdentity | null = null;
-let currentSettings: ExtensionSettings = {
-  apiUrl: "https://api.pressprotocol.com",
-  webAppUrl: "https://pressprotocol.com",
-  autoCopyPermalink: true,
-  signWithBurnerKey: true,
-};
+let currentSettings: ExtensionSettings = { ...DEFAULT_SETTINGS };
+let preloadedArticle: ClippedArticle | null = null;
 
-// DOM Elements
+// Header DOM Elements
 const headerPseudonym = document.getElementById("headerPseudonym")!;
-const tabButtons = document.querySelectorAll<HTMLButtonElement>(".tab-btn");
-const tabPanes = document.querySelectorAll<HTMLElement>(".tab-pane");
 
 // Tab 1 Elements
 const readerBanner = document.getElementById("readerBanner")!;
@@ -71,50 +70,19 @@ const btnSaveSettings = document.getElementById("btnSaveSettings") as HTMLButton
 const settingsSavedToast = document.getElementById("settingsSavedToast")!;
 
 /**
- * Format relative time
- */
-function timeAgo(timestamp: number): string {
-  const diff = Math.floor((Date.now() - timestamp) / 1000);
-  if (diff < 60) return "just now";
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-  return `${Math.floor(diff / 86400)}d ago`;
-}
-
-/**
  * Initialize Popup
  */
 async function init() {
-  setupTabs();
+  initTabs((tabId) => {
+    if (tabId === "tabScraps") {
+      refreshScraps();
+    }
+  });
+
   await loadSettings();
   await loadIdentity();
-  await loadScraps();
+  await refreshScraps();
   await inspectActiveTab();
-}
-
-/**
- * Tab Navigation Handler
- */
-function setupTabs() {
-  tabButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const targetId = btn.dataset.tab;
-      if (!targetId) return;
-
-      tabButtons.forEach((b) => b.classList.remove("active"));
-      tabPanes.forEach((pane) => pane.classList.remove("active"));
-
-      btn.classList.add("active");
-      const targetPane = document.getElementById(targetId);
-      if (targetPane) {
-        targetPane.classList.add("active");
-      }
-
-      if (targetId === "tabScraps") {
-        loadScraps();
-      }
-    });
-  });
 }
 
 /**
@@ -124,8 +92,8 @@ async function loadSettings() {
   const res = await chrome.runtime.sendMessage({ action: "getSettings" });
   if (res?.success && res.data) {
     currentSettings = res.data;
-    inputApiUrl.value = currentSettings.apiUrl || "https://api.pressprotocol.com";
-    inputWebAppUrl.value = currentSettings.webAppUrl || "https://pressprotocol.com";
+    inputApiUrl.value = currentSettings.apiUrl || DEFAULT_SETTINGS.apiUrl;
+    inputWebAppUrl.value = currentSettings.webAppUrl || DEFAULT_SETTINGS.webAppUrl;
   }
 }
 
@@ -139,7 +107,18 @@ async function loadIdentity() {
   settingsPubKey.textContent = `${currentIdentity.publicKey.slice(0, 14)}...${currentIdentity.publicKey.slice(-10)}`;
 }
 
-let preloadedArticle: ClippedArticle | null = null;
+/**
+ * Refresh Scraps List in Tab 2
+ */
+async function refreshScraps() {
+  await renderScrapsList(
+    scrapsList,
+    scrapsCountBadge,
+    scrapsEmpty,
+    vaultFooter,
+    refreshScraps
+  );
+}
 
 /**
  * Inspect Active Browser Tab
@@ -161,11 +140,18 @@ async function inspectActiveTab() {
 
   targetTitle.textContent = activeTabTitle;
 
-  // Check if we are on a PressProtocol Reader page (/read/[cid])
+  // Check if active tab is a PressProtocol Reader page (/read/[cid])
   const readerMatch = activeTabUrl.match(/\/read\/([^\/\?#]+)/);
   if (readerMatch) {
     const cid = readerMatch[1];
-    displayReaderDiagnostics(cid);
+    displayReaderDiagnostics(
+      readerBanner,
+      readerTitle,
+      readerCid,
+      mirrorsList,
+      cid,
+      activeTabTitle
+    );
   } else {
     readerBanner.classList.add("hidden");
   }
@@ -185,51 +171,8 @@ async function inspectActiveTab() {
       targetAuthor.textContent = preloadedArticle.author ? `By ${preloadedArticle.author}` : "By Sovereign Author";
       targetReadTime.textContent = `~${preloadedArticle.readingTimeMinutes || 1} min read (${preloadedArticle.wordCount || 0} words)`;
     }
-  } catch (inspectErr) {
-    // Restricted internal page (e.g. chrome://)
-  }
-}
-
-/**
- * Telemetry diagnostics if on /read/[cid]
- */
-async function displayReaderDiagnostics(cid: string) {
-  readerBanner.classList.remove("hidden");
-  readerCid.textContent = cid;
-  readerTitle.textContent = activeTabTitle.replace(" - PressProtocol", "");
-
-  mirrorsList.innerHTML = `
-    <div class="mirror-row">
-      <span class="mirror-tag">📦 IPFS Swarm</span>
-      <span class="mirror-latency online">✓ 38ms</span>
-    </div>
-    <div class="mirror-row">
-      <span class="mirror-tag">🧅 Tor v3 Onion</span>
-      <span class="mirror-latency online">✓ 210ms</span>
-    </div>
-    <div class="mirror-row">
-      <span class="mirror-tag">🌐 Global CDN Gateway</span>
-      <span class="mirror-latency online">✓ 52ms</span>
-    </div>
-  `;
-
-  try {
-    const res = await chrome.runtime.sendMessage({ action: "checkMirrors", cid });
-    if (res?.success && res.data?.mirrors) {
-      const mirrors = res.data.mirrors;
-      mirrorsList.innerHTML = Object.entries(mirrors)
-        .map(([type, m]: [string, any]) => `
-          <div class="mirror-row">
-            <span class="mirror-tag">${type === "ipfs" ? "📦 IPFS" : type === "tor" ? "🧅 Tor" : "🌐 Gateway"}</span>
-            <span class="mirror-latency ${m.available ? "online" : "offline"}">
-              ${m.available ? `✓ ${m.latency || 45}ms` : "✗ Unavailable"}
-            </span>
-          </div>
-        `)
-        .join("");
-    }
   } catch {
-    // Keep baseline display
+    // Restricted internal page (e.g. chrome://)
   }
 }
 
@@ -244,10 +187,10 @@ btnClipNow.addEventListener("click", async () => {
   clipSuccessCard.classList.add("hidden");
 
   // Step 1: Extract
-  updateStep(stepExtract, "active");
-  updateStep(stepScrub, "pending");
-  updateStep(stepSign, "pending");
-  updateStep(stepBroadcast, "pending");
+  updatePipelineStep(stepExtract, "active");
+  updatePipelineStep(stepScrub, "pending");
+  updatePipelineStep(stepSign, "pending");
+  updatePipelineStep(stepBroadcast, "pending");
 
   let clipped: ClippedArticle;
   if (preloadedArticle && preloadedArticle.textContent) {
@@ -273,36 +216,36 @@ btnClipNow.addEventListener("click", async () => {
     }
   }
 
-  const stepExtractText = stepExtract.querySelector(".step-text");
-  if (stepExtractText) {
-    stepExtractText.textContent = `Extracted ${clipped.wordCount} words (${Math.round(clipped.telemetry.cleanedByteSize / 1024)} KB)`;
-  }
-  updateStep(stepExtract, "completed");
+  updatePipelineStep(
+    stepExtract,
+    "completed",
+    `Extracted ${clipped.wordCount} words (${Math.round(clipped.telemetry.cleanedByteSize / 1024)} KB)`
+  );
 
   // Step 2: Scrub Surveillance
-  updateStep(stepScrub, "active");
+  updatePipelineStep(stepScrub, "active");
   targetAuthor.textContent = clipped?.author ? `By ${clipped.author}` : "By Sovereign Author";
   targetReadTime.textContent = `~${clipped?.readingTimeMinutes || 1} min read (${clipped?.wordCount || 0} words)`;
   targetTitle.textContent = clipped?.title || activeTabTitle;
 
-  const stepScrubText = stepScrub.querySelector(".step-text");
-  if (stepScrubText) {
-    stepScrubText.textContent = `Purged ${clipped.telemetry.totalPurged} surveillance beacons & modals`;
-  }
-  await new Promise((r) => setTimeout(r, 200));
-  updateStep(stepScrub, "completed");
+  updatePipelineStep(
+    stepScrub,
+    "completed",
+    `Purged ${clipped.telemetry.totalPurged} tracking beacons & modals`
+  );
+  await new Promise((r) => setTimeout(r, 180));
 
   // Step 3: Ed25519 Sign
-  updateStep(stepSign, "active");
-  const stepSignText = stepSign.querySelector(".step-text");
-  if (stepSignText) {
-    stepSignText.textContent = `Signed with Ed25519 key (${currentIdentity?.pseudonym || "Anon"})`;
-  }
-  await new Promise((r) => setTimeout(r, 200));
-  updateStep(stepSign, "completed");
+  updatePipelineStep(stepSign, "active");
+  updatePipelineStep(
+    stepSign,
+    "completed",
+    `Signed with Ed25519 key (${currentIdentity?.pseudonym || "Anon"})`
+  );
+  await new Promise((r) => setTimeout(r, 180));
 
   // Step 4: Broadcast to Swarm
-  updateStep(stepBroadcast, "active");
+  updatePipelineStep(stepBroadcast, "active");
 
   try {
     const res = await chrome.runtime.sendMessage({
@@ -315,7 +258,7 @@ btnClipNow.addEventListener("click", async () => {
     }
 
     const data = res.data;
-    updateStep(stepBroadcast, "completed");
+    updatePipelineStep(stepBroadcast, "completed");
 
     // Success State
     setTimeout(() => {
@@ -333,25 +276,28 @@ btnClipNow.addEventListener("click", async () => {
       // Setup Onion URL copy
       const onionUrl =
         data?.mirrors?.tor ||
-        `http://pressprotocol7sovereign4node6federation3mesh7relay5v3.onion/read/${data.cid}`;
+        `http://${CANONICAL_ONION_HOST}/read/${data.cid}`;
+
       btnCopyOnion.onclick = () => {
         navigator.clipboard.writeText(onionUrl);
-        btnCopyOnion.textContent = "✓ .onion Copied!";
+        const originalHtml = btnCopyOnion.innerHTML;
+        btnCopyOnion.innerHTML = `<span>✓ .onion Copied!</span>`;
         setTimeout(() => {
-          btnCopyOnion.textContent = "🧅 Copy .onion";
+          btnCopyOnion.innerHTML = originalHtml;
         }, 2000);
       };
 
-      // Setup embed code
-      const embedCode = `<iframe src="${currentSettings.webAppUrl}/embed/${data.cid}?theme=cyber" width="100%" height="600" frameborder="0" loading="lazy" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>`;
+      // Setup embed code (clean editorial embed without legacy theme param)
+      const embedCode = `<iframe src="${currentSettings.webAppUrl}/embed/${data.cid}" width="100%" height="600" frameborder="0" loading="lazy" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>`;
       btnCopyEmbedCode.onclick = () => {
         navigator.clipboard.writeText(embedCode);
-        btnCopyEmbedCode.textContent = "✓ Embed Code Copied!";
+        const originalHtml = btnCopyEmbedCode.innerHTML;
+        btnCopyEmbedCode.innerHTML = `<span>✓ Embed Copied!</span>`;
         setTimeout(() => {
-          btnCopyEmbedCode.textContent = "</> Copy Embed Code";
+          btnCopyEmbedCode.innerHTML = originalHtml;
         }, 2000);
       };
-    }, 400);
+    }, 350);
   } catch (err: any) {
     console.error("Publishing error:", err);
     alert(`Failed to syndicate article to PressProtocol gateway: ${err.message}`);
@@ -360,96 +306,18 @@ btnClipNow.addEventListener("click", async () => {
   }
 });
 
-function updateStep(el: HTMLElement, state: "pending" | "active" | "completed") {
-  el.classList.remove("active", "completed");
-  if (state !== "pending") {
-    el.classList.add(state);
-  }
-}
-
 /**
- * Copy CID Button
+ * Copy CID Button with Checkmark Feedback
  */
 btnCopyCid.addEventListener("click", () => {
   const cid = publishedCid.textContent || "";
   navigator.clipboard.writeText(cid);
-  btnCopyCid.textContent = "✓";
-  setTimeout(() => (btnCopyCid.textContent = "📋"), 1800);
+  const origHtml = btnCopyCid.innerHTML;
+  btnCopyCid.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+  setTimeout(() => {
+    btnCopyCid.innerHTML = origHtml;
+  }, 1800);
 });
-
-/**
- * Load Scraps Vault
- */
-async function loadScraps() {
-  const res = await chrome.runtime.sendMessage({ action: "getScraps" });
-  const scraps: SovereignScrap[] = res?.success ? res.data : [];
-
-  scrapsCountBadge.textContent = String(scraps.length);
-
-  if (scraps.length === 0) {
-    scrapsEmpty.classList.remove("hidden");
-    scrapsList.innerHTML = "";
-    vaultFooter.classList.add("hidden");
-    return;
-  }
-
-  scrapsEmpty.classList.add("hidden");
-  vaultFooter.classList.remove("hidden");
-
-  scrapsList.innerHTML = scraps
-    .map((scrap) => {
-      let hostname = "";
-      try {
-        hostname = new URL(scrap.url).hostname.replace("www.", "");
-      } catch {
-        hostname = "link";
-      }
-
-      return `
-        <div class="scrap-card" data-id="${scrap.id}">
-          <div class="scrap-quote">"${escapeHtml(scrap.quote)}"</div>
-          <div class="scrap-meta">
-            <a href="${scrap.url}" target="_blank" class="scrap-source text-truncate" title="${escapeHtml(scrap.pageTitle)}">
-              🔗 ${hostname}
-            </a>
-            <span>${timeAgo(scrap.timestamp)}</span>
-          </div>
-          <div class="scrap-actions">
-            <button class="btn-scrap-action btn-copy-scrap" data-quote="${escapeAttr(scrap.quote)}" data-title="${escapeAttr(scrap.pageTitle)}" data-url="${escapeAttr(scrap.url)}">
-              📋 Copy Markdown
-            </button>
-            <button class="btn-scrap-action btn-delete-scrap" data-id="${scrap.id}">
-              🗑️ Remove
-            </button>
-          </div>
-        </div>
-      `;
-    })
-    .join("");
-
-  // Attach delete listeners
-  document.querySelectorAll<HTMLButtonElement>(".btn-delete-scrap").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const id = btn.dataset.id;
-      if (!id) return;
-      await chrome.runtime.sendMessage({ action: "deleteScrap", id });
-      loadScraps();
-    });
-  });
-
-  // Attach copy listeners
-  document.querySelectorAll<HTMLButtonElement>(".btn-copy-scrap").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const q = btn.dataset.quote || "";
-      const t = btn.dataset.title || "";
-      const u = btn.dataset.url || "";
-      const markdown = `> "${q}"\n>\n> — [${t}](${u})`;
-      navigator.clipboard.writeText(markdown);
-      btn.textContent = "✓ Copied!";
-      setTimeout(() => (btn.textContent = "📋 Copy Markdown"), 1800);
-    });
-  });
-}
 
 /**
  * Clear All Scraps
@@ -457,7 +325,7 @@ async function loadScraps() {
 btnClearScraps.addEventListener("click", async () => {
   if (confirm("Permanently clear all saved passage scraps?")) {
     await chrome.runtime.sendMessage({ action: "clearScraps" });
-    loadScraps();
+    await refreshScraps();
   }
 });
 
@@ -475,7 +343,7 @@ btnSendToWriter.addEventListener("click", async () => {
 
   const fullPayload = `# Research Citations (${new Date().toLocaleDateString()})\n\n${citationsMarkdown}`;
 
-  // Copy to clipboard
+  // Copy citations to clipboard
   await navigator.clipboard.writeText(fullPayload);
 
   // Open /write in a new tab
@@ -489,7 +357,6 @@ btnBurnIdentity.addEventListener("click", async () => {
   if (confirm("Burn current Ed25519 identity and provision a fresh sovereign cryptographic keypair?")) {
     currentIdentity = await burnCurrentIdentity();
     await loadIdentity();
-    alert("New Ed25519 sovereign burner identity generated.");
   }
 });
 
@@ -508,8 +375,8 @@ btnCopyPubKey.addEventListener("click", () => {
  * Save Node & Gateway Configuration
  */
 btnSaveSettings.addEventListener("click", async () => {
-  currentSettings.apiUrl = inputApiUrl.value.trim() || "https://api.pressprotocol.com";
-  currentSettings.webAppUrl = inputWebAppUrl.value.trim() || "https://pressprotocol.com";
+  currentSettings.apiUrl = inputApiUrl.value.trim() || DEFAULT_SETTINGS.apiUrl;
+  currentSettings.webAppUrl = inputWebAppUrl.value.trim() || DEFAULT_SETTINGS.webAppUrl;
 
   await chrome.runtime.sendMessage({
     action: "saveSettings",
@@ -521,20 +388,6 @@ btnSaveSettings.addEventListener("click", async () => {
     settingsSavedToast.classList.add("hidden");
   }, 2200);
 });
-
-// Helper functions
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-function escapeAttr(str: string): string {
-  return escapeHtml(str).replace(/"/g, "&quot;");
-}
 
 // Start
 document.addEventListener("DOMContentLoaded", init);
