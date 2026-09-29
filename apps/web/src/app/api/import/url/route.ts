@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { extractArticleFromUrl } from "@/lib/scrubber";
+import { validateSafeUrl } from "@/lib/ssrf";
 import { PressProtocolClient } from "@pressprotocol/sdk";
 import { getBackendUrl } from "@/config/backend";
 
@@ -17,12 +18,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Validate URL syntax
+    // Validate URL syntax and check SSRF boundaries
     try {
-      new URL(url);
-    } catch {
+      validateSafeUrl(url);
+    } catch (urlErr) {
       return NextResponse.json(
-        { error: "Invalid URL syntax provided" },
+        { error: urlErr instanceof Error ? urlErr.message : "Invalid or forbidden URL provided" },
         { status: 400 }
       );
     }

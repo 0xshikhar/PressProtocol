@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { validateSafeUrl } from "@/lib/ssrf";
 
 export const dynamic = "force-dynamic";
+
+const CID_REGEX = /^[a-zA-Z0-9]{40,128}$/;
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,10 +18,30 @@ export async function POST(req: NextRequest) {
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://pressprotocol.com";
-    const canonicalTargetUrl = targetUrl || `${baseUrl}/read/${cid}`;
+    let canonicalTargetUrl: string;
 
-    const waybackSaveUrl = `https://web.archive.org/save/${canonicalTargetUrl}`;
-    const waybackLookupUrl = `https://web.archive.org/web/*/${canonicalTargetUrl}`;
+    if (targetUrl) {
+      try {
+        const safe = validateSafeUrl(targetUrl);
+        canonicalTargetUrl = safe.toString();
+      } catch (err) {
+        return NextResponse.json(
+          { error: err instanceof Error ? err.message : "Invalid or forbidden targetUrl" },
+          { status: 400 }
+        );
+      }
+    } else {
+      if (typeof cid !== "string" || !CID_REGEX.test(cid.trim())) {
+        return NextResponse.json(
+          { error: "Invalid IPFS CID format provided" },
+          { status: 400 }
+        );
+      }
+      canonicalTargetUrl = `${baseUrl}/read/${encodeURIComponent(cid.trim())}`;
+    }
+
+    const waybackSaveUrl = `https://web.archive.org/save/${encodeURI(canonicalTargetUrl)}`;
+    const waybackLookupUrl = `https://web.archive.org/web/*/${encodeURI(canonicalTargetUrl)}`;
 
     let status: "saved" | "queued" | "fallback" = "queued";
     let snapshotUrl: string | undefined;

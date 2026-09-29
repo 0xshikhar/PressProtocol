@@ -1,5 +1,6 @@
 import * as cheerio from "cheerio";
 import { calculateReadingTime } from "./reading-time";
+import { safeFetch, validateSafeUrl } from "./ssrf";
 
 export interface ScrubberTelemetry {
   scriptsPurged: number;
@@ -348,20 +349,19 @@ export function scrubArticleHtml(rawHtml: string): {
  * Extracts and scrubs article content from a Substack, Medium, Ghost, or blog URL / RSS feed.
  */
 export async function extractArticleFromUrl(targetUrl: string): Promise<ScrubbedArticle> {
-  const urlObj = new URL(targetUrl);
+  const urlObj = validateSafeUrl(targetUrl);
 
-  const response = await fetch(targetUrl, {
+  const response = await safeFetch(urlObj, {
     headers: {
       "User-Agent":
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 PressProtocol/1.0",
       Accept: "text/html,application/xhtml+xml,application/xml,application/rss+xml;q=0.9,*/*;q=0.8",
       "Accept-Language": "en-US,en;q=0.9",
     },
-    redirect: "follow",
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch article from ${targetUrl}: HTTP ${response.status} ${response.statusText}`);
+    throw new Error(`Failed to fetch article from ${urlObj.hostname}: HTTP ${response.status} ${response.statusText}`);
   }
 
   const rawText = await response.text();
