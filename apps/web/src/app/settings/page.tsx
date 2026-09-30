@@ -514,8 +514,8 @@ export default function SettingsPage() {
                     <div>
                       <div className="flex items-center gap-2">
                         <h4 className="text-xs font-semibold text-primary font-sans">Chromium Browser Extension</h4>
-                        <Badge className="bg-surface border border-hairline text-secondary font-mono text-[9px] rounded-[4px]">Manifest V3</Badge>
-                        <Badge variant="outline" className="border-hairline text-muted font-mono text-[9px] rounded-[4px]">31 KB</Badge>
+                        <Badge className="bg-surface border border-hairline text-secondary font-mono text-[9px] rounded-[4px]">v2.2.0</Badge>
+                        <Badge variant="outline" className="border-hairline text-muted font-mono text-[9px] rounded-[4px]">46 KB</Badge>
                       </div>
                       <p className="text-xs text-muted mt-1 font-sans">
                         Chrome, Brave, Edge, Arc. Provides instant burner identity generation and 1-click article archival to IPFS/Tor.

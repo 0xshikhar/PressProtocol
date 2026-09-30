@@ -15,10 +15,10 @@ const integrations = [
   {
     name: "Chromium Extension",
     category: "Extension",
-    description: "In-browser Ed25519 signing key management & IPFS reader sidebar.",
+    description: "In-browser Ed25519 burner keys, context Scrap Vault & sovereign IPFS archiver.",
     action: "download",
     target: "/downloads/PressProtocol_Browser_Extension.zip",
-    badge: "MV3 Ready",
+    badge: "v2.2.0 (MV3)",
   },
   {
     name: "TypeScript SDK",
