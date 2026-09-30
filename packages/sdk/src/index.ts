@@ -20,6 +20,7 @@ export {
   hexToBytes,
   isValidHex,
   calculateDeterministicCIDv1,
+  sha256Hex,
   type VerificationResult,
 } from "./crypto.js";
 
