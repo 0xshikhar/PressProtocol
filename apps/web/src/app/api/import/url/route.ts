@@ -6,6 +6,13 @@ import { getBackendUrl } from "@/config/backend";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Ingests a single article from a URL with SSRF boundary checks,
+ * scrubs surveillance trackers, and optionally publishes to PressProtocol.
+ *
+ * @param req - Incoming NextRequest with JSON payload containing url, tags, and autoPublish options
+ * @returns JSON response with scrubbed article payload and optional publication details
+ */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();

@@ -4,6 +4,13 @@ import { safeFetch, validateSafeUrl } from "@/lib/ssrf";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Ingests and parses an external RSS or Atom feed with SSRF protection,
+ * extracting sanitized articles and publication metadata.
+ *
+ * @param req - Incoming NextRequest with JSON payload containing feedUrl
+ * @returns JSON response containing parsed feed title, metadata, and articles
+ */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
