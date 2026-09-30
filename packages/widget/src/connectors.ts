@@ -190,11 +190,7 @@ export function extractTitle(titleElement: Element | null, fallbackContent?: str
   if (fallbackContent) {
     const h1Match = fallbackContent.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
     if (h1Match && h1Match[1]) {
-      let clean = h1Match[1];
-      while (/<[^>]*>/.test(clean)) {
-        clean = clean.replace(/<[^>]*>/g, '');
-      }
-      return clean.trim();
+      return h1Match[1].replace(/<[^>]+>/g, '').trim();
     }
     const mdH1Match = fallbackContent.match(/^#\s+(.+)$/m);
     if (mdH1Match && mdH1Match[1]) {
