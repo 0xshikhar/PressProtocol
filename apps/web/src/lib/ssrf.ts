@@ -20,6 +20,12 @@ const CLOUD_METADATA_HOSTNAMES = new Set([
   "instance-data",
 ]);
 
+// Non-link-local cloud metadata endpoints (Alibaba ECS 100.100.100.200, AWS Nitro IPv6 fd00:ec2::254)
+const CLOUD_METADATA_IPS = new Set([
+  "100.100.100.200",
+  "fd00:ec2::254",
+]);
+
 // Private and reserved IPv4 address ranges
 const IPV4_BLOCKED_RANGES = [
   { prefix: "0.", mask: 8 }, // Current network
@@ -33,13 +39,16 @@ const LOCAL_HOSTNAMES = new Set([
 ]);
 
 /**
- * Checks whether an IP string is the cloud hypervisor metadata service (169.254.x.x).
+ * Checks whether an IP string is a cloud hypervisor metadata service.
+ * Defends against AWS/OpenStack link-local (169.254.x.x), Alibaba Cloud ECS (100.100.100.200),
+ * and AWS Nitro IPv6 (fd00:ec2::254).
  *
- * @param ip - IPv4 string to check
- * @returns True if IP falls within link-local cloud metadata range (169.254.0.0/16)
+ * @param ip - IP string to check
+ * @returns True if IP matches cloud metadata service endpoints
  */
 export function isCloudMetadata(ip: string): boolean {
-  return ip.startsWith("169.254.");
+  const clean = ip.replace(/^\[|\]$/g, "").toLowerCase().trim();
+  return clean.startsWith("169.254.") || CLOUD_METADATA_IPS.has(clean);
 }
 
 /**

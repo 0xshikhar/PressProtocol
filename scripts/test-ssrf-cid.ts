@@ -83,7 +83,11 @@ async function runTests() {
   // Cloud Hypervisor Metadata (Unconditionally blocked)
   assert(isCloudMetadata("169.254.169.254"), "Identifies AWS/OpenStack IPv4 metadata");
   assert(isCloudMetadata("169.254.1.1"), "Identifies general link-local metadata range (169.254.0.0/16)");
+  assert(isCloudMetadata("100.100.100.200"), "Identifies Alibaba Cloud ECS metadata (100.100.100.200)");
+  assert(isCloudMetadata("fd00:ec2::254"), "Identifies AWS Nitro IPv6 metadata (fd00:ec2::254)");
   assert(isPrivateOrBlockedHost("169.254.169.254"), "Blocks AWS metadata IP");
+  assert(isPrivateOrBlockedHost("100.100.100.200"), "Blocks Alibaba ECS metadata IP");
+  assert(isPrivateOrBlockedHost("[fd00:ec2::254]"), "Blocks AWS Nitro IPv6 metadata IP");
   assert(isPrivateOrBlockedHost("metadata.google.internal"), "Blocks Google Cloud metadata hostname");
   assert(isPrivateOrBlockedHost("metadata.google.internal."), "Blocks Google Cloud metadata hostname with trailing dot");
   assert(isPrivateOrBlockedHost("instance-data"), "Blocks OpenStack instance-data");
