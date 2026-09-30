@@ -17,13 +17,53 @@ const PUBLIC_GATEWAYS = [
   "https://gateway.pinata.cloud/ipfs",
 ];
 
-const CID_REGEX = /^[a-zA-Z0-9]{40,128}$/;
+export const CID_REGEX = /^(Qm[1-9A-HJ-NP-Za-km-z]{44}|baf[0-9a-z]{40,100})$/;
 
+/**
+ * Strictly validates an IPFS CID format (v0 Base58btc or v1 Base32 multibase).
+ * Blocks directory traversal, protocol injection, query params, and non-alphanumeric chars.
+ *
+ * @param cid - Value to test for valid IPFS CID syntax
+ * @returns True if value is a valid CIDv0 or CIDv1 string
+ */
+export function isValidCID(cid: unknown): cid is string {
+  if (!cid || typeof cid !== "string") return false;
+  return CID_REGEX.test(cid.trim());
+}
+
+/**
+ * Asserts that a CID string is valid syntax, throwing an error if invalid.
+ *
+ * @param cid - Value to validate
+ * @returns Clean trimmed CID string
+ * @throws Error if the CID is not a valid format
+ */
+export function assertValidCID(cid: unknown): string {
+  if (!isValidCID(cid)) {
+    throw new Error(`Invalid IPFS CID format: '${cid}'`);
+  }
+  return cid.trim();
+}
+
+/**
+ * Extracts and cleans a plain-text excerpt from article HTML or Markdown.
+ * Preserves block element spacing and strips executable scripts/styles.
+ *
+ * @param content - Raw article content string or unknown
+ * @param maxLen - Maximum character length of the returned excerpt
+ * @returns Cleaned plain-text excerpt string
+ */
 function cleanExcerpt(content: unknown, maxLen = 170): string {
   if (!content || typeof content !== "string") return "";
   try {
     const $ = cheerio.load(content);
     $("script, style, noscript").remove();
+
+    // Preserve whitespace between block boundaries before text extraction
+    $("p, div, h1, h2, h3, h4, h5, h6, li, blockquote, br, hr, article, section").each((_, el) => {
+      $(el).append(" ");
+    });
+
     const text = $.text()
       .replace(/[#*`_~\[\]()]/g, " ")
       .replace(/\s+/g, " ")
@@ -38,11 +78,15 @@ function cleanExcerpt(content: unknown, maxLen = 170): string {
   }
 }
 
+/**
+ * Fetches and resolves article metadata by IPFS CID across local daemon and public gateways.
+ *
+ * @param cid - IPFS CID string of the article
+ * @returns Resolved metadata object including title, excerpt, tags, and publisher info
+ * @throws Error if CID format is invalid
+ */
 export async function fetchArticleMetadata(cid: string): Promise<ResolvedArticleMeta> {
-  const cleanCid = cid ? cid.trim() : "";
-  if (!CID_REGEX.test(cleanCid)) {
-    throw new Error(`Invalid IPFS CID: '${cid}'`);
-  }
+  const cleanCid = assertValidCID(cid);
 
   const backendUrl = getBackendUrl();
 

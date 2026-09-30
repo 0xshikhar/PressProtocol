@@ -8,7 +8,11 @@
  * - Cloud metadata (169.254.169.254) and non-HTTP protocols (file://) are UNCONDITIONALLY BLOCKED.
  * - Private subnets (RFC 1918) and localhost are BLOCKED by default on public hosted gateways,
  *   but PERMITTED when ALLOW_PRIVATE_NETWORK_FETCH=true or NODE_ENV=development for sovereign nodes.
+ * - Enforces DNS resolution verification to defend against DNS rebinding attacks.
  */
+
+import { isIP } from "node:net";
+import dns from "node:dns/promises";
 
 // Cloud metadata and reserved addresses that must NEVER be accessed in any environment
 const CLOUD_METADATA_HOSTNAMES = new Set([
@@ -30,15 +34,49 @@ const LOCAL_HOSTNAMES = new Set([
 
 /**
  * Checks whether an IP string is the cloud hypervisor metadata service (169.254.x.x).
+ *
+ * @param ip - IPv4 string to check
+ * @returns True if IP falls within link-local cloud metadata range (169.254.0.0/16)
  */
 export function isCloudMetadata(ip: string): boolean {
   return ip.startsWith("169.254.");
 }
 
 /**
- * Checks whether an IPv4 string falls within local or private network ranges.
+ * Decodes an IPv4-mapped IPv6 address into its standard dotted-decimal IPv4 string.
+ * Handles both dotted-quad (::ffff:192.168.1.1) and WHATWG hex pairs (::ffff:a9fe:a9fe).
+ *
+ * @param host - Host string to test and decode
+ * @returns Standard dotted-quad IPv4 string if mapped, or undefined
  */
-function isLocalOrPrivateIpv4(ip: string): boolean {
+export function decodeMappedIpv4(host: string): string | undefined {
+  const clean = host.replace(/^\[|\]$/g, "").toLowerCase();
+  if (isIP(clean) !== 6) return undefined;
+
+  if (clean.includes("::ffff:")) {
+    const remainder = clean.split("::ffff:").pop() || "";
+    if (isIP(remainder) === 4) return remainder;
+
+    // Handle hex-pair notation serialized by WHATWG URL parser (e.g. a9fe:a9fe)
+    const hexMatch = /^([0-9a-f]{1,4}):([0-9a-f]{1,4})$/.exec(remainder);
+    if (hexMatch) {
+      const high = parseInt(hexMatch[1], 16);
+      const low = parseInt(hexMatch[2], 16);
+      const val = (high * 0x10000) + low;
+      return `${(val >>> 24) & 0xff}.${(val >>> 16) & 0xff}.${(val >>> 8) & 0xff}.${val & 0xff}`;
+    }
+  }
+
+  return undefined;
+}
+
+/**
+ * Checks whether an IPv4 string falls within local or private network ranges.
+ *
+ * @param ip - IPv4 address string to validate
+ * @returns True if address belongs to private RFC 1918, loopback, or CGNAT subnets
+ */
+export function isLocalOrPrivateIpv4(ip: string): boolean {
   for (const range of IPV4_BLOCKED_RANGES) {
     if (ip.startsWith(range.prefix)) return true;
   }
@@ -66,8 +104,11 @@ function isLocalOrPrivateIpv4(ip: string): boolean {
 
 /**
  * Checks whether an IPv6 string falls within blocked local/private/mapped ranges.
+ *
+ * @param host - IPv6 address string to validate
+ * @returns True if address belongs to loopback, link-local, unique-local, or private mapped ranges
  */
-function isLocalOrPrivateIpv6(host: string): boolean {
+export function isLocalOrPrivateIpv6(host: string): boolean {
   const clean = host.replace(/^\[|\]$/g, "").toLowerCase();
 
   // Loopback & Unspecified
@@ -83,12 +124,10 @@ function isLocalOrPrivateIpv6(host: string): boolean {
     return true;
   }
 
-  // IPv4-mapped IPv6 (::ffff:127.0.0.1)
-  if (clean.includes("::ffff:")) {
-    const mappedIpv4 = clean.split("::ffff:").pop();
-    if (mappedIpv4 && (isCloudMetadata(mappedIpv4) || isLocalOrPrivateIpv4(mappedIpv4))) {
-      return true;
-    }
+  // IPv4-mapped IPv6 (::ffff:127.0.0.1 or hex)
+  const mapped = decodeMappedIpv4(clean);
+  if (mapped && (isCloudMetadata(mapped) || isLocalOrPrivateIpv4(mapped))) {
+    return true;
   }
 
   return false;
@@ -97,23 +136,33 @@ function isLocalOrPrivateIpv6(host: string): boolean {
 /**
  * Checks whether a hostname targets cloud hypervisor metadata or reserved addresses.
  * These are unconditionally forbidden in ALL environments (hosted or sovereign).
+ *
+ * @param hostname - Hostname string to check
+ * @returns True if host points to cloud hypervisor metadata
  */
 export function isCloudMetadataOrForbiddenHost(hostname: string): boolean {
-  const normalized = hostname.toLowerCase().trim();
+  const normalized = hostname.toLowerCase().trim().replace(/\.+$/, "");
 
   if (CLOUD_METADATA_HOSTNAMES.has(normalized)) return true;
 
   // Cloud metadata IPv4
   if (isCloudMetadata(normalized)) return true;
 
+  // Decoded IPv4-mapped IPv6
+  const mapped = decodeMappedIpv4(normalized);
+  if (mapped && isCloudMetadata(mapped)) return true;
+
   return false;
 }
 
 /**
  * Checks whether a hostname targets private subnets, loopback, or local domains.
+ *
+ * @param hostname - Hostname string to test
+ * @returns True if host belongs to local, loopback, or private subnets
  */
 export function isLocalOrPrivateNetworkHost(hostname: string): boolean {
-  const normalized = hostname.toLowerCase().trim();
+  const normalized = hostname.toLowerCase().trim().replace(/\.+$/, "");
 
   if (LOCAL_HOSTNAMES.has(normalized)) return true;
 
@@ -125,6 +174,12 @@ export function isLocalOrPrivateNetworkHost(hostname: string): boolean {
     normalized.endsWith(".lan") ||
     normalized.endsWith(".home")
   ) {
+    return true;
+  }
+
+  // Decoded IPv4-mapped IPv6
+  const mapped = decodeMappedIpv4(normalized);
+  if (mapped && (isCloudMetadata(mapped) || isLocalOrPrivateIpv4(mapped))) {
     return true;
   }
 
@@ -146,6 +201,9 @@ export function isLocalOrPrivateNetworkHost(hostname: string): boolean {
  * - Cloud metadata is ALWAYS blocked.
  * - Private subnets & localhost are blocked in public hosted mode (production default),
  *   but permitted if ALLOW_PRIVATE_NETWORK_FETCH=true or NODE_ENV=development.
+ *
+ * @param hostname - Hostname or IP to evaluate
+ * @returns True if host is prohibited in the active environment
  */
 export function isPrivateOrBlockedHost(hostname: string): boolean {
   // 1. Invariant: Cloud hypervisor metadata is permanently blocked everywhere
@@ -169,6 +227,10 @@ export function isPrivateOrBlockedHost(hostname: string): boolean {
 /**
  * Validates a target URL against SSRF threats.
  * Returns the parsed URL if safe, or throws an Error if the URL is invalid or targets restricted hosts.
+ *
+ * @param urlString - Raw URL string provided by caller or user
+ * @returns Clean parsed WHATWG URL instance
+ * @throws Error if protocol, credentials, destination port, or target host are restricted
  */
 export function validateSafeUrl(urlString: string): URL {
   if (!urlString || typeof urlString !== "string") {
@@ -187,6 +249,19 @@ export function validateSafeUrl(urlString: string): URL {
     throw new Error(`Forbidden protocol '${parsed.protocol}'. Only http: and https: are allowed.`);
   }
 
+  // Disallow credential-bearing URLs (user:pass@host) to prevent authority confusion attacks
+  if (parsed.username || parsed.password) {
+    throw new Error("URLs containing credentials (user:pass@host) are prohibited.");
+  }
+
+  // Enforce valid destination port semantics for HTTP(S)
+  if (parsed.port) {
+    const portNum = Number(parsed.port);
+    if (!Number.isInteger(portNum) || portNum < 1 || portNum > 65535) {
+      throw new Error("Invalid destination port.");
+    }
+  }
+
   // Check destination against SSRF boundaries
   if (isPrivateOrBlockedHost(parsed.hostname)) {
     throw new Error("Access to private, loopback, or cloud metadata network addresses is prohibited.");
@@ -197,7 +272,13 @@ export function validateSafeUrl(urlString: string): URL {
 
 /**
  * Performs a safe fetch request that follows redirects while strictly enforcing SSRF protection
- * on every redirect target.
+ * and DNS resolution checks on every redirect target.
+ *
+ * @param targetUrl - Initial target URL string or URL object
+ * @param init - Standard RequestInit options (headers, method, signal, etc.)
+ * @param maxRedirects - Maximum allowed redirect hops (default 3)
+ * @returns Fetch Response object
+ * @throws Error on SSRF violation, resolution to forbidden IP, timeout, or exceeded redirects
  */
 export async function safeFetch(
   targetUrl: string | URL,
@@ -210,8 +291,32 @@ export async function safeFetch(
   while (true) {
     const validated = validateSafeUrl(currentUrl);
 
+    // Verify DNS resolution if hostname is not already an IP literal (defends against DNS rebinding)
+    const rawHost = validated.hostname.replace(/^\[|\]$/g, "");
+    if (isIP(rawHost) === 0) {
+      try {
+        const lookupResults = await dns.lookup(validated.hostname, { all: true });
+        for (const entry of lookupResults) {
+          if (isPrivateOrBlockedHost(entry.address)) {
+            throw new Error(
+              `Destination host '${validated.hostname}' resolves to restricted IP: ${entry.address}`
+            );
+          }
+        }
+      } catch (dnsErr: any) {
+        if (dnsErr.code === "ENOTFOUND") {
+          throw new Error(`Could not resolve hostname: ${validated.hostname}`);
+        }
+        throw dnsErr;
+      }
+    }
+
+    // Apply 10s deadline timeout if caller has not supplied custom abort signal
+    const signal = init?.signal || AbortSignal.timeout(10000);
+
     const response = await fetch(validated.toString(), {
       ...init,
+      signal,
       redirect: "manual",
     });
 

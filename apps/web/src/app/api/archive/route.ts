@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateSafeUrl } from "@/lib/ssrf";
+import { isValidCID } from "@/lib/article-metadata";
 
 export const dynamic = "force-dynamic";
 
-const CID_REGEX = /^[a-zA-Z0-9]{40,128}$/;
-
+/**
+ * Handles archival requests for articles, dispatching snapshots to Wayback Machine
+ * and decentralized archive gateways after strict URL/CID verification.
+ *
+ * @param req - Incoming NextRequest with JSON payload containing cid or targetUrl
+ * @returns JSON response containing archive snapshot status and permanent links
+ */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -31,7 +37,7 @@ export async function POST(req: NextRequest) {
         );
       }
     } else {
-      if (typeof cid !== "string" || !CID_REGEX.test(cid.trim())) {
+      if (!isValidCID(cid)) {
         return NextResponse.json(
           { error: "Invalid IPFS CID format provided" },
           { status: 400 }

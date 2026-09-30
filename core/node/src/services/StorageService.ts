@@ -244,7 +244,7 @@ export class StorageService {
       try {
         const cacheDir = path.resolve(process.env.DATA_DIR || process.cwd(), '.data/content-cache');
         if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
-        fs.writeFileSync(path.join(cacheDir, `${cid}.json`), JSON.stringify(contentData, null, 2), 'utf-8');
+        fs.writeFileSync(path.join(cacheDir, `${safeCid}.json`), JSON.stringify(contentData, null, 2), 'utf-8');
       } catch {}
 
       return contentData;
@@ -297,7 +297,8 @@ export class StorageService {
     try {
       const safeCid = assertValidCID(cid);
       const gw = (this.gatewayUrl || 'https://ipfs.io/ipfs').replace(/\/+$/, '');
-      const response = await fetch(`${gw}/${safeCid}`);
+      const targetUrl = new URL(`${gw}/${encodeURIComponent(safeCid)}`);
+      const response = await fetch(targetUrl.toString());
       
       if (!response.ok) {
         throw new Error(`Failed to fetch content from IPFS: ${response.status}`);
