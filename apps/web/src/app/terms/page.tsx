@@ -35,7 +35,7 @@ export default function TermsPage() {
             Terms of Service &amp; Disclaimers
           </h1>
           <p className="text-base sm:text-lg text-secondary leading-relaxed font-light">
-            PressProtocol is a set of autonomous, open-source smart contracts, peer-to-peer daemon software, and decentralized web interfaces. By accessing or interacting with the protocol, you acknowledge and agree to these terms.
+            PressProtocol is an open-source decentralized communications protocol, client-side cryptographic toolset, peer-to-peer daemon software, and web interfaces. By accessing or interacting with the protocol, you acknowledge and agree to these terms.
           </p>
         </div>
 

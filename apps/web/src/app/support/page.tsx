@@ -25,6 +25,7 @@ import {
   HelpCircle,
   Clock,
   Mail,
+  Coffee,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -54,7 +55,7 @@ const TREASURY_ALLOCATION = [
   },
   {
     category: "Open-Source Contributor & Maintainer Stipends",
-    purpose: "Direct community grants to onboard 2–3 active co-maintainers, review pull requests, and permanently eliminate single-developer bus factor.",
+    purpose: "Direct protocol engineering grants to support active co-maintainers, peer code reviews, and multi-client library governance.",
     share: "25%",
     priority: "Governance & Longevity",
     status: "Expanding",
@@ -140,7 +141,7 @@ const ROADMAP_PHASES = [
     badgeColor: "bg-anonymous/10 text-anonymous border-anonymous/30",
     title: "Open Stewardship & Multi-Maintainer Council",
     points: [
-      "Onboarding 2–3 vetted open-source co-maintainers to eliminate bus factor",
+      "Expanding core maintainer council across independent geographic regions",
       "Transitioning protocol grants to community multi-sig treasury",
       "P2P community node federation with zero central coordinator",
       "Grants & integrations with investigative journalism consortiums",
@@ -151,12 +152,12 @@ const ROADMAP_PHASES = [
 // Deep FAQ
 const SUSTAINABILITY_FAQS = [
   {
-    q: "Why is PressProtocol built as a 100% solo-developed public good?",
-    a: "Venture-backed publishing platforms inevitably face pressure: shareholders demand user monetization, advertisers demand content moderation, and corporate boards comply with state censorship requests. By building as an independent public good, PressProtocol has zero shareholders, zero trackers, and zero platform incentives to compromise user sovereignty.",
+    q: "Why is PressProtocol structured as an independent public good?",
+    a: "Venture-backed publishing platforms inevitably face commercial capture: shareholders demand monetization, advertisers demand content suppression, and centralized cloud hosts comply with arbitrary censorship. By structuring PressProtocol as an independent public good, the infrastructure remains free of corporate shareholders, surveillance telemetry, and administrative backdoors.",
   },
   {
-    q: "How do you address the 'bus factor' if you are a solo builder?",
-    a: "Every line of code is open-source under the MIT license, backed by 14 end-to-end automated verification test suites and strict architectural documentation. Contributions and public good grants directly fund onboarding 2–3 active co-maintainers and establishing a multi-sig treasury so the protocol survives permanently regardless of any single individual.",
+    q: "How is protocol longevity and architectural permanence guaranteed?",
+    a: "Every line of code is open-source under the MIT license, backed by 14 automated verification test suites and deterministic specifications. All dispatches reside on decentralized content-addressed networks (IPFS) and Tor v3 onion circuits. Protocol grants fund dedicated maintainers and multi-sig treasury governance to guarantee autonomous operation indefinitely.",
   },
   {
     q: "Why not just use Substack, Medium, or self-hosted Ghost?",
@@ -174,6 +175,7 @@ export default function SupportPage() {
   const [copiedAddress, setCopiedAddress] = useState(false);
   const [copiedIdentifier, setCopiedIdentifier] = useState<string | null>(null);
   const [showQrModal, setShowQrModal] = useState(false);
+  const [selectedTraditionalMethod, setSelectedTraditionalMethod] = useState<TraditionalMethod | null>(null);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   const handleCopy = (text: string, isChain = true) => {
@@ -208,8 +210,8 @@ export default function SupportPage() {
           </Link>
         </div>
 
-        {/* Section 1: Hero & Real-World Censorship Threat Model */}
-        <div className="space-y-6 border-b border-hairline pb-12">
+        {/* Section 1: Hero */}
+        <div className="space-y-6 border-b border-hairline pb-8">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-[6px] bg-overlay border border-hairline text-secondary font-mono text-xs">
             <Heart className="h-3.5 w-3.5 text-secondary" />
             <span>Independent public good &bull; Zero corporate custody &bull; Zero trackers</span>
@@ -220,109 +222,16 @@ export default function SupportPage() {
           </h1>
 
           <p className="text-base sm:text-lg text-secondary font-light leading-relaxed max-w-3xl">
-            Built with conviction as an independent digital public good. Zero venture capital, zero telemetry trackers, zero corporate administrative backdoors.
+            Built with conviction as an independent digital public good. Zero venture capital, zero telemetry trackers, zero corporate administrative backdoors. 100% of community contributions directly sustain our decentralized IPFS nodes, Tor onion relays, and open-source infrastructure.
           </p>
-
-          {/* Deep Narrative: The Reality of Modern Publishing Chokepoints */}
-          <div className="p-6 sm:p-8 rounded-[6px] border border-hairline bg-surface relative overflow-hidden">
-            <div className="flex items-center gap-2 font-mono text-xs text-secondary mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-secondary" />
-              <span>Founder&apos;s Dispatch &bull; The Cost of Corporate Fragility</span>
-            </div>
-
-            <div className="space-y-4 text-sm sm:text-base text-secondary leading-relaxed font-sans font-light">
-              <p>
-                PressProtocol was not built by a venture-backed startup, an advertising agency, or an incubator. It was architected, written, and deployed from first principles as an independent cypherpunk digital public good: <strong className="text-primary font-normal">publishing truth, investigative journalism, and historical records must never depend on corporate permission or administrative benevolence.</strong>
-              </p>
-              
-              <div className="grid sm:grid-cols-2 gap-3 pt-2">
-                <div className="p-4 rounded-[6px] bg-surface-raised border border-hairline space-y-1.5">
-                  <div className="flex items-center gap-1.5 text-secondary font-mono text-xs font-semibold">
-                    <AlertTriangle className="w-3.5 h-3.5 text-warning" />
-                    <span>The Cloud Chokepoint</span>
-                  </div>
-                  <p className="text-xs text-muted leading-relaxed font-sans">
-                    Substack, Medium, and Ghost hosted on AWS log IP addresses, enforce terms-of-service bans under legal coercion, and centralize the world&apos;s investigative record into single points of failure.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-[6px] bg-surface-raised border border-hairline space-y-1.5">
-                  <div className="flex items-center gap-1.5 text-secondary font-mono text-xs font-semibold">
-                    <Globe className="w-3.5 h-3.5 text-muted" />
-                    <span>The 38% Web Rot Epidemic</span>
-                  </div>
-                  <p className="text-xs text-muted leading-relaxed font-sans">
-                    Pew Research documented that over 38% of all web pages published in 2013 are now completely broken 404s. Without deterministic content-addressed storage, human knowledge decays constantly.
-                  </p>
-                </div>
-              </div>
-
-              <p className="text-muted text-sm leading-relaxed pt-1">
-                By staying independent, there are no shareholders to appease, no user data to monetize, and no administrative backdoors to negotiate. Through open public goods grants and community support, we are expanding from our sovereign core into a resilient, multi-maintainer open collective that permanently belongs to the public domain.
-              </p>
-            </div>
-          </div>
         </div>
 
-        {/* Section 2: The 4 Non-Negotiable Sovereign Invariants */}
-        <div className="space-y-6">
-          <div>
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-[6px] bg-surface border border-hairline text-xs font-mono text-muted mb-3">
-              <Shield className="w-3.5 h-3.5 text-muted" />
-              <span>Architectural core</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-hero font-normal text-primary">
-              The 4 Sovereign Invariants
-            </h2>
-            <p className="text-xs sm:text-sm text-muted font-mono mt-1">
-              Guarantees enforced by mathematics, cryptography, and decentralized networks—not corporate promises.
-            </p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 gap-4">
-            {SOVEREIGN_INVARIANTS.map((inv) => {
-              const Icon = inv.icon;
-              return (
-                <div
-                  key={inv.id}
-                  className="p-6 rounded-[6px] border border-hairline bg-surface hover:border-focus transition-colors space-y-3 relative overflow-hidden group"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="h-10 w-10 rounded-[6px] bg-surface-raised border border-hairline flex items-center justify-center text-secondary group-hover:text-primary transition-colors">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <span className="text-[11px] font-mono text-muted px-2.5 py-0.5 rounded-[6px] bg-surface-raised border border-hairline">
-                      Invariant
-                    </span>
-                  </div>
-
-                  <div>
-                    <h3 className="font-semibold text-primary text-base transition-colors">
-                      {inv.title}
-                    </h3>
-                    <div className="text-xs font-mono text-muted mt-0.5">{inv.subtitle}</div>
-                  </div>
-
-                  <p className="text-xs sm:text-sm text-secondary leading-relaxed font-sans font-light">
-                    {inv.description}
-                  </p>
-
-                  <div className="pt-2 flex items-center gap-1.5 text-xs font-mono text-verified">
-                    <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                    <span>{inv.guarantee}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Section 3: Contribution Channels (Crypto & Traditional) */}
+        {/* Section 2: Contribution Channels (Crypto & Traditional) */}
         <div className="space-y-6 pt-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h2 className="text-2xl font-hero font-normal text-primary">
-                Infrastructure Contribution Channels
+                Contribution Channels
               </h2>
               <p className="text-xs sm:text-sm text-muted font-mono mt-1">
                 Choose between on-chain crypto addresses or direct payment methods.
@@ -333,25 +242,23 @@ export default function SupportPage() {
             <div className="w-full sm:w-auto grid grid-cols-2 sm:flex sm:items-center p-1 rounded-[6px] bg-surface border border-hairline font-mono text-xs shrink-0">
               <button
                 onClick={() => setActiveCategory("crypto")}
-                className={`px-3 sm:px-4 py-2 rounded-[6px] flex items-center justify-center gap-2 transition-all text-xs ${
-                  activeCategory === "crypto"
+                className={`px-3 sm:px-4 py-2 rounded-[6px] flex items-center justify-center gap-2 transition-all text-xs ${activeCategory === "crypto"
                     ? "bg-overlay text-primary font-medium shadow-sm"
                     : "text-muted hover:text-primary"
-                }`}
+                  }`}
               >
                 <Coins className="h-3.5 w-3.5 shrink-0" />
                 <span>Crypto Networks</span>
               </button>
               <button
                 onClick={() => setActiveCategory("traditional")}
-                className={`px-3 sm:px-4 py-2 rounded-[6px] flex items-center justify-center gap-2 transition-all text-xs ${
-                  activeCategory === "traditional"
+                className={`px-3 sm:px-4 py-2 rounded-[6px] flex items-center justify-center gap-2 transition-all text-xs ${activeCategory === "traditional"
                     ? "bg-overlay text-primary font-medium shadow-sm"
                     : "text-muted hover:text-primary"
-                }`}
+                  }`}
               >
                 <CreditCard className="h-3.5 w-3.5 shrink-0" />
-                <span>Traditional &amp; Card</span>
+                <span>Card &amp; Fiat</span>
               </button>
             </div>
           </div>
@@ -370,11 +277,10 @@ export default function SupportPage() {
                         setSelectedChain(chain);
                         setCopiedAddress(false);
                       }}
-                      className={`p-3 sm:p-4 rounded-[6px] border text-left transition-all relative overflow-hidden group ${
-                        isSelected
+                      className={`p-3 sm:p-4 rounded-[6px] border text-left transition-all relative overflow-hidden group ${isSelected
                           ? "border-focus bg-surface-raised text-primary shadow-sm"
                           : "border-hairline bg-surface text-muted hover:text-primary hover:bg-surface-raised"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-mono text-xs font-medium uppercase tracking-wider text-secondary">
@@ -528,99 +434,57 @@ export default function SupportPage() {
             </div>
           )}
 
-          {/* VIEW B: Traditional Methods */}
+          {/* VIEW B: Card & Fiat Methods */}
           {activeCategory === "traditional" && (
             <div className="space-y-6 animate-in fade-in duration-300">
-              {/* Verification in Progress Alert */}
-              <div className="p-4 rounded-[6px] bg-surface border border-hairline flex items-start gap-3">
-                <div className="h-8 w-8 rounded-[4px] bg-warning/10 border border-warning/30 flex items-center justify-center text-warning shrink-0 mt-0.5">
-                  <Clock className="h-4 w-4" />
-                </div>
-                <div className="space-y-1">
-                  <div className="font-sans text-xs font-semibold text-primary">
-                    Payment Gateway &amp; Entity Setup In Progress
-                  </div>
-                  <p className="text-xs text-muted leading-relaxed font-sans">
-                    Institutional merchant accounts and payment gateway verification are currently underway for <span className="text-secondary font-mono">pressprotocol.com</span>. We are adding PayPal, card processors, and Payoneer soon. GitHub Sponsors and all on-chain crypto networks are fully live.
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 gap-4">
                 {TRADITIONAL_METHODS.map((method: TraditionalMethod) => {
                   const isCopied = copiedIdentifier === method.identifier;
-                  const isComingSoon = method.status === "coming_soon";
                   return (
                     <div
                       key={method.id}
-                      className={`p-5 sm:p-6 rounded-[6px] border bg-surface transition-all flex flex-col justify-between space-y-4 group ${
-                        isComingSoon
-                          ? "border-hairline opacity-80"
-                          : "border-hairline hover:border-focus"
-                      }`}
+                      className="p-5 sm:p-6 rounded-[6px] border border-hairline hover:border-focus bg-surface transition-all flex flex-col justify-between space-y-4 group"
                     >
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="font-mono text-xs uppercase tracking-wider text-secondary font-medium">
+                          <span className="font-mono text-xs uppercase tracking-wider text-secondary font-medium flex items-center gap-1.5">
+                            {method.id === "buymeacoffee" && (
+                              <Coffee className="h-3.5 w-3.5 text-[#FFDD00]" />
+                            )}
+                            {method.id === "github-sponsors" && (
+                              <Github className="h-3.5 w-3.5 text-secondary" />
+                            )}
                             {method.name}
                           </span>
-                          <span
-                            className={`text-[11px] font-mono px-2.5 py-0.5 rounded-[6px] border ${
-                              isComingSoon
-                                ? "bg-warning/10 text-warning border-warning/30"
-                                : "bg-surface-raised border-hairline text-muted"
-                            }`}
-                          >
+                          <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-[6px] border bg-surface-raised border-hairline text-muted">
                             {method.badge}
                           </span>
                         </div>
                         <p className="text-xs text-secondary leading-relaxed font-sans">{method.description}</p>
-
-                        {isComingSoon && method.statusNotice && (
-                          <div className="p-2.5 rounded-[4px] bg-surface-raised border border-hairline text-[11px] font-mono text-muted flex items-start gap-1.5 mt-2">
-                            <Clock className="w-3.5 h-3.5 text-warning shrink-0 mt-0.5" />
-                            <span>{method.statusNotice}</span>
-                          </div>
-                        )}
                       </div>
 
-                      <div className="pt-2 flex items-center gap-2">
-                        {isComingSoon ? (
-                          <Button
-                            disabled
-                            className="w-full h-10 rounded-[6px] font-mono text-xs font-medium bg-overlay text-muted border border-hairline cursor-not-allowed opacity-60 flex items-center justify-center gap-2"
-                          >
-                            <Clock className="h-3.5 w-3.5" />
-                            <span>Adding Soon</span>
-                          </Button>
-                        ) : method.link ? (
+                      <div className="pt-2 flex flex-wrap items-center gap-2">
+                        {method.link && (
                           <a
                             href={method.link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex-1"
+                            className="flex-1 min-w-[140px]"
                           >
                             <Button className="w-full h-10 rounded-[6px] font-mono text-xs font-medium bg-surface-raised hover:bg-overlay border border-hairline text-primary flex items-center justify-center gap-2">
                               <span>Open {method.name}</span>
                               <ExternalLink className="h-3.5 w-3.5" />
                             </Button>
                           </a>
-                        ) : (
+                        )}
+                        {method.qrImage && (
                           <Button
-                            onClick={() => handleCopy(method.identifier, false)}
-                            className="flex-1 h-10 rounded-[6px] font-mono text-xs font-semibold bg-surface-raised hover:bg-surface border border-border/70 text-primary flex items-center justify-center gap-2"
+                            onClick={() => setSelectedTraditionalMethod(method)}
+                            className="h-10 px-3.5 rounded-[6px] font-mono text-xs font-medium bg-surface hover:bg-surface-raised border border-hairline text-primary flex items-center justify-center gap-1.5 shrink-0"
+                            title="View QR Code"
                           >
-                            {isCopied ? (
-                              <>
-                                <Check className="h-3.5 w-3.5 text-verified" />
-                                <span>Copied</span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="h-3.5 w-3.5" />
-                                <span>Copy Identifier</span>
-                              </>
-                            )}
+                            <QrCode className="h-3.5 w-3.5 text-secondary" />
+                            <span>QR Code</span>
                           </Button>
                         )}
                       </div>
@@ -628,6 +492,82 @@ export default function SupportPage() {
                   );
                 })}
               </div>
+
+              {/* Traditional QR Modal */}
+              {selectedTraditionalMethod && selectedTraditionalMethod.qrImage && (
+                <div
+                  className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
+                  onClick={() => setSelectedTraditionalMethod(null)}
+                >
+                  <div
+                    className="p-6 sm:p-8 rounded-[6px] border border-hairline bg-surface max-w-sm w-full space-y-4 text-center shadow-2xl relative"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="flex items-center justify-between pb-2 border-b border-hairline">
+                      <span className="font-mono text-xs text-secondary font-medium flex items-center gap-1.5">
+                        <Coffee className="h-3.5 w-3.5 text-[#FFDD00]" />
+                        {selectedTraditionalMethod.name} QR Code
+                      </span>
+                      <button
+                        onClick={() => setSelectedTraditionalMethod(null)}
+                        className="text-muted hover:text-primary font-mono text-xs"
+                      >
+                        ✕ Close
+                      </button>
+                    </div>
+
+                    <div className="p-4 bg-white rounded-[6px] mx-auto w-fit border border-hairline shadow-inner">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={selectedTraditionalMethod.qrImage}
+                        alt={`${selectedTraditionalMethod.name} QR`}
+                        className="w-52 h-52 sm:w-56 sm:h-56 mx-auto object-contain"
+                      />
+                    </div>
+
+                    <p className="font-mono text-xs text-muted px-2">
+                      Scan with your smartphone camera to donate via Apple Pay, Google Pay, or Card.
+                    </p>
+
+                    <div className="flex flex-col gap-2 pt-1">
+                      {selectedTraditionalMethod.link && (
+                        <a
+                          href={selectedTraditionalMethod.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full"
+                        >
+                          <Button className="w-full h-10 font-mono text-xs bg-surface-raised hover:bg-overlay border border-hairline text-primary font-medium rounded-[6px] flex items-center justify-center gap-2">
+                            <span>Open {selectedTraditionalMethod.name}</span>
+                            <ExternalLink className="h-3.5 w-3.5" />
+                          </Button>
+                        </a>
+                      )}
+                      <Button
+                        onClick={() =>
+                          handleCopy(
+                            selectedTraditionalMethod.link || selectedTraditionalMethod.identifier,
+                            false
+                          )
+                        }
+                        className="w-full h-10 font-mono text-xs bg-overlay hover:bg-surface-raised border border-hairline text-secondary font-medium rounded-[6px] flex items-center justify-center gap-2"
+                      >
+                        {copiedIdentifier ? (
+                          <>
+                            <Check className="h-3.5 w-3.5 text-verified" />
+                            <span>Link Copied</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="h-3.5 w-3.5" />
+                            <span>Copy Link</span>
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Direct Inquiries Box */}
               <div className="p-5 sm:p-6 rounded-[6px] border border-hairline bg-surface flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -662,6 +602,111 @@ export default function SupportPage() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Section 3: Protocol Architecture & The 4 Sovereign Invariants */}
+        <div className="space-y-8 pt-6 border-t border-hairline">
+          <div>
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-[6px] bg-surface border border-hairline text-xs font-mono text-muted mb-3">
+              <Shield className="w-3.5 h-3.5 text-muted" />
+              <span>Architectural core</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-hero font-normal text-primary">
+              Why Sovereign Infrastructure Matters
+            </h2>
+            <p className="text-xs sm:text-sm text-muted font-mono mt-1">
+              The architectural threat model and non-negotiable cryptographic invariants protecting every dispatch.
+            </p>
+          </div>
+
+          {/* Deep Narrative: The Reality of Modern Publishing Chokepoints */}
+          <div className="p-6 sm:p-8 rounded-[6px] border border-hairline bg-surface relative overflow-hidden">
+            <div className="flex items-center gap-2 font-mono text-xs text-secondary mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-secondary" />
+              <span>Maintainer&apos;s Dispatch &bull; The Cost of Corporate Fragility</span>
+            </div>
+
+            <div className="space-y-4 text-sm sm:text-base text-secondary leading-relaxed font-sans font-light">
+              <p>
+                PressProtocol was not built by a venture-backed startup, an advertising agency, or an incubator. It was architected, written, and deployed from first principles as an independent cypherpunk digital public good: <strong className="text-primary font-normal">publishing truth, investigative journalism, and historical records must never depend on corporate permission or administrative benevolence.</strong>
+              </p>
+
+              <div className="grid sm:grid-cols-2 gap-3 pt-2">
+                <div className="p-4 rounded-[6px] bg-surface-raised border border-hairline space-y-1.5">
+                  <div className="flex items-center gap-1.5 text-secondary font-mono text-xs font-semibold">
+                    <AlertTriangle className="w-3.5 h-3.5 text-warning" />
+                    <span>The Cloud Chokepoint</span>
+                  </div>
+                  <p className="text-xs text-muted leading-relaxed font-sans">
+                    Substack, Medium, and Ghost hosted on AWS log IP addresses, enforce terms-of-service bans under legal coercion, and centralize the world&apos;s investigative record into single points of failure.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-[6px] bg-surface-raised border border-hairline space-y-1.5">
+                  <div className="flex items-center gap-1.5 text-secondary font-mono text-xs font-semibold">
+                    <Globe className="w-3.5 h-3.5 text-muted" />
+                    <span>The 38% Web Rot Epidemic</span>
+                  </div>
+                  <p className="text-xs text-muted leading-relaxed font-sans">
+                    Pew Research documented that over 38% of all web pages published in 2013 are now completely broken 404s. Without deterministic content-addressed storage, human knowledge decays constantly.
+                  </p>
+                </div>
+              </div>
+
+              <p className="text-muted text-sm leading-relaxed pt-1">
+                By staying independent, there are no shareholders to appease, no user data to monetize, and no administrative backdoors to negotiate. Through open public goods grants and community support, we are expanding from our sovereign core into a resilient, multi-maintainer open collective that permanently belongs to the public domain.
+              </p>
+            </div>
+          </div>
+
+          {/* The 4 Non-Negotiable Sovereign Invariants */}
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-xl sm:text-2xl font-hero font-normal text-primary">
+                The 4 Sovereign Invariants
+              </h3>
+              <p className="text-xs sm:text-sm text-muted font-mono mt-1">
+                Guarantees enforced by mathematics, cryptography, and decentralized networks—not corporate promises.
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              {SOVEREIGN_INVARIANTS.map((inv) => {
+                const Icon = inv.icon;
+                return (
+                  <div
+                    key={inv.id}
+                    className="p-6 rounded-[6px] border border-hairline bg-surface hover:border-focus transition-colors space-y-3 relative overflow-hidden group"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="h-10 w-10 rounded-[6px] bg-surface-raised border border-hairline flex items-center justify-center text-secondary group-hover:text-primary transition-colors">
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <span className="text-[11px] font-mono text-muted px-2.5 py-0.5 rounded-[6px] bg-surface-raised border border-hairline">
+                        Invariant
+                      </span>
+                    </div>
+
+                    <div>
+                      <h3 className="font-semibold text-primary text-base transition-colors">
+                        {inv.title}
+                      </h3>
+                      <div className="text-xs font-mono text-muted mt-0.5">{inv.subtitle}</div>
+                    </div>
+
+                    <p className="text-xs sm:text-sm text-secondary leading-relaxed font-sans font-light">
+                      {inv.description}
+                    </p>
+
+                    <div className="pt-2 flex items-center gap-1.5 text-xs font-mono text-verified">
+                      <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                      <span>{inv.guarantee}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
         {/* Section 4: Transparent Infrastructure Ledger & Treasury Allocation */}
@@ -709,11 +754,10 @@ export default function SupportPage() {
                       </td>
                       <td className="p-4 text-right whitespace-nowrap">
                         <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] text-[10px] font-mono ${
-                            item.status.includes("Active")
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] text-[10px] font-mono ${item.status.includes("Active")
                               ? "bg-verified/10 text-verified border border-verified/30"
                               : "bg-warning/10 text-warning border border-warning/30"
-                          }`}
+                            }`}
                         >
                           <span className="w-1.5 h-1.5 rounded-full bg-current" />
                           {item.status}
@@ -735,11 +779,10 @@ export default function SupportPage() {
                       <div className="text-[10px] text-muted uppercase font-mono">{item.priority}</div>
                     </div>
                     <span
-                      className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[6px] text-[10px] font-mono shrink-0 ${
-                        item.status.includes("Active")
+                      className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[6px] text-[10px] font-mono shrink-0 ${item.status.includes("Active")
                           ? "bg-verified/10 text-verified border border-verified/30"
                           : "bg-warning/10 text-warning border border-warning/30"
-                      }`}
+                        }`}
                     >
                       <span className="w-1.5 h-1.5 rounded-full bg-current" />
                       {item.status}
@@ -767,7 +810,7 @@ export default function SupportPage() {
               Open Maintainer Roadmap
             </h2>
             <p className="text-xs sm:text-sm text-muted font-mono mt-1">
-              How we evolve from single-developer agility to permanent, decentralized institutional stewardship.
+              Architectural milestones for expanding global node federation, independent cryptographic audits, and decentralized stewardship.
             </p>
           </div>
 
@@ -870,17 +913,6 @@ export default function SupportPage() {
                 <span>Try Sovereign Studio</span>
               </Button>
             </Link>
-          </div>
-        </div>
-
-        {/* Footer Guarantee */}
-        <div className="border-t border-hairline pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-muted">
-          <div className="flex items-center gap-2">
-            <Shield className="h-4 w-4 text-verified" />
-            <span>MIT Licensed Open Source &bull; Sovereign Digital Public Good &bull; Zero Custody</span>
-          </div>
-          <div>
-            <span>PressProtocol &bull; Built with defiance and conviction</span>
           </div>
         </div>
       </div>
