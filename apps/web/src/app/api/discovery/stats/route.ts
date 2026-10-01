@@ -3,10 +3,6 @@ import { getBackendUrl } from "@/config/backend";
 
 export const dynamic = "force-dynamic";
 
-if (process.env.NODE_ENV !== "production") {
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-}
-
 export async function GET() {
   const backendUrl = getBackendUrl();
   const candidateUrls = [

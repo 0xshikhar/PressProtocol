@@ -5,10 +5,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBackendUrl } from "@/config/backend";
 
-if (process.env.NODE_ENV !== "production") {
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-}
-
 const BACKEND_URL = getBackendUrl();
 const CANONICAL_EDGE_URL = "https://api.pressprotocol.com";
 

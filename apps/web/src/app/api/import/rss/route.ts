@@ -1,8 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parseFullRssFeed } from "@/lib/scrubber";
+import { safeFetch, validateSafeUrl } from "@/lib/ssrf";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Ingests and parses an external RSS or Atom feed with SSRF protection,
+ * extracting sanitized articles and publication metadata.
+ *
+ * @param req - Incoming NextRequest with JSON payload containing feedUrl
+ * @returns JSON response containing parsed feed title, metadata, and articles
+ */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -15,19 +23,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Validate URL syntax
+    // Validate URL syntax and protect against SSRF (CWE-918)
     let parsedUrl: URL;
     try {
-      parsedUrl = new URL(feedUrl);
-    } catch {
+      parsedUrl = validateSafeUrl(feedUrl);
+    } catch (urlErr) {
       return NextResponse.json(
-        { error: "Invalid URL syntax provided. Please include http:// or https://" },
+        { error: urlErr instanceof Error ? urlErr.message : "Invalid or forbidden feed URL provided" },
         { status: 400 }
       );
     }
 
-    // Fetch the remote feed
-    const response = await fetch(parsedUrl.toString(), {
+    // Fetch the remote feed safely
+    const response = await safeFetch(parsedUrl, {
       headers: {
         "User-Agent":
           "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 PressProtocol-Archiver/2.0",
@@ -35,7 +43,6 @@ export async function POST(req: NextRequest) {
           "application/rss+xml, application/atom+xml, application/xml, text/xml, text/html;q=0.9, */*;q=0.8",
         "Accept-Language": "en-US,en;q=0.9",
       },
-      redirect: "follow",
     });
 
     if (!response.ok) {

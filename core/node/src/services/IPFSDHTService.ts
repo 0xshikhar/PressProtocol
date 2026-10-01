@@ -12,6 +12,7 @@
 
 import { storageService } from './StorageService.js';
 import { heliaNode } from './HeliaNode.js';
+import { isValidCID } from '../lib/cid.js';
 
 export interface ContentManifest {
   version: string; // Manifest format version
@@ -226,27 +227,34 @@ export class IPFSDHTService {
    * Fetch manifest from IPFS by CID
    */
   async fetchManifest(manifestCid: string): Promise<ContentManifest | null> {
+    if (!isValidCID(manifestCid)) {
+      console.warn('Invalid manifest CID provided:', manifestCid);
+      return null;
+    }
+
+    const cleanCid = manifestCid.trim();
+
     // Check cache first
-    if (this.manifestCache.has(manifestCid)) {
-      return this.manifestCache.get(manifestCid)!;
+    if (this.manifestCache.has(cleanCid)) {
+      return this.manifestCache.get(cleanCid)!;
     }
 
     try {
       // Fetch from IPFS
-      const manifest = await storageService.getContent(manifestCid) as ContentManifest;
+      const manifest = await storageService.getContent(cleanCid) as ContentManifest;
       
       // Validate manifest structure
       if (!manifest.cid || !manifest.title || !manifest.tags) {
-        console.warn(`Invalid manifest structure: ${manifestCid}`);
+        console.warn('Invalid manifest structure:', cleanCid);
         return null;
       }
       
       // Cache it
-      this.manifestCache.set(manifestCid, manifest);
+      this.manifestCache.set(cleanCid, manifest);
       
       return manifest;
     } catch (error) {
-      console.error(`Failed to fetch manifest ${manifestCid}:`, error);
+      console.error('Failed to fetch manifest:', cleanCid, error);
       return null;
     }
   }

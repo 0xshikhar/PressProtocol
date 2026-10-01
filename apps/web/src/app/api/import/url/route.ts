@@ -1,10 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { extractArticleFromUrl } from "@/lib/scrubber";
+import { validateSafeUrl } from "@/lib/ssrf";
 import { PressProtocolClient } from "@pressprotocol/sdk";
 import { getBackendUrl } from "@/config/backend";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Ingests a single article from a URL with SSRF boundary checks,
+ * scrubs surveillance trackers, and optionally publishes to PressProtocol.
+ *
+ * @param req - Incoming NextRequest with JSON payload containing url, tags, and autoPublish options
+ * @returns JSON response with scrubbed article payload and optional publication details
+ */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -17,12 +25,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Validate URL syntax
+    // Validate URL syntax and check SSRF boundaries
     try {
-      new URL(url);
-    } catch {
+      validateSafeUrl(url);
+    } catch (urlErr) {
       return NextResponse.json(
-        { error: "Invalid URL syntax provided" },
+        { error: urlErr instanceof Error ? urlErr.message : "Invalid or forbidden URL provided" },
         { status: 400 }
       );
     }

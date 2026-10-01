@@ -254,6 +254,9 @@ app.get('/api/content/:cid', async (c) => {
 
   try {
     const { raw, gateway } = await raceIPFSGateways(cid, c.env.IPFS_GATEWAY_URL, c.env.PINATA_JWT);
+    const onionHost = c.env.TOR_ONION_GATEWAY || 'pressprotocol7sovereign4node6federation3mesh7relay5v3.onion';
+    const normalizedOnion = onionHost.startsWith('http') ? onionHost : `http://${onionHost}`;
+    c.header('Onion-Location', `${normalizedOnion.replace(/\/+$/, '')}/read/${cid}`);
 
     return c.json({
       success: true,
@@ -279,7 +282,6 @@ app.get('/api/content/:cid', async (c) => {
           },
           tor: {
             url: (() => {
-              const onionHost = c.env.TOR_ONION_GATEWAY || 'pressprotocol7sovereign4node6federation3mesh7relay5v3.onion';
               const normalized = onionHost.startsWith('http') ? onionHost : `http://${onionHost}`;
               return `${normalized.replace(/\/+$/, '')}/read/${cid}`;
             })(),
@@ -295,11 +297,6 @@ app.get('/api/content/:cid', async (c) => {
         failoverGateway: gateway,
       },
     });
-
-    const onionHost = c.env.TOR_ONION_GATEWAY || 'pressprotocol7sovereign4node6federation3mesh7relay5v3.onion';
-    const normalizedOnion = onionHost.startsWith('http') ? onionHost : `http://${onionHost}`;
-    c.header('Onion-Location', `${normalizedOnion.replace(/\/+$/, '')}/read/${cid}`);
-    return res;
   } catch (err: any) {
     return c.json(
       {
