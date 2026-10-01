@@ -14,13 +14,16 @@
 
 <p align="center">
   <a href="https://pressprotocol.com"><img src="https://img.shields.io/badge/Web%20App-pressprotocol.com-000000.svg?style=flat-square&logo=vercel" alt="Vercel Live"/></a>
+  <a href="https://github.com/0xshikhar/PressProtocol/blob/master/LICENSE"><img src="https://img.shields.io/badge/License-MIT-amber.svg?style=flat-square" alt="License: MIT"/></a>
   <a href="https://github.com/0xshikhar/PressProtocol/blob/master/scripts/test.sh"><img src="https://img.shields.io/badge/Tests-419%2F419%20Passing%20(100%25)-10b981.svg?style=flat-square" alt="Tests Passing"/></a>
   <a href="https://www.npmjs.com/search?q=pressprotocol"><img src="https://img.shields.io/badge/npm-@pressprotocol-cb3837.svg?style=flat-square&logo=npm" alt="NPM Packages"/></a>
   <a href="https://pypi.org/project/pressprotocol-py/"><img src="https://img.shields.io/pypi/v/pressprotocol-py.svg?color=3775A9&style=flat-square&logo=pypi&label=pypi" alt="PyPI Package"/></a>
   <a href="https://crates.io/crates/pressprotocol-rs/1.0.7"><img src="https://img.shields.io/crates/v/pressprotocol-rs.svg?color=DEA584&style=flat-square&logo=rust&label=crates.io" alt="Crates.io Package"/></a>
-  <a href="https://pkg.go.dev/github.com/0xshikhar/PressProtocol/sdks/go"><img src="https://pkg.go.dev/badge/github.com/0xshikhar/PressProtocol/sdks/go.svg" alt="Go Reference"/></a>
+  <a href="https://pkg.go.dev/github.com/0xshikhar/PressProtocol/sdks/go"><img src="https://pkg.go.dev/badge/github.com/0xshikhar/PressProtocol/sdks/go.svg" alt="Go Reference"/></a> 
   <a href="https://pressprotocol.com/support"><img src="https://img.shields.io/badge/Support-Donate%20%26%20Underwrite-rose.svg?style=flat-square&logo=heart" alt="Support PressProtocol"/></a>
-  <a href="https://github.com/0xshikhar/PressProtocol/blob/master/LICENSE"><img src="https://img.shields.io/badge/License-MIT-amber.svg?style=flat-square" alt="License: MIT"/></a>
+  <a href="https://github.com/sponsors/0xshikhar"><img src="https://img.shields.io/badge/Sponsor-0xshikhar-ea4aaa.svg?style=flat-square&logo=github-sponsors" alt="Sponsor on GitHub"/></a>
+  <a href="https://buymeacoffee.com/pressprotocol"><img src="https://img.shields.io/badge/Buy%20Me%20A%20Coffee-pressprotocol-FFDD00.svg?style=flat-square&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me A Coffee"/></a>
+ 
 </p>
 
 > ### 🌐 Sovereign Digital Infrastructure — Not a Closed Platform
@@ -646,7 +649,7 @@ PressProtocol operates with **zero ads, zero tracking, and zero subscription pay
 We accept sovereign community underwriting via multiple networks:
 - **Ethereum & Layer 2s**: Ethereum, Arbitrum, Optimism, Base
 - **Privacy & Sovereign Assets**: Monero (XMR), Bitcoin (BTC), Solana (SOL)
-- **Traditional Methods**: GitHub Sponsors, Open Collective, and Fiat Sponsorships
+- **Traditional Methods**: [GitHub Sponsors](https://github.com/sponsors/0xshikhar), [Buy Me a Coffee](https://buymeacoffee.com/pressprotocol), and Fiat Sponsorships
 
 ---
 

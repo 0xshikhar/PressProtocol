@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Github, Twitter, Globe, Shield, Terminal, Activity, ArrowUpRight, Heart } from "lucide-react";
+import { Github, Twitter, Globe, Shield, Terminal, Activity, ArrowUpRight, Heart, Coffee } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Footer() {
@@ -39,6 +39,7 @@ export default function Footer() {
       links: [
         { name: "About PressProtocol", href: "/about" },
         { name: "Support & Public Goods", href: "/support" },
+        { name: "Buy Me a Coffee", href: "https://buymeacoffee.com/pressprotocol", external: true },
         { name: "How It Works", href: "/#features" },
         { name: "Threat Model", href: "/privacy" },
         { name: "Public Goods Mission", href: "/about" },
@@ -101,48 +102,51 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Live Protocol Health Status, Social Badges & Support Public Good Pill */}
+          {/* Social Badges & Support CTAs */}
           <div className="flex flex-col sm:items-end gap-3">
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-[6px] bg-[var(--verified-tint)] border border-[var(--verified)]/30 text-[var(--verified-bright)] font-mono text-xs">
-                <span className="h-1.5 w-1.5 rounded-full bg-[var(--verified-bright)]" />
-                <span>Swarm Active</span>
-                <span className="text-[var(--border-focus)]">|</span>
-                <span className="text-[var(--text-secondary)]">18ms SLA</span>
-              </div>
-
-              <div className="flex gap-2">
-                {socialLinks.map((social) => {
-                  const Icon = social.icon;
-                  return (
-                    <Button
-                      key={social.name}
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8 bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)] hover:border-[var(--border-focus)] rounded-[6px] transition-colors"
-                      asChild
+            <div className="flex items-center gap-2">
+              {socialLinks.map((social) => {
+                const Icon = social.icon;
+                return (
+                  <Button
+                    key={social.name}
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8 bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-overlay)] hover:border-[var(--border-focus)] rounded-[6px] transition-colors"
+                    asChild
+                  >
+                    <a
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={social.name}
                     >
-                      <a
-                        href={social.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={social.name}
-                      >
-                        <Icon className="h-4 w-4" />
-                      </a>
-                    </Button>
-                  );
-                })}
-              </div>
+                      <Icon className="h-4 w-4" />
+                    </a>
+                  </Button>
+                );
+              })}
             </div>
 
-            {/* Support Public Good Pill */}
-            <Link href="/support" className="group">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-[6px] border border-[var(--accent-primary)]/30 bg-[var(--accent-tint)] hover:bg-[var(--accent-primary)]/25 text-[var(--text-primary)] font-mono text-xs transition-all">
-                <Heart className="h-3.5 w-3.5 fill-[var(--accent-ribbon)] text-[var(--accent-ribbon)] group-hover:scale-105 transition-transform" />
-                <span>Support Public Good</span>
-              </div>
-            </Link>
+            {/* Support Public Good Pill & Buy Me a Coffee */}
+            <div className="flex flex-wrap items-center gap-2">
+              <a
+                href="https://buymeacoffee.com/pressprotocol"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-2 px-3.5 py-1.5 rounded-[6px] border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-overlay)] hover:border-[#FFDD00]/50 text-[var(--text-primary)] font-mono text-xs transition-all shadow-sm"
+              >
+                <Coffee className="h-3.5 w-3.5 text-[#FFDD00] group-hover:scale-110 transition-transform" />
+                <span>Buy Me a Coffee</span>
+              </a>
+
+              <Link href="/support" className="group">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-[6px] border border-[var(--accent-primary)]/30 bg-[var(--accent-tint)] hover:bg-[var(--accent-primary)]/25 text-[var(--text-primary)] font-mono text-xs transition-all">
+                  <Heart className="h-3.5 w-3.5 fill-[var(--accent-ribbon)] text-[var(--accent-ribbon)] group-hover:scale-105 transition-transform" />
+                  <span>Support Public Good</span>
+                </div>
+              </Link>
+            </div>
           </div>
         </div>
 
