@@ -16,7 +16,8 @@ export interface TraditionalMethod {
   badge: string;
   identifier: string;
   link?: string;
-  type: "paypal" | "payoneer" | "github" | "wire";
+  qrImage?: string;
+  type: "github" | "wire" | "buymeacoffee";
   status: "active" | "coming_soon";
   statusNotice?: string;
   description: string;
@@ -93,43 +94,24 @@ export const DONATION_CHAINS: DonationChain[] = [
 
 export const TRADITIONAL_METHODS: TraditionalMethod[] = [
   {
+    id: "buymeacoffee",
+    name: "Buy Me a Coffee",
+    badge: "Card · Apple Pay · Instant",
+    identifier: "buymeacoffee.com/pressprotocol",
+    link: "https://buymeacoffee.com/pressprotocol",
+    qrImage: "/bmc_qr.png",
+    type: "buymeacoffee",
+    status: "active",
+    description: "Support decentralized infrastructure and open-source protocol engineering via Credit Card, Debit Card, Apple Pay, or Google Pay with instant zero-friction checkout.",
+  },
+  {
     id: "github-sponsors",
     name: "GitHub Sponsors",
     badge: "Zero-Fee / Open Source",
     identifier: "github.com/sponsors/0xshikhar",
-    link: "https://github.com/0xshikhar/PressProtocol",
+    link: "https://github.com/sponsors/0xshikhar",
     type: "github",
     status: "active",
-    description: "Support open-source development directly through GitHub's sponsorship program with zero fees.",
-  },
-  {
-    id: "paypal",
-    name: "PayPal",
-    badge: "Coming Soon",
-    identifier: "Merchant Setup In Progress",
-    type: "paypal",
-    status: "coming_soon",
-    statusNotice: "Merchant entity verification & account setup in progress for pressprotocol.com. Integration launching soon.",
-    description: "Direct card & PayPal gateway. Currently undergoing institutional entity verification for pressprotocol.com.",
-  },
-  {
-    id: "payoneer",
-    name: "Payoneer",
-    badge: "Coming Soon",
-    identifier: "Account Setup In Progress",
-    type: "payoneer",
-    status: "coming_soon",
-    statusNotice: "Commercial billing profile currently under setup for pressprotocol.com. Integration launching soon.",
-    description: "Cross-border commercial settlement and card payouts. Entity review in progress.",
-  },
-  {
-    id: "wire",
-    name: "Direct Wire & Foundation Grants",
-    badge: "By Inquiry",
-    identifier: "pressprotocol.com/inquiry",
-    link: "https://github.com/0xshikhar/PressProtocol/issues",
-    type: "wire",
-    status: "active",
-    description: "For institutional wire transfers, donor-advised funds (DAFs), or journalism grants, open an inquiry directly with maintainers.",
-  },
+    description: "Support open-source protocol development directly through GitHub's verified sponsorship program with zero platform fees.",
+  }
 ];
