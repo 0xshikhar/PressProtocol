@@ -19,13 +19,13 @@ function cleanObsidianMarkdown(raw) {
     // 1. Strip YAML frontmatter
     text = text.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
     // 2. Transform wiki-links with custom display text: [[Note Title|Custom Text]] -> Custom Text
-    text = text.replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, "$2");
+    text = text.replace(/\[\[([^\]|\r\n]+)\|([^\]\r\n]+)\]\]/g, "$2");
     // 3. Transform simple wiki-links: [[Note Title]] -> Note Title
-    text = text.replace(/\[\[([^\]]+)\]\]/g, "$1");
+    text = text.replace(/\[\[([^\]\r\n]+)\]\]/g, "$1");
     // 4. Strip Obsidian block references (e.g. ^c7b8a1)
-    text = text.replace(/\s*\^[a-zA-Z0-9-]+\s*$/gm, "");
+    text = text.replace(/[ \t]*\^[a-zA-Z0-9-]+[ \t]*$/gm, "");
     // 5. Clean internal embedded transclusions: ![[Note Title]] -> [Note Reference: Note Title]
-    text = text.replace(/!\[\[([^\]]+)\]\]/g, "*[Embedded Note: $1]*");
+    text = text.replace(/!\[\[([^\]\r\n]+)\]\]/g, "*[Embedded Note: $1]*");
     return text.trim();
 }
 /**
@@ -41,7 +41,7 @@ function extractArticleTitle(raw, fallbackBasename) {
         }
     }
     // Check first markdown H1
-    const h1Match = raw.match(/^#\s+(.+)$/m);
+    const h1Match = raw.match(/^#[ \t]+([^\r\n]+)/m);
     if (h1Match && h1Match[1]) {
         return h1Match[1].trim();
     }
