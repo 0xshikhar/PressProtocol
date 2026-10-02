@@ -2,7 +2,7 @@ name: "CodeQL SAST Analysis"
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "feat/security-sanitization-fixes" ]
   pull_request:
     branches: [ "master" ]
   schedule:
