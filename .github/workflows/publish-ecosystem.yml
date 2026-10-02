@@ -17,10 +17,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - name: Setup Node.js 20
+      - name: Setup Node.js (v22.23.3 LTS)
         uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
         with:
-          node-version: 20
+          node-version: '22.23.3'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Setup pnpm
@@ -127,14 +127,16 @@ jobs:
           zip -r ../../PressProtocol_Wordpress_Plugin.zip . -x ".git/*"
           cd ../..
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@c95fe1489396fe8a9eb87c0abf8aa5b2ef267fda # v2.2.1
+      - name: Create GitHub Release (via GitHub CLI)
         if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: |
-            PressProtocol_Browser_Extension.zip
-            PressProtocol_Wordpress_Plugin.zip
-          generate_release_notes: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            PressProtocol_Browser_Extension.zip \
+            PressProtocol_Wordpress_Plugin.zip \
+            --title "${{ github.ref_name }}" \
+            --generate-notes
 
   publish-ghcr:
     name: Publish Sovereign Node to GitHub Packages (GHCR)

@@ -22,7 +22,7 @@ echo "📋 Checking prerequisites..."
 # Check Node.js
 if ! command -v node &> /dev/null; then
     echo -e "${RED}❌ Node.js is not installed${NC}"
-    echo "Please install Node.js 20+ from https://nodejs.org"
+    echo "Please install Node.js 22+ (LTS v22.23.3) from https://nodejs.org"
     exit 1
 fi
 echo -e "${GREEN}✅ Node.js $(node --version)${NC}"
@@ -30,10 +30,18 @@ echo -e "${GREEN}✅ Node.js $(node --version)${NC}"
 # Check pnpm
 if ! command -v pnpm &> /dev/null; then
     echo -e "${RED}❌ pnpm is not installed${NC}"
-    echo "Please install pnpm using: npm install -g pnpm or corepack enable"
+    echo "Please install pnpm using: corepack enable or npm install -g pnpm"
     exit 1
 fi
 echo -e "${GREEN}✅ pnpm $(pnpm --version)${NC}"
+
+# Check GitHub CLI (gh)
+if ! command -v gh &> /dev/null; then
+    echo -e "${YELLOW}⚠️ GitHub CLI (gh) is not installed${NC}"
+    echo "Install gh from https://cli.github.com for PR, issue, and release automation"
+else
+    echo -e "${GREEN}✅ GitHub CLI $(gh --version | head -n 1)${NC}"
+fi
 
 echo ""
 

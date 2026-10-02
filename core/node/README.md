@@ -13,7 +13,7 @@ Backend API for AnonPress - Decentralized censorship-resistant publishing platfo
 
 ## Tech Stack
 
-- **Runtime**: Node.js 20+
+- **Runtime**: Node.js v22.23.3 (LTS)
 - **Framework**: Fastify
 - **Database**: PostgreSQL + Prisma
 - **Storage**: Pinata (IPFS)
@@ -22,7 +22,7 @@ Backend API for AnonPress - Decentralized censorship-resistant publishing platfo
 
 ## Prerequisites
 
-- Node.js 20+ or Bun
+- Node.js v22.23.3 (LTS) or Bun
 - PostgreSQL database
 - Pinata API credentials
 - (Optional) Tor daemon for real onion services
@@ -31,7 +31,7 @@ Backend API for AnonPress - Decentralized censorship-resistant publishing platfo
 
 ```bash
 # Install dependencies
-npm install
+pnpm install
 
 # Or use pnpm/bun
 pnpm install

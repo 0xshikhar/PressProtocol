@@ -2,7 +2,7 @@
 # Platforms: linux/amd64, linux/arm64 (Raspberry Pi 4/5, Apple Silicon, VPS)
 # Target: PressProtocol Complete Sovereign Infrastructure (Wave 4)
 
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
@@ -27,7 +27,7 @@ RUN npx prisma generate --no-engine 2>/dev/null || true
 RUN pnpm run build
 
 # --- Production Image ---
-FROM node:20-alpine AS runner
+FROM node:22-alpine AS runner
 
 LABEL org.opencontainers.image.title="PressProtocol Sovereign Community Node"
 LABEL org.opencontainers.image.description="Autonomous, zero-SPOF censorship-resistant publishing node with embedded Helia IPFS and Tor v3"
