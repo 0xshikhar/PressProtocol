@@ -149,11 +149,17 @@ export function transpileMarkdown(markdown: string): { html: string; wordCount: 
       continue;
     }
 
+    // Purge executable script tags
+    if (trimmed.toLowerCase().includes("<script") || trimmed.toLowerCase().includes("</script>")) {
+      continue;
+    }
+
     // Callouts: `> 💡 ...` or `> ⚠️ ...` or `> 🚨 ...` or `> 🛡️ ...`
-    if (/^>\s*([\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF]|💡|⚠️|🚨|🔥|🛡️)\s*/.test(trimmed)) {
-      const match = trimmed.match(/^>\s*([\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF]|💡|⚠️|🚨|🔥|🛡️)\s*(.*)$/);
-      const icon = match ? match[1] : "💡";
-      const content = match ? match[2] : trimmed.slice(1).trim();
+    else if (trimmed.startsWith(">") && ["💡", "⚠️", "🚨", "🔥", "🛡️"].some((emoji) => trimmed.slice(1).trimStart().startsWith(emoji))) {
+      const rest = trimmed.slice(1).trimStart();
+      const calloutEmojis = ["💡", "⚠️", "🚨", "🔥", "🛡️"];
+      const icon = calloutEmojis.find((e) => rest.startsWith(e)) || "💡";
+      const content = rest.slice(icon.length).trimStart();
 
       let calloutType = "info";
       if (icon === "⚠️" || icon === "🚨" || icon === "🔥") {
@@ -203,16 +209,11 @@ export function transpileMarkdown(markdown: string): { html: string; wordCount: 
   }
 
   const rawHtml = htmlParts.join("\n");
-  const sanitized = rawHtml
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-    .replace(/\s*on\w+\s*=\s*(?:"[^"]*"|'[^']*'|&quot;.*?&quot;|[^\s>]+)/gi, "")
-    .replace(/\b(onload|onclick|onerror|onmouseover|onfocus)\b\s*=\s*(?:"[^"]*"|'[^']*'|&quot;.*?&quot;|[^\s>]+)/gi, "");
-
   const words = markdown.trim().split(/\s+/).filter(Boolean).length;
   const readingTimeMinutes = Math.max(1, Math.ceil(words / 200));
 
   return {
-    html: sanitized,
+    html: rawHtml,
     wordCount: words,
     readingTimeMinutes,
   };
@@ -222,13 +223,20 @@ export function transpileMarkdown(markdown: string): { html: string; wordCount: 
  * Handles inline formatting: bold, italic, code, links.
  */
 function renderInlineMarkdown(text: string): string {
-  return escapeHtml(text)
+  const sanitizedText = text.replace(/\bon[a-zA-Z]+\s*=\s*(?:'[^']*'|"[^"]*"|[^\s>]+)/gi, "data-purged='event'");
+  return escapeHtml(sanitizedText)
     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
     .replace(/\*(.*?)\*/g, "<em>$1</em>")
     .replace(/`([^`]+)`/g, "<code class=\"px-1.5 py-0.5 rounded bg-white/10 text-cyan-300 font-mono text-xs\">$1</code>")
     .replace(/\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-cyan-400 underline hover:text-cyan-300">$1</a>');
 }
 
+/**
+ * Escapes sensitive HTML characters into corresponding safe HTML entities.
+ *
+ * @param str - Input string to escape.
+ * @returns Escaped safe HTML string.
+ */
 function escapeHtml(str: string): string {
   return str
     .replace(/&/g, "&amp;")

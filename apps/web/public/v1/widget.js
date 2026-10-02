@@ -90,6 +90,13 @@
     return editorEl.innerHTML || editorEl.innerText || '';
   }
 
+  /**
+   * Extracts title from title element or fallback HTML/Markdown content without DOMParser reinterpretation.
+   *
+   * @param {Element|null} titleEl - Title input or heading element.
+   * @param {string} [fallbackContent] - Raw HTML or Markdown content.
+   * @returns {string} Sanitized title text.
+   */
   function extractTitle(titleEl, fallbackContent) {
     if (titleEl) {
       if ('value' in titleEl && titleEl.value) return titleEl.value.trim();
@@ -97,8 +104,27 @@
       if (text && text.trim()) return text.trim();
     }
     if (fallbackContent) {
-      const h1Match = fallbackContent.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
-      if (h1Match) return h1Match[1].replace(/<[^>]+>/g, '').trim();
+      const cleanMarkup = fallbackContent.replace(/="[^"]*"|='[^']*'/g, '=""');
+      const h1Open = /<h1\b[^>]*>/i.exec(cleanMarkup);
+      if (h1Open) {
+        const startIndex = h1Open.index + h1Open[0].length;
+        const closeIndex = cleanMarkup.toLowerCase().indexOf('</h1>', startIndex);
+        if (closeIndex !== -1) {
+          const innerHtml = cleanMarkup.slice(startIndex, closeIndex);
+          let inTag = false;
+          let text = '';
+          for (let i = 0; i < innerHtml.length; i++) {
+            if (innerHtml[i] === '<') {
+              inTag = true;
+            } else if (innerHtml[i] === '>') {
+              inTag = false;
+            } else if (!inTag) {
+              text += innerHtml[i];
+            }
+          }
+          if (text.trim()) return text.trim();
+        }
+      }
     }
     return 'Untitled Sovereign Publication';
   }

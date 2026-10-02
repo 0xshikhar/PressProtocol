@@ -174,7 +174,49 @@ export function extractEditorContent(element: Element | null, editorType?: Suppo
 }
 
 /**
+ * Strips HTML tags safely using character-level scanning while preserving literal '<' symbols.
+ *
+ * @param html - Raw HTML string to be stripped of tags.
+ * @returns Cleaned text content with HTML tags removed.
+ */
+function stripHtmlTags(html: string): string {
+  let inTag = false;
+  let quoteChar: string | null = null;
+  let text = '';
+
+  for (let i = 0; i < html.length; i++) {
+    const ch = html[i];
+    if (!inTag) {
+      if (ch === '<' && i + 1 < html.length && /[a-zA-Z\/!_?]/.test(html[i + 1])) {
+        inTag = true;
+        quoteChar = null;
+        text += ' ';
+      } else {
+        text += ch;
+      }
+    } else {
+      if (quoteChar) {
+        if (ch === quoteChar) {
+          quoteChar = null;
+        }
+      } else {
+        if (ch === '"' || ch === "'") {
+          quoteChar = ch;
+        } else if (ch === '>') {
+          inTag = false;
+        }
+      }
+    }
+  }
+  return text;
+}
+
+/**
  * Extracts title from a title element, input, or fallback heading.
+ *
+ * @param titleElement - Optional DOM element containing the document title.
+ * @param fallbackContent - Optional fallback HTML or Markdown string to extract title from.
+ * @returns Extracted clean title string or default fallback title.
  */
 export function extractTitle(titleElement: Element | null, fallbackContent?: string): string {
   if (titleElement) {
@@ -186,13 +228,20 @@ export function extractTitle(titleElement: Element | null, fallbackContent?: str
     if (text.trim()) return text.trim();
   }
 
-  // Fallback: Check for first H1 tag in content
+  // Fallback: Check for first H1 tag in content outside attributes
   if (fallbackContent) {
-    const h1Match = fallbackContent.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
-    if (h1Match && h1Match[1]) {
-      return h1Match[1].replace(/<[^>]+>/g, '').trim();
+    const cleanMarkup = fallbackContent.replace(/="[^"]*"|='[^']*'/g, '=""');
+    const h1Open = /<h1\b[^>]*>/i.exec(cleanMarkup);
+    if (h1Open) {
+      const startIndex = h1Open.index + h1Open[0].length;
+      const closeIndex = cleanMarkup.toLowerCase().indexOf('</h1>', startIndex);
+      if (closeIndex !== -1) {
+        const inner = cleanMarkup.slice(startIndex, closeIndex);
+        const titleText = stripHtmlTags(inner).trim();
+        if (titleText) return titleText;
+      }
     }
-    const mdH1Match = fallbackContent.match(/^#\s+(.+)$/m);
+    const mdH1Match = fallbackContent.match(/^#[ \t]+([^\r\n]+)/m);
     if (mdH1Match && mdH1Match[1]) {
       return mdH1Match[1].trim();
     }
@@ -203,24 +252,29 @@ export function extractTitle(titleElement: Element | null, fallbackContent?: str
 
 /**
  * Extracts inline media and image URLs from content.
+ *
+ * @param htmlOrMarkdown - Content string in HTML or Markdown format.
+ * @returns Array of unique media URL strings.
  */
 export function extractMediaUrls(htmlOrMarkdown: string): string[] {
   const urls = new Set<string>();
 
-  // HTML img src regex
-  const imgRegex = /<img[^>]+src=["']([^"']+)["']/gi;
-  let match: RegExpExecArray | null;
-  while ((match = imgRegex.exec(htmlOrMarkdown)) !== null) {
-    if (match[1] && !match[1].startsWith('data:image/svg+xml;utf8,<svg')) {
-      urls.add(match[1]);
+  // HTML img src regex (bounded linear tag match to prevent backtracking)
+  const imgTagRegex = /<img\b[^>]+>/gi;
+  let imgMatch: RegExpExecArray | null;
+  while ((imgMatch = imgTagRegex.exec(htmlOrMarkdown)) !== null) {
+    const srcMatch = imgMatch[0].match(/(?:\s|^)src=["']([^"']+)["']/i);
+    if (srcMatch && srcMatch[1] && !srcMatch[1].startsWith('data:image/svg+xml;utf8,<svg')) {
+      urls.add(srcMatch[1]);
     }
   }
 
-  // Markdown image syntax regex: ![alt](url)
-  const mdImgRegex = /!\[[^\]]*\]\(([^)]+)\)/g;
-  while ((match = mdImgRegex.exec(htmlOrMarkdown)) !== null) {
-    if (match[1]) {
-      urls.add(match[1].split(/\s+/)[0]);
+  // Markdown image syntax regex: ![alt](url) bounded to single-line without nested [ to prevent ReDoS
+  const mdImgRegex = /!\[[^\[\]\r\n]{0,300}\]\(([^)\s\r\n]{1,500})\)/g;
+  let mdMatch: RegExpExecArray | null;
+  while ((mdMatch = mdImgRegex.exec(htmlOrMarkdown)) !== null) {
+    if (mdMatch[1]) {
+      urls.add(mdMatch[1]);
     }
   }
 
@@ -241,11 +295,11 @@ export function extractArticleFromDom(options: {
   const title = extractTitle(titleElement || null, rawContent) || defaultTitle || 'Untitled Publication';
   const media = extractMediaUrls(rawContent);
 
-  // Compute word count
-  const cleanText = rawContent.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  // Compute word count safely without ReDoS or incomplete sanitization
+  const cleanText = stripHtmlTags(rawContent).replace(/\s+/g, ' ').trim();
   const wordCount = cleanText ? cleanText.split(/\s+/).length : 0;
 
-  const isHtml = /<[a-z][\s\S]*>/i.test(rawContent);
+  const isHtml = /<[a-z][^<>]{0,250}>/i.test(rawContent);
 
   return {
     title,

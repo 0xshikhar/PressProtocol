@@ -54,7 +54,7 @@ export async function renderScrapsList(
         const parsed = new URL(scrap.url);
         if (parsed.protocol === "http:" || parsed.protocol === "https:") {
           safeUrl = parsed.toString();
-          hostname = parsed.hostname.replace("www.", "");
+          hostname = parsed.hostname.replace(/^www\./i, "");
         } else {
           hostname = "external-source";
         }

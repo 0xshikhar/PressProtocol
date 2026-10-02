@@ -181,8 +181,9 @@ export class StorageService {
     // 1. Check local disk cache first (sub-millisecond instant hit)
     try {
       const cacheDir = path.resolve(process.env.DATA_DIR || process.cwd(), '.data/content-cache');
-      const cacheFile = path.join(cacheDir, `${safeCid}.json`);
-      if (fs.existsSync(cacheFile)) {
+      const cleanFileName = path.basename(`${safeCid}.json`);
+      const cacheFile = path.resolve(cacheDir, cleanFileName);
+      if (cacheFile.startsWith(cacheDir + path.sep) && fs.existsSync(cacheFile)) {
         const raw = fs.readFileSync(cacheFile, 'utf-8');
         const parsed = JSON.parse(raw);
         if (parsed && (parsed.content || parsed.title)) {

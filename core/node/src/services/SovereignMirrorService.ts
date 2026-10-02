@@ -3,6 +3,77 @@ import { storageService } from './StorageService.js';
 import { torService } from './TorService.js';
 import { calculateDeterministicCIDv1 } from '../lib/cid.js';
 
+/**
+ * Strips HTML tags safely using character-level scanning while preserving literal '<' symbols.
+ *
+ * @param html - Raw HTML string to be stripped of tags.
+ * @returns Cleaned text content with HTML tags removed.
+ */
+function stripHtmlTags(html: string): string {
+  let inTag = false;
+  let quoteChar: string | null = null;
+  let text = '';
+
+  for (let i = 0; i < html.length; i++) {
+    const ch = html[i];
+    if (!inTag) {
+      if (ch === '<' && i + 1 < html.length && /[a-zA-Z\/!_?]/.test(html[i + 1])) {
+        inTag = true;
+        quoteChar = null;
+        text += ' ';
+      } else {
+        text += ch;
+      }
+    } else {
+      if (quoteChar) {
+        if (ch === quoteChar) {
+          quoteChar = null;
+        }
+      } else {
+        if (ch === '"' || ch === "'") {
+          quoteChar = ch;
+        } else if (ch === '>') {
+          inTag = false;
+        }
+      }
+    }
+  }
+  return text;
+}
+
+/**
+ * Strips script tags and their inner content deterministically without regular expressions.
+ * Handles spaced closing tags (e.g., '</script >') and unclosed scripts.
+ *
+ * @param html - HTML string potentially containing script elements.
+ * @returns Object containing the cleaned HTML content and the count of purged script tags.
+ */
+function stripScriptTags(html: string): { content: string; count: number } {
+  let count = 0;
+  let result = html;
+  let lower = result.toLowerCase();
+  let startIdx = lower.indexOf('<script');
+  while (startIdx !== -1) {
+    const endTagIdx = lower.indexOf('</script', startIdx);
+    if (endTagIdx === -1) {
+      result = result.slice(0, startIdx);
+      count++;
+      break;
+    }
+    const closeAngle = lower.indexOf('>', endTagIdx);
+    if (closeAngle === -1) {
+      result = result.slice(0, startIdx);
+      count++;
+      break;
+    }
+    result = result.slice(0, startIdx) + result.slice(closeAngle + 1);
+    count++;
+    lower = result.toLowerCase();
+    startIdx = lower.indexOf('<script');
+  }
+  return { content: result, count };
+}
+
 export interface MediumIngestInput {
   url?: string;
   title?: string;
@@ -111,13 +182,10 @@ export class SovereignMirrorService {
       paramMatches = content.match(trackingParamRegex);
     }
 
-    // 4. Strip commercial tracker scripts
-    const scriptRegex = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
-    const scriptMatches = content.match(scriptRegex);
-    if (scriptMatches) {
-      trackersRemoved += scriptMatches.length;
-      content = content.replace(scriptRegex, '');
-    }
+    // 4. Strip commercial tracker scripts deterministically without regex
+    const scriptPurge = stripScriptTags(content);
+    trackersRemoved += scriptPurge.count;
+    content = scriptPurge.content;
 
     return {
       cleansed: content.trim(),
@@ -136,7 +204,7 @@ export class SovereignMirrorService {
     if (!title) {
       const h1Match = input.content.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
       if (h1Match) {
-        title = h1Match[1].replace(/<[^>]+>/g, '').trim();
+        title = stripHtmlTags(h1Match[1]).trim();
       } else {
         title = 'Medium Sovereign Archive';
       }
@@ -193,7 +261,7 @@ export class SovereignMirrorService {
       },
     };
 
-    const cleanText = cleansed.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    const cleanText = stripHtmlTags(cleansed).replace(/\s+/g, ' ').trim();
     const wordCount = cleanText ? cleanText.split(/\s+/).length : 0;
 
     return {
@@ -221,7 +289,7 @@ export class SovereignMirrorService {
     let title = input.title;
     if (!title) {
       const h1Match = input.content.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
-      title = h1Match ? h1Match[1].replace(/<[^>]+>/g, '').trim() : 'Substack Sovereign Archive';
+      title = h1Match ? stripHtmlTags(h1Match[1]).trim() : 'Substack Sovereign Archive';
     }
 
     const tags = input.tags && input.tags.length > 0 ? input.tags : ['substack-mirror', 'sovereign'];
@@ -272,7 +340,7 @@ export class SovereignMirrorService {
       },
     };
 
-    const cleanText = cleansed.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    const cleanText = stripHtmlTags(cleansed).replace(/\s+/g, ' ').trim();
     const wordCount = cleanText ? cleanText.split(/\s+/).length : 0;
 
     return {

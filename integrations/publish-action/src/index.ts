@@ -104,7 +104,15 @@ ${rows.join("\n")}
 }
 
 function escapeMarkdown(str: string): string {
-  return str.replace(/\|/g, "\\|");
+  return str
+    .replace(/\\/g, "\\\\")
+    .replace(/\|/g, "\\|")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\[/g, "\\[")
+    .replace(/\]/g, "\\]")
+    .replace(/`/g, "\\`")
+    .replace(/[\r\n]+/g, " ");
 }
 
 /**

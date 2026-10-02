@@ -92,18 +92,27 @@ export function scanContentPrivacy(content: string): PrivacyScanResult {
     }
   }
 
-  // 2. Check for known surveillance & analytics domains
-  for (const domain of KNOWN_SURVEILLANCE_DOMAINS) {
-    const regex = new RegExp(`https?://[a-zA-Z0-9.-]*${domain.replace(".", "\\.")}[^"\\s']*`, "gi");
-    let match;
-    while ((match = regex.exec(content)) !== null) {
-      trackerDomainsCount++;
-      issues.push({
-        type: "tracker_domain",
-        label: `Surveillance domain referenced: ${domain}`,
-        found: match[0],
-        recommendation: `Remove or mirror external surveillance beacons`,
-      });
+  // 2. Check for known surveillance & analytics domains using robust URL parsing
+  const urlRegex = /https?:\/\/[^\s"'>)]+/gi;
+  let urlMatch;
+  while ((urlMatch = urlRegex.exec(content)) !== null) {
+    try {
+      const parsed = new URL(urlMatch[0]);
+      const host = parsed.hostname.toLowerCase();
+      for (const domain of KNOWN_SURVEILLANCE_DOMAINS) {
+        if (host === domain || host.endsWith("." + domain)) {
+          trackerDomainsCount++;
+          issues.push({
+            type: "tracker_domain",
+            label: `Surveillance domain referenced: ${domain}`,
+            found: urlMatch[0],
+            recommendation: `Remove or mirror external surveillance beacons`,
+          });
+          break;
+        }
+      }
+    } catch {
+      // not a parseable URL
     }
   }
 
