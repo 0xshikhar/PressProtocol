@@ -901,7 +901,7 @@ export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
             dangerouslySetInnerHTML={{
               __html:
                 content.content ||
-                `<div class='p-8 rounded-[6px] border border-hairline bg-surface font-mono text-xs text-center text-secondary'><p class='font-medium'>Article body is synchronizing across decentralized IPFS swarm mirrors.</p><p class='mt-2 text-muted'>CID: ${content.cid}</p></div>`,
+                `<div class='p-8 rounded-[6px] border border-hairline bg-surface font-mono text-xs text-center text-secondary'><p class='font-medium'>Article body is synchronizing across decentralized IPFS swarm mirrors.</p><p class='mt-2 text-muted'>CID: ${encodeURIComponent(content.cid)}</p></div>`,
             }}
           />
         </article>
