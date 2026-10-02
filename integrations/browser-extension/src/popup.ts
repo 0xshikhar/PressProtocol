@@ -144,7 +144,7 @@ async function inspectActiveTab() {
 
   try {
     const urlObj = new URL(activeTabUrl);
-    targetDomain.textContent = urlObj.hostname.replace("www.", "");
+    targetDomain.textContent = urlObj.hostname.replace(/^www\./i, "");
   } catch {
     targetDomain.textContent = "web-document";
   }

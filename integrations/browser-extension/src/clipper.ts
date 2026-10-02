@@ -69,12 +69,16 @@ export function sanitizeUrl(
   urlStr: string,
   base: string = typeof window !== "undefined" && window.location?.href ? window.location.href : "https://pressprotocol.com/"
 ): { cleanedUrl: string; purged: number } {
-  if (!urlStr || urlStr.startsWith("#") || urlStr.startsWith("mailto:") || urlStr.startsWith("tel:") || urlStr.startsWith("javascript:")) {
+  const trimmed = (urlStr || "").trim().toLowerCase();
+  if (!trimmed || trimmed.startsWith("#") || trimmed.startsWith("mailto:") || trimmed.startsWith("tel:") || /^javascript\s*:/i.test(trimmed) || /^data\s*:/i.test(trimmed)) {
     return { cleanedUrl: urlStr || "", purged: 0 };
   }
 
   try {
     const url = new URL(urlStr, base);
+    if (url.protocol === "javascript:" || url.protocol === "data:" || url.protocol === "vbscript:") {
+      return { cleanedUrl: "#", purged: 0 };
+    }
     let purged = 0;
 
     for (const param of TRACKING_URL_PARAMS) {
@@ -119,11 +123,15 @@ export function extractPageContent(): ClippedArticle {
   ];
 
   function cleanUrl(urlStr: string, base: string = window.location.href): { cleanedUrl: string; purged: number } {
-    if (!urlStr || urlStr.startsWith("#") || urlStr.startsWith("mailto:") || urlStr.startsWith("tel:") || urlStr.startsWith("javascript:")) {
+    const trimmed = (urlStr || "").trim().toLowerCase();
+    if (!trimmed || trimmed.startsWith("#") || trimmed.startsWith("mailto:") || trimmed.startsWith("tel:") || /^javascript\s*:/i.test(trimmed) || /^data\s*:/i.test(trimmed)) {
       return { cleanedUrl: urlStr || "", purged: 0 };
     }
     try {
       const url = new URL(urlStr, base);
+      if (url.protocol === "javascript:" || url.protocol === "data:" || url.protocol === "vbscript:") {
+        return { cleanedUrl: "#", purged: 0 };
+      }
       let purged = 0;
       for (const param of TRACKING_PARAMS) {
         if (url.searchParams.has(param)) {
@@ -227,7 +235,7 @@ export function extractPageContent(): ClippedArticle {
     const author = jsonLdAuthor ||
       (ogAuthor ? ogAuthor.replace(/^by\s+/i, "").trim() : "") ||
       titleAuthor ||
-      window.location.hostname.replace("www.", "");
+      window.location.hostname.replace(/^www\./i, "");
 
     // Excerpt Cascade
     const ogDesc = document.querySelector('meta[property="og:description"]')?.getAttribute("content") ||
@@ -251,7 +259,7 @@ export function extractPageContent(): ClippedArticle {
 
     // Site Name
     const siteName = document.querySelector('meta[property="og:site_name"]')?.getAttribute("content") ||
-      window.location.hostname.replace("www.", "");
+      window.location.hostname.replace(/^www\./i, "");
 
     // Tags
     const metaKeywords = document.querySelector('meta[name="keywords"]')?.getAttribute("content") || "";
@@ -400,7 +408,9 @@ export function extractPageContent(): ClippedArticle {
       const text = quoteBody?.textContent?.trim() || holder.textContent?.trim() || "";
       if (text) {
         const bq = document.createElement("blockquote");
-        bq.innerHTML = `<p>${text}</p>`;
+        const p = document.createElement("p");
+        p.textContent = text;
+        bq.appendChild(p);
         holder.replaceWith(bq);
       } else {
         holder.remove();
@@ -417,8 +427,15 @@ export function extractPageContent(): ClippedArticle {
 
       if (titleText || eyebrowText) {
         const bq = document.createElement("blockquote");
-        const heading = eyebrowText ? `<strong>${eyebrowText}</strong>: ` : "";
-        bq.innerHTML = `<p>${heading}${titleText || bodyText}</p>`;
+        const p = document.createElement("p");
+        if (eyebrowText) {
+          const strong = document.createElement("strong");
+          strong.textContent = eyebrowText;
+          p.appendChild(strong);
+          p.appendChild(document.createTextNode(": "));
+        }
+        p.appendChild(document.createTextNode(titleText || bodyText));
+        bq.appendChild(p);
         box.replaceWith(bq);
       }
     });
@@ -504,7 +521,12 @@ export function extractPageContent(): ClippedArticle {
     // Unsafe iframes (keep only youtube / vimeo)
     clone.querySelectorAll("iframe, object, embed").forEach((frame) => {
       const src = frame.getAttribute("src") || "";
-      const isSafe = src.includes("youtube.com") || src.includes("youtube-nocookie.com") || src.includes("vimeo.com");
+      let isSafe = false;
+      try {
+        const parsed = new URL(src, "https://pressprotocol.com");
+        const host = parsed.hostname.toLowerCase();
+        isSafe = host === "www.youtube.com" || host === "youtube.com" || host === "www.youtube-nocookie.com" || host === "youtube-nocookie.com" || host === "player.vimeo.com" || host === "vimeo.com";
+      } catch {}
       if (!isSafe) {
         frame.remove();
         surveillanceElementsPurged++;
@@ -653,15 +675,31 @@ export function extractPageContent(): ClippedArticle {
     const fallbackTitle = document.querySelector("h1")?.textContent?.trim() || document.title || "Untitled Document";
     const fallbackText = (document.body ? document.body.innerText : "").trim();
     const words = fallbackText ? fallbackText.split(/\s+/).filter(Boolean).length : 0;
+    const article = document.createElement("article");
+    const h1 = document.createElement("h1");
+    h1.textContent = fallbackTitle;
+    article.appendChild(h1);
+    const paragraphs = fallbackText.split(/\n\n+/).filter(Boolean);
+    if (paragraphs.length === 0) {
+      const p = document.createElement("p");
+      p.textContent = fallbackText;
+      article.appendChild(p);
+    } else {
+      for (const para of paragraphs) {
+        const p = document.createElement("p");
+        p.textContent = para.trim();
+        article.appendChild(p);
+      }
+    }
     return {
       title: fallbackTitle,
-      author: window.location.hostname.replace("www.", ""),
+      author: window.location.hostname.replace(/^www\./i, ""),
       excerpt: fallbackText.slice(0, 200),
-      contentHtml: `<article><h1>${fallbackTitle}</h1><p>${fallbackText.replace(/\n\n+/g, "</p><p>")}</p></article>`,
+      contentHtml: article.outerHTML,
       textContent: fallbackText,
       canonicalUrl: window.location.href,
       publishedAt: new Date().toISOString(),
-      siteName: window.location.hostname.replace("www.", ""),
+      siteName: window.location.hostname.replace(/^www\./i, ""),
       tags: ["web-archive"],
       wordCount: words,
       readingTimeMinutes: Math.max(1, Math.ceil(words / 200)),
