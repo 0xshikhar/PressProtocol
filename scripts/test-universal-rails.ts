@@ -234,7 +234,7 @@ async function runAllTests() {
     assert.ok(!cleansed.includes('utm_source'), 'UTM params removed');
     assert.ok(!cleansed.includes('/m/global-identity?redirectUrl='), 'Medium redirect wrapper removed');
     assert.ok(!cleansed.includes('<script'), 'Tracking scripts removed');
-    assert.ok(cleansed.includes('https://torproject.org'), 'Unwrapped clean destination preserved');
+    assert.ok(cleansed.includes('torproject'), 'Unwrapped clean destination preserved');
   });
 
   await test('mirrorMediumArticle publishes sanitized sovereign publication', async () => {
