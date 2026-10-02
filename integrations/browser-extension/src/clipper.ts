@@ -70,7 +70,10 @@ export function sanitizeUrl(
   base: string = typeof window !== "undefined" && window.location?.href ? window.location.href : "https://pressprotocol.com/"
 ): { cleanedUrl: string; purged: number } {
   const trimmed = (urlStr || "").trim().toLowerCase();
-  if (!trimmed || trimmed.startsWith("#") || trimmed.startsWith("mailto:") || trimmed.startsWith("tel:") || /^javascript\s*:/i.test(trimmed) || /^data\s*:/i.test(trimmed)) {
+  if (/^(?:javascript|data|vbscript)\s*:/i.test(trimmed)) {
+    return { cleanedUrl: "#", purged: 0 };
+  }
+  if (!trimmed || trimmed.startsWith("#") || trimmed.startsWith("mailto:") || trimmed.startsWith("tel:")) {
     return { cleanedUrl: urlStr || "", purged: 0 };
   }
 
@@ -124,7 +127,10 @@ export function extractPageContent(): ClippedArticle {
 
   function cleanUrl(urlStr: string, base: string = window.location.href): { cleanedUrl: string; purged: number } {
     const trimmed = (urlStr || "").trim().toLowerCase();
-    if (!trimmed || trimmed.startsWith("#") || trimmed.startsWith("mailto:") || trimmed.startsWith("tel:") || /^javascript\s*:/i.test(trimmed) || /^data\s*:/i.test(trimmed)) {
+    if (/^(?:javascript|data|vbscript)\s*:/i.test(trimmed)) {
+      return { cleanedUrl: "#", purged: 0 };
+    }
+    if (!trimmed || trimmed.startsWith("#") || trimmed.startsWith("mailto:") || trimmed.startsWith("tel:")) {
       return { cleanedUrl: urlStr || "", purged: 0 };
     }
     try {
@@ -521,11 +527,12 @@ export function extractPageContent(): ClippedArticle {
     // Unsafe iframes (keep only youtube / vimeo)
     clone.querySelectorAll("iframe, object, embed").forEach((frame) => {
       const src = frame.getAttribute("src") || "";
+      const hasSrcdoc = frame.hasAttribute("srcdoc");
       let isSafe = false;
       try {
         const parsed = new URL(src, "https://pressprotocol.com");
         const host = parsed.hostname.toLowerCase();
-        isSafe = host === "www.youtube.com" || host === "youtube.com" || host === "www.youtube-nocookie.com" || host === "youtube-nocookie.com" || host === "player.vimeo.com" || host === "vimeo.com";
+        isSafe = !hasSrcdoc && (host === "www.youtube.com" || host === "youtube.com" || host === "www.youtube-nocookie.com" || host === "youtube-nocookie.com" || host === "player.vimeo.com" || host === "vimeo.com");
       } catch {}
       if (!isSafe) {
         frame.remove();
