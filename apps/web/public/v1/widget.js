@@ -97,8 +97,32 @@
       if (text && text.trim()) return text.trim();
     }
     if (fallbackContent) {
-      const h1Match = fallbackContent.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
-      if (h1Match) return h1Match[1].replace(/<[^>]+>/g, '').trim();
+      if (typeof DOMParser !== 'undefined') {
+        try {
+          const doc = new DOMParser().parseFromString(fallbackContent, 'text/html');
+          const h1 = doc.querySelector('h1');
+          if (h1 && h1.textContent && h1.textContent.trim()) {
+            return h1.textContent.trim();
+          }
+        } catch {
+          // ignore and fallback
+        }
+      }
+      const h1Open = /<h1\b[^>]*>/i.exec(fallbackContent);
+      if (h1Open) {
+        const startIndex = h1Open.index + h1Open[0].length;
+        const closeIndex = fallbackContent.toLowerCase().indexOf('</h1>', startIndex);
+        if (closeIndex !== -1) {
+          const innerHtml = fallbackContent.slice(startIndex, closeIndex);
+          let sanitized = innerHtml;
+          let prev;
+          do {
+            prev = sanitized;
+            sanitized = sanitized.replace(/<[^>]+>/g, '');
+          } while (sanitized !== prev);
+          if (sanitized.trim()) return sanitized.trim();
+        }
+      }
     }
     return 'Untitled Sovereign Publication';
   }

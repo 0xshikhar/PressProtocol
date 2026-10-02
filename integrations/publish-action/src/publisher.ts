@@ -203,10 +203,14 @@ export function transpileMarkdown(markdown: string): { html: string; wordCount: 
   }
 
   const rawHtml = htmlParts.join("\n");
-  const sanitized = rawHtml
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-    .replace(/\s*on\w+\s*=\s*(?:"[^"]*"|'[^']*'|&quot;.*?&quot;|[^\s>]+)/gi, "")
-    .replace(/\b(onload|onclick|onerror|onmouseover|onfocus)\b\s*=\s*(?:"[^"]*"|'[^']*'|&quot;.*?&quot;|[^\s>]+)/gi, "");
+  let sanitized = rawHtml;
+  const scriptRegex = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+  const handlerRegex = /\s*on\w+\s*=\s*(?:"[^"]*"|'[^']*'|&quot;.*?&quot;|[^\s>]+)/gi;
+  let prevSanitized: string;
+  do {
+    prevSanitized = sanitized;
+    sanitized = sanitized.replace(scriptRegex, "").replace(handlerRegex, "");
+  } while (sanitized !== prevSanitized);
 
   const words = markdown.trim().split(/\s+/).filter(Boolean).length;
   const readingTimeMinutes = Math.max(1, Math.ceil(words / 200));

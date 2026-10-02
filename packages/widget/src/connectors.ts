@@ -173,6 +173,24 @@ export function extractEditorContent(element: Element | null, editorType?: Suppo
   }
 }
 
+function stripHtmlTags(html: string): string {
+  if (typeof DOMParser !== 'undefined') {
+    try {
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      return doc.body.textContent || '';
+    } catch {
+      // fallback to multi-pass sanitization loop
+    }
+  }
+  let prev: string;
+  let sanitized = html;
+  do {
+    prev = sanitized;
+    sanitized = sanitized.replace(/<[^>]+>/g, ' ');
+  } while (sanitized !== prev);
+  return sanitized;
+}
+
 /**
  * Extracts title from a title element, input, or fallback heading.
  */
@@ -188,11 +206,17 @@ export function extractTitle(titleElement: Element | null, fallbackContent?: str
 
   // Fallback: Check for first H1 tag in content
   if (fallbackContent) {
-    const h1Match = fallbackContent.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
-    if (h1Match && h1Match[1]) {
-      return h1Match[1].replace(/<[^>]+>/g, '').trim();
+    const h1Open = /<h1\b[^>]*>/i.exec(fallbackContent);
+    if (h1Open) {
+      const startIndex = h1Open.index + h1Open[0].length;
+      const closeIndex = fallbackContent.toLowerCase().indexOf('</h1>', startIndex);
+      if (closeIndex !== -1) {
+        const inner = fallbackContent.slice(startIndex, closeIndex);
+        const titleText = stripHtmlTags(inner).trim();
+        if (titleText) return titleText;
+      }
     }
-    const mdH1Match = fallbackContent.match(/^#\s+(.+)$/m);
+    const mdH1Match = fallbackContent.match(/^#[ \t]+([^\r\n]+)/m);
     if (mdH1Match && mdH1Match[1]) {
       return mdH1Match[1].trim();
     }
@@ -207,20 +231,22 @@ export function extractTitle(titleElement: Element | null, fallbackContent?: str
 export function extractMediaUrls(htmlOrMarkdown: string): string[] {
   const urls = new Set<string>();
 
-  // HTML img src regex
-  const imgRegex = /<img[^>]+src=["']([^"']+)["']/gi;
-  let match: RegExpExecArray | null;
-  while ((match = imgRegex.exec(htmlOrMarkdown)) !== null) {
-    if (match[1] && !match[1].startsWith('data:image/svg+xml;utf8,<svg')) {
-      urls.add(match[1]);
+  // HTML img src regex (bounded linear tag match to prevent backtracking)
+  const imgTagRegex = /<img\b[^>]+>/gi;
+  let imgMatch: RegExpExecArray | null;
+  while ((imgMatch = imgTagRegex.exec(htmlOrMarkdown)) !== null) {
+    const srcMatch = imgMatch[0].match(/\bsrc=["']([^"']+)["']/i);
+    if (srcMatch && srcMatch[1] && !srcMatch[1].startsWith('data:image/svg+xml;utf8,<svg')) {
+      urls.add(srcMatch[1]);
     }
   }
 
-  // Markdown image syntax regex: ![alt](url)
-  const mdImgRegex = /!\[[^\]]*\]\(([^)]+)\)/g;
-  while ((match = mdImgRegex.exec(htmlOrMarkdown)) !== null) {
-    if (match[1]) {
-      urls.add(match[1].split(/\s+/)[0]);
+  // Markdown image syntax regex: ![alt](url) bounded to single-line
+  const mdImgRegex = /!\[[^\]\r\n]*\]\(([^)\r\n]+)\)/g;
+  let mdMatch: RegExpExecArray | null;
+  while ((mdMatch = mdImgRegex.exec(htmlOrMarkdown)) !== null) {
+    if (mdMatch[1]) {
+      urls.add(mdMatch[1].split(/\s+/)[0]);
     }
   }
 
@@ -241,11 +267,11 @@ export function extractArticleFromDom(options: {
   const title = extractTitle(titleElement || null, rawContent) || defaultTitle || 'Untitled Publication';
   const media = extractMediaUrls(rawContent);
 
-  // Compute word count
-  const cleanText = rawContent.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  // Compute word count safely without ReDoS or incomplete sanitization
+  const cleanText = stripHtmlTags(rawContent).replace(/\s+/g, ' ').trim();
   const wordCount = cleanText ? cleanText.split(/\s+/).length : 0;
 
-  const isHtml = /<[a-z][\s\S]*>/i.test(rawContent);
+  const isHtml = /<[a-z][^>]*>/i.test(rawContent);
 
   return {
     title,

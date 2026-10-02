@@ -367,7 +367,7 @@ export function convertNotionBlocksToHtml(recordMap: any, rootPageId: string): C
   const excerpt = firstP ? firstP.slice(0, 200) : pageTitle;
 
   return {
-    title: pageTitle.replace(/<[^>]*>/g, "").trim(),
+    title: (cheerio.load(pageTitle).text() || pageTitle).trim(),
     author: "Notion Author",
     excerpt,
     cleanHtml,
@@ -458,9 +458,9 @@ export function parseNotionMarkdown(markdownText: string): ConvertedNotionArticl
       htmlParts.push(`<h3 class="text-xl font-serif font-semibold text-foreground/90 mt-5 mb-2">${escapeHtml(trimmed.slice(4).trim())}</h3>`);
     }
     // Notion Callouts formatted as `> 💡 ...` or `> ⚠️ ...` or `> 🚨 ...`
-    else if (/^>\s*([\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF]|💡|⚠️|🚨|🔥|🛡️)\s*/.test(trimmed)) {
+    else if (trimmed.startsWith(">") && /^>\s*(💡|⚠️|🚨|🔥|🛡️|[\u2600-\u27BF])\s+(.*)$/.test(trimmed)) {
       stats.calloutsConverted++;
-      const match = trimmed.match(/^>\s*([\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF]|💡|⚠️|🚨|🔥|🛡️)\s*(.*)$/);
+      const match = trimmed.match(/^>\s*(💡|⚠️|🚨|🔥|🛡️|[\u2600-\u27BF])\s+(.*)$/);
       const icon = match ? match[1] : "💡";
       const content = match ? match[2] : trimmed.slice(1).trim();
 
@@ -509,9 +509,9 @@ export function parseNotionMarkdown(markdownText: string): ConvertedNotionArticl
       htmlParts.push(`<hr class="my-8 border-hairline" />`);
     }
     // Image
-    else if (/^!\[(.*?)\]\((.*?)\)/.test(trimmed)) {
+    else if (/^!\[([^\]]*)\]\(([^)\s]+)\)/.test(trimmed)) {
       stats.imagesPreserved++;
-      const match = trimmed.match(/^!\[(.*?)\]\((.*?)\)/);
+      const match = trimmed.match(/^!\[([^\]]*)\]\(([^)\s]+)\)/);
       if (match) {
         const alt = match[1] || title;
         const src = match[2];
@@ -536,7 +536,7 @@ export function parseNotionMarkdown(markdownText: string): ConvertedNotionArticl
   return {
     title,
     author: "Notion Author",
-    excerpt: cleanHtml.replace(/<[^>]*>/g, "").slice(0, 200).trim(),
+    excerpt: (cheerio.load(cleanHtml).text() || cleanHtml).slice(0, 200).trim(),
     cleanHtml,
     wordCount: readingStats.words,
     readingTimeMinutes: readingStats.minutes,

@@ -395,7 +395,7 @@ export async function extractArticleFromUrl(targetUrl: string): Promise<Scrubbed
     $('meta[property="article:author"]').attr("content") ||
     $('[rel="author"]').first().text() ||
     $(".byline, .author-name, .author").first().text().trim() ||
-    urlObj.hostname.replace("www.", "");
+    urlObj.hostname.replace(/^www\./i, "");
 
   const excerpt =
     $('meta[property="og:description"]').attr("content") ||
@@ -530,7 +530,7 @@ function parseRssFeedItem(xmlString: string, feedUrl: string): ScrubbedArticle {
   return {
     title,
     author,
-    excerpt: description.replace(/<[^>]*>/g, "").slice(0, 200).trim(),
+    excerpt: (cheerio.load(description || "").text() || description || "").slice(0, 200).trim(),
     cleanHtml,
     rawHtmlLength: Buffer.byteLength(rawHtml, "utf8"),
     cleanHtmlLength: Buffer.byteLength(cleanHtml, "utf8"),
@@ -643,7 +643,7 @@ export function parseFullRssFeed(xmlString: string, feedUrl: string): ParsedRssF
       }
     });
 
-    const excerptText = description.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+    const excerptText = (cheerio.load(description || "").text() || description || "").replace(/\s+/g, " ").trim();
     const excerpt = excerptText.slice(0, 240);
 
     const { cleanHtml, telemetry } = scrubArticleHtml(rawContentHtml);
