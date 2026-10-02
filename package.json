@@ -16,6 +16,14 @@
     "worker:secret:db": "pnpm --filter pressprotocol-worker run secret:db",
     "worker:dev": "pnpm --filter pressprotocol-worker run dev",
     "worker:deploy": "pnpm --filter pressprotocol-worker run deploy",
-    "pressprotocol": "pnpm --filter @pressprotocol/sdk run cli"
+    "pressprotocol": "pnpm --filter @pressprotocol/sdk run cli",
+    "gh:pr:status": "gh pr status",
+    "gh:pr:view": "gh pr view",
+    "gh:pr:checks": "gh pr checks",
+    "gh:issue:list": "gh issue list"
+  },
+  "engines": {
+    "node": ">=22.23.3",
+    "pnpm": ">=10.0.0"
   }
 }
