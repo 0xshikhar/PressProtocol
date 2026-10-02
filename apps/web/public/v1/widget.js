@@ -114,13 +114,18 @@
         const closeIndex = fallbackContent.toLowerCase().indexOf('</h1>', startIndex);
         if (closeIndex !== -1) {
           const innerHtml = fallbackContent.slice(startIndex, closeIndex);
-          let sanitized = innerHtml;
-          let prev;
-          do {
-            prev = sanitized;
-            sanitized = sanitized.replace(/<[^>]+>/g, '');
-          } while (sanitized !== prev);
-          if (sanitized.trim()) return sanitized.trim();
+          let inTag = false;
+          let text = '';
+          for (let i = 0; i < innerHtml.length; i++) {
+            if (innerHtml[i] === '<') {
+              inTag = true;
+            } else if (innerHtml[i] === '>') {
+              inTag = false;
+            } else if (!inTag) {
+              text += innerHtml[i];
+            }
+          }
+          if (text.trim()) return text.trim();
         }
       }
     }

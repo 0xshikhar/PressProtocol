@@ -182,13 +182,19 @@ function stripHtmlTags(html: string): string {
       // fallback to multi-pass sanitization loop
     }
   }
-  let prev: string;
-  let sanitized = html;
-  do {
-    prev = sanitized;
-    sanitized = sanitized.replace(/<[^>]+>/g, ' ');
-  } while (sanitized !== prev);
-  return sanitized;
+  let inTag = false;
+  let text = '';
+  for (let i = 0; i < html.length; i++) {
+    if (html[i] === '<') {
+      inTag = true;
+      text += ' ';
+    } else if (html[i] === '>') {
+      inTag = false;
+    } else if (!inTag) {
+      text += html[i];
+    }
+  }
+  return text;
 }
 
 /**

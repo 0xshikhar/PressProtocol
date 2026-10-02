@@ -3,6 +3,22 @@ import { storageService } from './StorageService.js';
 import { torService } from './TorService.js';
 import { calculateDeterministicCIDv1 } from '../lib/cid.js';
 
+function stripHtmlTags(html: string): string {
+  let inTag = false;
+  let text = '';
+  for (let i = 0; i < html.length; i++) {
+    if (html[i] === '<') {
+      inTag = true;
+      text += ' ';
+    } else if (html[i] === '>') {
+      inTag = false;
+    } else if (!inTag) {
+      text += html[i];
+    }
+  }
+  return text;
+}
+
 export interface MediumIngestInput {
   url?: string;
   title?: string;
@@ -112,11 +128,9 @@ export class SovereignMirrorService {
     }
 
     // 4. Strip commercial tracker scripts
-    const scriptRegex = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
-    const scriptMatches = content.match(scriptRegex);
-    if (scriptMatches) {
-      trackersRemoved += scriptMatches.length;
-      content = content.replace(scriptRegex, '');
+    while (/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/i.test(content)) {
+      trackersRemoved++;
+      content = content.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/i, '');
     }
 
     return {
@@ -136,7 +150,7 @@ export class SovereignMirrorService {
     if (!title) {
       const h1Match = input.content.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
       if (h1Match) {
-        title = h1Match[1].replace(/<[^>]+>/g, '').trim();
+        title = stripHtmlTags(h1Match[1]).trim();
       } else {
         title = 'Medium Sovereign Archive';
       }
@@ -193,7 +207,7 @@ export class SovereignMirrorService {
       },
     };
 
-    const cleanText = cleansed.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    const cleanText = stripHtmlTags(cleansed).replace(/\s+/g, ' ').trim();
     const wordCount = cleanText ? cleanText.split(/\s+/).length : 0;
 
     return {
@@ -221,7 +235,7 @@ export class SovereignMirrorService {
     let title = input.title;
     if (!title) {
       const h1Match = input.content.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
-      title = h1Match ? h1Match[1].replace(/<[^>]+>/g, '').trim() : 'Substack Sovereign Archive';
+      title = h1Match ? stripHtmlTags(h1Match[1]).trim() : 'Substack Sovereign Archive';
     }
 
     const tags = input.tags && input.tags.length > 0 ? input.tags : ['substack-mirror', 'sovereign'];
@@ -272,7 +286,7 @@ export class SovereignMirrorService {
       },
     };
 
-    const cleanText = cleansed.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    const cleanText = stripHtmlTags(cleansed).replace(/\s+/g, ' ').trim();
     const wordCount = cleanText ? cleanText.split(/\s+/).length : 0;
 
     return {
