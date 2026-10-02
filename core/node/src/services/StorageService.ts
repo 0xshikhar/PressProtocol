@@ -212,7 +212,8 @@ export class StorageService {
     const timeoutId = setTimeout(() => controller.abort(), 9000);
 
     const fetchPromises = gateways.map(async (gw) => {
-      let targetUrl = `${gw}/${safeCid}`;
+      const baseGw = new URL(gw);
+      const targetUrl = new URL(encodeURIComponent(safeCid), baseGw.href.endsWith('/') ? baseGw.href : baseGw.href + '/').toString();
       const headers: Record<string, string> = {
         Accept: 'application/json, text/html, text/plain, */*',
         'User-Agent': 'PressProtocol-Node/1.0.0 (+https://pressprotocol.com)',
@@ -262,10 +263,10 @@ export class StorageService {
       try {
         const cacheDir = path.resolve(process.env.DATA_DIR || process.cwd(), '.data/content-cache');
         if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
-        const cleanFileName = path.basename(`${safeCid}.json`);
-        const cacheFile = path.resolve(cacheDir, cleanFileName);
-        if (cacheFile.startsWith(cacheDir + path.sep)) {
-          fs.writeFileSync(cacheFile, JSON.stringify(contentData, null, 2), 'utf-8');
+        const safeFileName = path.basename(`${encodeURIComponent(safeCid)}.json`);
+        const safeFilePath = path.join(cacheDir, safeFileName);
+        if (safeFilePath.startsWith(cacheDir)) {
+          fs.writeFileSync(safeFilePath, JSON.stringify(contentData, null, 2), 'utf-8');
         }
       } catch {}
 
