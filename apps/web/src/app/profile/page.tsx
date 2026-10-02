@@ -531,13 +531,13 @@ export default function ProfilePage() {
                           <td className="py-3 text-right">
                             <div className="flex items-center justify-end gap-1.5">
                               <Button variant="ghost" size="sm" asChild className="h-6 px-2 text-[11px] text-text-secondary hover:text-text-primary hover:bg-overlay">
-                                <Link href={`/read/${item.cid}`}>
+                                <Link href={`/read/${encodeURIComponent(item.cid)}`}>
                                   <span>Read</span>
                                   <ExternalLink className="h-3 w-3 ml-1" />
                                 </Link>
                               </Button>
                               <Button variant="ghost" size="sm" asChild className="h-6 px-2 text-[11px] text-text-muted hover:text-text-primary hover:bg-overlay">
-                                <Link href={`/embed/builder?cid=${item.cid}`}>
+                                <Link href={`/embed/builder?cid=${encodeURIComponent(item.cid)}`}>
                                   <span>Embed</span>
                                   <Code2 className="h-3 w-3 ml-1" />
                                 </Link>
@@ -554,7 +554,7 @@ export default function ProfilePage() {
                 <div className="sm:hidden divide-y divide-hairline">
                   {articles.map((item) => (
                     <div key={item.cid} className="py-3.5 space-y-2.5">
-                      <Link href={`/read/${item.cid}`} className="font-sans font-medium text-sm text-text-primary hover:text-accent-ribbon transition-colors line-clamp-2">
+                      <Link href={`/read/${encodeURIComponent(item.cid)}`} className="font-sans font-medium text-sm text-text-primary hover:text-accent-ribbon transition-colors line-clamp-2">
                         {item.title}
                       </Link>
 
@@ -567,13 +567,13 @@ export default function ProfilePage() {
 
                       <div className="flex items-center gap-2 pt-1">
                         <Button variant="outline" size="sm" asChild className="flex-1 h-8 text-xs font-mono border-hairline bg-overlay hover:bg-elevated text-text-primary">
-                          <Link href={`/read/${item.cid}`}>
+                          <Link href={`/read/${encodeURIComponent(item.cid)}`}>
                             <span>Read</span>
                             <ExternalLink className="h-3 w-3 ml-1" />
                           </Link>
                         </Button>
                         <Button variant="outline" size="sm" asChild className="flex-1 h-8 text-xs font-mono border-hairline bg-surface hover:bg-elevated text-text-secondary">
-                          <Link href={`/embed/builder?cid=${item.cid}`}>
+                          <Link href={`/embed/builder?cid=${encodeURIComponent(item.cid)}`}>
                             <span>Embed</span>
                             <Code2 className="h-3 w-3 ml-1" />
                           </Link>

@@ -400,7 +400,9 @@ export function extractPageContent(): ClippedArticle {
       const text = quoteBody?.textContent?.trim() || holder.textContent?.trim() || "";
       if (text) {
         const bq = document.createElement("blockquote");
-        bq.innerHTML = `<p>${text}</p>`;
+        const p = document.createElement("p");
+        p.textContent = text;
+        bq.appendChild(p);
         holder.replaceWith(bq);
       } else {
         holder.remove();
@@ -417,8 +419,15 @@ export function extractPageContent(): ClippedArticle {
 
       if (titleText || eyebrowText) {
         const bq = document.createElement("blockquote");
-        const heading = eyebrowText ? `<strong>${eyebrowText}</strong>: ` : "";
-        bq.innerHTML = `<p>${heading}${titleText || bodyText}</p>`;
+        const p = document.createElement("p");
+        if (eyebrowText) {
+          const strong = document.createElement("strong");
+          strong.textContent = eyebrowText;
+          p.appendChild(strong);
+          p.appendChild(document.createTextNode(": "));
+        }
+        p.appendChild(document.createTextNode(titleText || bodyText));
+        bq.appendChild(p);
         box.replaceWith(bq);
       }
     });

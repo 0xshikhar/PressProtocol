@@ -370,7 +370,7 @@ export default function DashboardPage() {
                           className="hover:bg-surface-elevated/40 transition-colors"
                         >
                           <td className="py-3.5 px-4 font-sans font-medium text-foreground max-w-[260px] truncate">
-                            <Link href={`/read/${content.cid}`} className="hover:text-primary transition-colors">
+                            <Link href={`/read/${encodeURIComponent(content.cid)}`} className="hover:text-primary transition-colors">
                               {content.title}
                             </Link>
                           </td>
@@ -406,12 +406,12 @@ export default function DashboardPage() {
                                 )}
                               </Button>
                               <Button variant="ghost" size="sm" asChild className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground rounded-[4px]">
-                                <Link href={`/embed/builder?cid=${content.cid}`}>
+                                <Link href={`/embed/builder?cid=${encodeURIComponent(content.cid)}`}>
                                   <Code2 className="h-3 w-3" />
                                 </Link>
                               </Button>
                               <Button variant="ghost" size="sm" asChild className="h-7 px-2 text-xs text-primary hover:text-primary/80 rounded-[4px]">
-                                <Link href={`/read/${content.cid}`}>
+                                <Link href={`/read/${encodeURIComponent(content.cid)}`}>
                                   <span>Read</span>
                                   <ExternalLink className="h-3 w-3 ml-1" />
                                 </Link>
@@ -428,7 +428,7 @@ export default function DashboardPage() {
                 <div className="sm:hidden divide-y divide-border/60">
                   {sortedContents.map((content) => (
                     <div key={content.id} className="p-4 space-y-3">
-                      <Link href={`/read/${content.cid}`} className="font-sans font-medium text-sm text-foreground hover:text-primary transition-colors line-clamp-2 block">
+                      <Link href={`/read/${encodeURIComponent(content.cid)}`} className="font-sans font-medium text-sm text-foreground hover:text-primary transition-colors line-clamp-2 block">
                         {content.title}
                       </Link>
 
@@ -463,7 +463,7 @@ export default function DashboardPage() {
                             )}
                           </Button>
                           <Button variant="outline" size="sm" asChild className="h-8 px-3 text-xs font-mono border-border/60 bg-surface-subtle hover:bg-surface-elevated text-foreground rounded-[4px]">
-                            <Link href={`/read/${content.cid}`}>
+                            <Link href={`/read/${encodeURIComponent(content.cid)}`}>
                               <span>Read</span>
                               <ExternalLink className="h-3 w-3 ml-1" />
                             </Link>
@@ -506,7 +506,7 @@ export default function DashboardPage() {
                           className="flex-1 gap-1.5 border-border/60 bg-surface-subtle hover:bg-surface-elevated text-foreground text-xs rounded-[4px]"
                           asChild
                         >
-                          <Link href={`/read/${content.cid}`}>
+                          <Link href={`/read/${encodeURIComponent(content.cid)}`}>
                             <Eye className="h-3.5 w-3.5 text-primary" />
                             <span>Read</span>
                           </Link>

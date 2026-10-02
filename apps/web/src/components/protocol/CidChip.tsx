@@ -65,7 +65,7 @@ export function CidChip({
 
       {showExplorerLink && (
         <a
-          href={`https://ipfs.io/ipfs/${cid}`}
+          href={`https://ipfs.io/ipfs/${encodeURIComponent(cid)}`}
           target="_blank"
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
