@@ -90,6 +90,13 @@
     return editorEl.innerHTML || editorEl.innerText || '';
   }
 
+  /**
+   * Extracts title from title element or fallback HTML/Markdown content without DOMParser reinterpretation.
+   *
+   * @param {Element|null} titleEl - Title input or heading element.
+   * @param {string} [fallbackContent] - Raw HTML or Markdown content.
+   * @returns {string} Sanitized title text.
+   */
   function extractTitle(titleEl, fallbackContent) {
     if (titleEl) {
       if ('value' in titleEl && titleEl.value) return titleEl.value.trim();
@@ -97,23 +104,13 @@
       if (text && text.trim()) return text.trim();
     }
     if (fallbackContent) {
-      if (typeof DOMParser !== 'undefined') {
-        try {
-          const doc = new DOMParser().parseFromString(fallbackContent, 'text/html');
-          const h1 = doc.querySelector('h1');
-          if (h1 && h1.textContent && h1.textContent.trim()) {
-            return h1.textContent.trim();
-          }
-        } catch {
-          // ignore and fallback
-        }
-      }
-      const h1Open = /<h1\b[^>]*>/i.exec(fallbackContent);
+      const cleanMarkup = fallbackContent.replace(/="[^"]*"|='[^']*'/g, '=""');
+      const h1Open = /<h1\b[^>]*>/i.exec(cleanMarkup);
       if (h1Open) {
         const startIndex = h1Open.index + h1Open[0].length;
-        const closeIndex = fallbackContent.toLowerCase().indexOf('</h1>', startIndex);
+        const closeIndex = cleanMarkup.toLowerCase().indexOf('</h1>', startIndex);
         if (closeIndex !== -1) {
-          const innerHtml = fallbackContent.slice(startIndex, closeIndex);
+          const innerHtml = cleanMarkup.slice(startIndex, closeIndex);
           let inTag = false;
           let text = '';
           for (let i = 0; i < innerHtml.length; i++) {

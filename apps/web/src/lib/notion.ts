@@ -458,16 +458,25 @@ export function parseNotionMarkdown(markdownText: string): ConvertedNotionArticl
       htmlParts.push(`<h3 class="text-xl font-serif font-semibold text-foreground/90 mt-5 mb-2">${escapeHtml(trimmed.slice(4).trim())}</h3>`);
     }
     // Notion Callouts formatted as `> 💡 ...` or `> ⚠️ ...` or `> 🚨 ...`
-    else if (trimmed.startsWith(">") && /^>\s*(💡|⚠️|🚨|🔥|🛡️|[\u2600-\u27BF])\s+(.*)$/.test(trimmed)) {
+    else if (trimmed.startsWith(">") && (() => {
+      const rest = trimmed.slice(1).trimStart();
+      const firstChar = Array.from(rest)[0];
+      if (!firstChar) return false;
+      const cp = firstChar.codePointAt(0) || 0;
+      return ["💡", "⚠️", "🚨", "🔥", "🛡️", "☀️", "⚡", "⭐"].includes(firstChar) || (cp >= 0x2600 && cp <= 0x27bf);
+    })()) {
       stats.calloutsConverted++;
-      const match = trimmed.match(/^>\s*(💡|⚠️|🚨|🔥|🛡️|[\u2600-\u27BF])\s+(.*)$/);
-      const icon = match ? match[1] : "💡";
-      const content = match ? match[2] : trimmed.slice(1).trim();
+      const rest = trimmed.slice(1).trimStart();
+      let icon = Array.from(rest)[0] || "💡";
+      if (rest.startsWith(icon + "\uFE0F")) {
+        icon = icon + "\uFE0F";
+      }
+      const content = rest.slice(icon.length).trimStart();
 
       let calloutType = "info";
       if (icon === "⚠️" || icon === "🚨" || icon === "🔥") {
         calloutType = "warning";
-      } else if (icon === "🛡️") {
+      } else if (icon.startsWith("🛡️") || icon.startsWith("🛡")) {
         calloutType = "whistleblower";
       }
 
@@ -536,7 +545,7 @@ export function parseNotionMarkdown(markdownText: string): ConvertedNotionArticl
   return {
     title,
     author: "Notion Author",
-    excerpt: (cheerio.load(cleanHtml).text() || cleanHtml).slice(0, 200).trim(),
+    excerpt: (cheerio.load(cleanHtml).text() || title).slice(0, 200).trim(),
     cleanHtml,
     wordCount: readingStats.words,
     readingTimeMinutes: readingStats.minutes,
@@ -544,6 +553,12 @@ export function parseNotionMarkdown(markdownText: string): ConvertedNotionArticl
   };
 }
 
+/**
+ * Escapes sensitive HTML characters into corresponding safe HTML entities.
+ *
+ * @param str - Input string to escape.
+ * @returns Escaped safe HTML string.
+ */
 function escapeHtml(str: string): string {
   return str
     .replace(/&/g, "&amp;")
