@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { validateSafeUrl } from "@/lib/ssrf";
+import { validateSafeUrl, safeFetch } from "@/lib/ssrf";
 import { isValidCID } from "@/lib/article-metadata";
 
 export const dynamic = "force-dynamic";
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 4000);
 
-      const response = await fetch(waybackSaveUrl, {
+      const response = await safeFetch(waybackSaveUrl, {
         method: "GET",
         signal: controller.signal,
         headers: {
