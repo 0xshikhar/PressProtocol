@@ -94,7 +94,8 @@ export function scanContentPrivacy(content: string): PrivacyScanResult {
 
   // 2. Check for known surveillance & analytics domains
   for (const domain of KNOWN_SURVEILLANCE_DOMAINS) {
-    const regex = new RegExp(`https?://[a-zA-Z0-9.-]*${domain.replace(".", "\\.")}[^"\\s']*`, "gi");
+    const escapedDomain = domain.replace(/\./g, "\\.");
+    const regex = new RegExp(`https?://(?:[a-zA-Z0-9-]+\\.)*${escapedDomain}(?::\\d+)?(?:/[^"\\s']*)?`, "gi");
     let match;
     while ((match = regex.exec(content)) !== null) {
       trackerDomainsCount++;
