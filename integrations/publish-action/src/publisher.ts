@@ -149,6 +149,11 @@ export function transpileMarkdown(markdown: string): { html: string; wordCount: 
       continue;
     }
 
+    // Purge executable script tags
+    if (trimmed.toLowerCase().includes("<script") || trimmed.toLowerCase().includes("</script>")) {
+      continue;
+    }
+
     // Callouts: `> 💡 ...` or `> ⚠️ ...` or `> 🚨 ...` or `> 🛡️ ...`
     if (/^>\s*([\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF]|💡|⚠️|🚨|🔥|🛡️)\s*/.test(trimmed)) {
       const match = trimmed.match(/^>\s*([\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF]|💡|⚠️|🚨|🔥|🛡️)\s*(.*)$/);
@@ -203,20 +208,11 @@ export function transpileMarkdown(markdown: string): { html: string; wordCount: 
   }
 
   const rawHtml = htmlParts.join("\n");
-  let sanitized = rawHtml;
-  const scriptRegex = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
-  const handlerRegex = /\s*on\w+\s*=\s*(?:"[^"]*"|'[^']*'|&quot;.*?&quot;|[^\s>]+)/gi;
-  let prevSanitized: string;
-  do {
-    prevSanitized = sanitized;
-    sanitized = sanitized.replace(scriptRegex, "").replace(handlerRegex, "");
-  } while (sanitized !== prevSanitized);
-
   const words = markdown.trim().split(/\s+/).filter(Boolean).length;
   const readingTimeMinutes = Math.max(1, Math.ceil(words / 200));
 
   return {
-    html: sanitized,
+    html: rawHtml,
     wordCount: words,
     readingTimeMinutes,
   };
@@ -226,7 +222,8 @@ export function transpileMarkdown(markdown: string): { html: string; wordCount: 
  * Handles inline formatting: bold, italic, code, links.
  */
 function renderInlineMarkdown(text: string): string {
-  return escapeHtml(text)
+  const safeText = text.replace(/\bon[a-zA-Z]+\s*=\s*(?:'[^']*'|"[^"]*"|[^\s>]+)/gi, "");
+  return escapeHtml(safeText)
     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
     .replace(/\*(.*?)\*/g, "<em>$1</em>")
     .replace(/`([^`]+)`/g, "<code class=\"px-1.5 py-0.5 rounded bg-white/10 text-cyan-300 font-mono text-xs\">$1</code>")
