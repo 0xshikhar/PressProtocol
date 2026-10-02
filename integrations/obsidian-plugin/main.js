@@ -19,13 +19,13 @@ function cleanObsidianMarkdown(raw) {
     // 1. Strip YAML frontmatter
     text = text.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
     // 2. Transform wiki-links with custom display text: [[Note Title|Custom Text]] -> Custom Text
-    text = text.replace(/\[\[([^\]|\r\n]+)\|([^\]\r\n]+)\]\]/g, "$2");
+    text = text.replace(/\[\[([^\[\]|\r\n]{1,300})\|([^\[\]\r\n]{1,300})\]\]/g, "$2");
     // 3. Transform simple wiki-links: [[Note Title]] -> Note Title
-    text = text.replace(/\[\[([^\]\r\n]+)\]\]/g, "$1");
+    text = text.replace(/\[\[([^\[\]\r\n]{1,300})\]\]/g, "$1");
     // 4. Strip Obsidian block references (e.g. ^c7b8a1)
     text = text.replace(/[ \t]*\^[a-zA-Z0-9-]+[ \t]*$/gm, "");
     // 5. Clean internal embedded transclusions: ![[Note Title]] -> [Note Reference: Note Title]
-    text = text.replace(/!\[\[([^\]\r\n]+)\]\]/g, "*[Embedded Note: $1]*");
+    text = text.replace(/!\[\[([^\[\]\r\n]{1,300})\]\]/g, "*[Embedded Note: $1]*");
     return text.trim();
 }
 /**
