@@ -10,11 +10,13 @@ import Footer from "@/components/navigation/footer"
 
 const inter = localFont({
   src: "../fonts/inter-var.woff2",
+  weight: "100 900",
   variable: "--font-sans",
   display: "swap",
 })
 const sourceSerif = localFont({
   src: "../fonts/source-serif-4-var.woff2",
+  weight: "200 900",
   variable: "--font-source-serif",
   display: "swap",
 })
@@ -26,6 +28,7 @@ const instrumentSerif = localFont({
 })
 const jetbrainsMono = localFont({
   src: "../fonts/jetbrains-mono-var.woff2",
+  weight: "100 800",
   variable: "--font-jetbrains",
   display: "swap",
 })
