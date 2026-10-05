@@ -1,6 +1,6 @@
 import "./globals.css"
 import type { Metadata, Viewport } from "next"
-import { Inter, Instrument_Serif, JetBrains_Mono, Source_Serif_4 } from "next/font/google"
+import localFont from "next/font/local"
 import { siteConfig } from "@/config/site"
 import { cn } from "@/lib/utils"
 import { Providers } from "@/app/providers"
@@ -8,22 +8,26 @@ import Navbar from "@/components/navigation/navbar"
 import Footer from "@/components/navigation/footer"
 
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
-const sourceSerif = Source_Serif_4({
-  subsets: ["latin"],
-  variable: "--font-source-serif",
-  weight: ["400", "500", "600", "700"],
+const inter = localFont({
+  src: "../fonts/inter-var.woff2",
+  variable: "--font-sans",
   display: "swap",
 })
-const instrumentSerif = Instrument_Serif({
-  subsets: ["latin"],
+const sourceSerif = localFont({
+  src: "../fonts/source-serif-4-var.woff2",
+  variable: "--font-source-serif",
+  display: "swap",
+})
+const instrumentSerif = localFont({
+  src: "../fonts/instrument-serif-400.woff2",
   weight: "400",
   variable: "--font-instrument-serif",
-  adjustFontFallback: false,
+  display: "swap",
 })
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
+const jetbrainsMono = localFont({
+  src: "../fonts/jetbrains-mono-var.woff2",
   variable: "--font-jetbrains",
+  display: "swap",
 })
 
 interface RootLayoutProps {
