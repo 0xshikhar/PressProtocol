@@ -145,7 +145,7 @@ jobs:
           gh release create "${{ github.ref_name }}" \
             PressProtocol_Browser_Extension.zip \
             PressProtocol_Wordpress_Plugin.zip \
-            --title "${{ github.ref_name }}" \
+            --title "PressProtocol Platform ${{ github.ref_name }}" \
             --generate-notes
 
   publish-ghcr:
