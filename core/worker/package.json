@@ -1,6 +1,6 @@
 {
   "name": "pressprotocol-worker",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "PressProtocol Serverless Edge Backend on Cloudflare Workers",
   "private": true,
   "type": "module",

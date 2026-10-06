@@ -37,12 +37,17 @@ jobs:
       - name: Publish to NPM
         run: |
           if [ -z "$NODE_AUTH_TOKEN" ]; then
-            echo "⚠️ NPM_TOKEN secret not configured; skipping NPM publishing."
-            exit 0
+            echo "::error::NPM_TOKEN secret not configured; cannot publish."
+            exit 1
           fi
-          pnpm --filter @pressprotocol/sdk publish --access public --no-git-checks
-          pnpm --filter @pressprotocol/proof publish --access public --no-git-checks
-          pnpm --filter @pressprotocol/widget publish --access public --no-git-checks
+          for pkg in sdk proof widget; do
+            version=$(node -p "require('./packages/$pkg/package.json').version")
+            if npm view "@pressprotocol/$pkg@$version" version >/dev/null 2>&1; then
+              echo "Skipping @pressprotocol/$pkg@$version — already published."
+            else
+              pnpm --filter "@pressprotocol/$pkg" publish --access public --no-git-checks
+            fi
+          done
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -69,8 +74,8 @@ jobs:
       - name: Publish to PyPI
         run: |
           if [ -z "$PYPI_TOKEN" ]; then
-            echo "⚠️ PYPI_TOKEN secret not configured in repository secrets; skipping PyPI publishing."
-            exit 0
+            echo "::error::PYPI_TOKEN secret not configured in repository secrets; cannot publish."
+            exit 1
           fi
           python -m twine upload sdks/python/dist/* -u __token__ -p "$PYPI_TOKEN" --skip-existing
         env:
@@ -91,10 +96,15 @@ jobs:
       - name: Publish to Crates.io
         run: |
           if [ -z "$CRATES_IO_TOKEN" ]; then
-            echo "⚠️ CRATES_IO_TOKEN secret not configured in repository secrets; skipping Crates.io publishing."
-            exit 0
+            echo "::error::CRATES_IO_TOKEN secret not configured in repository secrets; cannot publish."
+            exit 1
           fi
-          cargo publish --manifest-path sdks/rust/Cargo.toml --token "$CRATES_IO_TOKEN"
+          version=$(grep '^version' sdks/rust/Cargo.toml | head -1 | cut -d'"' -f2)
+          if cargo search pressprotocol-rs --limit 1 2>/dev/null | grep -q "\"$version\""; then
+            echo "Skipping pressprotocol-rs@$version — already published."
+          else
+            cargo publish --manifest-path sdks/rust/Cargo.toml --token "$CRATES_IO_TOKEN"
+          fi
         env:
           CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
 
@@ -158,6 +168,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Resolve Node Daemon Version
+        id: node_version
+        run: echo "version=$(node -p "require('./core/node/package.json').version")" >> "$GITHUB_OUTPUT"
+
       - name: Build and Push Docker Image
         uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5.4.0
         with:
@@ -165,4 +179,4 @@ jobs:
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/pressprotocol-node:latest
-            ghcr.io/${{ github.repository_owner }}/pressprotocol-node:v1.1.0
+            ghcr.io/${{ github.repository_owner }}/pressprotocol-node:v${{ steps.node_version.outputs.version }}
