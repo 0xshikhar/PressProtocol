@@ -141,11 +141,12 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.ref_name }}
         run: |
-          gh release create "${{ github.ref_name }}" \
+          gh release create "$RELEASE_TAG" \
             PressProtocol_Browser_Extension.zip \
             PressProtocol_Wordpress_Plugin.zip \
-            --title "PressProtocol Platform ${{ github.ref_name }}" \
+            --title "PressProtocol Platform $RELEASE_TAG" \
             --generate-notes
 
   publish-ghcr:
