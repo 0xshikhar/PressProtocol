@@ -113,8 +113,8 @@ importers:
         specifier: ^8.6.0
         version: 8.6.0(react@18.3.1)
       lucide-react:
-        specifier: ^0.477.0
-        version: 0.477.0(react@18.3.1)
+        specifier: ^1.57.0
+        version: 1.57.0(@types/react@18.3.31)(react@18.3.1)
       next:
         specifier: 14.1.0
         version: 14.1.0(@babel/core@7.29.7(supports-color@10.2.2))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -5956,10 +5956,14 @@ packages:
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0
 
-  lucide-react@0.477.0:
-    resolution: {integrity: sha512-yCf7aYxerFZAbd8jHJxjwe1j7jEMPptjnaOqdYeirFnEy85cNR3/L+o0I875CYFYya+eEVzZSbNuRk8BZPDpVw==}
+  lucide-react@1.57.0:
+    resolution: {integrity: sha512-bXFZEucYhAzLD62Jse76AbTR6LiSLTn3Tqir2f1n8rZrWAdLodYy7jnRZSPIT89dRLk/IseMOUWG82wJtTyTTw==}
     peerDependencies:
+      '@types/react': '*'
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
   main-event@1.0.5:
     resolution: {integrity: sha512-4l9z8r7Q446mhhVTwdHmfPksOYBwN2xa7ewEW2yxPVNQapIaAf57ORFLMB91SpMEMa4wXowect7fq3uMLjDnGA==}
@@ -16843,9 +16847,11 @@ snapshots:
     dependencies:
       react: 18.3.1
 
-  lucide-react@0.477.0(react@18.3.1):
+  lucide-react@1.57.0(@types/react@18.3.31)(react@18.3.1):
     dependencies:
       react: 18.3.1
+    optionalDependencies:
+      '@types/react': 18.3.31
 
   main-event@1.0.5: {}
 
