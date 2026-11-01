@@ -6,10 +6,10 @@ import {
 import { 
   generateKeypair, 
   getPublicKey, 
-  signPayload, 
   calculateDeterministicCIDv1,
   KeyPair 
 } from './crypto.js';
+import { signArticleV2 } from '@pressprotocol/sdk/protocol';
 
 export interface PublishResult {
   cid: string;
@@ -152,13 +152,10 @@ export class PressProtocolPublishElement extends HTMLElement {
 
       const identity = await this.getOrCreateIdentity();
       const timestamp = new Date().toISOString();
-      const canonicalPayload = JSON.stringify({
-        title: article.title,
-        tags: this.tags,
-        timestamp,
-      });
-
-      const signature = await signPayload(canonicalPayload, identity.privateKey);
+      const signature = await signArticleV2(
+        { title: article.title, tags: this.tags, timestamp, content: article.content },
+        identity.privateKey
+      );
       const deterministicCID = calculateDeterministicCIDv1(article.content);
 
       // Step 3: Node dispatch or direct archival

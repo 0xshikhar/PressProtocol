@@ -304,6 +304,9 @@ importers:
       '@noble/ed25519':
         specifier: ^2.3.0
         version: 2.3.0
+      '@pressprotocol/sdk':
+        specifier: workspace:*
+        version: link:../../packages/sdk
     devDependencies:
       '@types/chrome':
         specifier: ^0.0.268
@@ -335,6 +338,9 @@ importers:
       '@noble/hashes':
         specifier: ^1.7.1
         version: 1.8.0
+      '@pressprotocol/sdk':
+        specifier: workspace:*
+        version: link:../../packages/sdk
     devDependencies:
       '@types/node':
         specifier: ^20.12.7
@@ -389,6 +395,9 @@ importers:
       '@noble/hashes':
         specifier: ^2.4.0
         version: 2.4.0
+      '@pressprotocol/sdk':
+        specifier: workspace:*
+        version: link:../sdk
     devDependencies:
       '@types/node':
         specifier: ^22.10.2

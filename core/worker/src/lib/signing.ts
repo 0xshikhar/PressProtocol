@@ -31,7 +31,7 @@ const UNSIGNED: Attribution = { pubkey: '', signature: 'unsigned', status: 'unsi
 export async function attributeSubmission(
   input: Submission
 ): Promise<{ ok: true; attribution: Attribution } | { ok: false; verification: PublicationVerification }> {
-  if (!input.publicKey && !input.signature) return { ok: true, attribution: UNSIGNED };
+  if (!input.signature) return { ok: true, attribution: UNSIGNED };
 
   const verification = await verifyPublication({
     title: input.title,

@@ -44,7 +44,7 @@ def calculate_deterministic_cidv1(content: str | bytes) -> str:
 
 
 def create_canonical_payload(title: str, tags: list[str], timestamp: str) -> str:
-    """Creates deterministic canonical JSON for article signing."""
+    """Legacy v1 payload (metadata only). Deprecated: use protocol.build_signing_payload_v2."""
     return json.dumps({
         "title": title,
         "tags": sorted(tags),

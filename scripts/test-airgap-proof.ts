@@ -16,7 +16,7 @@ import {
   base32Encode,
   base32Decode,
 } from "../packages/proof/src/index";
-import { generateKeypair, signPayload, createCanonicalPayload } from "../packages/sdk/src/index";
+import { generateKeypair, signPayload, createCanonicalPayload, signArticleV2 } from "../packages/sdk/src/index";
 import { POST as postArchive } from "../apps/web/src/app/api/archive/route";
 
 async function runTests() {
@@ -65,8 +65,7 @@ async function runTests() {
   const timestamp = new Date().toISOString();
   const title = "Air-Gapped Whistleblower Dossier";
   const tags = ["whistleblower", "airgap", "cryptography"];
-  const canonicalPayload = createCanonicalPayload(title, tags, timestamp);
-  const signature = await signPayload(canonicalPayload, authorKeypair.privateKey);
+  const signature = await signArticleV2({ title, tags, timestamp, content: contentA }, authorKeypair.privateKey);
 
   const proof = exportPressProof({
     title,
@@ -95,6 +94,18 @@ async function runTests() {
   assert(verification.signatureValid === true, "Author Ed25519 signature verified offline in-memory");
   assert(verification.status === "verified", "Verification status is 'verified'");
   assert(verification.latencyMs < 50, `Offline verification latency SLA met (${verification.latencyMs}ms < 50ms)`);
+
+  const legacySignature = await signPayload(createCanonicalPayload(title, tags, timestamp), authorKeypair.privateKey);
+  const legacyProof = exportPressProof({
+    title,
+    content: contentA,
+    tags,
+    timestamp,
+    publisher: { publicKey: authorKeypair.publicKey, signature: legacySignature },
+  });
+  const legacyVerification = await verifyPressProof(legacyProof);
+  assert(legacyVerification.status === "legacy_signature", "Legacy v1 (metadata-only) signature is reported as legacy");
+  assert(legacyVerification.signatureValid === false, "Legacy v1 signature does not authenticate the article body");
 
   // TEST 4: Tamper Resistance in Air-Gapped Verification
   console.log("\n🔹 4. Testing Tamper Resistance & Threat Model Defense in Offline Verification...");

@@ -31,6 +31,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getOrCreateBurnerWallet, type BurnerWallet } from "@/lib/burner-wallet";
+import { publishArticleSigned } from "@/lib/client-publish";
 import { CidChip } from "@/components/protocol/CidChip";
 import type { ConvertedNotionArticle, NotionBlockStats } from "@/lib/notion";
 
@@ -141,8 +142,7 @@ curl -s https://pressprotocol.com/api/content/$CID | pressprotocol resolve --ver
 
       const payload: any = {
         tags: tagList,
-        autoPublish,
-        privateKey: customKey.trim() || burnerWallet?.privateKey || undefined,
+        autoPublish: false,
       };
 
       if (inputMode === "url") {
@@ -164,10 +164,16 @@ curl -s https://pressprotocol.com/api/content/$CID | pressprotocol resolve --ver
 
       setConvertedArticle(data.article);
 
-      if (data.published) {
-        setPublishedCid(data.cid);
-        setShareUrl(data.shareUrl);
-        setEmbedCode(data.embedCode);
+      if (autoPublish) {
+        const published = await publishArticleSigned({
+          title: data.article.title,
+          content: data.article.cleanHtml,
+          tags: Array.from(new Set([...tagList, ...(data.article.tags || [])])),
+          privateKey: customKey.trim() || burnerWallet?.privateKey || undefined,
+        });
+        setPublishedCid(published.cid);
+        setShareUrl(published.shareUrl);
+        setEmbedCode(published.embedCode);
       }
     } catch (err: any) {
       setError(err.message || "Failed to convert Notion page.");

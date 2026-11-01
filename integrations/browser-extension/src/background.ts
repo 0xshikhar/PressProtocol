@@ -2,7 +2,8 @@
  * PressProtocol Browser Extension - Background Service Worker
  * Manages context menus, passage clipping, burner signing, and gateway broadcasting.
  */
-import { getOrCreateBurnerIdentity, signPayload } from "./crypto";
+import { getOrCreateBurnerIdentity } from "./crypto";
+import { signArticleV2 } from "@pressprotocol/sdk/protocol";
 import type { ClippedArticle, SovereignScrap, ExtensionSettings } from "./types";
 import {
   DEFAULT_SETTINGS,
@@ -175,14 +176,11 @@ async function publishArticle(article: ClippedArticle): Promise<any> {
   const timestamp = article.publishedAt || new Date().toISOString();
   const tags = article.tags && article.tags.length > 0 ? article.tags : ["web-archive", "sovereign-clip"];
 
-  // Deterministic signable payload
-  const signable = {
-    title: article.title,
-    tags,
-    timestamp,
-  };
-
-  const { signature } = await signPayload(signable, identity.privateKey);
+  // Protocol v2 signature binds title, tags, timestamp and the article body
+  const signature = await signArticleV2(
+    { title: article.title, tags, timestamp, content: article.contentHtml },
+    identity.privateKey
+  );
 
   // Payload for backend /api/content with full provenance metadata
   const body = {

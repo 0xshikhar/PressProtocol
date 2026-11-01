@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { url, tags, privateKey, autoPublish = true } = body;
+    const { url, tags, autoPublish = true } = body;
 
     if (!url || typeof url !== "string") {
       return NextResponse.json(
@@ -62,16 +62,12 @@ export async function POST(req: NextRequest) {
 
     // 3. Publish canonical sovereign content using PressProtocol SDK
     const backendEndpoint = getBackendUrl();
-    const client = new PressProtocolClient({
-      endpoint: backendEndpoint,
-      privateKey: privateKey || undefined,
-    });
+    const client = new PressProtocolClient({ endpoint: backendEndpoint });
 
     const publishResult = await client.publish({
       title: scrubbed.title,
       content: scrubbed.cleanHtml,
       tags: mergedTags,
-      privateKey: privateKey || undefined,
     });
 
     // 4. Construct sovereign embed iframe code
