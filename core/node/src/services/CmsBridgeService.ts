@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 import { storageService } from './StorageService.js';
 import { torService } from './TorService.js';
-import { identityService } from './IdentityService.js';
+import { signAsNode } from '../lib/node-identity.js';
 import { calculateDeterministicCIDv1 } from '../lib/cid.js';
 
 export interface GhostWebhookPayload {
@@ -113,7 +113,6 @@ export class CmsBridgeService {
    */
   public async ingestGhostPost(
     post: GhostWebhookPayload['post'] | any,
-    options?: { privateKey?: string; publicKey?: string }
   ) {
     const current = post?.current || post;
     if (!current || !current.title || !current.html) {
@@ -131,21 +130,10 @@ export class CmsBridgeService {
     }
     tagList.push('ghost-cms', 'sovereign');
 
-    let privKey = options?.privateKey;
-    let pubKey = options?.publicKey;
-    if (!privKey || !pubKey) {
-      const kp = await identityService.generateKeypair();
-      privKey = kp.privateKey;
-      pubKey = kp.publicKey;
-    }
-
     const timestamp = current.published_at || new Date().toISOString();
-    const canonicalPayload = JSON.stringify({
-      title,
-      tags: tagList,
-      timestamp,
-    });
-    const signature = await identityService.signContent(canonicalPayload, privKey);
+    const nodeSig = await signAsNode({ title, tags: tagList, timestamp, content });
+    const pubKey = nodeSig.pubkey;
+    const signature = nodeSig.signature;
     const deterministicCID = calculateDeterministicCIDv1(content);
 
     const storageResult = await storageService.uploadContent(
@@ -182,7 +170,7 @@ export class CmsBridgeService {
           slug: current.slug,
         },
       },
-      ipfsUrl: `https://ipfs.io/ipfs/${finalCID}`,
+      ipfsUrl: storageResult.pinned ? `ipfs://${finalCID}` : null,
       torUrl: onionAddress ? `http://${onionAddress}/read/${finalCID}` : undefined,
     };
   }
@@ -192,7 +180,6 @@ export class CmsBridgeService {
    */
   public async ingestStrapiEntry(
     payload: StrapiWebhookPayload,
-    options?: { privateKey?: string; publicKey?: string }
   ) {
     const entry = payload.entry;
     if (!entry) {
@@ -213,21 +200,10 @@ export class CmsBridgeService {
       }
     }
 
-    let privKey = options?.privateKey;
-    let pubKey = options?.publicKey;
-    if (!privKey || !pubKey) {
-      const kp = await identityService.generateKeypair();
-      privKey = kp.privateKey;
-      pubKey = kp.publicKey;
-    }
-
     const timestamp = entry.publishedAt || new Date().toISOString();
-    const canonicalPayload = JSON.stringify({
-      title,
-      tags: tagList,
-      timestamp,
-    });
-    const signature = await identityService.signContent(canonicalPayload, privKey);
+    const nodeSig = await signAsNode({ title, tags: tagList, timestamp, content });
+    const pubKey = nodeSig.pubkey;
+    const signature = nodeSig.signature;
     const deterministicCID = calculateDeterministicCIDv1(content);
 
     const storageResult = await storageService.uploadContent(
@@ -265,7 +241,7 @@ export class CmsBridgeService {
           model: payload.model,
         },
       },
-      ipfsUrl: `https://ipfs.io/ipfs/${finalCID}`,
+      ipfsUrl: storageResult.pinned ? `ipfs://${finalCID}` : null,
       torUrl: onionAddress ? `http://${onionAddress}/read/${finalCID}` : undefined,
     };
   }
@@ -275,7 +251,6 @@ export class CmsBridgeService {
    */
   public async ingestGenericCms(
     payload: GenericCmsPayload,
-    options?: { privateKey?: string; publicKey?: string }
   ) {
     if (!payload.title || !payload.content) {
       throw new Error('Invalid CMS payload: title and content are required');
@@ -284,21 +259,10 @@ export class CmsBridgeService {
     const platform = payload.platform || 'generic-cms';
     const tagList = payload.tags && payload.tags.length > 0 ? payload.tags : [platform, 'sovereign'];
 
-    let privKey = options?.privateKey;
-    let pubKey = options?.publicKey;
-    if (!privKey || !pubKey) {
-      const kp = await identityService.generateKeypair();
-      privKey = kp.privateKey;
-      pubKey = kp.publicKey;
-    }
-
     const timestamp = new Date().toISOString();
-    const canonicalPayload = JSON.stringify({
-      title: payload.title,
-      tags: tagList,
-      timestamp,
-    });
-    const signature = await identityService.signContent(canonicalPayload, privKey);
+    const nodeSig = await signAsNode({ title: payload.title, tags: tagList, timestamp, content: payload.content });
+    const pubKey = nodeSig.pubkey;
+    const signature = nodeSig.signature;
     const deterministicCID = calculateDeterministicCIDv1(payload.content);
 
     const storageResult = await storageService.uploadContent(
@@ -334,7 +298,7 @@ export class CmsBridgeService {
           author: payload.author,
         },
       },
-      ipfsUrl: `https://ipfs.io/ipfs/${finalCID}`,
+      ipfsUrl: storageResult.pinned ? `ipfs://${finalCID}` : null,
       torUrl: onionAddress ? `http://${onionAddress}/read/${finalCID}` : undefined,
     };
   }

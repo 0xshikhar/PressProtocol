@@ -1,6 +1,8 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { federationService, AutoPinPolicy, GossipPayload } from '../services/FederationService.js';
+import { requireScope } from '../lib/auth.js';
+import { validateSafeUrl } from '../lib/ssrf.js';
 
 const addPeerSchema = z.object({
   peerUrl: z.string().min(1),
@@ -77,9 +79,10 @@ export async function nodeRoutes(fastify: FastifyInstance) {
    * POST /api/node/federation/peers
    * Register a new federation peer
    */
-  fastify.post('/api/node/federation/peers', async (request, reply) => {
+  fastify.post('/api/node/federation/peers', { preHandler: requireScope('federate') }, async (request, reply) => {
     try {
       const body = addPeerSchema.parse(request.body);
+      validateSafeUrl(body.peerUrl); // block internal-network peers
       const peer = federationService.addPeer(body.peerUrl, body.name);
       return reply.status(201).send({
         success: true,
@@ -98,7 +101,7 @@ export async function nodeRoutes(fastify: FastifyInstance) {
    * DELETE /api/node/federation/peers
    * Remove a registered peer
    */
-  fastify.delete('/api/node/federation/peers', async (request, reply) => {
+  fastify.delete('/api/node/federation/peers', { preHandler: requireScope('federate') }, async (request, reply) => {
     try {
       const body = removePeerSchema.parse(request.body);
       const removed = federationService.removePeer(body.peerUrl);
@@ -130,8 +133,9 @@ export async function nodeRoutes(fastify: FastifyInstance) {
           ...result,
         });
       }
-      if (!result.accepted && result.reason?.startsWith('Forbidden')) {
-        return reply.status(403).send({
+      if (!result.accepted) {
+        const status = result.reason?.startsWith('Forbidden') ? 403 : 422;
+        return reply.status(status).send({
           success: false,
           ...result,
         });
@@ -166,7 +170,7 @@ export async function nodeRoutes(fastify: FastifyInstance) {
    * PUT /api/node/federation/gated
    * Update PSK and peer whitelist for private newsroom swarms
    */
-  fastify.put('/api/node/federation/gated', async (request, reply) => {
+  fastify.put('/api/node/federation/gated', { preHandler: requireScope('federate') }, async (request, reply) => {
     try {
       const body = z.object({
         psk: z.string().optional(),
@@ -209,7 +213,7 @@ export async function nodeRoutes(fastify: FastifyInstance) {
    * PUT /api/node/federation/policy
    * Update auto-pinning policy (all, followed, trending)
    */
-  fastify.put('/api/node/federation/policy', async (request, reply) => {
+  fastify.put('/api/node/federation/policy', { preHandler: requireScope('federate') }, async (request, reply) => {
     try {
       const body = updatePolicySchema.parse(request.body);
       federationService.setAutoPinPolicy(body.policy as AutoPinPolicy, body.followedKeys);

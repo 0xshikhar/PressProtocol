@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { StorageService } from '../services/StorageService.js';
+import { requireScope } from '../lib/auth.js';
 
 export async function uploadRoutes(fastify: FastifyInstance) {
   const storageService = new StorageService();
@@ -8,7 +9,7 @@ export async function uploadRoutes(fastify: FastifyInstance) {
    * POST /api/upload/image
    * Upload an image to IPFS via Pinata
    */
-  fastify.post('/api/upload/image', async (request, reply) => {
+  fastify.post('/api/upload/image', { preHandler: requireScope('pin') }, async (request, reply) => {
     try {
       // Get uploaded file
       const data = await request.file();
@@ -61,7 +62,7 @@ export async function uploadRoutes(fastify: FastifyInstance) {
    * POST /api/upload/json
    * Upload JSON data to IPFS (for manifests, comments, etc.)
    */
-  fastify.post('/api/upload/json', async (request, reply) => {
+  fastify.post('/api/upload/json', { preHandler: requireScope('pin') }, async (request, reply) => {
     try {
       const { data: jsonData } = request.body as { data: any };
 

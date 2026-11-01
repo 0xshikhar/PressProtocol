@@ -6,7 +6,7 @@ primary_region = "iad"
 
 [build]
   dockerfile = "core/node/Dockerfile"
-  ignorefile = "core/node/.dockerignore"
+  ignorefile = ".dockerignore"
 
 [mounts]
   source = "pressprotocol_data"

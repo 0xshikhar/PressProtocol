@@ -1,19 +1,63 @@
 import { FastifyInstance } from 'fastify';
+import sanitizeHtml from 'sanitize-html';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { storageService } from '../services/StorageService.js';
 import { torService } from '../services/TorService.js';
 import { mirrorService } from '../services/MirrorService.js';
-import { identityService } from '../services/IdentityService.js';
 import { discoveryService } from '../services/DiscoveryService.js';
-import { env } from '../config/env.js';
+import { publicAppUrl, publicNodeUrl } from '../lib/public-urls.js';
+import { rateLimit } from '../lib/auth.js';
+import { verifyPublication } from '@pressprotocol/sdk/protocol';
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+const TOR_ARTICLE_CSP =
+  "default-src 'none'; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
+
+const articleSanitizeOptions: sanitizeHtml.IOptions = {
+  allowedTags: [
+    'a', 'p', 'br', 'hr', 'em', 'strong', 'b', 'i', 'u', 's', 'del', 'ins', 'mark',
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'ul', 'ol', 'li', 'blockquote', 'q', 'cite',
+    'pre', 'code', 'kbd', 'samp', 'var',
+    'figure', 'figcaption', 'img', 'picture', 'video', 'audio', 'source',
+    'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td', 'caption', 'colgroup', 'col',
+    'div', 'span', 'section', 'article', 'aside', 'header', 'footer', 'main', 'nav',
+    'dl', 'dt', 'dd', 'details', 'summary', 'sup', 'sub', 'small', 'time', 'abbr',
+  ],
+  allowedAttributes: {
+    a: ['href', 'title', 'rel', 'target'],
+    img: ['src', 'alt', 'title', 'width', 'height', 'loading'],
+    video: ['src', 'controls', 'poster', 'width', 'height'],
+    audio: ['src', 'controls'],
+    source: ['src', 'type', 'srcset', 'media'],
+    td: ['colspan', 'rowspan'],
+    th: ['colspan', 'rowspan', 'scope'],
+    col: ['span'],
+    time: ['datetime'],
+    '*': ['class', 'id', 'lang', 'dir'],
+  },
+  allowedSchemes: ['https', 'http', 'mailto', 'ipfs'],
+  allowedSchemesByTag: { img: ['https', 'http', 'data', 'ipfs'] },
+  disallowedTagsMode: 'discard',
+  transformTags: {
+    a: sanitizeHtml.simpleTransform('a', { rel: 'noopener noreferrer nofollow' }),
+  },
+};
 
 const publishContentSchema = z.object({
   title: z.string().min(1).max(500),
   content: z.string().min(1),
   tags: z.array(z.string()).default([]),
   walletAddress: z.string().optional(), // Optional - anonymous publishing
-  privateKey: z.string().optional(), // For signing, should be handled securely
   publicKey: z.string().optional(), // Optional - client-provided Ed25519 public key
   signature: z.string().optional(), // Optional - client-provided Ed25519 signature
   timestamp: z.string().optional(), // Optional - client-signed timestamp
@@ -34,82 +78,55 @@ export async function contentRoutes(fastify: FastifyInstance) {
   /**
    * POST /api/content - Publish new content
    */
-  fastify.post('/api/content', async (request, reply) => {
+  fastify.post('/api/content', { preHandler: rateLimit(120) }, async (request, reply) => {
     try {
       const body = publishContentSchema.parse(request.body);
 
-      // 1. Generate or get identity (anonymous by default)
+      // 1. Optional client signature — must be protocol v2 (content-bound). A wallet
+      //    address alone is stored only as a label; it does not authenticate the publish.
       let user = null;
       let userId = null;
-      let identity = null;
-      let privateKey = body.privateKey;
-      let publicKey = body.publicKey;
-      let signature = body.signature;
       const publishedTimestamp = body.timestamp || new Date().toISOString();
+      let publicKey: string | undefined;
+      let signature = 'unsigned';
+      let signatureStatus: 'verified' | 'unsigned' = 'unsigned';
+
+      if (body.signature || body.publicKey) {
+        const verification = await verifyPublication({
+          title: body.title,
+          tags: body.tags,
+          timestamp: body.timestamp || '',
+          content: body.content,
+          publicKey: body.publicKey || '',
+          signature: body.signature || '',
+        });
+        if (!verification.isValid) {
+          return reply.status(401).send({
+            success: false,
+            error:
+              verification.status === 'legacy'
+                ? 'Signature uses the legacy v1 format (metadata only). Re-sign with protocol v2.'
+                : 'Invalid signature for the v2 content-bound payload.',
+          });
+        }
+        publicKey = body.publicKey;
+        signature = body.signature!;
+        signatureStatus = 'verified';
+        await prisma.identity.create({
+          data: { publicKey: body.publicKey! },
+        }).catch(() => undefined); // dedupe best-effort
+      }
 
       if (body.walletAddress) {
-        // Authenticated publishing
         user = await prisma.user.findUnique({
           where: { walletAddress: body.walletAddress },
         });
-
         if (!user) {
           user = await prisma.user.create({
             data: { walletAddress: body.walletAddress },
           });
         }
         userId = user.id;
-
-        // Get or create identity for user
-        identity = await prisma.identity.findFirst({
-          where: { userId: user.id },
-        });
-
-        if (!identity) {
-          const keypair = await identityService.generateKeypair();
-          privateKey = keypair.privateKey;
-          identity = await identityService.createIdentity(user.id, keypair.publicKey);
-        }
-        publicKey = identity.publicKey;
-      } else if (body.publicKey) {
-        // Client provided sovereign burner public key
-        identity = await prisma.identity.findUnique({
-          where: { publicKey: body.publicKey },
-        });
-
-        if (!identity) {
-          identity = await prisma.identity.create({
-            data: {
-              publicKey: body.publicKey,
-            },
-          });
-        }
-        publicKey = identity.publicKey;
-      } else {
-        // Anonymous publishing - generate ephemeral keypair
-        const keypair = await identityService.generateKeypair();
-        privateKey = keypair.privateKey;
-        
-        // Create anonymous identity (no user linkage)
-        identity = await prisma.identity.create({
-          data: {
-            publicKey: keypair.publicKey,
-          },
-        });
-        publicKey = identity.publicKey;
-      }
-
-      // 2. Sign content BEFORE uploading to IPFS if not already signed client-side
-      const contentToSign = JSON.stringify({
-        title: body.title,
-        tags: body.tags,
-        timestamp: publishedTimestamp,
-      });
-
-      if (!signature) {
-        signature = privateKey
-          ? await identityService.signContent(contentToSign, privateKey)
-          : 'unsigned';
       }
 
       // Metadata passed through from client (e.g. browser extension)
@@ -145,7 +162,7 @@ export async function contentRoutes(fastify: FastifyInstance) {
           cid: ipfsResult.cid,
           title: body.title,
           tags: body.tags,
-          publisherPubKey: publicKey,
+          publisherPubKey: publicKey || 'unsigned',
           userId: userId || undefined, // undefined for anonymous
           signature,
           createdAt: new Date(publishedTimestamp),
@@ -156,10 +173,10 @@ export async function contentRoutes(fastify: FastifyInstance) {
       console.log('📦 Source of truth: IPFS CID', ipfsResult.cid);
 
       // 6. Create mirrors
-      const webGatewayUrl = `${env.CORS_ORIGIN}/read/${ipfsResult.cid}`;
+      const webGatewayUrl = `${publicAppUrl()}/read/${ipfsResult.cid}`;
       
       console.log('🪞 [PUBLISH] Creating mirrors with:', {
-        ipfs: ipfsResult.gatewayUrl,
+        ipfs: ipfsResult.gatewayUrl || `${publicNodeUrl()}/ipfs/${ipfsResult.cid}`,
         tor: onionResult.onionUrl,
         gateway: webGatewayUrl,
       });
@@ -183,7 +200,7 @@ export async function contentRoutes(fastify: FastifyInstance) {
         body.tags,
         { pubkey: publicKey, signature },
         {
-          ipfs: ipfsResult.gatewayUrl,
+          ipfs: ipfsResult.gatewayUrl || `${publicNodeUrl()}/ipfs/${ipfsResult.cid}`,
           tor: onionResult.onionUrl,
           gateway: webGatewayUrl,
         },
@@ -204,9 +221,13 @@ export async function contentRoutes(fastify: FastifyInstance) {
             gateway: mirrors.find((m) => m.type === 'gateway')?.url,
           },
           publisher: {
-            publicKey: publicKey,
-            isAnonymous: !body.walletAddress,
+            publicKey: publicKey || null,
+            signatureStatus,
+            sigVersion: signatureStatus === 'verified' ? 2 : null,
+            isAnonymous: !publicKey,
           },
+          storage: ipfsResult.storage,
+          pinnedToIpfs: ipfsResult.pinned,
           dht: {
             announced: dhtResult.dhtAnnounced,
             manifestCid: dhtResult.manifestCid,
@@ -417,12 +438,39 @@ export async function contentRoutes(fastify: FastifyInstance) {
       }
 
       // Normalize fields
-      const title = cachedContent?.title || fullContent?.title || 'Preserved Sovereign Dispatch';
-      const bodyHtml = fullContent?.content || cachedContent?.content || '<p>Content body synchronizing across DHT...</p>';
-      const tags: string[] = cachedContent?.tags || (Array.isArray(fullContent?.tags) ? fullContent.tags : []);
+      const rawTitle = cachedContent?.title || fullContent?.title || 'Preserved Sovereign Dispatch';
+      const rawBodyHtml = fullContent?.content || '<p>Content body synchronizing across DHT...</p>';
+      const rawTags: string[] = cachedContent?.tags || (Array.isArray(fullContent?.tags) ? fullContent.tags : []);
+      const rawTimestamp = fullContent?.timestamp || cachedContent?.createdAt?.toISOString?.() || '';
       const createdAt = cachedContent?.createdAt ? new Date(cachedContent.createdAt).toLocaleDateString() : new Date().toLocaleDateString();
-      const publisherKey = cachedContent?.publisherPubKey || fullContent?.publisher?.pubkey || fullContent?.publisher?.publicKey || 'sovereign-anonymous-author';
-      const signature = cachedContent?.signature || fullContent?.publisher?.signature || 'Ed25519 Verified';
+      const publisherKey = cachedContent?.publisherPubKey || fullContent?.publisher?.pubkey || fullContent?.publisher?.publicKey || '';
+      const signature = cachedContent?.signature || fullContent?.publisher?.signature || '';
+
+      // Sanitize untrusted article HTML — it arrives from arbitrary IPFS publishers
+      const bodyHtml = sanitizeHtml(rawBodyHtml, articleSanitizeOptions);
+      const title = escapeHtml(String(rawTitle));
+      const tags = rawTags.map((t: string) => escapeHtml(String(t)));
+
+      // Verify the signature against the fetched body instead of trusting a badge
+      let proofBadge = 'Unsigned';
+      if (signature && publisherKey && signature !== 'unsigned' && publisherKey !== 'unsigned') {
+        const verification = await verifyPublication({
+          title: String(rawTitle),
+          tags: rawTags,
+          timestamp: rawTimestamp,
+          content: rawBodyHtml,
+          publicKey: publisherKey,
+          signature,
+        });
+        proofBadge =
+          verification.status === 'verified'
+            ? '✓ Ed25519 Verified (v2, content-bound)'
+            : verification.status === 'legacy'
+              ? 'Legacy signature (metadata only)'
+              : '⚠ Signature invalid';
+      }
+
+      const shortKey = publisherKey.length > 24 ? publisherKey.slice(0, 16) + '...' + publisherKey.slice(-8) : (publisherKey || 'sovereign-anonymous-author');
 
       // Return hardened self-contained HTML page conforming to v2 design tokens
       const html = `<!DOCTYPE html>
@@ -571,7 +619,7 @@ export async function contentRoutes(fastify: FastifyInstance) {
     <div class="container">
         <div class="header-strip">
             <span class="tor-badge">🧅 Tor v3 Hidden Circuit</span>
-            <span class="proof-badge">✓ Ed25519 Sealed</span>
+            <span class="proof-badge">${proofBadge}</span>
         </div>
         <h1>${title}</h1>
         <div class="meta">
@@ -581,11 +629,11 @@ export async function contentRoutes(fastify: FastifyInstance) {
             </div>
             <div class="meta-row">
                 <span class="meta-label">Author Sovereign Key:</span>
-                <span class="meta-val">${publisherKey.length > 24 ? publisherKey.slice(0, 16) + '...' + publisherKey.slice(-8) : publisherKey}</span>
+                <span class="meta-val">${escapeHtml(shortKey)}</span>
             </div>
             <div class="meta-row">
                 <span class="meta-label">IPFS CID:</span>
-                <span class="cid-chip">${cid}</span>
+                <span class="cid-chip">${escapeHtml(cid)}</span>
             </div>
         </div>
         ${tags.length > 0 ? `
@@ -604,7 +652,12 @@ export async function contentRoutes(fastify: FastifyInstance) {
 </body>
 </html>`;
 
-      reply.type('text/html; charset=utf-8').send(html);
+      reply
+        .header('Content-Security-Policy', TOR_ARTICLE_CSP)
+        .header('X-Content-Type-Options', 'nosniff')
+        .header('Cross-Origin-Opener-Policy', 'same-origin')
+        .type('text/html; charset=utf-8')
+        .send(html);
     } catch (error) {
       fastify.log.error(error);
       return reply.status(500).send({

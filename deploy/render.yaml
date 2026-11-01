@@ -5,7 +5,7 @@ services:
     name: pressprotocol-node
     env: docker
     dockerfilePath: core/node/Dockerfile
-    dockerContext: core/node
+    dockerContext: .
     plan: starter
     region: oregon
     healthCheckPath: /api/node/health

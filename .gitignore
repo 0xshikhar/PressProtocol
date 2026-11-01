@@ -35,3 +35,5 @@ dist-test/
 core/worker/.dev.vars*
 !core/worker/.dev.vars.example
 core/worker/dist-test/
+
+brag-output/
