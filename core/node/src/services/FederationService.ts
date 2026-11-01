@@ -115,9 +115,9 @@ export class FederationService {
       timestamp: new Date().toISOString(),
       ipfs: {
         ready: heliaNode.isReady(),
-        peerId: ipfsStats ? ipfsStats.peerId : '12D3KooW-sovereign-helia-dht',
-        peersCount: ipfsStats ? ipfsStats.peers : 8,
-        dhtActive: true,
+        peerId: ipfsStats ? ipfsStats.peerId : null,
+        peersCount: ipfsStats ? ipfsStats.peers : 0,
+        dhtActive: heliaNode.isReady() && (ipfsStats?.peers ?? 0) > 0,
         pinnedCount: pins.length,
       },
       tor: torStatus,

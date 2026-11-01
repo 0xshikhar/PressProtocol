@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { Env, PublishContentInput, PublishResponseData } from './types';
 import { PinataService } from './services/pinata';
-import { indexContentInDB, getRecentContentFromDB } from './services/db';
+import { indexContentInDB, getRecentContentFromDB, getContentStatsFromDB } from './services/db';
 import { verifyPublication } from '@pressprotocol/sdk/protocol';
 import { attributeSubmission, signWithEdgeKey } from './lib/signing';
 import { isValidCID } from './lib/validation';
@@ -106,8 +106,7 @@ app.get('/api/node/status', (c) => {
   return c.json({
     status: 'online',
     mode: 'edge-serverless',
-    substrate: 'Cloudflare Edge Network',
-    regions: '300+ global PoPs',
+    substrate: 'Cloudflare Workers',
     ipfsMode: 'Pinata Gateway + Swarm Race',
     database: c.env.DATABASE_URL ? 'Prisma Postgres Accelerate' : 'stateless',
     timestamp: new Date().toISOString(),
@@ -805,20 +804,22 @@ app.get('/api/v1/metrics', (c) => {
   return c.json({
     success: true,
     status: 'operational',
-    edgePoPs: '300+ global locations',
     protocol: 'PressProtocol RFC-009',
     gateways: PUBLIC_GATEWAYS,
     timestamp: new Date().toISOString(),
   });
 });
 
-// GET /api/manifests/stats - Manifest Statistics
-app.get('/api/manifests/stats', (c) => {
+// GET /api/manifests/stats - Manifest Statistics (from the content index; null when unavailable)
+app.get('/api/manifests/stats', async (c) => {
+  const stats = await getContentStatsFromDB(c.env);
   return c.json({
     success: true,
-    totalManifests: 142,
-    totalPeers: 38,
-    uniqueTags: 45,
+    source: stats ? 'content-index' : 'unavailable',
+    totalManifests: stats?.totalManifests ?? null,
+    uniqueTags: stats?.uniqueTags ?? null,
+    uniquePublishers: stats?.uniquePublishers ?? null,
+    totalPeers: null,
     timestamp: new Date().toISOString(),
   });
 });
