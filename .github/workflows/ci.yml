@@ -75,8 +75,11 @@ jobs:
       - name: Typecheck & Build Node
         run: pnpm --dir core/node build
 
+      - name: Typecheck Edge Worker
+        run: pnpm --dir core/worker exec tsc --noEmit
+
   subsystem-tests:
-    name: Run Automated Subsystem Verification (15 Suites)
+    name: Run Automated Subsystem Verification (21 Suites)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -103,6 +106,37 @@ jobs:
 
       - name: Run Test Harness
         run: bash scripts/test.sh
+
+  sdk-conformance:
+    name: Cross-Language Signature Vectors (Python/Go/Rust)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Go
+        uses: actions/setup-go@4a3601fe6c8cf1a449761d4dca4017ab3ff4f055 # v6.2.0
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@21b3a05be5534fe582a0a97b96cd6d98d8d5a9f0 # stable
+
+      - name: Setup Python
+        uses: actions/setup-python@fd734b7c0c22f6b5cf4f24e5acbc06a4eaae51cd # v6.2.0
+        with:
+          python-version: '3.12'
+
+      - name: Go SDK conformance
+        run: go test ./...
+        working-directory: sdks/go
+
+      - name: Rust SDK conformance
+        run: cargo test
+        working-directory: sdks/rust
+
+      - name: Python SDK conformance
+        run: |
+          pip install "cryptography>=42"
+          python -m unittest discover -s tests -v
+        working-directory: sdks/python
 
   audit:
     name: Dependency Audit

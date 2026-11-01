@@ -199,6 +199,109 @@ export class EmbeddedDB {
     return Object.keys(this.data!.contents).length;
   }
 
+  // --- Users & Identities ---
+
+  public upsertUser(input: { walletAddress: string; username?: string | null; avatar?: string | null }): EmbeddedUser {
+    this.ensureLoaded();
+    const existing = this.data!.users[input.walletAddress];
+    const record: EmbeddedUser = {
+      id: existing?.id || `u-${Math.random().toString(36).substring(2, 10)}`,
+      walletAddress: input.walletAddress,
+      username: input.username ?? existing?.username ?? null,
+      avatar: input.avatar ?? existing?.avatar ?? null,
+      createdAt: existing?.createdAt || new Date().toISOString(),
+    };
+    this.data!.users[input.walletAddress] = record;
+    this.persist();
+    return record;
+  }
+
+  public findUserByWallet(walletAddress: string): EmbeddedUser | null {
+    this.ensureLoaded();
+    return this.data!.users[walletAddress] || null;
+  }
+
+  public findUserById(id: string): EmbeddedUser | null {
+    this.ensureLoaded();
+    return Object.values(this.data!.users).find((u) => u.id === id) || null;
+  }
+
+  public addIdentity(input: { publicKey: string; userId?: string | null; ipnsName?: string | null }): EmbeddedIdentity {
+    this.ensureLoaded();
+    const existing = this.data!.identities[input.publicKey];
+    const record: EmbeddedIdentity = {
+      id: existing?.id || `i-${Math.random().toString(36).substring(2, 10)}`,
+      publicKey: input.publicKey,
+      userId: input.userId ?? existing?.userId ?? null,
+      ipnsName: input.ipnsName ?? existing?.ipnsName ?? null,
+      createdAt: existing?.createdAt || new Date().toISOString(),
+    };
+    this.data!.identities[input.publicKey] = record;
+    this.persist();
+    return record;
+  }
+
+  public findIdentityByPubKey(publicKey: string): EmbeddedIdentity | null {
+    this.ensureLoaded();
+    return this.data!.identities[publicKey] || null;
+  }
+
+  public findIdentityByUserId(userId: string): EmbeddedIdentity | null {
+    this.ensureLoaded();
+    return Object.values(this.data!.identities).find((i) => i.userId === userId) || null;
+  }
+
+  public listIdentities(): EmbeddedIdentity[] {
+    this.ensureLoaded();
+    return Object.values(this.data!.identities);
+  }
+
+  // --- Mirrors ---
+
+  public addMirrors(
+    contentId: string,
+    mirrors: Array<{ type: string; url: string; available?: boolean; latency?: number | null }>
+  ): EmbeddedMirror[] {
+    this.ensureLoaded();
+    const now = new Date().toISOString();
+    const records: EmbeddedMirror[] = mirrors.map((m) => ({
+      id: `m-${Math.random().toString(36).substring(2, 10)}`,
+      contentId,
+      type: m.type,
+      url: m.url,
+      available: m.available ?? true,
+      latency: m.latency ?? undefined,
+      lastCheck: now,
+      createdAt: now,
+    }));
+    this.data!.mirrors[contentId] = [...(this.data!.mirrors[contentId] || []), ...records];
+    this.persist();
+    return records;
+  }
+
+  public listMirrors(contentId: string): EmbeddedMirror[] {
+    this.ensureLoaded();
+    return this.data!.mirrors[contentId] || [];
+  }
+
+  public updateMirror(
+    id: string,
+    patch: { available?: boolean; latency?: number | null; lastCheck?: Date | string }
+  ): EmbeddedMirror | null {
+    this.ensureLoaded();
+    for (const list of Object.values(this.data!.mirrors)) {
+      const mirror = list.find((m) => m.id === id);
+      if (mirror) {
+        if (patch.available !== undefined) mirror.available = patch.available;
+        if (patch.latency !== undefined) mirror.latency = patch.latency ?? undefined;
+        mirror.lastCheck = new Date(patch.lastCheck || Date.now()).toISOString();
+        this.persist();
+        return mirror;
+      }
+    }
+    return null;
+  }
+
   // --- Pins ---
 
   public addPin(cid: string): void {

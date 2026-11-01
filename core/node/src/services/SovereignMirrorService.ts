@@ -1,4 +1,4 @@
-import { identityService } from './IdentityService.js';
+import { signAsNode } from '../lib/node-identity.js';
 import { storageService } from './StorageService.js';
 import { torService } from './TorService.js';
 import { calculateDeterministicCIDv1 } from '../lib/cid.js';
@@ -80,8 +80,6 @@ export interface MediumIngestInput {
   content: string; // HTML or Markdown
   author?: string;
   tags?: string[];
-  privateKey?: string;
-  publicKey?: string;
 }
 
 export interface SubstackIngestInput {
@@ -92,8 +90,6 @@ export interface SubstackIngestInput {
   author?: string;
   tags?: string[];
   audioEnclosureUrl?: string;
-  privateKey?: string;
-  publicKey?: string;
 }
 
 export interface MirrorResult {
@@ -213,23 +209,10 @@ export class SovereignMirrorService {
     const tags = input.tags && input.tags.length > 0 ? input.tags : ['medium-mirror', 'sovereign'];
     
     // Determine keypair
-    let privKey = input.privateKey;
-    let pubKey = input.publicKey;
-
-    if (!privKey || !pubKey) {
-      const kp = await identityService.generateKeypair();
-      privKey = kp.privateKey;
-      pubKey = kp.publicKey;
-    }
-
-    // Cryptographic signing
     const timestamp = new Date().toISOString();
-    const canonicalPayload = JSON.stringify({
-      title,
-      tags,
-      timestamp,
-    });
-    const signature = await identityService.signContent(canonicalPayload, privKey);
+    const nodeSig = await signAsNode({ title, tags, timestamp, content: cleansed });
+    const pubKey = nodeSig.pubkey;
+    const signature = nodeSig.signature;
     const deterministicCID = calculateDeterministicCIDv1(cleansed);
 
     // Save to storage
@@ -275,7 +258,7 @@ export class SovereignMirrorService {
       wordCount,
       tags,
       proof,
-      ipfsUrl: `https://ipfs.io/ipfs/${finalCID}`,
+      ipfsUrl: storageResult.pinned ? `ipfs://${finalCID}` : null,
       torUrl: onionAddress ? `http://${onionAddress}/read/${finalCID}` : undefined,
     };
   }
@@ -294,22 +277,10 @@ export class SovereignMirrorService {
 
     const tags = input.tags && input.tags.length > 0 ? input.tags : ['substack-mirror', 'sovereign'];
 
-    let privKey = input.privateKey;
-    let pubKey = input.publicKey;
-
-    if (!privKey || !pubKey) {
-      const kp = await identityService.generateKeypair();
-      privKey = kp.privateKey;
-      pubKey = kp.publicKey;
-    }
-
     const timestamp = new Date().toISOString();
-    const canonicalPayload = JSON.stringify({
-      title,
-      tags,
-      timestamp,
-    });
-    const signature = await identityService.signContent(canonicalPayload, privKey);
+    const nodeSig = await signAsNode({ title, tags, timestamp, content: cleansed });
+    const pubKey = nodeSig.pubkey;
+    const signature = nodeSig.signature;
     const deterministicCID = calculateDeterministicCIDv1(cleansed);
 
     const storageResult = await storageService.uploadContent(
@@ -354,7 +325,7 @@ export class SovereignMirrorService {
       wordCount,
       tags,
       proof,
-      ipfsUrl: `https://ipfs.io/ipfs/${finalCID}`,
+      ipfsUrl: storageResult.pinned ? `ipfs://${finalCID}` : null,
       torUrl: onionAddress ? `http://${onionAddress}/read/${finalCID}` : undefined,
     };
   }

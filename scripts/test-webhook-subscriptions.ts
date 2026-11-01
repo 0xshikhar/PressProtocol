@@ -16,11 +16,16 @@
 
 import assert from 'node:assert';
 import http from 'node:http';
+import { mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import {
   generateWebhookSecret,
   signWebhookPayload as nodeSign,
   verifyWebhookSignature as nodeVerify,
 } from '../core/node/src/lib/webhook-crypto.js';
+
+const TEST_DATA_DIR = mkdtempSync(join(tmpdir(), 'pp-webhook-test-'));
 import { WebhookSubscriptionService } from '../core/node/src/services/WebhookSubscriptionService.js';
 import {
   signWebhookPayload as sdkSign,
@@ -153,7 +158,7 @@ async function runAllTests() {
   // =========================================================================
   console.log('\n🔹 4. WebhookSubscriptionService Subscription Management (CRUD)');
 
-  const service = new WebhookSubscriptionService();
+  const service = new WebhookSubscriptionService(TEST_DATA_DIR);
 
   let sub1Id = '';
   test('createSubscription registers endpoint and returns generated secret', () => {
@@ -233,7 +238,7 @@ async function runAllTests() {
   const address = mockServer.address() as any;
   const mockServerUrl = `http://127.0.0.1:${address.port}/webhook-target`;
 
-  const liveTestService = new WebhookSubscriptionService();
+  const liveTestService = new WebhookSubscriptionService(join(TEST_DATA_DIR, 'live'));
 
   // Create a subscription listening to article.published only
   const publishedOnlySub = liveTestService.createSubscription({

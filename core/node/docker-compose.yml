@@ -8,8 +8,8 @@ services:
   # Sovereign Community Node (Fastify + Embedded Helia IPFS + Embedded Tor v3 Daemon)
   pressprotocol-node:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../..
+      dockerfile: core/node/Dockerfile
     image: pressprotocol/node:latest
     container_name: pressprotocol-node
     restart: unless-stopped

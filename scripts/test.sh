@@ -112,6 +112,8 @@ run_suite "Outbound Real-Time Webhook Subscriptions & Event Bus" "17/17 tests" p
 run_suite "SDK CLI Version Flags" "3/3 tests" pnpm --filter @pressprotocol/sdk exec tsx ../../scripts/test-sdk-cli.ts
 run_suite "Security Boundaries & Strict CID Invariants" "45/45 tests" pnpm --filter pressprotocol-web exec tsx ../../scripts/test-ssrf-cid.ts
 run_suite "Signature Protocol v2 Cross-Language Vectors" "11/11 tests" pnpm --dir packages/sdk exec tsx ../../scripts/test-signature-vectors.ts
+run_suite "Edge Worker Routes (Hono request)" "13/13 tests" pnpm --dir core/node exec tsx ../../scripts/test-worker-routes.ts
+run_suite "Sovereign Node Routes (Fastify inject)" "13/13 tests" pnpm --dir core/node exec tsx ../../scripts/test-node-routes.ts
 
 
 echo ""

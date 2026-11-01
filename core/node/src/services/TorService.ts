@@ -149,7 +149,7 @@ export class TorService {
    * Get onion URL for content via Tor hidden service
    * Returns the actual .onion address from embedded Tor daemon or onionize
    */
-  async createOnionService(contentCid: string, gatewayUrl: string): Promise<OnionServiceResult> {
+  async createOnionService(contentCid: string, gatewayUrl?: string | null): Promise<OnionServiceResult> {
     try {
       console.log('🔍 [TOR] Creating onion service reference for content...');
       console.log(`   CID: ${contentCid}`);

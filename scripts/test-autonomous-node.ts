@@ -4,7 +4,23 @@ import crypto from 'node:crypto';
 import { federationService } from '../core/node/src/services/FederationService.js';
 import { torService } from '../core/node/src/services/TorService.js';
 import { embeddedDB } from '../core/node/src/lib/embedded-db.js';
+import { storageService } from '../core/node/src/services/StorageService.js';
+import { calculateDeterministicCIDv1 } from '../core/node/src/lib/cid.js';
 import { env } from '../core/node/src/config/env.js';
+import { signArticleV2 } from '../packages/sdk/src/protocol.js';
+import { generateKeypair } from '../packages/sdk/src/crypto.js';
+
+/** Publishes a v2-signed article to the local sovereign store and returns its gossip envelope. */
+async function publishLocalArticle(title: string, tags: string[] = []): Promise<{
+  cid: string; title: string; tags: string[]; timestamp: string; signature: string; publicKey: string;
+}> {
+  const kp = await generateKeypair();
+  const timestamp = new Date().toISOString();
+  const content = `<p>${title} — gossip test body</p>`;
+  const signature = await signArticleV2({ title, tags, timestamp, content }, kp.privateKey);
+  await storageService.uploadContent(title, content, tags, { pubkey: kp.publicKey, signature }, timestamp);
+  return { cid: calculateDeterministicCIDv1(content), title, tags, timestamp, signature, publicKey: kp.publicKey };
+}
 
 let passed = 0;
 let failed = 0;
@@ -72,55 +88,47 @@ async function runAutonomousNodeTests() {
   
   // Test Policy 1: 'all'
   federationService.setAutoPinPolicy('all');
-  const { publicKey: pubKeyObj, privateKey: privKeyObj } = crypto.generateKeyPairSync('ed25519');
-  const pubKeyRaw = pubKeyObj.export({ type: 'spki', format: 'der' }).subarray(-32);
-  const pubKey1 = pubKeyRaw.toString('hex');
-  const testCid1 = 'bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi';
-  const sig1 = crypto.sign(null, Buffer.from(testCid1), privKeyObj).toString('hex');
+  const gossip1 = await publishLocalArticle('Sovereign Manifest 01');
 
-  const gossipRes1 = await federationService.handleGossip({
-    cid: testCid1,
-    title: 'Sovereign Manifest 01',
-    signature: sig1,
-    publicKey: pubKey1,
-    timestamp: new Date().toISOString(),
-  });
+  const gossipRes1 = await federationService.handleGossip(gossip1);
 
-  assert(gossipRes1.accepted === true, 'Gossip message accepted by node');
+  assert(gossipRes1.accepted === true, `Gossip message accepted by node (${gossipRes1.reason || 'ok'})`);
   assert(gossipRes1.pinned === true, 'Auto-pin policy "all" pinned the gossiped CID');
-  assert(embeddedDB.isPinned(testCid1), 'CID recorded in persistent local pin store');
+  assert(gossipRes1.signatureStatus === 'verified', 'Gossip signature verified against content-bound v2 payload');
+  assert(embeddedDB.isPinned(gossip1.cid), 'CID recorded in persistent local pin store');
 
   // Test Policy 2: 'followed'
-  const pubKeyFollowed = crypto.randomBytes(32).toString('hex');
-  const pubKeyIgnored = crypto.randomBytes(32).toString('hex');
+  const gossipIgnored = await publishLocalArticle('Ignored Non-Followed Post');
+  const gossipFollowed = await publishLocalArticle('Followed Author Post');
+  federationService.setAutoPinPolicy('followed', [gossipFollowed.publicKey]);
 
-  federationService.setAutoPinPolicy('followed', [pubKeyFollowed]);
-
-  const testCidIgnored = 'bafybeicgdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55ignored';
-  const gossipResIgnored = await federationService.handleGossip({
-    cid: testCidIgnored,
-    title: 'Ignored Non-Followed Post',
-    signature: 'mock-sig',
-    publicKey: pubKeyIgnored,
-    timestamp: new Date().toISOString(),
-  });
+  const gossipResIgnored = await federationService.handleGossip(gossipIgnored);
+  assert(gossipResIgnored.accepted === true, 'Verified gossip from non-followed author still accepted');
   assert(gossipResIgnored.pinned === false, 'Auto-pin policy "followed" ignored non-followed author');
 
-  const testCidFollowed = 'bafybeicgdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55followed';
-  const gossipResFollowed = await federationService.handleGossip({
-    cid: testCidFollowed,
-    title: 'Followed Author Post',
-    signature: 'mock-sig',
-    publicKey: pubKeyFollowed,
+  const gossipResFollowed = await federationService.handleGossip(gossipFollowed);
+  assert(gossipResFollowed.pinned === true, 'Auto-pin policy "followed" pinned followed author CID');
+
+  // Test unsigned / invalid-signature rejection (NEW-08 regression)
+  const unsignedGossip = await federationService.handleGossip({
+    cid: gossip1.cid,
+    title: 'Unsigned Forgery',
+    signature: '',
+    publicKey: '',
     timestamp: new Date().toISOString(),
   });
-  assert(gossipResFollowed.pinned === true, 'Auto-pin policy "followed" pinned followed author CID');
+  assert(unsignedGossip.accepted === false, 'Unsigned gossip rejected');
+  const forgedGossip = await federationService.handleGossip({
+    ...gossip1,
+    title: 'Forged Title For Same CID',
+  });
+  assert(forgedGossip.accepted === false, 'Gossip whose signature does not cover the payload is rejected');
 
   // --- 5. Embedded Zero-Config Storage Engine ---
   console.log('5️⃣  Embedded Storage Engine & Search...');
   const searchResults = embeddedDB.searchContent('Sovereign');
   assert(searchResults.length > 0, 'Embedded DB indexes and searches gossiped articles');
-  assert(searchResults[0].cid === testCid1, 'Embedded DB retrieves correct article by search');
+  assert(searchResults[0].cid === gossip1.cid, 'Embedded DB retrieves correct article by search');
 
   // --- 6. Multi-Architecture Docker & Security Blueprint Verification ---
   console.log('6️⃣  Multi-Architecture Container & Security Hardening...');

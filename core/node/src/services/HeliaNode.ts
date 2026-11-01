@@ -44,10 +44,35 @@ export class HeliaNode {
       const { createHelia } = await import('helia');
       const { unixfs } = await import('@helia/unixfs');
       const { json } = await import('@helia/json');
+      const { FsBlockstore } = await import('blockstore-fs');
+      const { FsDatastore } = await import('datastore-fs');
+      const { generateKeyPair, privateKeyFromProtobuf, privateKeyToProtobuf } = await import('@libp2p/crypto/keys');
+      const { mkdirSync, existsSync, readFileSync, writeFileSync } = await import('node:fs');
+      const { join, dirname } = await import('node:path');
+      const { env } = await import('../config/env.js');
 
-      // Create Helia node with default configuration
-      // This creates in-memory blockstore and datastore automatically
-      this.node = await createHelia();
+      // Persistent on-disk blockstore/datastore under DATA_DIR/ipfs so locally pinned
+      // content and the DHT provider record survive restarts (Fly volume at /data)
+      const blockstore = new FsBlockstore(join(env.DATA_DIR, 'ipfs', 'blockstore'));
+      const datastore = new FsDatastore(join(env.DATA_DIR, 'ipfs', 'datastore'));
+
+      // Persist the libp2p peer identity so the node keeps a stable peer ID
+      const peerKeyPath = join(env.DATA_DIR, 'identity', 'helia-peer.key');
+      let privateKey: any;
+      if (existsSync(peerKeyPath)) {
+        privateKey = privateKeyFromProtobuf(readFileSync(peerKeyPath));
+      } else {
+        privateKey = await generateKeyPair('Ed25519');
+        mkdirSync(dirname(peerKeyPath), { recursive: true, mode: 0o700 });
+        writeFileSync(peerKeyPath, privateKeyToProtobuf(privateKey), { mode: 0o600 });
+        console.log(`🔑 Generated persistent libp2p peer identity at ${peerKeyPath}`);
+      }
+
+      this.node = await createHelia({
+        blockstore,
+        datastore,
+        libp2p: { privateKey },
+      });
 
       // Initialize UnixFS for file operations
       this.fs = unixfs(this.node);
@@ -145,12 +170,12 @@ export class HeliaNode {
     }
 
     try {
-      // In full implementation, this would use libp2p's DHT
-      // to announce that we provide this CID
-      // For now, Helia handles this automatically for added content
+      const { CID } = await import('multiformats/cid');
+      const cid = CID.parse(cidString);
+      await this.node.libp2p.contentRouting.provide(cid);
       console.log(`📢 Providing ${cidString} to DHT`);
     } catch (error) {
-      console.error('Failed to provide to DHT:', error);
+      console.warn(`⚠️  DHT provide failed for ${cidString}:`, (error as any)?.message || error);
     }
   }
 

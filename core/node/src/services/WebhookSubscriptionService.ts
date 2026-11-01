@@ -1,5 +1,7 @@
 import crypto from 'node:crypto';
 import { generateWebhookSecret, signWebhookPayload } from '../lib/webhook-crypto.js';
+import { safeFetch, validateSafeUrl } from '../lib/ssrf.js';
+import { JsonFileStore } from '../lib/json-store.js';
 
 export type WebhookEventType =
   | 'article.published'
@@ -42,6 +44,12 @@ export interface CreateSubscriptionInput {
   description?: string;
 }
 
+/** Subscription as exposed through the API — the HMAC secret is only returned on creation. */
+export function toPublicSubscription(sub: WebhookSubscription, includeSecret = false) {
+  const { secret, ...rest } = sub;
+  return includeSecret ? sub : rest;
+}
+
 export interface WebhookEventEnvelope {
   id: string;
   event: WebhookEventType;
@@ -51,9 +59,31 @@ export interface WebhookEventEnvelope {
 
 export class WebhookSubscriptionService {
   private subscriptions: Map<string, WebhookSubscription> = new Map();
+  private store: JsonFileStore<WebhookSubscription[]>;
+  private dirty = false;
+
+  constructor(private readonly dataDir?: string) {
+    this.store = new JsonFileStore<WebhookSubscription[]>('webhooks/subscriptions.json', () => [], dataDir);
+    for (const sub of this.store.load()) {
+      this.subscriptions.set(sub.id, sub);
+    }
+    setInterval(() => {
+      if (this.dirty) this.persist();
+    }, 15_000).unref();
+  }
+
+  private persist(): void {
+    this.store.save(Array.from(this.subscriptions.values()));
+    this.dirty = false;
+  }
+
+  private markDirty(): void {
+    this.dirty = true;
+  }
 
   /**
-   * Registers a new outbound webhook subscription.
+   * Registers a new outbound webhook subscription. The destination URL is checked against
+   * the SSRF policy (no internal networks, cloud metadata, or non-HTTP schemes).
    */
   public createSubscription(input: CreateSubscriptionInput): WebhookSubscription {
     if (!input.url || typeof input.url !== 'string') {
@@ -61,12 +91,9 @@ export class WebhookSubscriptionService {
     }
 
     try {
-      const parsed = new URL(input.url);
-      if (!['http:', 'https:'].includes(parsed.protocol)) {
-        throw new Error('URL must use http: or https: protocol');
-      }
-    } catch {
-      throw new Error(`Invalid webhook URL: "${input.url}"`);
+      validateSafeUrl(input.url);
+    } catch (err: any) {
+      throw new Error(`Forbidden webhook URL: ${err.message || 'blocked destination'}`);
     }
 
     const id = `sub_${crypto.randomBytes(8).toString('hex')}`;
@@ -95,6 +122,7 @@ export class WebhookSubscriptionService {
     };
 
     this.subscriptions.set(id, subscription);
+    this.persist();
     return subscription;
   }
 
@@ -120,7 +148,16 @@ export class WebhookSubscriptionService {
    * Revokes and removes a subscription.
    */
   public deleteSubscription(id: string): boolean {
-    return this.subscriptions.delete(id);
+    const deleted = this.subscriptions.delete(id);
+    if (deleted) this.persist();
+    return deleted;
+  }
+
+  /**
+   * Whether `keyId` may administer this subscription (owner or admin scope).
+   */
+  public canManage(subscription: WebhookSubscription, keyId: string | undefined, isAdmin: boolean): boolean {
+    return isAdmin || subscription.owner === keyId;
   }
 
   /**
@@ -167,8 +204,11 @@ export class WebhookSubscriptionService {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 6000); // 6s timeout
 
-      const res = await fetch(sub.url, {
+      // Deliver through the SSRF-guarded fetch: validates scheme/host, verifies DNS
+      // against private/metadata ranges, and enforces per-hop redirect checks.
+      const res = await safeFetch(sub.url, {
         method: 'POST',
+        redirect: 'manual',
         headers: {
           'Content-Type': 'application/json',
           'User-Agent': 'PressProtocol-Webhook/1.0',
@@ -190,12 +230,14 @@ export class WebhookSubscriptionService {
         sub.stats.deliveredCount = sub.stats.successfulDeliveries;
         sub.stats.lastDeliveryStatus = 'success';
         delete sub.stats.lastError;
+        this.markDirty();
         return { success: true, statusCode: res.status };
       } else {
         sub.stats.failedDeliveries++;
         sub.stats.failureCount = sub.stats.failedDeliveries;
         sub.stats.lastDeliveryStatus = 'failed';
         sub.stats.lastError = `HTTP ${res.status}: ${res.statusText}`;
+        this.markDirty();
 
         // Retry on 5xx server errors up to 2 times
         if (res.status >= 500 && retryCount < 2) {
@@ -212,6 +254,7 @@ export class WebhookSubscriptionService {
       sub.stats.failureCount = sub.stats.failedDeliveries;
       sub.stats.lastDeliveryStatus = 'failed';
       sub.stats.lastError = err.message || 'Connection error';
+      this.markDirty();
 
       // Retry on network errors
       if (retryCount < 2) {
