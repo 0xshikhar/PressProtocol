@@ -7,6 +7,17 @@ import { verifyPublication } from '@pressprotocol/sdk/protocol';
 import { attributeSubmission, signWithEdgeKey } from './lib/signing';
 import { isValidCID } from './lib/validation';
 import { getOnionHost, onionReadUrl } from './lib/tor';
+import { bodyLimit } from 'hono/body-limit';
+import {
+  MAX_JSON_BODY_BYTES,
+  MAX_UPLOAD_BYTES,
+  publishContentSchema,
+  publishRawSchema,
+  publishSignedSchema,
+  rateLimit,
+  validateImageUpload,
+  validationError,
+} from './lib/limits';
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -22,6 +33,37 @@ app.use('*', async (c, next) => {
   });
   return corsMiddleware(c, next);
 });
+
+const jsonBodyLimit = bodyLimit({
+  maxSize: MAX_JSON_BODY_BYTES,
+  onError: (c) => c.json({ success: false, error: 'Request body too large' }, 413),
+});
+const uploadBodyLimit = bodyLimit({
+  maxSize: MAX_UPLOAD_BYTES + 64 * 1024,
+  onError: (c) => c.json({ success: false, error: 'Upload too large' }, 413),
+});
+
+app.use('/api/content', jsonBodyLimit);
+app.use('/api/identity', jsonBodyLimit);
+app.use('/api/v1/*', jsonBodyLimit);
+app.use('/api/upload/*', uploadBodyLimit);
+
+for (const path of ['/api/content', '/api/upload/*', '/api/v1/publish/*']) {
+  app.on('POST', path, rateLimit('PUBLISH_LIMITER', 'publish'));
+}
+for (const path of ['/api/content/*', '/api/resolve/*', '/api/mirrors/*', '/api/v1/resolve/*', '/api/v1/verify']) {
+  app.use(path, rateLimit('READ_LIMITER', 'read'));
+}
+
+for (const path of ['/api/content/:cid', '/api/resolve/:cid', '/api/mirrors/:cid/health', '/api/v1/resolve/:cid']) {
+  app.use(path, async (c, next) => {
+    const cid = c.req.param('cid');
+    if (!isValidCID(cid)) {
+      return c.json({ success: false, error: 'Invalid IPFS CID format', cid }, 400);
+    }
+    await next();
+  });
+}
 
 // Root RFC-009 Node Spec Overview
 app.get('/', (c) => {
@@ -75,14 +117,9 @@ app.get('/api/node/status', (c) => {
 // 1. POST /api/content - Publish Content to IPFS & Index
 app.post('/api/content', async (c) => {
   try {
-    const body = await c.req.json<PublishContentInput>();
-
-    if (typeof body.title !== 'string' || !body.title.trim()) {
-      return c.json({ success: false, error: 'Title is required' }, 400);
-    }
-    if (typeof body.content !== 'string' || !body.content.trim()) {
-      return c.json({ success: false, error: 'Content is required' }, 400);
-    }
+    const parsed = publishContentSchema.safeParse(await c.req.json().catch(() => null));
+    if (!parsed.success) return validationError(c, parsed.error);
+    const body: PublishContentInput = parsed.data;
 
     const title = body.title;
     const content = body.content;
@@ -499,8 +536,13 @@ app.post('/api/identity', async (c) => {
 app.post('/api/upload/image', async (c) => {
   try {
     const formData = await c.req.formData();
+    const file = formData.get('file') ?? formData.get('image');
+    const invalid = validateImageUpload(file);
+    if (invalid) return c.json({ success: false, error: invalid }, 400);
+    const upload = new FormData();
+    upload.append('file', file as File);
     const pinata = new PinataService(c.env);
-    const result = await pinata.pinFile(formData);
+    const result = await pinata.pinFile(upload);
 
     return c.json({
       success: true,
@@ -518,21 +560,9 @@ app.post('/api/upload/image', async (c) => {
 // POST /api/v1/publish/raw - Edge ingest (signed with the operator key when EDGE_SIGNING_KEY is set)
 app.post('/api/v1/publish/raw', async (c) => {
   try {
-    const body = await c.req.json<{
-      title: string;
-      content: string;
-      tags?: string[];
-      format?: string;
-      author?: string;
-      metadata?: Record<string, any>;
-    }>();
-
-    if (typeof body.title !== 'string' || !body.title.trim()) {
-      return c.json({ success: false, error: 'Title is required' }, 400);
-    }
-    if (typeof body.content !== 'string' || !body.content.trim()) {
-      return c.json({ success: false, error: 'Content is required' }, 400);
-    }
+    const parsed = publishRawSchema.safeParse(await c.req.json().catch(() => null));
+    if (!parsed.success) return validationError(c, parsed.error);
+    const body = parsed.data;
 
     const title = body.title;
     const content = body.content;
@@ -594,25 +624,9 @@ app.post('/api/v1/publish/raw', async (c) => {
 // POST /api/v1/publish/signed - Zero-Custody Client-Signed Ingest
 app.post('/api/v1/publish/signed', async (c) => {
   try {
-    const body = await c.req.json<{
-      title: string;
-      content: string;
-      tags?: string[];
-      timestamp?: string;
-      publicKey: string;
-      signature: string;
-      metadata?: Record<string, any>;
-    }>();
-
-    if (typeof body.title !== 'string' || !body.title.trim()) {
-      return c.json({ success: false, error: 'Title is required' }, 400);
-    }
-    if (typeof body.content !== 'string' || !body.content.trim()) {
-      return c.json({ success: false, error: 'Content is required' }, 400);
-    }
-    if (!body.publicKey || !body.signature || !body.timestamp) {
-      return c.json({ success: false, error: 'publicKey, signature and timestamp are required for signed publish' }, 400);
-    }
+    const parsed = publishSignedSchema.safeParse(await c.req.json().catch(() => null));
+    if (!parsed.success) return validationError(c, parsed.error);
+    const body = parsed.data;
 
     const title = body.title;
     const content = body.content;
