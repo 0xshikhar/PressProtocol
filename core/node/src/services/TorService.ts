@@ -229,24 +229,11 @@ export class TorService {
   }
 
   /**
-   * Measure latency to onion service
-   * Returns typical Tor latency (~450ms)
+   * Latency to the onion service is not measured yet (requires a SOCKS round-trip through Tor),
+   * so no value is reported rather than a fabricated one.
    */
-  async measureOnionLatency(serviceName: string = 'self'): Promise<number | null> {
-    try {
-      const isAvailable = await this.checkOnionAvailability(serviceName);
-      
-      if (!isAvailable) {
-        return null;
-      }
-
-      // Return typical Tor latency
-      // In production, could measure actual latency via SOCKS proxy
-      return 450;
-    } catch (error) {
-      console.error('Onion latency measurement failed:', error);
-      return null;
-    }
+  async measureOnionLatency(_serviceName: string = 'self'): Promise<number | null> {
+    return null;
   }
 
   /**
