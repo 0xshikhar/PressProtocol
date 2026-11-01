@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { sanitizeArticleHtml } from "@/lib/sanitize-html";
 import {
   Shield,
   ShieldCheck,
@@ -508,7 +509,7 @@ export default function ImportPage() {
                       <CardContent className="p-6 sm:p-10">
                         <div
                           className="prose prose-invert max-w-none prose-headings:font-serif prose-p:leading-relaxed prose-a:text-primary prose-blockquote:border-primary prose-code:text-foreground prose-img:rounded-[6px]"
-                          dangerouslySetInnerHTML={{ __html: result.article.cleanHtml }}
+                          dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(result.article.cleanHtml) }}
                         />
                       </CardContent>
                     </Card>

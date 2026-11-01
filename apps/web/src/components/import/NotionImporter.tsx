@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { sanitizeArticleHtml } from "@/lib/sanitize-html";
 import {
   FileText,
   Sparkles,
@@ -459,7 +460,7 @@ curl -s https://pressprotocol.com/api/content/$CID | pressprotocol resolve --ver
             <CardContent className="p-6 sm:p-10">
               <div
                 className="prose prose-neutral max-w-none prose-headings:font-serif prose-p:leading-relaxed prose-a:text-primary prose-code:text-primary"
-                dangerouslySetInnerHTML={{ __html: convertedArticle.cleanHtml }}
+                dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(convertedArticle.cleanHtml) }}
               />
             </CardContent>
           </Card>

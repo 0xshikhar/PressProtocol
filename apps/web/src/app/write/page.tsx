@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import DOMPurify from "dompurify";
+import { sanitizeArticleHtml } from "@/lib/sanitize-html";
 import { usePrivy } from "@privy-io/react-auth";
 import { EnhancedEditor } from "@/components/editor/EnhancedEditor";
 import { Button } from "@/components/ui/button";
@@ -572,7 +572,7 @@ export default function WritePage() {
               <div
                 className="prose prose-lg dark:prose-invert max-w-none pt-4 font-serif leading-relaxed text-primary dispatch-prose"
                 dangerouslySetInnerHTML={{
-                  __html: typeof window !== "undefined" ? DOMPurify.sanitize(content) : content,
+                  __html: sanitizeArticleHtml(content),
                 }}
               />
             ) : (

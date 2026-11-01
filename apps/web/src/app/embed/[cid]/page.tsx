@@ -20,6 +20,7 @@ import {
 import { apiClient, type ResolveContentResponse } from "@/lib/api-client";
 import { verifyArticleSignature, type VerificationResult } from "@/lib/signature-verifier";
 import { calculateReadingTime } from "@/lib/reading-time";
+import { sanitizeArticleHtml } from "@/lib/sanitize-html";
 import { toast } from "sonner";
 import {
   Tooltip,
@@ -97,6 +98,8 @@ function EmbedReaderContent() {
   const readingStats = useMemo(() => {
     return content?.content ? calculateReadingTime(content.content) : null;
   }, [content?.content]);
+
+  const safeArticleHtml = useMemo(() => sanitizeArticleHtml(content?.content), [content?.content]);
 
   const authorPubkey = content?.publisher?.pubkey || (content?.publisher as any)?.publicKey || "";
   const pubkeySnippet = authorPubkey
@@ -450,7 +453,7 @@ function EmbedReaderContent() {
                      prose-img:rounded-xl prose-img:border prose-img:border-inherit
                      prose-code:font-mono prose-code:text-xs prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
                      prose-pre:p-4 prose-pre:rounded-xl prose-pre:border prose-pre:border-inherit`}
-          dangerouslySetInnerHTML={{ __html: content.content }}
+          dangerouslySetInnerHTML={{ __html: safeArticleHtml }}
         />
       </main>
 
