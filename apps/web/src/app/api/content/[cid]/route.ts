@@ -69,9 +69,9 @@ async function fetchFastestFromIPFSGateways(
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { cid: string } }
+  { params }: { params: Promise<{ cid: string }> }
 ) {
-  const { cid } = params;
+  const { cid } = await params;
   if (!isValidCID(cid)) {
     return NextResponse.json({ error: "Invalid IPFS CID format", cid }, { status: 400 });
   }

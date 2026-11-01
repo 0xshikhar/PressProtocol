@@ -9,7 +9,7 @@ interface QuoteSharePillProps {
   articleTitle: string;
   authorName?: string;
   isVerified?: boolean;
-  containerRef?: React.RefObject<HTMLElement>;
+  containerRef?: React.RefObject<HTMLElement | null>;
 }
 
 /**
