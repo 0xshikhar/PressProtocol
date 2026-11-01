@@ -35,6 +35,7 @@ import {
   signWithBurner, 
   verifyBurnerSignature,
   getBurnerArticles,
+  persistBurnerWallet,
   type BurnerWallet,
   type BurnerArticle
 } from "@/lib/burner-wallet";
@@ -130,7 +131,7 @@ export default function ProfilePage() {
     toast.success("Downloaded sovereign identity backup.");
   };
 
-  const handleImportKey = () => {
+  const handleImportKey = async () => {
     const raw = importKeyInput.trim();
     if (!raw) return;
 
@@ -147,8 +148,8 @@ export default function ProfilePage() {
       }
 
       // We can update the burner identity in localStorage
-      const ed = require("@noble/ed25519");
-      const pubBytes = ed.getPublicKey(privHex);
+      const ed = await import("@noble/ed25519");
+      const pubBytes = await ed.getPublicKeyAsync(privHex);
       const pubHex = ed.etc.bytesToHex(pubBytes);
       const pseudonym = `Anon-${pubHex.slice(0, 4)}...${pubHex.slice(-4)}`;
 
@@ -159,7 +160,7 @@ export default function ProfilePage() {
         createdAt: Date.now(),
       };
 
-      localStorage.setItem("pressprotocol_burner_identity", JSON.stringify(imported));
+      await persistBurnerWallet(imported);
       setWallet(imported);
       setShowImport(false);
       setImportKeyInput("");
