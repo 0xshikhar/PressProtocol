@@ -164,7 +164,6 @@ app.post('/api/content', async (c) => {
 // 2. GET /api/content/:cid - Parallel Swarm Gateway Race
 const PUBLIC_GATEWAYS = [
   'https://ipfs.filebase.io/ipfs',
-  'https://tan-awake-wombat-832.mypinata.cloud/ipfs',
   'https://4everland.io/ipfs',
   'https://nftstorage.link/ipfs',
   'https://gateway.pinata.cloud/ipfs',
@@ -172,17 +171,13 @@ const PUBLIC_GATEWAYS = [
   'https://dweb.link/ipfs',
 ];
 
-const PINATA_GATEWAY_TOKEN = '4yPfAllkWi5DUEGZ_qbPGI1faHfyQlq9oNqCt3_jL75CTXseiykewlMr6jGFgOFR';
-
-async function raceIPFSGateways(
-  cid: string,
-  customGateway?: string,
-  pinataJwt?: string
-): Promise<{ raw: any; gateway: string }> {
+async function raceIPFSGateways(cid: string, env: Env): Promise<{ raw: any; gateway: string }> {
+  const dedicatedGateway = env.PINATA_GATEWAY_URL?.replace(/\/+$/, '');
   const gateways = Array.from(
     new Set(
       [
-        customGateway ? customGateway.replace(/\/+$/, '') : null,
+        dedicatedGateway,
+        env.IPFS_GATEWAY_URL ? env.IPFS_GATEWAY_URL.replace(/\/+$/, '') : null,
         ...PUBLIC_GATEWAYS,
       ].filter(Boolean) as string[]
     )
@@ -192,19 +187,18 @@ async function raceIPFSGateways(
   const timeoutId = setTimeout(() => controller.abort(), 8000);
 
   const fetchPromises = gateways.map(async (gw) => {
-    let targetUrl = `${gw}/${cid}`;
+    const targetUrl = `${gw}/${cid}`;
     const headers: Record<string, string> = {
       Accept: 'application/json, text/html, text/plain, */*',
       'User-Agent': 'PressProtocol-Edge/1.0.6 (Decentralized Publishing Gateway; +https://pressprotocol.com)',
     };
 
-    if (gw.includes('mypinata.cloud')) {
-      targetUrl = `${gw}/${cid}?pinataGatewayToken=${PINATA_GATEWAY_TOKEN}`;
-      headers['x-pinata-gateway-token'] = PINATA_GATEWAY_TOKEN;
+    if (gw === dedicatedGateway && env.PINATA_GATEWAY_TOKEN) {
+      headers['x-pinata-gateway-token'] = env.PINATA_GATEWAY_TOKEN;
     }
 
-    if (pinataJwt && gw.includes('pinata.cloud')) {
-      headers['Authorization'] = `Bearer ${pinataJwt}`;
+    if (env.PINATA_JWT && gw.includes('pinata.cloud')) {
+      headers['Authorization'] = `Bearer ${env.PINATA_JWT}`;
     }
 
     const res = await fetch(targetUrl, {
@@ -253,7 +247,7 @@ app.get('/api/content/:cid', async (c) => {
   const cid = c.req.param('cid');
 
   try {
-    const { raw, gateway } = await raceIPFSGateways(cid, c.env.IPFS_GATEWAY_URL, c.env.PINATA_JWT);
+    const { raw, gateway } = await raceIPFSGateways(cid, c.env);
     const onionHost = c.env.TOR_ONION_GATEWAY || 'pressprotocol7sovereign4node6federation3mesh7relay5v3.onion';
     const normalizedOnion = onionHost.startsWith('http') ? onionHost : `http://${onionHost}`;
     c.header('Onion-Location', `${normalizedOnion.replace(/\/+$/, '')}/read/${cid}`);
@@ -653,7 +647,7 @@ app.post('/api/v1/publish/signed', async (c) => {
 app.get('/api/v1/resolve/:cid', async (c) => {
   const cid = c.req.param('cid');
   try {
-    const { raw, gateway } = await raceIPFSGateways(cid, c.env.IPFS_GATEWAY_URL, c.env.PINATA_JWT);
+    const { raw, gateway } = await raceIPFSGateways(cid, c.env);
     const appBaseUrl = c.env.PUBLIC_APP_URL || 'https://pressprotocol.com';
 
     return c.json({

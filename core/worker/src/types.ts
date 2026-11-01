@@ -7,6 +7,8 @@ export interface Env {
   CORS_ORIGIN?: string;
   PUBLIC_APP_URL?: string;
   TOR_ONION_GATEWAY?: string;
+  PINATA_GATEWAY_URL?: string;
+  PINATA_GATEWAY_TOKEN?: string;
   JWT_SECRET?: string;
   ENVIRONMENT?: string;
 }
