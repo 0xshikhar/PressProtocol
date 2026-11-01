@@ -9,9 +9,9 @@ export const viewport: Viewport = {
 export async function generateMetadata({
   params,
 }: {
-  params: { cid: string };
+  params: Promise<{ cid: string }>;
 }): Promise<Metadata> {
-  const { cid } = params;
+  const { cid } = await params;
   return {
     title: `Sovereign Article | PressProtocol Embed`,
     description: `Decentralized, cryptographically verified sovereign publication on PressProtocol (CID: ${cid}).`,

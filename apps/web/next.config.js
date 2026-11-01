@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+const path = require("path");
 
 const baseSecurityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -44,21 +45,24 @@ const nextConfig = {
       ...(onionEnabled
         ? [
             {
-              source: "/:path*",
+              source: "/:path+",
               headers: [
                 {
                   key: "Onion-Location",
-                  value: `http://${cleanHost}/:path*`,
+                  value: `http://${cleanHost}/:path+`,
                 },
               ],
+            },
+            {
+              source: "/",
+              headers: [{ key: "Onion-Location", value: `http://${cleanHost}/` }],
             },
           ]
         : []),
     ];
   },
-  experimental: {
-    serverComponentsExternalPackages: ["cheerio", "undici"],
-  },
+  outputFileTracingRoot: path.join(__dirname, "../.."),
+  serverExternalPackages: ["cheerio", "undici"],
 };
 
 module.exports = nextConfig
