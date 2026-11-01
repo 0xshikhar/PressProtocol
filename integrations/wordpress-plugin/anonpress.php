@@ -24,6 +24,7 @@ require_once ANONPRESS_PLUGIN_DIR . 'includes/class-anonpress-settings.php';
 require_once ANONPRESS_PLUGIN_DIR . 'includes/class-anonpress-publisher.php';
 require_once ANONPRESS_PLUGIN_DIR . 'includes/class-anonpress-api-client.php';
 require_once ANONPRESS_PLUGIN_DIR . 'includes/class-anonpress-identity.php';
+require_once ANONPRESS_PLUGIN_DIR . 'includes/class-anonpress-signer.php';
 
 /**
  * Main AnonPress class

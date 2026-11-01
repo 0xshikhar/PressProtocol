@@ -1,5 +1,5 @@
 import { sha256 } from "@noble/hashes/sha256";
-import { bytesToHex, verifyArticle, verifySignature, createCanonicalPayload } from "@pressprotocol/sdk";
+import { bytesToHex, verifyArticle } from "@pressprotocol/sdk";
 import { calculateDeterministicCIDv1, type PressProofManifest } from "./encoder.js";
 
 export interface PressProofVerificationResult {
@@ -8,7 +8,7 @@ export interface PressProofVerificationResult {
   checksumMatches: boolean;
   signatureValid: boolean;
   latencyMs: number;
-  status: "verified" | "checksum_mismatch" | "cid_mismatch" | "signature_invalid" | "unsigned" | "malformed";
+  status: "verified" | "legacy_signature" | "checksum_mismatch" | "cid_mismatch" | "signature_invalid" | "unsigned" | "malformed";
   details: {
     computedCid: string;
     manifestCid: string;
@@ -88,40 +88,26 @@ export async function verifyPressProof(proof: PressProofManifest): Promise<Press
   let error: string | undefined;
 
   if (!signature || signature === "unsigned" || !pubkey) {
-    signatureValid = false;
     status = "unsigned";
   } else {
     try {
-      // Test signature against canonical payload
-      const canonicalPayload = createCanonicalPayload(proof.title, proof.tags || [], proof.timestamp);
-      const isCanonicalValid = await verifySignature(canonicalPayload, signature, pubkey);
-
-      if (isCanonicalValid) {
-        signatureValid = true;
-      } else {
-        // Fallback article candidate check
-        const articleCheck = await verifyArticle({
-          title: proof.title,
-          content: proof.content,
-          tags: proof.tags,
-          createdAt: proof.timestamp,
-          publisher: {
-            pubkey,
-            publicKey: pubkey,
-            signature,
-          },
-          signature,
-        });
-
-        signatureValid = articleCheck.isValid;
-      }
-
-      if (!signatureValid) {
+      const check = await verifyArticle({
+        title: proof.title,
+        content: proof.content,
+        tags: proof.tags,
+        timestamp: proof.timestamp,
+        publisher: { pubkey, publicKey: pubkey, signature, sigVersion: proof.publisher?.sigVersion },
+        signature,
+      });
+      signatureValid = check.isValid;
+      if (check.status === "legacy") {
+        status = "legacy_signature";
+        error = check.error;
+      } else if (!check.isValid) {
         status = "signature_invalid";
-        error = "Author Ed25519 signature is invalid for the specified content and metadata";
+        error = check.error || "Author Ed25519 signature is invalid for the specified content and metadata";
       }
     } catch (err: any) {
-      signatureValid = false;
       status = "signature_invalid";
       error = err.message || "Failed to compute cryptographic signature verification";
     }
@@ -130,7 +116,7 @@ export async function verifyPressProof(proof: PressProofManifest): Promise<Press
   const elapsed = Math.round((performance.now() - start) * 100) / 100;
 
   return {
-    valid: checksumMatches && (signatureValid || status === "unsigned"),
+    valid: checksumMatches && (signatureValid || status === "unsigned" || status === "legacy_signature"),
     cidMatches,
     checksumMatches,
     signatureValid,

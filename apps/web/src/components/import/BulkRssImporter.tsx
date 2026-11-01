@@ -30,6 +30,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { getOrCreateBurnerWallet, type BurnerWallet } from "@/lib/burner-wallet";
+import { publishArticleSigned } from "@/lib/client-publish";
 import type { ParsedRssFeed, RssFeedItem } from "@/lib/scrubber";
 import { CidChip } from "@/components/protocol/CidChip";
 
@@ -172,27 +173,14 @@ export function BulkRssImporter() {
           prev.map((a, idx) => (idx === i ? { ...a, status: "publishing" } : a))
         );
 
-        // Dispatch to content publishing API
-        const response = await fetch("/api/content", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            title: article.title,
-            content: article.cleanHtml,
-            tags: Array.from(new Set([...tagList, ...article.tags])),
-            privateKey: signingKey,
-            publicKey: burnerWallet?.publicKey,
-            timestamp: article.publishedAt,
-          }),
+        // Sign in the browser and dispatch to the content publishing API
+        const { cid, shareUrl } = await publishArticleSigned({
+          title: article.title,
+          content: article.cleanHtml,
+          tags: Array.from(new Set([...tagList, ...article.tags])),
+          privateKey: signingKey,
+          timestamp: article.publishedAt,
         });
-
-        const resData = await response.json();
-        if (!response.ok) {
-          throw new Error(resData.error || `HTTP ${response.status}`);
-        }
-
-        const cid = resData.data?.cid || resData.cid;
-        const shareUrl = `${window.location.origin}/read/${cid}`;
 
         setArticles((prev) =>
           prev.map((a, idx) =>

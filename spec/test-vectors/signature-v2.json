@@ -1,0 +1,156 @@
+{
+  "protocol": "pressprotocol/sig/v2",
+  "description": "Ed25519 over RFC 8785 canonical JSON of {proto, title, tags, timestamp, contentSha256}. Tags keep their order; title, timestamp and content are used byte-for-byte (UTF-8).",
+  "valid": [
+    {
+      "name": "basic",
+      "privateKey": "b53480420cd730bf2c033342532359a1a460e153bae14542353d1496e0c7e735",
+      "publicKey": "3632fd8bf9d6c6313c2f606c8e63ddefe0d34263b71499e876bc3c0a7351f6a0",
+      "article": {
+        "title": "Hello PressProtocol",
+        "tags": [
+          "press",
+          "freedom"
+        ],
+        "timestamp": "2026-11-01T00:00:00.000Z",
+        "content": "<p>Hello world</p>"
+      },
+      "contentSha256": "c91cd3f896f41f669fd05715352e466084057f65ff6523937321118bca858960",
+      "signingPayload": "{\"contentSha256\":\"c91cd3f896f41f669fd05715352e466084057f65ff6523937321118bca858960\",\"proto\":\"pressprotocol/sig/v2\",\"tags\":[\"press\",\"freedom\"],\"timestamp\":\"2026-11-01T00:00:00.000Z\",\"title\":\"Hello PressProtocol\"}",
+      "signature": "7996edba7a015867b3c38c077b663a366144f997cdaf7b7f240a84a97a85384261b285de735948720cf07754a23a8864548f2e682df249e06e3d02796c017708",
+      "expectedStatus": "verified"
+    },
+    {
+      "name": "empty-tags-unicode",
+      "privateKey": "02a45cfbb2ddbb82937d445dfb9b5b280fb6d4f0dbac951e50ed317f6dbe8d24",
+      "publicKey": "52804f28b721fa3c9a80b90a8ff0627ed776d9fb2d78aeb65aecbf2c2b3197d5",
+      "article": {
+        "title": "Ünïcødé — “quotes” & 日本語 🗞️",
+        "tags": [],
+        "timestamp": "2026-11-01T12:34:56.789Z",
+        "content": "<p>Grüße aus München 🚀</p>"
+      },
+      "contentSha256": "75ae8f60eff3297f67818e034a4e74268449731a2770de0817543b81aebfe662",
+      "signingPayload": "{\"contentSha256\":\"75ae8f60eff3297f67818e034a4e74268449731a2770de0817543b81aebfe662\",\"proto\":\"pressprotocol/sig/v2\",\"tags\":[],\"timestamp\":\"2026-11-01T12:34:56.789Z\",\"title\":\"Ünïcødé — “quotes” & 日本語 🗞️\"}",
+      "signature": "ec1e32b7349760e1387759710ead1c4319e226cee5b121afaf9549c7239993f630e1844953448fd3a5a3edc9873a83423404f67c57b32f484ac6675dcde6a00a",
+      "expectedStatus": "verified"
+    },
+    {
+      "name": "escaping",
+      "privateKey": "f12e794c90382223819d1a0833782a1c3bd0b5ea3092b7df0072271dab509414",
+      "publicKey": "9fbc7c24cbf2bd3a4342702cba5cece2142a02bbdb08aa35878ae59ce41cbb84",
+      "article": {
+        "title": "Back\\slash \"quoted\" / slash",
+        "tags": [
+          "tab\tseparated",
+          "line\nbreak",
+          "ctrl\u0001char",
+          "sep line"
+        ],
+        "timestamp": "2024-05-01",
+        "content": "<script>alert(\"x\")</script>\r\n\u0000 null byte"
+      },
+      "contentSha256": "fcfa7f2e8eec3928ce3237f8a2a8d9acc92cc0906d538607ce286a8d98bb1067",
+      "signingPayload": "{\"contentSha256\":\"fcfa7f2e8eec3928ce3237f8a2a8d9acc92cc0906d538607ce286a8d98bb1067\",\"proto\":\"pressprotocol/sig/v2\",\"tags\":[\"tab\\tseparated\",\"line\\nbreak\",\"ctrl\\u0001char\",\"sep line\"],\"timestamp\":\"2024-05-01\",\"title\":\"Back\\\\slash \\\"quoted\\\" / slash\"}",
+      "signature": "e1534ceb8dd19edd3bbd9d90ec500fd8ad2d7a74cbf294a237a2680e5038ae6b46bf07d55ac0d94af5b8887e96c35701fbbee5487fda3cce0124e7c06912b30a",
+      "expectedStatus": "verified"
+    },
+    {
+      "name": "tag-order-preserved",
+      "privateKey": "86f256b37537e62065597ce462c8ae50426f01d9e0e50215fa80241c4b1f70b1",
+      "publicKey": "a77010e0afb13a58a14af1b0198a452617fa8faeb3fc724cc43cdef35d278643",
+      "article": {
+        "title": "Order matters",
+        "tags": [
+          "zeta",
+          "alpha",
+          "mu"
+        ],
+        "timestamp": "2026-01-02T03:04:05Z",
+        "content": "plain text body"
+      },
+      "contentSha256": "9fc5d90c995fdacb82e2cb454025e169a5b94d0cd31051d23e82d51338311da8",
+      "signingPayload": "{\"contentSha256\":\"9fc5d90c995fdacb82e2cb454025e169a5b94d0cd31051d23e82d51338311da8\",\"proto\":\"pressprotocol/sig/v2\",\"tags\":[\"zeta\",\"alpha\",\"mu\"],\"timestamp\":\"2026-01-02T03:04:05Z\",\"title\":\"Order matters\"}",
+      "signature": "3e118791a275e7d6c330f4457a7883012600714d59ec4ac71a8c7d8e7caddd97be3e192ec37ecb7f8acc8242dece4629789dda7a886957daed2e3069523c7a03",
+      "expectedStatus": "verified"
+    }
+  ],
+  "invalid": [
+    {
+      "name": "tampered-content",
+      "article": {
+        "title": "Hello PressProtocol",
+        "tags": [
+          "press",
+          "freedom"
+        ],
+        "timestamp": "2026-11-01T00:00:00.000Z",
+        "content": "<p>Hello world!</p>"
+      },
+      "publicKey": "3632fd8bf9d6c6313c2f606c8e63ddefe0d34263b71499e876bc3c0a7351f6a0",
+      "signature": "7996edba7a015867b3c38c077b663a366144f997cdaf7b7f240a84a97a85384261b285de735948720cf07754a23a8864548f2e682df249e06e3d02796c017708",
+      "expectedStatus": "invalid"
+    },
+    {
+      "name": "tampered-title",
+      "article": {
+        "title": "Hello PressProtocoI",
+        "tags": [
+          "press",
+          "freedom"
+        ],
+        "timestamp": "2026-11-01T00:00:00.000Z",
+        "content": "<p>Hello world</p>"
+      },
+      "publicKey": "3632fd8bf9d6c6313c2f606c8e63ddefe0d34263b71499e876bc3c0a7351f6a0",
+      "signature": "7996edba7a015867b3c38c077b663a366144f997cdaf7b7f240a84a97a85384261b285de735948720cf07754a23a8864548f2e682df249e06e3d02796c017708",
+      "expectedStatus": "invalid"
+    },
+    {
+      "name": "tampered-tags-order",
+      "article": {
+        "title": "Hello PressProtocol",
+        "tags": [
+          "freedom",
+          "press"
+        ],
+        "timestamp": "2026-11-01T00:00:00.000Z",
+        "content": "<p>Hello world</p>"
+      },
+      "publicKey": "3632fd8bf9d6c6313c2f606c8e63ddefe0d34263b71499e876bc3c0a7351f6a0",
+      "signature": "7996edba7a015867b3c38c077b663a366144f997cdaf7b7f240a84a97a85384261b285de735948720cf07754a23a8864548f2e682df249e06e3d02796c017708",
+      "expectedStatus": "invalid"
+    },
+    {
+      "name": "tampered-timestamp",
+      "article": {
+        "title": "Hello PressProtocol",
+        "tags": [
+          "press",
+          "freedom"
+        ],
+        "timestamp": "2026-11-01T00:00:00.001Z",
+        "content": "<p>Hello world</p>"
+      },
+      "publicKey": "3632fd8bf9d6c6313c2f606c8e63ddefe0d34263b71499e876bc3c0a7351f6a0",
+      "signature": "7996edba7a015867b3c38c077b663a366144f997cdaf7b7f240a84a97a85384261b285de735948720cf07754a23a8864548f2e682df249e06e3d02796c017708",
+      "expectedStatus": "invalid"
+    }
+  ],
+  "legacy": [
+    {
+      "name": "legacy-v1-metadata-only",
+      "publicKey": "16005ba11c4e3f5d9b592d5f06c8fb91d4c45795ff67b5b61792765933f60036",
+      "article": {
+        "title": "Legacy v1",
+        "tags": [
+          "old"
+        ],
+        "timestamp": "2025-06-01T00:00:00.000Z",
+        "content": "<p>body not covered</p>"
+      },
+      "signature": "56fabfaf0fff8693a02b7acd6ef5ebcbe3339a7b245f42e7557037ec94981a12fea4fcc6e2470f297301dc045d95a62a3e73790ead73af95271f0e6d48c6360e",
+      "expectedStatus": "legacy"
+    }
+  ]
+}

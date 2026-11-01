@@ -24,6 +24,9 @@ classifiers = [
     "Topic :: Security :: Cryptography",
 ]
 
+[project.optional-dependencies]
+crypto = ["cryptography>=42"]
+
 [project.urls]
 Homepage = "https://pressprotocol.com"
 Documentation = "https://pressprotocol.com/docs"

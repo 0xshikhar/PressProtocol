@@ -43,13 +43,13 @@ class AnonPress_API_Client {
     /**
      * Publish content to AnonPress backend
      */
-    public function publish_content($title, $content, $tags, $wallet_address, $private_key = null) {
+    public function publish_content($title, $content, $tags, $wallet_address, $signed = null) {
         $endpoint = $this->api_url . '/api/content';
         
         $data = array(
             'title' => $title,
             'content' => $content,
-            'tags' => $tags,
+            'tags' => array_values($tags),
         );
         
         // Add wallet address for authenticated publishing
@@ -57,9 +57,11 @@ class AnonPress_API_Client {
             $data['walletAddress'] = $wallet_address;
         }
         
-        // Add private key if available (for signing)
-        if (!empty($private_key)) {
-            $data['privateKey'] = $private_key;
+        // Locally produced signature (the private key never leaves WordPress)
+        if (is_array($signed)) {
+            $data['publicKey'] = $signed['publicKey'];
+            $data['signature'] = $signed['signature'];
+            $data['timestamp'] = $signed['timestamp'];
         }
         
         $response = wp_remote_post($endpoint, array(

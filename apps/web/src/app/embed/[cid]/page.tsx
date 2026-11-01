@@ -202,7 +202,7 @@ function EmbedReaderContent() {
                   ? themeStyles.badgeBg
                   : verificationResult?.isValid
                   ? themeStyles.verifiedBadge
-                  : verificationResult?.status === "unsigned"
+                  : verificationResult?.status === "unsigned" || verificationResult?.status === "legacy"
                   ? themeStyles.unsignedBadge
                   : themeStyles.invalidBadge
               }`}
@@ -226,6 +226,11 @@ function EmbedReaderContent() {
                 <>
                   <Shield className="w-3.5 h-3.5 opacity-60 shrink-0" />
                   <span className="font-mono text-[11px]">Unsigned</span>
+                </>
+              ) : verificationResult?.status === "legacy" ? (
+                <>
+                  <Shield className="w-3.5 h-3.5 opacity-60 shrink-0" />
+                  <span className="font-mono text-[11px]">Legacy signature</span>
                 </>
               ) : (
                 <>

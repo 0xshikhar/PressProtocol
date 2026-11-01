@@ -97,7 +97,7 @@ run_suite() {
 
 run_suite "Surveillance Stripper & CMS Cleaner" "28/28 tests" pnpm --filter pressprotocol-web exec tsx ../../scripts/test-cms-scrubber.ts
 run_suite "Multi-Transport Telemetry & Live Gateway Probes" "40/40 tests" pnpm --filter pressprotocol-web exec tsx ../../scripts/test-transport-telemetry.ts
-run_suite "Air-Gapped Proofs & Offline Verification" "26/26 tests" pnpm --filter pressprotocol-web exec tsx ../../scripts/test-airgap-proof.ts
+run_suite "Air-Gapped Proofs & Offline Verification" "28/28 tests" pnpm --filter pressprotocol-web exec tsx ../../scripts/test-airgap-proof.ts
 run_suite "Optical QR Codec & Delay-Tolerant Mesh" "22/22 tests" pnpm --filter pressprotocol-web exec tsx ../../scripts/test-optical-qr-mesh.ts
 run_suite "Sovereign Web Clipper (Chromium MV3 Extension)" "37/37 tests" pnpm --filter pressprotocol-web exec tsx ../../scripts/test-web-clipper.ts
 run_suite "Bulk RSS Publication Archive Importer" "32/32 tests" pnpm --filter pressprotocol-web exec tsx ../../scripts/test-bulk-rss.ts
@@ -111,6 +111,7 @@ run_suite "Open Infrastructure API & Enterprise Gateway" "12/12 tests" pnpm --di
 run_suite "Outbound Real-Time Webhook Subscriptions & Event Bus" "17/17 tests" pnpm --dir core/node exec tsx ../../scripts/test-webhook-subscriptions.ts
 run_suite "SDK CLI Version Flags" "3/3 tests" pnpm --filter @pressprotocol/sdk exec tsx ../../scripts/test-sdk-cli.ts
 run_suite "Security Boundaries & Strict CID Invariants" "45/45 tests" pnpm --filter pressprotocol-web exec tsx ../../scripts/test-ssrf-cid.ts
+run_suite "Signature Protocol v2 Cross-Language Vectors" "11/11 tests" pnpm --dir packages/sdk exec tsx ../../scripts/test-signature-vectors.ts
 
 
 echo ""

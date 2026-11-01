@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { sanitizeArticleHtml } from "@/lib/sanitize-html";
+import { publishArticleSigned } from "@/lib/client-publish";
+import { getOrCreateBurnerWallet } from "@/lib/burner-wallet";
 import {
   Shield,
   ShieldCheck,
@@ -125,8 +127,7 @@ export default function ImportPage() {
         body: JSON.stringify({
           url: url.trim(),
           tags: tagList,
-          privateKey: privateKey.trim() || undefined,
-          autoPublish,
+          autoPublish: false,
         }),
       });
 
@@ -135,7 +136,42 @@ export default function ImportPage() {
         throw new Error(data.error || "Failed to process import");
       }
 
-      setResult(data);
+      const scrubbed = data.scrubbed;
+      const mergedTags: string[] = Array.from(new Set([...tagList, ...(scrubbed.tags || [])]));
+      const article = {
+        title: scrubbed.title,
+        author: scrubbed.author,
+        excerpt: scrubbed.excerpt,
+        canonicalUrl: scrubbed.canonicalUrl,
+        tags: mergedTags,
+        cleanHtml: scrubbed.cleanHtml,
+      };
+
+      if (!autoPublish) {
+        setResult({ success: true, published: false, article, telemetry: data.telemetry });
+        return;
+      }
+
+      // Sign in the browser; the private key is never sent to any server
+      const signingKey = privateKey.trim() || (await getOrCreateBurnerWallet()).privateKey;
+      const published = await publishArticleSigned({
+        title: article.title,
+        content: article.cleanHtml,
+        tags: mergedTags,
+        privateKey: signingKey,
+        extras: { author: scrubbed.author, sourceUrl: scrubbed.canonicalUrl, excerpt: scrubbed.excerpt },
+      });
+
+      setResult({
+        success: true,
+        published: true,
+        cid: published.cid,
+        shareUrl: published.shareUrl,
+        embedUrl: published.embedUrl,
+        embedCode: published.embedCode,
+        article,
+        telemetry: data.telemetry,
+      });
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred while importing.");
     } finally {

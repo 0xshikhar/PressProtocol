@@ -19,7 +19,6 @@ export async function POST(req: NextRequest) {
       rawMarkdown,
       rawBlocks,
       tags = ["notion", "sovereign-doc"],
-      privateKey,
       autoPublish = false,
     } = body;
 
@@ -88,16 +87,12 @@ export async function POST(req: NextRequest) {
 
     // If autoPublish is requested
     const backendEndpoint = getBackendUrl();
-    const client = new PressProtocolClient({
-      endpoint: backendEndpoint,
-      privateKey: privateKey || undefined,
-    });
+    const client = new PressProtocolClient({ endpoint: backendEndpoint });
 
     const publishResult = await client.publish({
       title: article.title,
       content: article.cleanHtml,
       tags,
-      privateKey: privateKey || undefined,
     });
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://pressprotocol.com";
