@@ -49,7 +49,8 @@ export class TorService {
   async getSelfOnionAddress(): Promise<string | null> {
     // 1. Explicit env override
     if (env.TOR_ONION_ADDRESS) {
-      return env.TOR_ONION_ADDRESS.trim();
+      const configured = env.TOR_ONION_ADDRESS.trim().toLowerCase().replace(/^https?:\/\//, '').split('/')[0];
+      return /^[a-z2-7]{56}\.onion$/.test(configured) ? configured : null;
     }
 
     // 2. Candidate paths in autonomous container or onionize volume
@@ -73,20 +74,13 @@ export class TorService {
         try {
           const content = await readFile(p, 'utf-8');
           const address = content.trim();
-          if (address && address.endsWith('.onion')) {
+          if (/^[a-z2-7]{56}\.onion$/.test(address)) {
             return address;
           }
         } catch {
           // continue checking next path
         }
       }
-    }
-
-    // 3. In dev / test / fallback: Return deterministic fallback
-    if (env.NODE_ENV === 'test' || env.NODE_ENV === 'development') {
-      const fallbackHash = 'pressprotocol7sovereign4node6federation3mesh7relay5v3';
-      const padded = (fallbackHash + '234567abcdefghijklmnopqrstuvwxyz').slice(0, 56);
-      return `${padded}.onion`;
     }
 
     return null;

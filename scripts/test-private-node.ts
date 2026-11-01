@@ -54,7 +54,7 @@ async function runPrivateNodeTests() {
     assert(result.cid === expectedCid, 'CLI computed CID matches in-memory deterministic multihash');
     assert(typeof result.publicKey === 'string' && result.publicKey.length === 64, 'Local Ed25519 public key generated (32 bytes hex)');
     assert(typeof result.signature === 'string' && result.signature.length === 128, 'Local Ed25519 signature generated (64 bytes hex)');
-    assert(result.onionMirror.includes('.onion'), 'Live Onion Mirror is formatted');
+    assert(result.onionMirror === null || /^http:\/\/[a-z2-7]{56}\.onion\//.test(result.onionMirror), 'Onion mirror is a real v3 address or omitted when no local node is running');
     assert(result.localGateway.includes('http://127.0.0.1:4000/read/'), 'Local Gateway URL is formatted');
 
     // Verify .pressproof.json file
