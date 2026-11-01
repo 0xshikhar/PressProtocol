@@ -1,4 +1,5 @@
 import * as ed from "@noble/ed25519";
+import { isKeyVaultSupported, openSecret, sealSecret, type SealedSecret } from "./key-vault";
 
 export interface BurnerWallet {
   publicKey: string;
@@ -17,9 +18,39 @@ export interface BurnerArticle {
 const STORAGE_KEY = "pressprotocol_burner_identity";
 const ARTICLES_STORAGE_KEY = "pressprotocol_burner_articles";
 
+/** Shape persisted in localStorage: public fields in clear, private key sealed. */
+interface StoredBurnerWallet {
+  v: 2;
+  publicKey: string;
+  pseudonym: string;
+  createdAt: number;
+  sealedPrivateKey: SealedSecret;
+}
+
+/**
+ * Persists a burner wallet with its private key sealed at rest.
+ * Falls back to legacy plaintext storage only when WebCrypto/IndexedDB are unavailable.
+ */
+export async function persistBurnerWallet(wallet: BurnerWallet): Promise<void> {
+  if (typeof window === "undefined") return;
+  if (!isKeyVaultSupported()) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(wallet));
+    return;
+  }
+  const stored: StoredBurnerWallet = {
+    v: 2,
+    publicKey: wallet.publicKey,
+    pseudonym: wallet.pseudonym,
+    createdAt: wallet.createdAt,
+    sealedPrivateKey: await sealSecret(wallet.privateKey),
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
+}
+
 /**
  * Retrieves the existing persistent burner wallet from localStorage,
  * or generates a fresh cryptographic Ed25519 keypair if none exists.
+ * Legacy plaintext entries are transparently re-sealed.
  */
 export async function getOrCreateBurnerWallet(): Promise<BurnerWallet> {
   if (typeof window === "undefined") {
@@ -29,12 +60,23 @@ export async function getOrCreateBurnerWallet(): Promise<BurnerWallet> {
   const existing = localStorage.getItem(STORAGE_KEY);
   if (existing) {
     try {
-      const parsed = JSON.parse(existing) as BurnerWallet;
+      const parsed = JSON.parse(existing) as Partial<BurnerWallet & StoredBurnerWallet>;
+      if (parsed.v === 2 && parsed.publicKey && parsed.sealedPrivateKey) {
+        const privateKey = await openSecret(parsed.sealedPrivateKey);
+        return {
+          publicKey: parsed.publicKey,
+          privateKey,
+          pseudonym: parsed.pseudonym || `Anon-${parsed.publicKey.slice(0, 4)}...${parsed.publicKey.slice(-4)}`,
+          createdAt: parsed.createdAt || Date.now(),
+        };
+      }
       if (parsed.publicKey && parsed.privateKey) {
-        return parsed;
+        const legacy = parsed as BurnerWallet;
+        await persistBurnerWallet(legacy);
+        return legacy;
       }
     } catch (e) {
-      console.warn("Corrupted burner wallet in storage, generating fresh identity...");
+      console.warn("Burner wallet in storage could not be opened, generating fresh identity...");
     }
   }
 
@@ -59,9 +101,7 @@ export async function createFreshBurnerWallet(): Promise<BurnerWallet> {
     createdAt: Date.now(),
   };
 
-  if (typeof window !== "undefined") {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(wallet));
-  }
+  await persistBurnerWallet(wallet);
 
   return wallet;
 }
