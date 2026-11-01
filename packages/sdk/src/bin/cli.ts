@@ -11,10 +11,9 @@ import { PressProtocolClient } from "../client.js";
 import {
   generateKeypairSync,
   getPublicKey,
-  signPayload,
-  createCanonicalPayload,
   calculateDeterministicCIDv1,
 } from "../crypto.js";
+import { signArticleV2 } from "../protocol.js";
 
 // ANSI Color Helpers
 const colors = {
@@ -179,11 +178,10 @@ async function handlePublish(positionals: string[], flags: Record<string, any>) 
       keypair = generateKeypairSync();
     }
 
-    const canonicalPayload = createCanonicalPayload(title, tags, timestamp);
-    const signature = await signPayload(canonicalPayload, keypair.privateKey);
+    const signature = await signArticleV2({ title, tags, timestamp, content }, keypair.privateKey);
 
     // Check if local node or Tor daemon is running on 127.0.0.1:4000
-    let onionHost = "pressprotocol7sovereign4node6federation3mesh7relay5v3.onion";
+    let onionHost: string | null = null;
     let localGateway = `http://127.0.0.1:4000/read/${cid}`;
     try {
       const controller = new AbortController();
@@ -200,7 +198,7 @@ async function handlePublish(positionals: string[], flags: Record<string, any>) 
       // Local node is offline, gracefully use default onion routing
     }
 
-    const onionMirror = `http://${onionHost}/ipfs/${cid}`;
+    const onionMirror = onionHost ? `http://${onionHost}/ipfs/${cid}` : null;
 
     // Construct and export .pressproof.json receipt
     const proofManifest = {
@@ -250,7 +248,7 @@ async function handlePublish(positionals: string[], flags: Record<string, any>) 
     console.log(`
 ${colors.green}${colors.bold}✅ Cryptographically signed with local Ed25519 key (0x${keypair.publicKey.slice(0, 6)}...)${colors.reset}
 ${colors.cyan}${colors.bold}📦 Deterministic CIDv1: ${cid}${colors.reset}
-${colors.magenta}🧅 Live Onion Mirror:   ${onionMirror}${colors.reset}
+${colors.magenta}🧅 Live Onion Mirror:   ${onionMirror ?? "unavailable (no local node with Tor)"}${colors.reset}
 ${colors.blue}🌐 Local Gateway:      ${localGateway}${colors.reset}
 ${colors.yellow}💾 Proof Exported:      ./${proofFileName}${colors.reset}
 `);

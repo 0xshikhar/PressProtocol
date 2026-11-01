@@ -2,6 +2,7 @@ import * as ed from "@noble/ed25519";
 import { sha512 } from "@noble/hashes/sha512";
 import { sha256 } from "@noble/hashes/sha256";
 import type { MarkdownArticle, PublishResultItem } from "./types.js";
+import { signArticleV2 } from "@pressprotocol/sdk/protocol";
 
 // Bind SHA-512 for @noble/ed25519
 ed.etc.sha512Sync = (...m) => sha512(ed.etc.concatBytes(...m));
@@ -277,9 +278,11 @@ export async function publishArticle(
   const mergedTags = Array.from(new Set([...article.tags, ...options.extraTags]));
   const timestamp = article.date || new Date().toISOString();
 
-  // Canonical payload & Ed25519 signature
-  const canonicalPayload = createCanonicalPayload(article.title, mergedTags, timestamp);
-  const signature = await signPayload(canonicalPayload, privKey);
+  // Canonical payload & Ed25519 signature (protocol v2: binds the published HTML body)
+  const signature = await signArticleV2(
+    { title: article.title, tags: mergedTags, timestamp, content: html },
+    privKey
+  );
 
   // Compute deterministic CIDv1
   const fullArticleBundle = JSON.stringify({
@@ -298,7 +301,7 @@ export async function publishArticle(
   const mirrors = {
     ipfs: `https://gateway.pinata.cloud/ipfs/${cid}`,
     gateway: `https://cloudflare-ipfs.com/ipfs/${cid}`,
-    tor: `http://pressp42x7a6sover.onion/read/${cid}`,
+    ...(process.env.PRESSPROTOCOL_ONION_HOST ? { tor: `http://${process.env.PRESSPROTOCOL_ONION_HOST}/read/${cid}` } : {}),
   };
 
   // If not dry-run, broadcast to node gateway

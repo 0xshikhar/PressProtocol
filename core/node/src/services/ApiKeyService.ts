@@ -1,4 +1,6 @@
 import crypto from 'node:crypto';
+import { env } from '../config/env.js';
+import { JsonFileStore } from '../lib/json-store.js';
 
 export interface ApiKeyRecord {
   id: string;
@@ -31,10 +33,22 @@ export interface RateLimitResult {
   retryAfterSec?: number;
 }
 
+const MAX_BUCKETS = 10_000;
+const BUCKET_TTL_MS = 60 * 60 * 1000; // evict buckets idle for an hour
+const FLUSH_INTERVAL_MS = 30_000;
+
+/**
+ * API key management. Only SHA-256 hashes are kept; records persist to
+ * DATA_DIR/keys/api-keys.json so keys and their scopes survive restarts.
+ * There is no baked-in credential: an admin key comes from ADMIN_API_KEY or is
+ * generated once, printed to the log, and persisted.
+ */
 export class ApiKeyService {
   private keys: Map<string, ApiKeyRecord> = new Map(); // id -> ApiKeyRecord
   private hashIndex: Map<string, string> = new Map(); // keyHash -> id
   private buckets: Map<string, TokenBucket> = new Map(); // key or IP -> TokenBucket
+  private store = new JsonFileStore<ApiKeyRecord[]>('keys/api-keys.json', () => []);
+  private dirty = false;
   private metrics = {
     totalRequests: 0,
     totalBytesRelayed: 0,
@@ -43,25 +57,63 @@ export class ApiKeyService {
   };
 
   constructor() {
-    // Bootstrap a default admin key if none exists (for local testing and node administration)
-    const adminKey = 'pp_live_master_admin_key_pressprotocol_2026';
-    const hash = this.hashKey(adminKey);
-    const id = 'key_admin_root';
-    const record: ApiKeyRecord = {
-      id,
-      name: 'Root Node Administrator',
+    for (const record of this.store.load()) {
+      this.keys.set(record.id, record);
+      this.hashIndex.set(record.keyHash, record.id);
+    }
+    this.bootstrapAdminKey();
+    setInterval(() => {
+      if (this.dirty) {
+        this.persist();
+      }
+    }, FLUSH_INTERVAL_MS).unref();
+  }
+
+  private bootstrapAdminKey(): void {
+    if (Array.from(this.keys.values()).some((k) => k.isActive && k.scopes.includes('admin'))) {
+      // An env-supplied key still takes precedence even if persisted keys exist
+      if (env.ADMIN_API_KEY && !this.hashIndex.has(this.hashKey(env.ADMIN_API_KEY))) {
+        this.registerAdminKey(env.ADMIN_API_KEY, 'Node Administrator (env)');
+      }
+      return;
+    }
+    if (env.ADMIN_API_KEY) {
+      this.registerAdminKey(env.ADMIN_API_KEY, 'Node Administrator (env)');
+      return;
+    }
+    const generated = this.generateKey({
+      name: 'Node Administrator (bootstrap)',
       owner: 'Node Operator',
-      keyHash: hash,
-      keyPrefix: adminKey.slice(0, 16) + '...',
-      scopes: ['publish:raw', 'publish:signed', 'resolve', 'pin', 'federate', 'admin'],
+      scopes: ['admin'],
+      rateLimitPerMin: 10000,
+    });
+    console.log('🔑 Generated a one-time admin API key for this node (stored as a hash only):');
+    console.log(`   ${generated.key}`);
+    console.log('   Save it now; it will not be printed again.');
+  }
+
+  private registerAdminKey(rawKey: string, name: string): void {
+    const record: ApiKeyRecord = {
+      id: `key_${crypto.randomBytes(8).toString('hex')}`,
+      name,
+      owner: 'Node Operator',
+      keyHash: this.hashKey(rawKey),
+      keyPrefix: rawKey.slice(0, 16) + '...',
+      scopes: ['admin'],
       rateLimitPerMin: 10000,
       usedBytes: 0,
       requestCount: 0,
       createdAt: new Date().toISOString(),
       isActive: true,
     };
-    this.keys.set(id, record);
-    this.hashIndex.set(hash, id);
+    this.keys.set(record.id, record);
+    this.hashIndex.set(record.keyHash, record.id);
+    this.persist();
+  }
+
+  private persist(): void {
+    this.store.save(Array.from(this.keys.values()));
+    this.dirty = false;
   }
 
   public hashKey(rawKey: string): string {
@@ -106,6 +158,7 @@ export class ApiKeyService {
 
     this.keys.set(id, record);
     this.hashIndex.set(hash, id);
+    this.persist();
 
     return { key: rawKey, record };
   }
@@ -147,9 +200,18 @@ export class ApiKeyService {
     return { valid: true, record };
   }
 
+  private evictStaleBuckets(now: number): void {
+    for (const [id, bucket] of this.buckets) {
+      if (now - bucket.lastRefill > BUCKET_TTL_MS) {
+        this.buckets.delete(id);
+      }
+    }
+  }
+
   /**
    * Token-bucket rate limiter engine.
-   * Enforces continuous token refill based on allowed req/min.
+   * Enforces continuous token refill based on allowed req/min. The bucket map is
+   * bounded (stale entries evicted, hard cap) so hostile traffic cannot grow memory.
    */
   public checkRateLimit(identifier: string, limitPerMin = 60): RateLimitResult {
     const now = Date.now();
@@ -160,13 +222,23 @@ export class ApiKeyService {
     const capacity = Math.max(10, Math.floor(limitPerMin * 0.25)); // 25% burst capacity or 10 min
 
     if (!bucket) {
-      bucket = {
-        tokens: capacity,
-        lastRefill: now,
-        capacity,
-        refillRatePerMs,
-      };
-      this.buckets.set(identifier, bucket);
+      if (this.buckets.size >= MAX_BUCKETS) {
+        this.evictStaleBuckets(now);
+      }
+      if (this.buckets.size >= MAX_BUCKETS) {
+        // Still full of hot buckets: degrade to a strict shared bucket rather than unbounded memory
+        identifier = '__overflow__';
+        bucket = this.buckets.get(identifier);
+      }
+      if (!bucket) {
+        bucket = {
+          tokens: capacity,
+          lastRefill: now,
+          capacity,
+          refillRatePerMs,
+        };
+        this.buckets.set(identifier, bucket);
+      }
     } else {
       // Calculate token replenishment
       const elapsed = now - bucket.lastRefill;
@@ -197,7 +269,7 @@ export class ApiKeyService {
   }
 
   /**
-   * Records usage metrics for an authenticated key.
+   * Records usage metrics for an authenticated key (flushed to disk periodically).
    */
   public recordUsage(keyId: string, bytes = 0) {
     this.metrics.totalRequests++;
@@ -207,6 +279,7 @@ export class ApiKeyService {
     if (record) {
       record.requestCount++;
       record.usedBytes += bytes;
+      this.dirty = true;
     }
   }
 
@@ -219,6 +292,7 @@ export class ApiKeyService {
 
     record.isActive = false;
     record.revokedAt = new Date().toISOString();
+    this.persist();
     return true;
   }
 

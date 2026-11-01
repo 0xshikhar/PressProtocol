@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { downloadPressProofFile, exportPressProof } from "@pressprotocol/proof"
@@ -31,6 +31,7 @@ import {
   saveArticleOffline,
 } from "@/lib/offline-storage"
 import { calculateReadingTime } from "@/lib/reading-time"
+import { sanitizeArticleHtml } from "@/lib/sanitize-html"
 import {
   verifyArticleSignature,
   type VerificationResult,
@@ -87,6 +88,11 @@ export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
   const readingStats = content?.content
     ? calculateReadingTime(content.content)
     : calculateReadingTime("")
+
+  const safeArticleHtml = useMemo(
+    () => sanitizeArticleHtml(content?.content),
+    [content?.content]
+  )
 
   const handleExportProof = () => {
     if (!content) return
@@ -792,6 +798,14 @@ export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
                     <Shield className="h-3.5 w-3.5" />
                     Unsigned
                   </span>
+                ) : verificationResult?.status === "legacy" ? (
+                  <span
+                    className={`flex items-center gap-1 text-xs ${isEink ? "font-semibold text-black" : "text-muted"}`}
+                    title="Signed with the legacy v1 format: authenticates title, tags and timestamp, not the article body"
+                  >
+                    <Shield className="h-3.5 w-3.5" />
+                    Legacy signature (metadata only)
+                  </span>
                 ) : (
                   <span
                     className={`flex items-center gap-1 text-xs font-medium ${
@@ -900,7 +914,7 @@ export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
             }`}
             dangerouslySetInnerHTML={{
               __html:
-                content.content ||
+                safeArticleHtml ||
                 `<div class='p-8 rounded-[6px] border border-hairline bg-surface font-mono text-xs text-center text-secondary'><p class='font-medium'>Article body is synchronizing across decentralized IPFS swarm mirrors.</p><p class='mt-2 text-muted'>CID: ${encodeURIComponent(content.cid)}</p></div>`,
             }}
           />
@@ -1105,19 +1119,28 @@ export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
                     content.mirrors?.tor?.url
                   )
                   const isTorActive = !!(
-                    content.mirrors?.tor?.available ||
-                    (typeof window !== "undefined" && isAccessingViaOnion())
+                    resolvedOnionUrl &&
+                    (content.mirrors?.tor?.available ||
+                      (typeof window !== "undefined" && isAccessingViaOnion()))
                   )
 
                   return (
                     <div className="flex items-center justify-between rounded-[6px] border border-hairline bg-canvas p-2.5">
                       <div className="flex items-center gap-2">
                         <MirrorHealthDot
-                          status={isTorActive ? "healthy" : "ready"}
+                          status={
+                            !resolvedOnionUrl
+                              ? "standby"
+                              : isTorActive
+                                ? "healthy"
+                                : "ready"
+                          }
                           label={
-                            isTorActive
-                              ? "Tor Circuit Active"
-                              : "Tor Onion Mirror"
+                            !resolvedOnionUrl
+                              ? "Tor Onion Mirror — coming soon"
+                              : isTorActive
+                                ? "Tor Circuit Active"
+                                : "Tor Onion Mirror"
                           }
                         />
                       </div>

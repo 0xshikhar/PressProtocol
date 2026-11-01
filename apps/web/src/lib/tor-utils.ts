@@ -49,7 +49,7 @@ export function extractOnionAddress(onionUrl: string): string {
 
 /**
  * Formats a 56-character v3 onion address for compact editorial display
- * Example: "pressprotocol7sovereign4node6federation3mesh7relay5v3.onion" -> "pressproto...5v3.onion"
+ * Example: "<56-char-v3-address>.onion" -> "abcdefghij...uvwxyz.onion"
  */
 export function formatOnionDisplay(onionUrl: string): string {
   const host = extractOnionAddress(onionUrl);
@@ -59,16 +59,37 @@ export function formatOnionDisplay(onionUrl: string): string {
   return `${base.slice(0, 10)}...${base.slice(-6)}.onion`;
 }
 
+/** Tor v3 onion hosts are 56 base32 characters followed by ".onion". */
+const ONION_V3_HOST = /^[a-z2-7]{56}\.onion$/;
+
 /**
- * Resolves a canonical Tor v3 onion URL for a given CID
+ * Normalizes and validates a configured onion host (with or without scheme/path).
+ * Returns null when the value is not a well-formed Tor v3 address.
  */
-export function getCanonicalOnionUrl(cid: string, configuredUrl?: string): string {
-  if (configuredUrl && configuredUrl.includes(".onion")) {
-    return configuredUrl;
+export function normalizeOnionHost(value?: string | null): string | null {
+  if (!value) return null;
+  const host = extractOnionAddress(value.trim().toLowerCase());
+  return ONION_V3_HOST.test(host) ? host : null;
+}
+
+/**
+ * Tor routing is served by the PressProtocol node. Until a node with a hidden service is
+ * deployed and NEXT_PUBLIC_TOR_ONION_HOST is set, Tor mirrors are reported as unavailable.
+ */
+export function isTorRoutingEnabled(): boolean {
+  return normalizeOnionHost(process.env.NEXT_PUBLIC_TOR_ONION_HOST) !== null;
+}
+
+/**
+ * Resolves the Tor v3 onion URL for a CID, or null when no real onion service is configured.
+ */
+export function getCanonicalOnionUrl(cid: string, configuredUrl?: string | null): string | null {
+  const configuredHost = normalizeOnionHost(configuredUrl);
+  if (configuredHost && configuredUrl) {
+    return configuredUrl.startsWith("http") ? configuredUrl : `http://${configuredUrl.replace(/^\/+/, "")}`;
   }
-  const envHost = process.env.NEXT_PUBLIC_TOR_ONION_HOST || "pressprotocol7sovereign4node6federation3mesh7relay5v3.onion";
-  const cleanHost = envHost.replace(/^https?:\/\//i, "").replace(/\/+$/, "");
-  return `http://${cleanHost}/read/${cid}`;
+  const envHost = normalizeOnionHost(process.env.NEXT_PUBLIC_TOR_ONION_HOST);
+  return envHost ? `http://${envHost}/read/${encodeURIComponent(cid)}` : null;
 }
 
 /**

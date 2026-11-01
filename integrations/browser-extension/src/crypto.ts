@@ -3,6 +3,7 @@
  * Provides sovereign Ed25519 keypair generation, storage, and deterministic RFC 8785 payload signing.
  */
 import * as ed from "@noble/ed25519";
+import { isKeyVaultSupported, openSecret, sealSecret, type SealedSecret } from "./key-vault";
 
 export interface BurnerIdentity {
   publicKey: string;
@@ -33,22 +34,56 @@ export function canonicalizeJson(value: any): string {
   return "{" + pairs.join(",") + "}";
 }
 
+interface StoredBurnerIdentity {
+  v: 2;
+  publicKey: string;
+  pseudonym: string;
+  createdAt: number;
+  sealedPrivateKey: SealedSecret;
+}
+
+async function persistIdentity(identity: BurnerIdentity): Promise<void> {
+  const value = isKeyVaultSupported()
+    ? ({
+        v: 2,
+        publicKey: identity.publicKey,
+        pseudonym: identity.pseudonym,
+        createdAt: identity.createdAt,
+        sealedPrivateKey: await sealSecret(identity.privateKey),
+      } satisfies StoredBurnerIdentity)
+    : identity;
+  await new Promise<void>((resolve) => {
+    chrome.storage.local.set({ [STORAGE_KEY]: value }, () => resolve());
+  });
+}
+
 /**
  * Retrieves the stored burner identity, or generates a fresh one if missing.
+ * Legacy plaintext identities are transparently re-sealed.
  */
 export async function getOrCreateBurnerIdentity(): Promise<BurnerIdentity> {
-  return new Promise((resolve) => {
-    chrome.storage.local.get([STORAGE_KEY], async (result) => {
-      const stored = result[STORAGE_KEY] as BurnerIdentity | undefined;
-      if (stored && stored.publicKey && stored.privateKey) {
-        resolve(stored);
-        return;
-      }
+  const result = await new Promise<Record<string, any>>((resolve) => chrome.storage.local.get([STORAGE_KEY], resolve));
+  const stored = result[STORAGE_KEY] as Partial<BurnerIdentity & StoredBurnerIdentity> | undefined;
 
-      const fresh = await createFreshBurnerIdentity();
-      resolve(fresh);
-    });
-  });
+  try {
+    if (stored?.v === 2 && stored.publicKey && stored.sealedPrivateKey) {
+      return {
+        publicKey: stored.publicKey,
+        privateKey: await openSecret(stored.sealedPrivateKey),
+        pseudonym: stored.pseudonym || `Anon-${stored.publicKey.slice(0, 4)}...${stored.publicKey.slice(-4)}`,
+        createdAt: stored.createdAt || Date.now(),
+      };
+    }
+    if (stored?.publicKey && stored.privateKey) {
+      const legacy = stored as BurnerIdentity;
+      await persistIdentity(legacy);
+      return legacy;
+    }
+  } catch (err) {
+    console.warn("Stored burner identity could not be opened; generating a fresh one.", err);
+  }
+
+  return createFreshBurnerIdentity();
 }
 
 /**
@@ -69,9 +104,7 @@ export async function createFreshBurnerIdentity(): Promise<BurnerIdentity> {
     createdAt: Date.now(),
   };
 
-  await new Promise<void>((resolve) => {
-    chrome.storage.local.set({ [STORAGE_KEY]: identity }, () => resolve());
-  });
+  await persistIdentity(identity);
 
   return identity;
 }

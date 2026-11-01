@@ -1,6 +1,8 @@
 pub mod crypto;
+pub mod protocol;
 
 pub use crypto::{base32_encode, calculate_deterministic_cidv1};
+pub use protocol::{build_signing_payload_v2, sign_article_v2, verify_publication, SignableArticle, SignatureStatus};
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;

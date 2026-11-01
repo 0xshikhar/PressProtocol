@@ -114,3 +114,34 @@ export async function getRecentContentFromDB(env: Env, limit: number = 20) {
     return [];
   }
 }
+
+export interface ContentStats {
+  totalManifests: number;
+  uniqueTags: number;
+  uniquePublishers: number;
+}
+
+export async function getContentStatsFromDB(env: Env): Promise<ContentStats | null> {
+  const prisma = getPrismaClient(env);
+  if (!prisma) return null;
+
+  try {
+    const [totalManifests, publishers, tagRows] = await Promise.all([
+      prisma.content.count(),
+      prisma.content.groupBy({ by: ['publisherPubKey'] }),
+      prisma.content.findMany({ select: { tags: true }, orderBy: { createdAt: 'desc' }, take: 1000 }),
+    ]);
+    const tags = new Set<string>();
+    for (const row of tagRows as Array<{ tags: string[] }>) {
+      for (const tag of row.tags || []) tags.add(tag.toLowerCase().trim());
+    }
+    return {
+      totalManifests,
+      uniqueTags: tags.size,
+      uniquePublishers: (publishers as Array<{ publisherPubKey: string }>).filter((p) => p.publisherPubKey).length,
+    };
+  } catch (err) {
+    console.error('Failed to compute content stats from DB:', err);
+    return null;
+  }
+}

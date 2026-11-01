@@ -2,7 +2,22 @@ import { existsSync, readFileSync, unlinkSync } from 'fs';
 import { join } from 'path';
 import { execSync } from 'child_process';
 import { federationService } from '../core/node/src/services/FederationService.js';
-import { calculateDeterministicCIDv1 } from '../packages/sdk/src/crypto.js';
+import { storageService } from '../core/node/src/services/StorageService.js';
+import { calculateDeterministicCIDv1 } from '../core/node/src/lib/cid.js';
+import { signArticleV2 } from '../packages/sdk/src/protocol.js';
+import { generateKeypair } from '../packages/sdk/src/crypto.js';
+
+/** Publishes a v2-signed article to the local sovereign store and returns its gossip envelope. */
+async function publishLocalArticle(title: string, tags: string[] = []): Promise<{
+  cid: string; title: string; tags: string[]; timestamp: string; signature: string; publicKey: string;
+}> {
+  const kp = await generateKeypair();
+  const timestamp = new Date().toISOString();
+  const content = `<p>${title} — private gossip body</p>`;
+  const signature = await signArticleV2({ title, tags, timestamp, content }, kp.privateKey);
+  await storageService.uploadContent(title, content, tags, { pubkey: kp.publicKey, signature }, timestamp);
+  return { cid: calculateDeterministicCIDv1(content), title, tags, timestamp, signature, publicKey: kp.publicKey };
+}
 
 let passed = 0;
 let failed = 0;
@@ -54,7 +69,7 @@ async function runPrivateNodeTests() {
     assert(result.cid === expectedCid, 'CLI computed CID matches in-memory deterministic multihash');
     assert(typeof result.publicKey === 'string' && result.publicKey.length === 64, 'Local Ed25519 public key generated (32 bytes hex)');
     assert(typeof result.signature === 'string' && result.signature.length === 128, 'Local Ed25519 signature generated (64 bytes hex)');
-    assert(result.onionMirror.includes('.onion'), 'Live Onion Mirror is formatted');
+    assert(result.onionMirror === null || /^http:\/\/[a-z2-7]{56}\.onion\//.test(result.onionMirror), 'Onion mirror is a real v3 address or omitted when no local node is running');
     assert(result.localGateway.includes('http://127.0.0.1:4000/read/'), 'Local Gateway URL is formatted');
 
     // Verify .pressproof.json file
@@ -137,21 +152,14 @@ async function runPrivateNodeTests() {
   assert(gossipFailPsk.accepted === false, 'Gossip without PSK rejected');
   assert(gossipFailPsk.reason?.includes('Unauthorized'), 'Rejection reason states Unauthorized PSK');
 
-  // Attempt gossip with correct PSK -> should be accepted
-  const gossipPassPsk = await federationService.handleGossip(
-    {
-      cid: 'bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55consortium',
-      title: 'Authorized Consortium Leak',
-      signature: 'mock-sig',
-      publicKey: 'mock-pub',
-      timestamp: new Date().toISOString(),
-    },
-    { psk: testPsk }
-  );
-  assert(gossipPassPsk.accepted === true, 'Gossip with valid PSK accepted');
+  // Attempt gossip with correct PSK -> should be accepted (v2 signature verified)
+  const gossipLeaked = await publishLocalArticle('Authorized Consortium Leak');
+  const gossipPassPsk = await federationService.handleGossip(gossipLeaked, { psk: testPsk });
+  assert(gossipPassPsk.accepted === true, `Gossip with valid PSK accepted (${gossipPassPsk.reason || 'ok'})`);
 
   // Test Whitelist Isolation
-  const authorizedAuthorKey = '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+  const gossipWhitelisted = await publishLocalArticle('Whitelisted Author Leak');
+  const authorizedAuthorKey = gossipWhitelisted.publicKey;
   federationService.setPeerWhitelist([authorizedAuthorKey]);
 
   const gossipFailWhitelist = await federationService.handleGossip(
@@ -167,16 +175,7 @@ async function runPrivateNodeTests() {
   assert(gossipFailWhitelist.accepted === false, 'Gossip from non-whitelisted key rejected in gated swarm');
   assert(gossipFailWhitelist.reason?.includes('Forbidden'), 'Rejection states Forbidden: Peer not in private consortium whitelist');
 
-  const gossipPassWhitelist = await federationService.handleGossip(
-    {
-      cid: 'bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55whitelisted',
-      title: 'Whitelisted Author Leak',
-      signature: 'mock-sig',
-      publicKey: authorizedAuthorKey,
-      timestamp: new Date().toISOString(),
-    },
-    { psk: testPsk }
-  );
+  const gossipPassWhitelist = await federationService.handleGossip(gossipWhitelisted, { psk: testPsk });
   assert(gossipPassWhitelist.accepted === true, 'Gossip from whitelisted consortium author accepted');
 
   // Reset node to open federation

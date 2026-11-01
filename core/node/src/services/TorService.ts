@@ -49,7 +49,8 @@ export class TorService {
   async getSelfOnionAddress(): Promise<string | null> {
     // 1. Explicit env override
     if (env.TOR_ONION_ADDRESS) {
-      return env.TOR_ONION_ADDRESS.trim();
+      const configured = env.TOR_ONION_ADDRESS.trim().toLowerCase().replace(/^https?:\/\//, '').split('/')[0];
+      return /^[a-z2-7]{56}\.onion$/.test(configured) ? configured : null;
     }
 
     // 2. Candidate paths in autonomous container or onionize volume
@@ -73,20 +74,13 @@ export class TorService {
         try {
           const content = await readFile(p, 'utf-8');
           const address = content.trim();
-          if (address && address.endsWith('.onion')) {
+          if (/^[a-z2-7]{56}\.onion$/.test(address)) {
             return address;
           }
         } catch {
           // continue checking next path
         }
       }
-    }
-
-    // 3. In dev / test / fallback: Return deterministic fallback
-    if (env.NODE_ENV === 'test' || env.NODE_ENV === 'development') {
-      const fallbackHash = 'pressprotocol7sovereign4node6federation3mesh7relay5v3';
-      const padded = (fallbackHash + '234567abcdefghijklmnopqrstuvwxyz').slice(0, 56);
-      return `${padded}.onion`;
     }
 
     return null;
@@ -155,7 +149,7 @@ export class TorService {
    * Get onion URL for content via Tor hidden service
    * Returns the actual .onion address from embedded Tor daemon or onionize
    */
-  async createOnionService(contentCid: string, gatewayUrl: string): Promise<OnionServiceResult> {
+  async createOnionService(contentCid: string, gatewayUrl?: string | null): Promise<OnionServiceResult> {
     try {
       console.log('🔍 [TOR] Creating onion service reference for content...');
       console.log(`   CID: ${contentCid}`);
@@ -235,24 +229,11 @@ export class TorService {
   }
 
   /**
-   * Measure latency to onion service
-   * Returns typical Tor latency (~450ms)
+   * Latency to the onion service is not measured yet (requires a SOCKS round-trip through Tor),
+   * so no value is reported rather than a fabricated one.
    */
-  async measureOnionLatency(serviceName: string = 'self'): Promise<number | null> {
-    try {
-      const isAvailable = await this.checkOnionAvailability(serviceName);
-      
-      if (!isAvailable) {
-        return null;
-      }
-
-      // Return typical Tor latency
-      // In production, could measure actual latency via SOCKS proxy
-      return 450;
-    } catch (error) {
-      console.error('Onion latency measurement failed:', error);
-      return null;
-    }
+  async measureOnionLatency(_serviceName: string = 'self'): Promise<number | null> {
+    return null;
   }
 
   /**

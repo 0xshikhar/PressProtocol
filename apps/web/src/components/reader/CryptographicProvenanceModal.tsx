@@ -109,6 +109,9 @@ export function CryptographicProvenanceModal({
                 <DialogDescription className="text-xs text-muted-foreground mt-0.5">
                   Zero-trust RFC 8032 digital signature & IPFS multihash verification breakdown
                 </DialogDescription>
+                {verificationResult && !verificationResult.isValid && verificationResult.error && (
+                  <p className="text-xs text-warning mt-1">{verificationResult.error}</p>
+                )}
               </div>
             </div>
           </div>

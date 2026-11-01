@@ -24,6 +24,7 @@ require_once ANONPRESS_PLUGIN_DIR . 'includes/class-anonpress-settings.php';
 require_once ANONPRESS_PLUGIN_DIR . 'includes/class-anonpress-publisher.php';
 require_once ANONPRESS_PLUGIN_DIR . 'includes/class-anonpress-api-client.php';
 require_once ANONPRESS_PLUGIN_DIR . 'includes/class-anonpress-identity.php';
+require_once ANONPRESS_PLUGIN_DIR . 'includes/class-anonpress-signer.php';
 
 /**
  * Main AnonPress class
@@ -216,9 +217,6 @@ class AnonPress {
         $read_url = 'https://pressprotocol.com/read/' . esc_attr($cid);
         $embed_url = 'https://pressprotocol.com/embed/' . esc_attr($cid) . '?theme=cyber';
         $tor_url = get_post_meta($post->ID, '_pressprotocol_tor_url', true);
-        if (empty($tor_url)) {
-            $tor_url = 'http://pressprotocol7sovereign4node6federation3mesh7relay5v3.onion/read/' . esc_attr($cid);
-        }
 
         $badge_html = '
         <div class="pressprotocol-sovereign-badge" style="margin-top: 2.5rem; padding: 1.25rem 1.5rem; background: #09090b; border: 1px solid rgba(6, 182, 212, 0.3); border-radius: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; color: #f4f4f5; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
@@ -238,7 +236,7 @@ class AnonPress {
                 </div>
                 <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
                     <a href="' . esc_url($read_url) . '" target="_blank" rel="noopener noreferrer" style="color: #06b6d4; text-decoration: none; font-weight: 600;">↗ Open Reader</a>
-                    <a href="' . esc_url($tor_url) . '" target="_blank" rel="noopener noreferrer" style="color: #a855f7; text-decoration: none; font-weight: 600;" title="Open via Tor Onion Circuit">🧅 Tor Onion</a>
+                    ' . (!empty($tor_url) ? '<a href="' . esc_url($tor_url) . '" target="_blank" rel="noopener noreferrer" style="color: #a855f7; text-decoration: none; font-weight: 600;" title="Open via Tor Onion Circuit">🧅 Tor Onion</a>' : '') . '
                     <a href="' . esc_url($embed_url) . '" target="_blank" rel="noopener noreferrer" style="color: #a1a1aa; text-decoration: none;">↗ Embed</a>
                 </div>
             </div>

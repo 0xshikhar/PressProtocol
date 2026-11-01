@@ -15,9 +15,9 @@ export const runtime = "edge";
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { cid: string } }
+  { params }: { params: Promise<{ cid: string }> }
 ) {
-  const { cid } = params;
+  const { cid } = await params;
   const { searchParams } = request.nextUrl;
   const rawQuote = searchParams.get("q") || searchParams.get("quote") || "";
   const quote = rawQuote.replace(/\+/g, " ").trim();

@@ -1,7 +1,11 @@
-import * as ed from '@noble/ed25519';
+import { timingSafeEqual } from 'node:crypto';
+import { verifyPublication } from '@pressprotocol/sdk/protocol';
 import { env } from '../config/env.js';
 import { embeddedDB, EmbeddedFederationPeer } from '../lib/embedded-db.js';
+import { isValidCID } from '../lib/cid.js';
+import { getNodeIdentity } from '../lib/node-identity.js';
 import { heliaNode } from './HeliaNode.js';
+import { storageService } from './StorageService.js';
 import { torService } from './TorService.js';
 
 export type AutoPinPolicy = 'all' | 'followed' | 'trending';
@@ -24,6 +28,7 @@ export interface NodeStatusResponse {
   status: 'online' | 'degraded';
   uptimeSeconds: number;
   mode: 'sovereign' | 'hybrid';
+  nodePublicKey: string;
   timestamp: string;
   ipfs: {
     ready: boolean;
@@ -87,7 +92,10 @@ export class FederationService {
 
   public validatePsk(incomingPsk?: string): boolean {
     if (!this.federationPsk) return true; // Open federation
-    return incomingPsk === this.federationPsk;
+    if (!incomingPsk) return false;
+    const expected = Buffer.from(this.federationPsk, 'utf-8');
+    const incoming = Buffer.from(incomingPsk, 'utf-8');
+    return expected.length === incoming.length && timingSafeEqual(expected, incoming);
   }
 
   public isPeerAllowed(identifier: string): boolean {
@@ -115,11 +123,12 @@ export class FederationService {
       timestamp: new Date().toISOString(),
       ipfs: {
         ready: heliaNode.isReady(),
-        peerId: ipfsStats ? ipfsStats.peerId : '12D3KooW-sovereign-helia-dht',
-        peersCount: ipfsStats ? ipfsStats.peers : 8,
-        dhtActive: true,
+        peerId: ipfsStats ? ipfsStats.peerId : null,
+        peersCount: ipfsStats ? ipfsStats.peers : 0,
+        dhtActive: heliaNode.isReady() && (ipfsStats?.peers ?? 0) > 0,
         pinnedCount: pins.length,
       },
+      nodePublicKey: (await getNodeIdentity()).publicKey,
       tor: torStatus,
       federation: {
         peersCount: peers.length,
@@ -170,6 +179,7 @@ export class FederationService {
   ): Promise<{
     accepted: boolean;
     pinned: boolean;
+    signatureStatus?: 'verified' | 'legacy' | 'unsigned';
     reason?: string;
   }> {
     // 1. Enforce Pre-Shared Key (PSK) if configured for gated consortium swarms
@@ -189,22 +199,39 @@ export class FederationService {
     if (!payload.cid || !payload.title) {
       return { accepted: false, pinned: false, reason: 'Missing CID or title in gossip payload' };
     }
+    if (!isValidCID(payload.cid)) {
+      return { accepted: false, pinned: false, reason: 'Invalid CID in gossip payload' };
+    }
 
-    // Optional cryptographic verification if signature and publicKey provided
-    if (payload.signature && payload.publicKey) {
-      try {
-        const sigBytes = Buffer.from(payload.signature, 'hex');
-        const pubKeyBytes = Buffer.from(payload.publicKey, 'hex');
-        if (sigBytes.length === 64 && pubKeyBytes.length === 32) {
-          const messageBytes = new TextEncoder().encode(payload.cid);
-          const isValid = await ed.verifyAsync(new Uint8Array(sigBytes), messageBytes, new Uint8Array(pubKeyBytes));
-          if (!isValid) {
-            console.warn(`⚠️  Gossip message signature invalid for CID: ${payload.cid}`);
-          }
-        }
-      } catch (err) {
-        console.warn(`Signature verification check passed with caution:`, err);
+    // 3. Cryptographic verification of the exact signed payload. The signature must bind
+    //    the title/tags/timestamp AND the article body (v2). v1 metadata-only signatures
+    //    are accepted as 'legacy'; unsigned gossip is refused unless explicitly allowed.
+    const hasSignature = Boolean(payload.signature && payload.publicKey);
+    let signatureStatus: 'verified' | 'legacy' | 'unsigned' = 'unsigned';
+    if (!hasSignature) {
+      if (env.ALLOW_UNSIGNED_GOSSIP !== 'true') {
+        return { accepted: false, pinned: false, reason: 'Unsigned gossip rejected (set ALLOW_UNSIGNED_GOSSIP=true to opt out)' };
       }
+    } else {
+      let content: string | undefined;
+      try {
+        const fetched = await storageService.getContentFromIPFS(payload.cid);
+        content = typeof fetched === 'string' ? fetched : fetched?.content;
+      } catch {
+        return { accepted: false, pinned: false, reason: `Cannot verify gossip: content for CID ${payload.cid} is not retrievable` };
+      }
+      const verification = await verifyPublication({
+        title: payload.title,
+        tags: payload.tags || [],
+        timestamp: payload.timestamp,
+        content,
+        publicKey: payload.publicKey,
+        signature: payload.signature,
+      });
+      if (!verification.signatureValid) {
+        return { accepted: false, pinned: false, reason: `Invalid gossip signature (status: ${verification.status})` };
+      }
+      signatureStatus = verification.status === 'verified' ? 'verified' : 'legacy';
     }
 
     // Index content into embedded DB
@@ -241,6 +268,7 @@ export class FederationService {
     return {
       accepted: true,
       pinned: shouldPin,
+      signatureStatus,
     };
   }
 

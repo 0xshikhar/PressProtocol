@@ -90,6 +90,7 @@ export function calculateDeterministicCIDv1(content: string | Uint8Array): strin
 export interface PressProofPublisher {
   publicKey: string;
   signature: string;
+  sigVersion?: 1 | 2;
   walletAddress?: string;
   username?: string;
   isAnonymous?: boolean;
@@ -153,6 +154,7 @@ export function exportPressProof(input: ExportProofInput): PressProofManifest {
     publisher: {
       publicKey: input.publisher?.publicKey || "",
       signature: input.publisher?.signature || "unsigned",
+      ...(input.publisher?.sigVersion ? { sigVersion: input.publisher.sigVersion } : {}),
       walletAddress: input.publisher?.walletAddress,
       username: input.publisher?.username,
       isAnonymous: input.publisher?.isAnonymous ?? !input.publisher?.walletAddress,

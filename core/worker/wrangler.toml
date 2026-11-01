@@ -8,7 +8,18 @@ IPFS_GATEWAY_URL = "https://ipfs.filebase.io/ipfs"
 CORS_ORIGIN = "*"
 ENVIRONMENT = "production"
 PUBLIC_APP_URL = "https://pressprotocol.com"
-TOR_ONION_GATEWAY = "pressprotocol7sovereign4node6federation3mesh7relay5v3.onion"
+# TOR_ONION_GATEWAY = "<56-char-v3-address>.onion"  # set once the node hidden service is deployed
+
+# Cloudflare Rate Limiting bindings (per client IP, per route bucket)
+[[ratelimits]]
+name = "PUBLISH_LIMITER"
+namespace_id = "1001"
+simple = { limit = 10, period = 60 }
+
+[[ratelimits]]
+name = "READ_LIMITER"
+namespace_id = "1002"
+simple = { limit = 120, period = 60 }
 
 [observability.logs]
 enabled = true

@@ -5,3 +5,6 @@ PINATA_SECRET_KEY="your_pinata_secret_key_here"
 DATABASE_URL="prisma+postgres://accelerate.prisma-data.net/?api_key=..."
 CORS_ORIGIN="*"
 PUBLIC_APP_URL="https://pressprotocol.com"
+# Optional dedicated gateway (e.g. https://<name>.mypinata.cloud/ipfs) and its access token
+PINATA_GATEWAY_URL=""
+PINATA_GATEWAY_TOKEN=""

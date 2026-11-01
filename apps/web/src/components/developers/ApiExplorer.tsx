@@ -17,9 +17,8 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   calculateDeterministicCIDv1,
   generateKeypair,
-  signPayload,
-  verifySignature,
-  createCanonicalPayload,
+  signArticleV2,
+  verifyPublication,
 } from "@pressprotocol/sdk";
 import { getBackendUrl } from "@/config/backend";
 
@@ -246,8 +245,10 @@ export default function ApiExplorer({ apiKey, initialEndpoint }: ApiExplorerProp
           const cid = calculateDeterministicCIDv1(parsed.content || "sample content");
           const kp = await generateKeypair();
           const timestamp = new Date().toISOString();
-          const canonical = createCanonicalPayload(parsed.title || "Untitled", parsed.tags || [], timestamp);
-          const signature = await signPayload(canonical, kp.privateKey);
+          const signature = await signArticleV2(
+            { title: parsed.title || "Untitled", tags: parsed.tags || [], timestamp, content: parsed.content || "sample content" },
+            kp.privateKey
+          );
 
           const latencyMs = Math.round((performance.now() - startTime) * 100) / 100;
           setResponseResult({
@@ -274,7 +275,6 @@ export default function ApiExplorer({ apiKey, initialEndpoint }: ApiExplorerProp
               urls: {
                 ipfs: `https://ipfs.io/ipfs/${cid}`,
                 gateway: `http://127.0.0.1:4000/read/${cid}`,
-                tor: `http://pressp42x7a6sover.onion/read/${cid}`,
               },
               proof: {
                 protocol: "PressProtocol",
@@ -288,8 +288,10 @@ export default function ApiExplorer({ apiKey, initialEndpoint }: ApiExplorerProp
           const parsed = JSON.parse(requestBodyText || "{}");
           const kp = await generateKeypair();
           const timestamp = parsed.timestamp || new Date().toISOString();
-          const canonical = createCanonicalPayload(parsed.title, parsed.tags || [], timestamp);
-          const signature = await signPayload(canonical, kp.privateKey);
+          const signature = await signArticleV2(
+            { title: parsed.title || "Untitled", tags: parsed.tags || [], timestamp, content: parsed.content || "" },
+            kp.privateKey
+          );
           const cid = calculateDeterministicCIDv1(parsed.content || "");
 
           const latencyMs = Math.round((performance.now() - startTime) * 100) / 100;
@@ -315,7 +317,6 @@ export default function ApiExplorer({ apiKey, initialEndpoint }: ApiExplorerProp
               },
               transports: {
                 ipfs: `https://ipfs.io/ipfs/${cid}`,
-                tor: `http://pressp42x7a6sover.onion/read/${cid}`,
                 local: `http://127.0.0.1:4000/read/${cid}`,
               },
             },
@@ -348,7 +349,6 @@ export default function ApiExplorer({ apiKey, initialEndpoint }: ApiExplorerProp
               },
               mirrors: [
                 { type: "local-daemon", url: `http://127.0.0.1:4000/read/${cid}`, online: true, latencyMs: 8 },
-                { type: "tor-onion", url: `http://pressp42x7a6sover.onion/read/${cid}`, online: true, latencyMs: 84 },
                 { type: "public-ipfs", url: `https://ipfs.io/ipfs/${cid}`, online: true, latencyMs: 142 },
               ],
             },
@@ -356,9 +356,14 @@ export default function ApiExplorer({ apiKey, initialEndpoint }: ApiExplorerProp
         } else if (selectedEndpoint === "verify") {
           const parsed = JSON.parse(requestBodyText || "{}");
           const kp = await generateKeypair();
-          const canonical = createCanonicalPayload(parsed.title, parsed.tags || [], parsed.timestamp);
-          const sig = await signPayload(canonical, kp.privateKey);
-          const isSigValid = await verifySignature(canonical, sig, kp.publicKey);
+          const sandboxArticle = {
+            title: parsed.title || "Untitled",
+            tags: parsed.tags || [],
+            timestamp: parsed.timestamp || new Date().toISOString(),
+            content: parsed.content || "",
+          };
+          const sig = await signArticleV2(sandboxArticle, kp.privateKey);
+          const isSigValid = (await verifyPublication({ ...sandboxArticle, publicKey: kp.publicKey, signature: sig })).isValid;
           const cid = calculateDeterministicCIDv1(parsed.content || "");
 
           const latencyMs = Math.round((performance.now() - startTime) * 100) / 100;

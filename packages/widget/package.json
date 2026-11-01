@@ -24,7 +24,6 @@
   "bugs": {
     "url": "https://github.com/0xshikhar/PressProtocol/issues"
   },
-
   "keywords": [
     "pressprotocol",
     "web-component",
@@ -41,11 +40,11 @@
   "license": "MIT",
   "dependencies": {
     "@noble/ed25519": "^2.1.0",
-    "@noble/hashes": "^2.4.0"
+    "@noble/hashes": "^2.4.0",
+    "@pressprotocol/sdk": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
     "typescript": "^5.4.5"
   }
 }
-

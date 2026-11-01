@@ -14,7 +14,7 @@ export const SCRAPS_STORAGE_KEY = "pressprotocol_scraps";
 export const SETTINGS_STORAGE_KEY = "pressprotocol_settings";
 export const IDENTITY_STORAGE_KEY = "pressprotocol_burner_identity";
 
-export const CANONICAL_ONION_HOST = "pressprotocol7sovereign4node6federation3mesh7relay5v3.onion";
+export const CANONICAL_ONION_HOST: string | null = null;
 
 export const CANDIDATE_API_ENDPOINTS = [
   "https://api.pressprotocol.com",

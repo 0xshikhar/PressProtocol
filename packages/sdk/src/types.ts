@@ -68,7 +68,7 @@ export interface ResolveResult {
   recommended?: string;
   verified: boolean;
   verificationLatencyMs?: number;
-  verificationStatus: "verified" | "invalid" | "unsigned" | "malformed";
+  verificationStatus: "verified" | "legacy" | "invalid" | "unsigned" | "malformed";
   verificationAlgorithm?: string;
   source?: string;
 }
