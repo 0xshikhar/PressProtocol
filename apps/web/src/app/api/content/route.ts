@@ -33,7 +33,6 @@ export async function POST(req: NextRequest) {
       });
 
       const data = await response.json().catch(() => null);
-      // Client errors are authoritative (validation, auth); only retry on 5xx / network failures.
       if (response.ok || (response.status >= 400 && response.status < 500)) {
         return NextResponse.json(data ?? { success: false, error: "Empty backend response" }, {
           status: response.status,

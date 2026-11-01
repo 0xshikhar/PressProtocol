@@ -1111,19 +1111,28 @@ export function ReadArticleClient({ cid: initialCid }: { cid?: string }) {
                     content.mirrors?.tor?.url
                   )
                   const isTorActive = !!(
-                    content.mirrors?.tor?.available ||
-                    (typeof window !== "undefined" && isAccessingViaOnion())
+                    resolvedOnionUrl &&
+                    (content.mirrors?.tor?.available ||
+                      (typeof window !== "undefined" && isAccessingViaOnion()))
                   )
 
                   return (
                     <div className="flex items-center justify-between rounded-[6px] border border-hairline bg-canvas p-2.5">
                       <div className="flex items-center gap-2">
                         <MirrorHealthDot
-                          status={isTorActive ? "healthy" : "ready"}
+                          status={
+                            !resolvedOnionUrl
+                              ? "standby"
+                              : isTorActive
+                                ? "healthy"
+                                : "ready"
+                          }
                           label={
-                            isTorActive
-                              ? "Tor Circuit Active"
-                              : "Tor Onion Mirror"
+                            !resolvedOnionUrl
+                              ? "Tor Onion Mirror — coming soon"
+                              : isTorActive
+                                ? "Tor Circuit Active"
+                                : "Tor Onion Mirror"
                           }
                         />
                       </div>

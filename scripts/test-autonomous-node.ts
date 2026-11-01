@@ -4,6 +4,7 @@ import crypto from 'node:crypto';
 import { federationService } from '../core/node/src/services/FederationService.js';
 import { torService } from '../core/node/src/services/TorService.js';
 import { embeddedDB } from '../core/node/src/lib/embedded-db.js';
+import { env } from '../core/node/src/config/env.js';
 
 let passed = 0;
 let failed = 0;
@@ -33,13 +34,15 @@ async function runAutonomousNodeTests() {
 
   // --- 2. Tor v3 Onion Hidden Service Cryptographic Format ---
   console.log('2️⃣  Tor v3 Onion Address Cryptographic Verification...');
+  const previousOnion = env.TOR_ONION_ADDRESS;
+  env.TOR_ONION_ADDRESS = 'not-a-real-onion.onion';
+  assert((await torService.getSelfOnionAddress()) === null, 'Malformed configured onion address is rejected');
+  const validOnion = `${'a'.repeat(52)}2345.onion`;
+  env.TOR_ONION_ADDRESS = `http://${validOnion}/`;
   const onionAddress = await torService.getSelfOnionAddress();
-  assert(onionAddress !== null, 'Self onion address is resolved');
-  if (onionAddress) {
-    // Tor v3 standard: 56 base32 characters (a-z, 2-7) + .onion
-    const v3OnionRegex = /^[a-z2-7]{56}\.onion$/;
-    assert(v3OnionRegex.test(onionAddress), `Onion address "${onionAddress}" matches 56-char base32 v3 specification`);
-  }
+  // Tor v3 standard: 56 base32 characters (a-z, 2-7) + .onion
+  assert(onionAddress === validOnion, `Configured v3 onion address "${onionAddress}" is normalized`);
+  env.TOR_ONION_ADDRESS = previousOnion;
 
   const torStatus = await torService.getTorStatus();
   assert(torStatus.enabled === true, 'Tor daemon is enabled in node status');

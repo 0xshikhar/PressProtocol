@@ -292,11 +292,14 @@ btnClipNow.addEventListener("click", async () => {
       navigator.clipboard.writeText(safeReadUrl).catch(() => {});
 
       // Setup Onion URL copy
-      const onionUrl =
+      const onionUrl: string | null =
         data?.mirrors?.tor ||
-        `http://${CANONICAL_ONION_HOST}/read/${cleanCid}`;
+        (CANONICAL_ONION_HOST ? `http://${CANONICAL_ONION_HOST}/read/${cleanCid}` : null);
 
+      btnCopyOnion.disabled = !onionUrl;
+      btnCopyOnion.title = onionUrl ? "Copy Tor .onion URL" : "Tor mirror coming soon";
       btnCopyOnion.onclick = () => {
+        if (!onionUrl) return;
         navigator.clipboard.writeText(onionUrl);
         const originalHtml = btnCopyOnion.innerHTML;
         btnCopyOnion.innerHTML = `<span>✓ .onion Copied!</span>`;

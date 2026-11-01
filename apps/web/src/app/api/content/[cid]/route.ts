@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getBackendUrl } from "@/config/backend";
 import { getIpfsGatewayCandidates } from "@/lib/ipfs-gateways";
 import { isValidCID } from "@/lib/article-metadata";
+import { getCanonicalOnionUrl } from "@/lib/tor-utils";
 
 const BACKEND_URL = getBackendUrl();
 const BACKEND_TIMEOUT_MS = 2500;
@@ -102,6 +103,7 @@ export async function GET(
   // 2. Parallel Failover: Race the global IPFS gateway swarm concurrently
   try {
     const { raw, gateway } = await fetchFastestFromIPFSGateways(cid);
+    const onionUrl = getCanonicalOnionUrl(cid);
 
     return NextResponse.json({
       success: true,
@@ -125,14 +127,9 @@ export async function GET(
             url: `${gateway}/${cid}`,
             available: true,
           },
-          tor: {
-            url: (() => {
-              const onionHost = process.env.TOR_ONION_GATEWAY || process.env.NEXT_PUBLIC_TOR_ONION_HOST || "pressprotocol7sovereign4node6federation3mesh7relay5v3.onion";
-              const normalized = onionHost.startsWith("http") ? onionHost : `http://${onionHost}`;
-              return `${normalized.replace(/\/+$/, "")}/read/${cid}`;
-            })(),
-            available: true,
-          },
+          tor: onionUrl
+            ? { url: onionUrl, available: true }
+            : { url: null, available: false, status: "disabled" },
           gateway: {
             url: `https://cloudflare-ipfs.com/ipfs/${cid}`,
             available: true,
@@ -142,15 +139,7 @@ export async function GET(
         source: "ipfs-decentralized-gateway-failover",
         failoverGateway: gateway,
       },
-    }, {
-      headers: {
-        "Onion-Location": (() => {
-          const onionHost = process.env.TOR_ONION_GATEWAY || process.env.NEXT_PUBLIC_TOR_ONION_HOST || "pressprotocol7sovereign4node6federation3mesh7relay5v3.onion";
-          const normalized = onionHost.startsWith("http") ? onionHost : `http://${onionHost}`;
-          return `${normalized.replace(/\/+$/, "")}/read/${cid}`;
-        })(),
-      }
-    });
+    }, onionUrl ? { headers: { "Onion-Location": onionUrl } } : undefined);
   } catch (swarmError) {
     console.error(`❌ All IPFS gateways failed to resolve CID ${cid}:`, swarmError);
   }
