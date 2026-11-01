@@ -11,7 +11,8 @@
     "login": "wrangler login",
     "secret:jwt": "wrangler secret put PINATA_JWT",
     "secret:db": "wrangler secret put DATABASE_URL",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "secret:gateway-token": "wrangler secret put PINATA_GATEWAY_TOKEN"
   },
   "dependencies": {
     "@noble/ed25519": "^2.1.0",
