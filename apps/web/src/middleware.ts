@@ -24,7 +24,7 @@ export default async function middleware(request: NextRequest) {
     // Handle embed routes with permissive iframe headers
     if (pathname.startsWith('/embed')) {
         const response = NextResponse.next();
-        response.headers.set('Content-Security-Policy', 'frame-ancestors *;');
+        response.headers.set('Content-Security-Policy', "frame-ancestors *; object-src 'none'; base-uri 'self'; form-action 'none';");
         response.headers.delete('X-Frame-Options');
         return response;
     }
