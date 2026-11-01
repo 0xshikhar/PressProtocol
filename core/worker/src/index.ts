@@ -3,6 +3,9 @@ import { cors } from 'hono/cors';
 import { Env, PublishContentInput, PublishResponseData } from './types';
 import { PinataService } from './services/pinata';
 import { indexContentInDB, getRecentContentFromDB } from './services/db';
+import { verifyPublication } from '@pressprotocol/sdk/protocol';
+import { attributeSubmission, signWithEdgeKey } from './lib/signing';
+import { isValidCID } from './lib/validation';
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -73,20 +76,35 @@ app.post('/api/content', async (c) => {
   try {
     const body = await c.req.json<PublishContentInput>();
 
-    if (!body.title || !body.title.trim()) {
+    if (typeof body.title !== 'string' || !body.title.trim()) {
       return c.json({ success: false, error: 'Title is required' }, 400);
     }
-    if (!body.content || !body.content.trim()) {
+    if (typeof body.content !== 'string' || !body.content.trim()) {
       return c.json({ success: false, error: 'Content is required' }, 400);
     }
 
-    const title = body.title.trim();
-    const content = body.content.trim();
+    // Title and body are stored exactly as signed; trimming would break signature verification.
+    const title = body.title;
+    const content = body.content;
     const tags = Array.isArray(body.tags) ? body.tags : [];
     const timestamp = body.timestamp || new Date().toISOString();
-    const publisherPubKey = body.publicKey || 'sovereign-anonymous-publisher';
-    const signature = body.signature || 'unsigned';
     const appBaseUrl = c.env.PUBLIC_APP_URL || 'https://pressprotocol.com';
+
+    const attributed = await attributeSubmission({
+      title,
+      tags,
+      timestamp,
+      content,
+      publicKey: body.publicKey,
+      signature: body.signature,
+    });
+    if (!attributed.ok) {
+      return c.json(
+        { success: false, error: 'Signature verification failed', verification: attributed.verification },
+        401
+      );
+    }
+    const { pubkey: publisherPubKey, signature, sigVersion, status: signatureStatus } = attributed.attribution;
 
     // Pin to Pinata IPFS
     const pinata = new PinataService(c.env);
@@ -94,7 +112,7 @@ app.post('/api/content', async (c) => {
       title,
       content,
       tags,
-      { pubkey: publisherPubKey, signature },
+      { pubkey: publisherPubKey, signature, ...(sigVersion ? { sigVersion } : {}) },
       timestamp
     );
 
@@ -142,6 +160,7 @@ app.post('/api/content', async (c) => {
         signature,
         walletAddress: body.walletAddress,
       },
+      signatureStatus,
       mirrors,
     };
 
@@ -505,7 +524,7 @@ app.post('/api/upload/image', async (c) => {
 // v1 REST API Endpoints (SDK & cURL Quickstarts)
 // ==========================================
 
-// POST /api/v1/publish/raw - Custodial / Server-Signed Ingest
+// POST /api/v1/publish/raw - Edge ingest (signed with the operator key when EDGE_SIGNING_KEY is set)
 app.post('/api/v1/publish/raw', async (c) => {
   try {
     const body = await c.req.json<{
@@ -517,25 +536,27 @@ app.post('/api/v1/publish/raw', async (c) => {
       metadata?: Record<string, any>;
     }>();
 
-    if (!body.title || !body.title.trim()) {
+    if (typeof body.title !== 'string' || !body.title.trim()) {
       return c.json({ success: false, error: 'Title is required' }, 400);
     }
-    if (!body.content || !body.content.trim()) {
+    if (typeof body.content !== 'string' || !body.content.trim()) {
       return c.json({ success: false, error: 'Content is required' }, 400);
     }
 
-    const title = body.title.trim();
-    const content = body.content.trim();
+    const title = body.title;
+    const content = body.content;
     const tags = Array.isArray(body.tags) ? body.tags : [];
     const timestamp = new Date().toISOString();
     const appBaseUrl = c.env.PUBLIC_APP_URL || 'https://pressprotocol.com';
+
+    const attribution = await signWithEdgeKey({ title, tags, timestamp, content }, c.env.EDGE_SIGNING_KEY);
 
     const pinata = new PinataService(c.env);
     const pinResult = await pinata.pinJSON(
       title,
       content,
       tags,
-      { pubkey: 'node-signed-edge', signature: 'edge-runtime' },
+      { pubkey: attribution.pubkey, signature: attribution.signature, ...(attribution.sigVersion ? { sigVersion: attribution.sigVersion } : {}) },
       timestamp
     );
 
@@ -549,9 +570,10 @@ app.post('/api/v1/publish/raw', async (c) => {
         title,
         tags,
         timestamp,
+        signatureStatus: attribution.status,
         publisher: {
-          publicKey: 'node-signed-edge',
-          signature: 'edge-runtime',
+          publicKey: attribution.pubkey,
+          signature: attribution.signature,
         },
         urls: {
           ipfs: pinResult.gatewayUrl,
@@ -564,6 +586,11 @@ app.post('/api/v1/publish/raw', async (c) => {
           title,
           tags,
           timestamp,
+          publisher: {
+            publicKey: attribution.pubkey,
+            signature: attribution.signature,
+            ...(attribution.sigVersion ? { sigVersion: attribution.sigVersion } : {}),
+          },
         },
       },
       201
@@ -586,30 +613,44 @@ app.post('/api/v1/publish/signed', async (c) => {
       metadata?: Record<string, any>;
     }>();
 
-    if (!body.title || !body.title.trim()) {
+    if (typeof body.title !== 'string' || !body.title.trim()) {
       return c.json({ success: false, error: 'Title is required' }, 400);
     }
-    if (!body.content || !body.content.trim()) {
+    if (typeof body.content !== 'string' || !body.content.trim()) {
       return c.json({ success: false, error: 'Content is required' }, 400);
     }
-    if (!body.publicKey || !body.signature) {
-      return c.json({ success: false, error: 'publicKey and signature are required for signed publish' }, 400);
+    if (!body.publicKey || !body.signature || !body.timestamp) {
+      return c.json({ success: false, error: 'publicKey, signature and timestamp are required for signed publish' }, 400);
     }
 
-    const title = body.title.trim();
-    const content = body.content.trim();
+    const title = body.title;
+    const content = body.content;
     const tags = Array.isArray(body.tags) ? body.tags : [];
-    const timestamp = body.timestamp || new Date().toISOString();
+    const timestamp = body.timestamp;
     const appBaseUrl = c.env.PUBLIC_APP_URL || 'https://pressprotocol.com';
 
-    const pinata = new PinataService(c.env);
-    const pinResult = await pinata.pinJSON(
+    const attributed = await attributeSubmission({
       title,
-      content,
       tags,
-      { pubkey: body.publicKey, signature: body.signature },
-      timestamp
-    );
+      timestamp,
+      content,
+      publicKey: body.publicKey,
+      signature: body.signature,
+    });
+    if (!attributed.ok) {
+      return c.json(
+        {
+          success: false,
+          error: 'Cryptographic signature mismatch. Client signature is invalid for the canonical payload.',
+          verification: attributed.verification,
+        },
+        401
+      );
+    }
+    const { pubkey, signature, sigVersion, status } = attributed.attribution;
+
+    const pinata = new PinataService(c.env);
+    const pinResult = await pinata.pinJSON(title, content, tags, { pubkey, signature, sigVersion }, timestamp);
 
     const shareUrl = `${appBaseUrl.replace(/\/+$/, '')}/read/${pinResult.cid}`;
 
@@ -617,7 +658,9 @@ app.post('/api/v1/publish/signed', async (c) => {
       {
         success: true,
         cid: pinResult.cid,
-        verified: true,
+        verified: status === 'verified',
+        signatureStatus: status,
+        contentBound: status === 'verified',
         algorithm: 'Ed25519 (RFC 8032)',
         transports: {
           ipfs: pinResult.gatewayUrl,
@@ -631,8 +674,9 @@ app.post('/api/v1/publish/signed', async (c) => {
           tags,
           timestamp,
           publisher: {
-            publicKey: body.publicKey,
-            signature: body.signature,
+            publicKey: pubkey,
+            signature,
+            sigVersion,
           },
         },
       },
@@ -649,6 +693,15 @@ app.get('/api/v1/resolve/:cid', async (c) => {
   try {
     const { raw, gateway } = await raceIPFSGateways(cid, c.env);
     const appBaseUrl = c.env.PUBLIC_APP_URL || 'https://pressprotocol.com';
+    const verification = await verifyPublication({
+      title: raw.title || '',
+      tags: Array.isArray(raw.tags) ? raw.tags : [],
+      timestamp: raw.timestamp,
+      content: typeof raw.content === 'string' ? raw.content : undefined,
+      publicKey: raw.publisher?.pubkey || raw.publisher?.publicKey,
+      signature: raw.publisher?.signature,
+      sigVersion: raw.publisher?.sigVersion,
+    });
 
     return c.json({
       success: true,
@@ -657,7 +710,9 @@ app.get('/api/v1/resolve/:cid', async (c) => {
       content: raw.content || '',
       tags: Array.isArray(raw.tags) ? raw.tags : [],
       timestamp: raw.timestamp || new Date().toISOString(),
-      verified: true,
+      verified: verification.isValid,
+      signatureStatus: verification.status,
+      verification,
       resolvedVia: gateway,
       publisher: raw.publisher || {},
       urls: {
@@ -671,26 +726,73 @@ app.get('/api/v1/resolve/:cid', async (c) => {
   }
 });
 
-// POST /api/v1/verify - Verify Cryptographic Signature / Content
+// POST /api/v1/verify - Verify an article signature (inline payload, or fetched by CID)
 app.post('/api/v1/verify', async (c) => {
+  let body: {
+    cid?: string;
+    title?: string;
+    content?: string;
+    tags?: string[];
+    timestamp?: string;
+    publicKey?: string;
+    signature?: string;
+    sigVersion?: number;
+  };
   try {
-    const body = await c.req.json<{
-      cid?: string;
-      content?: string;
-      publicKey: string;
-      signature: string;
-    }>();
-
-    return c.json({
-      success: true,
-      verified: true,
-      algorithm: 'Ed25519 (RFC 8032)',
-      cid: body.cid,
-      checkedAt: new Date().toISOString(),
-    });
-  } catch (err: any) {
-    return c.json({ success: false, error: err.message }, 400);
+    body = await c.req.json();
+  } catch {
+    return c.json({ success: false, error: 'Invalid JSON body' }, 400);
   }
+
+  let article = body;
+  if (body.cid && (body.content === undefined || body.title === undefined)) {
+    if (!isValidCID(body.cid)) {
+      return c.json({ success: false, error: 'Invalid IPFS CID format' }, 400);
+    }
+    try {
+      const { raw } = await raceIPFSGateways(body.cid, c.env);
+      article = {
+        cid: body.cid,
+        title: raw.title,
+        content: raw.content,
+        tags: raw.tags,
+        timestamp: raw.timestamp,
+        publicKey: body.publicKey || raw.publisher?.pubkey || raw.publisher?.publicKey,
+        signature: body.signature || raw.publisher?.signature,
+        sigVersion: raw.publisher?.sigVersion,
+      };
+    } catch (err: any) {
+      return c.json({ success: false, error: err.message || `Could not resolve CID ${body.cid}` }, 504);
+    }
+  }
+
+  if (typeof article.title !== 'string') {
+    return c.json({ success: false, error: 'title is required (or provide a resolvable cid)' }, 400);
+  }
+
+  const verification = await verifyPublication({
+    title: article.title,
+    tags: Array.isArray(article.tags) ? article.tags : [],
+    timestamp: article.timestamp,
+    content: article.content,
+    publicKey: article.publicKey,
+    signature: article.signature,
+    sigVersion: article.sigVersion,
+  });
+
+  return c.json({
+    success: true,
+    isValid: verification.isValid,
+    verified: verification.isValid,
+    signatureValid: verification.signatureValid,
+    contentBound: verification.contentBound,
+    status: verification.status,
+    version: verification.version,
+    algorithm: verification.algorithm,
+    error: verification.error,
+    cid: article.cid,
+    checkedAt: new Date().toISOString(),
+  });
 });
 
 // GET /api/v1/metrics - Edge Telemetry Metrics
