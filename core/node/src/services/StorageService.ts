@@ -198,9 +198,10 @@ export class StorageService {
       // Continue to network fetch
     }
 
-    // 2. Fetch from IPFS gateways concurrently
+    // 2. Fetch from IPFS gateways and the canonical edge API concurrently
     const gateways = Array.from(
       new Set([
+        'https://api.pressprotocol.com/api/content',
         this.gatewayUrl ? this.gatewayUrl.replace(/\/+$/, '') : null,
         'https://ipfs.filebase.io/ipfs',
         'https://cloudflare-ipfs.com/ipfs',
@@ -239,6 +240,15 @@ export class StorageService {
       let parsed: any;
       try {
         parsed = JSON.parse(text);
+        if (parsed && parsed.data && (parsed.data.content || parsed.data.title)) {
+          parsed = {
+            title: parsed.data.title,
+            content: parsed.data.content,
+            tags: parsed.data.tags || [],
+            timestamp: parsed.data.createdAt || parsed.data.timestamp || new Date().toISOString(),
+            publisher: parsed.data.publisher,
+          };
+        }
       } catch {
         parsed = {
           title: 'Preserved Sovereign Document',
