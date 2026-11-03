@@ -154,7 +154,7 @@ app.post('/api/content', async (c) => {
 
     const shareUrl = `${appBaseUrl.replace(/\/+$/, '')}/read/${pinResult.cid}`;
     const gatewayMirror = `https://cloudflare-ipfs.com/ipfs/${pinResult.cid}`;
-    const onionHost = c.env.TOR_ONION_GATEWAY || 'pressprotocol7sovereign4node6federation3mesh7relay5v3.onion';
+    const onionHost = c.env.TOR_ONION_GATEWAY || '6wst2skhjdkaltwvy37clw2mzk75lteq66qu5qzg3ujhresdhloy63yd.onion';
     const torMirror = onionHost
       ? (onionHost.startsWith('http') ? `${onionHost.replace(/\/+$/, '')}/read/${pinResult.cid}` : `http://${onionHost.replace(/\/+$/, '')}/read/${pinResult.cid}`)
       : '';
@@ -303,7 +303,7 @@ app.get('/api/content/:cid', async (c) => {
 
   try {
     const { raw, gateway } = await raceIPFSGateways(cid, c.env);
-    const onionHost = c.env.TOR_ONION_GATEWAY || 'pressprotocol7sovereign4node6federation3mesh7relay5v3.onion';
+    const onionHost = c.env.TOR_ONION_GATEWAY || '6wst2skhjdkaltwvy37clw2mzk75lteq66qu5qzg3ujhresdhloy63yd.onion';
     const normalizedOnion = onionHost.startsWith('http') ? onionHost : `http://${onionHost}`;
     c.header('Onion-Location', `${normalizedOnion.replace(/\/+$/, '')}/read/${cid}`);
 

@@ -96,11 +96,9 @@ export class TorService {
       return this.cachedOnionAddress;
     }
 
-    // 3. In dev / test / fallback: Return deterministic fallback
+    // 3. In dev / test / fallback: Return canonical Tor v3 address
     if (env.NODE_ENV === 'test' || env.NODE_ENV === 'development') {
-      const fallbackHash = 'pressprotocol7sovereign4node6federation3mesh7relay5v3';
-      const padded = (fallbackHash + '234567abcdefghijklmnopqrstuvwxyz').slice(0, 56);
-      return `${padded}.onion`;
+      return '6wst2skhjdkaltwvy37clw2mzk75lteq66qu5qzg3ujhresdhloy63yd.onion';
     }
 
     return null;

@@ -127,7 +127,7 @@ export async function GET(
           },
           tor: {
             url: (() => {
-              const onionHost = process.env.TOR_ONION_GATEWAY || process.env.NEXT_PUBLIC_TOR_ONION_HOST || "pressprotocol7sovereign4node6federation3mesh7relay5v3.onion";
+              const onionHost = process.env.TOR_ONION_GATEWAY || process.env.NEXT_PUBLIC_TOR_ONION_HOST || "6wst2skhjdkaltwvy37clw2mzk75lteq66qu5qzg3ujhresdhloy63yd.onion";
               const normalized = onionHost.startsWith("http") ? onionHost : `http://${onionHost}`;
               return `${normalized.replace(/\/+$/, "")}/read/${cid}`;
             })(),

@@ -301,7 +301,7 @@ export async function publishArticle(
   const mirrors = {
     ipfs: `https://gateway.pinata.cloud/ipfs/${cid}`,
     gateway: `https://cloudflare-ipfs.com/ipfs/${cid}`,
-    tor: `http://pressp42x7a6sover.onion/read/${cid}`,
+    tor: `http://6wst2skhjdkaltwvy37clw2mzk75lteq66qu5qzg3ujhresdhloy63yd.onion/read/${cid}`,
   };
 
   // If not dry-run, broadcast to node gateway
