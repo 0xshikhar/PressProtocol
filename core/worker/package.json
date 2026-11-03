@@ -20,7 +20,7 @@
     "@noble/hashes": "^2.4.0",
     "@prisma/client": "^6.4.1",
     "@prisma/extension-accelerate": "^1.2.2",
-    "hono": "^4.7.2",
+    "hono": "^4.13.14",
     "zod": "^3.23.4",
     "@pressprotocol/sdk": "workspace:*"
   },
