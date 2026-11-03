@@ -11,7 +11,9 @@
     "login": "wrangler login",
     "secret:jwt": "wrangler secret put PINATA_JWT",
     "secret:db": "wrangler secret put DATABASE_URL",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "secret:gateway-token": "wrangler secret put PINATA_GATEWAY_TOKEN",
+    "secret:edge-key": "wrangler secret put EDGE_SIGNING_KEY"
   },
   "dependencies": {
     "@noble/ed25519": "^2.1.0",
@@ -19,7 +21,8 @@
     "@prisma/client": "^6.4.1",
     "@prisma/extension-accelerate": "^1.2.2",
     "hono": "^4.7.2",
-    "zod": "^3.23.4"
+    "zod": "^3.23.4",
+    "@pressprotocol/sdk": "workspace:*"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250224.0",

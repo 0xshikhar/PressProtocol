@@ -11,10 +11,9 @@ import { PressProtocolClient } from "../client.js";
 import {
   generateKeypairSync,
   getPublicKey,
-  signPayload,
-  createCanonicalPayload,
   calculateDeterministicCIDv1,
 } from "../crypto.js";
+import { signArticleV2 } from "../protocol.js";
 
 // ANSI Color Helpers
 const colors = {
@@ -179,11 +178,10 @@ async function handlePublish(positionals: string[], flags: Record<string, any>) 
       keypair = generateKeypairSync();
     }
 
-    const canonicalPayload = createCanonicalPayload(title, tags, timestamp);
-    const signature = await signPayload(canonicalPayload, keypair.privateKey);
+    const signature = await signArticleV2({ title, tags, timestamp, content }, keypair.privateKey);
 
     // Check if local node or Tor daemon is running on 127.0.0.1:4000
-    let onionHost = "pressprotocol7sovereign4node6federation3mesh7relay5v3.onion";
+    let onionHost = "6wst2skhjdkaltwvy37clw2mzk75lteq66qu5qzg3ujhresdhloy63yd.onion";
     let localGateway = `http://127.0.0.1:4000/read/${cid}`;
     try {
       const controller = new AbortController();

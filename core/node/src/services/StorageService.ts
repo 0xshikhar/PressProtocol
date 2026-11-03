@@ -13,6 +13,9 @@ export interface UploadContentResult {
   cid: string;
   ipfsUrl: string;
   gatewayUrl: string;
+  /** Where the content actually ended up: the public IPFS swarm or the local sovereign store. */
+  storage: 'ipfs' | 'local';
+  pinned: boolean;
 }
 
 export interface ContentData {
@@ -37,11 +40,33 @@ export class StorageService {
   private pinataJWT: string;
   private gatewayUrl: string;
 
+  private readonly cacheDir: string;
+
   constructor() {
     this.pinataApiKey = env.PINATA_API_KEY;
     this.pinataSecretKey = env.PINATA_SECRET_KEY;
     this.pinataJWT = env.PINATA_JWT;
     this.gatewayUrl = env.IPFS_GATEWAY_URL;
+    this.cacheDir = path.join(env.DATA_DIR, 'content-cache');
+  }
+
+  private cachePath(cid: string): string {
+    const safe = path.resolve(this.cacheDir, path.basename(`${cid}.json`));
+    if (!safe.startsWith(path.resolve(this.cacheDir) + path.sep)) {
+      throw new Error('Unsafe cache path');
+    }
+    return safe;
+  }
+
+  private writeCache(cid: string, data: ContentData): void {
+    try {
+      if (!fs.existsSync(this.cacheDir)) {
+        fs.mkdirSync(this.cacheDir, { recursive: true });
+      }
+      fs.writeFileSync(this.cachePath(cid), JSON.stringify(data, null, 2), 'utf-8');
+    } catch (cacheErr) {
+      console.warn('Could not write to local disk cache:', cacheErr);
+    }
   }
 
   /**
@@ -82,22 +107,15 @@ export class StorageService {
       // If no Pinata credentials configured (Pure Sovereign / CI / Offline Mode), store directly in local blockstore
       if (!this.pinataApiKey || !this.pinataSecretKey) {
         const deterministicCid = calculateDeterministicCIDv1(content);
-        try {
-          const cacheDir = path.resolve(process.cwd(), '.data/content-cache');
-          if (!fs.existsSync(cacheDir)) {
-            fs.mkdirSync(cacheDir, { recursive: true });
-          }
-          const cacheFile = path.join(cacheDir, `${deterministicCid}.json`);
-          fs.writeFileSync(cacheFile, JSON.stringify(contentData, null, 2), 'utf-8');
-          console.log(`💾 Sovereign local blockstore stored article at ${cacheFile}`);
-        } catch (cacheErr) {
-          console.warn('Could not write to local disk cache:', cacheErr);
-        }
+        this.writeCache(deterministicCid, contentData);
+        console.log(`💾 Sovereign local store wrote article ${deterministicCid} (not pinned to IPFS)`);
 
         return {
           cid: deterministicCid,
           ipfsUrl: `ipfs://${deterministicCid}`,
           gatewayUrl: `${this.gatewayUrl}/${deterministicCid}`,
+          storage: 'local',
+          pinned: false,
         };
       }
 
@@ -125,19 +143,14 @@ export class StorageService {
         const errorText = await response.text();
         console.warn(`Pinata upload returned ${response.status} (${errorText}); falling back to local sovereign blockstore.`);
         const deterministicCid = calculateDeterministicCIDv1(content);
-        try {
-          const cacheDir = path.resolve(process.cwd(), '.data/content-cache');
-          if (!fs.existsSync(cacheDir)) {
-            fs.mkdirSync(cacheDir, { recursive: true });
-          }
-          const cacheFile = path.join(cacheDir, `${deterministicCid}.json`);
-          fs.writeFileSync(cacheFile, JSON.stringify(contentData, null, 2), 'utf-8');
-        } catch {}
+        this.writeCache(deterministicCid, contentData);
 
         return {
           cid: deterministicCid,
           ipfsUrl: `ipfs://${deterministicCid}`,
           gatewayUrl: `${this.gatewayUrl}/${deterministicCid}`,
+          storage: 'local',
+          pinned: false,
         };
       }
 
@@ -148,22 +161,15 @@ export class StorageService {
       console.log(`🔗 Gateway URL: ${this.gatewayUrl}/${result.IpfsHash}`);
 
       // Persist to local disk cache for instant zero-latency retrieval & offline resilience
-      try {
-        const cacheDir = path.resolve(process.cwd(), '.data/content-cache');
-        if (!fs.existsSync(cacheDir)) {
-          fs.mkdirSync(cacheDir, { recursive: true });
-        }
-        const cacheFile = path.join(cacheDir, `${result.IpfsHash}.json`);
-        fs.writeFileSync(cacheFile, JSON.stringify(contentData, null, 2), 'utf-8');
-        console.log(`💾 Cached article locally at ${cacheFile}`);
-      } catch (cacheErr) {
-        console.warn('Could not write to local disk cache:', cacheErr);
-      }
+      this.writeCache(result.IpfsHash, contentData);
+      console.log(`💾 Cached article locally under ${this.cacheDir}`);
 
       return {
         cid: result.IpfsHash,
         ipfsUrl: `ipfs://${result.IpfsHash}`,
         gatewayUrl: `${this.gatewayUrl}/${result.IpfsHash}`,
+        storage: 'ipfs',
+        pinned: true,
       };
     } catch (error) {
       console.error('Error uploading to IPFS:', error);
@@ -180,12 +186,9 @@ export class StorageService {
 
     // 1. Check local disk cache first (sub-millisecond instant hit)
     try {
-      const cacheDir = path.resolve(process.env.DATA_DIR || process.cwd(), '.data/content-cache');
-      const cleanFileName = path.basename(`${safeCid}.json`);
-      const cacheFile = path.resolve(cacheDir, cleanFileName);
-      if (cacheFile.startsWith(cacheDir + path.sep) && fs.existsSync(cacheFile)) {
-        const raw = fs.readFileSync(cacheFile, 'utf-8');
-        const parsed = JSON.parse(raw);
+      const cacheFile = this.cachePath(safeCid);
+      if (fs.existsSync(cacheFile)) {
+        const parsed = JSON.parse(fs.readFileSync(cacheFile, 'utf-8'));
         if (parsed && (parsed.content || parsed.title)) {
           console.log(`⚡ [CACHE HIT] Loaded content locally: ${safeCid}`);
           return parsed;
@@ -195,9 +198,10 @@ export class StorageService {
       // Continue to network fetch
     }
 
-    // 2. Fetch from IPFS gateways concurrently
+    // 2. Fetch from IPFS gateways and the canonical edge API concurrently
     const gateways = Array.from(
       new Set([
+        'https://api.pressprotocol.com/api/content',
         this.gatewayUrl ? this.gatewayUrl.replace(/\/+$/, '') : null,
         'https://ipfs.filebase.io/ipfs',
         'https://cloudflare-ipfs.com/ipfs',
@@ -236,6 +240,15 @@ export class StorageService {
       let parsed: any;
       try {
         parsed = JSON.parse(text);
+        if (parsed && parsed.data && (parsed.data.content || parsed.data.title)) {
+          parsed = {
+            title: parsed.data.title,
+            content: parsed.data.content,
+            tags: parsed.data.tags || [],
+            timestamp: parsed.data.createdAt || parsed.data.timestamp || new Date().toISOString(),
+            publisher: parsed.data.publisher,
+          };
+        }
       } catch {
         parsed = {
           title: 'Preserved Sovereign Document',
@@ -260,15 +273,7 @@ export class StorageService {
       console.log(`✅ Fetched content from IPFS swarm: ${cid}`);
 
       // Save to cache for subsequent reads
-      try {
-        const cacheDir = path.resolve(process.env.DATA_DIR || process.cwd(), '.data/content-cache');
-        if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
-        const safeFileName = path.basename(`${encodeURIComponent(safeCid)}.json`);
-        const safeFilePath = path.join(cacheDir, safeFileName);
-        if (safeFilePath.startsWith(cacheDir)) {
-          fs.writeFileSync(safeFilePath, JSON.stringify(contentData, null, 2), 'utf-8');
-        }
-      } catch {}
+      this.writeCache(safeCid, contentData);
 
       return contentData;
     } catch (err: any) {
@@ -282,6 +287,24 @@ export class StorageService {
    */
   async uploadFile(file: Buffer, filename: string): Promise<UploadContentResult> {
     try {
+      // Pure sovereign mode: no pinning credentials — keep the blob in the local store
+      if (!this.pinataApiKey || !this.pinataSecretKey) {
+        const deterministicCid = calculateDeterministicCIDv1(file.toString('utf-8'));
+        try {
+          if (!fs.existsSync(this.cacheDir)) fs.mkdirSync(this.cacheDir, { recursive: true });
+          fs.writeFileSync(this.cachePath(deterministicCid), file);
+        } catch (cacheErr) {
+          console.warn('Could not write to local disk cache:', cacheErr);
+        }
+        return {
+          cid: deterministicCid,
+          ipfsUrl: `ipfs://${deterministicCid}`,
+          gatewayUrl: `${this.gatewayUrl}/${deterministicCid}`,
+          storage: 'local',
+          pinned: false,
+        };
+      }
+
       const formData = new FormData();
       const blob = new Blob([file]);
       formData.append('file', blob, filename);
@@ -306,6 +329,8 @@ export class StorageService {
         cid: result.IpfsHash,
         ipfsUrl: `ipfs://${result.IpfsHash}`,
         gatewayUrl: `${this.gatewayUrl}/${result.IpfsHash}`,
+        storage: 'ipfs' as const,
+        pinned: true,
       };
     } catch (error) {
       console.error('Error uploading file to IPFS:', error);

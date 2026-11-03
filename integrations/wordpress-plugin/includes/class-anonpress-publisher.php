@@ -17,7 +17,6 @@ class AnonPress_Publisher {
         
         // Get wallet address from settings (optional - can publish anonymously)
         $wallet_address = get_option('anonpress_wallet_address');
-        $private_key = get_option('anonpress_private_key'); // Encrypted/hashed storage recommended
         
         // Allow hook to modify publishing behavior
         do_action('anonpress_before_publish', $post->ID);
@@ -30,9 +29,17 @@ class AnonPress_Publisher {
         // Allow filtering content before publishing
         $content = apply_filters('anonpress_prepare_content', $content, $post);
         
+        // Sign locally with the site key (protocol v2 binds title, tags, timestamp and body)
+        $timestamp = gmdate('Y-m-d\\TH:i:s\\Z');
+        $signed = array(
+            'publicKey' => AnonPress_Signer::get_public_key_hex(),
+            'signature' => AnonPress_Signer::sign_article($title, $tags, $timestamp, $content),
+            'timestamp' => $timestamp,
+        );
+        
         // Publish via API
         $api_client = new AnonPress_API_Client();
-        $result = $api_client->publish_content($title, $content, $tags, $wallet_address, $private_key);
+        $result = $api_client->publish_content($title, $content, $tags, $wallet_address, $signed);
         
         if (is_wp_error($result)) {
             return $result;
@@ -222,7 +229,7 @@ class AnonPress_Publisher {
             }
         }
         
-        return array_unique($tags);
+        return array_values(array_unique($tags));
     }
     
     /**

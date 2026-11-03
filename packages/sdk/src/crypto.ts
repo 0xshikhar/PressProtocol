@@ -1,6 +1,7 @@
 import * as ed from "@noble/ed25519";
 import { sha512, sha256 } from "@noble/hashes/sha2.js";
 import type { KeyPair } from "./types.js";
+import { verifyPublication, type SignatureStatus } from "./protocol.js";
 
 // Bind SHA-512 for @noble/ed25519 v2
 ed.etc.sha512Sync = (...m) => sha512(ed.etc.concatBytes(...m));
@@ -76,7 +77,8 @@ export async function getPublicKey(privateKeyHex: string): Promise<string> {
 }
 
 /**
- * Constructs the canonical deterministic JSON payload for article signing.
+ * Constructs the legacy v1 signing payload ({ title, tags, timestamp }).
+ * @deprecated v1 signatures do not cover the article body. Use signArticleV2 / buildSigningPayloadV2.
  */
 export function createCanonicalPayload(
   title: string,
@@ -126,113 +128,63 @@ export async function verifySignature(
 }
 
 export interface VerificationResult {
+  /** True only for content-bound (protocol v2) signatures. */
   isValid: boolean;
-  status: "verified" | "invalid" | "unsigned" | "malformed";
+  status: SignatureStatus;
   algorithm: string;
   publicKey: string;
   signature: string;
+  version?: 1 | 2 | null;
   latencyMs: number;
-  matchedPayload?: string;
   error?: string;
 }
 
 /**
- * Verifies an article's Ed25519 signature across canonical payload candidates.
+ * Verifies an article's Ed25519 signature using the shared PressProtocol signature protocol.
+ * Only v2 (content-bound) signatures are "verified"; v1 metadata-only signatures are "legacy".
  */
 export async function verifyArticle(article: {
   title: string;
   content?: string;
   tags?: string[];
   createdAt?: string | number | Date;
+  timestamp?: string;
   publisher?: {
     pubkey?: string;
     publicKey?: string;
     signature?: string;
+    sigVersion?: number;
   };
   signature?: string;
 }): Promise<VerificationResult> {
   const start = performance.now();
-  const signatureHex = article.signature || article.publisher?.signature;
-  const publicKeyHex = article.publisher?.pubkey || article.publisher?.publicKey;
+  const rawTimestamp = article.timestamp ?? article.createdAt;
+  const timestamp =
+    typeof rawTimestamp === "string"
+      ? rawTimestamp
+      : rawTimestamp !== undefined
+        ? new Date(rawTimestamp).toISOString()
+        : undefined;
 
-  if (!signatureHex || signatureHex === "unsigned" || !publicKeyHex) {
-    return {
-      isValid: false,
-      status: "unsigned",
-      algorithm: "None (Unsigned)",
-      publicKey: publicKeyHex || "",
-      signature: signatureHex || "unsigned",
-      latencyMs: Math.round((performance.now() - start) * 100) / 100,
-    };
-  }
-
-  if (!isValidHex(publicKeyHex, 32) || !isValidHex(signatureHex, 64)) {
-    return {
-      isValid: false,
-      status: "malformed",
-      algorithm: "Ed25519 (RFC 8032)",
-      publicKey: publicKeyHex,
-      signature: signatureHex,
-      latencyMs: Math.round((performance.now() - start) * 100) / 100,
-      error: "Public key or signature has invalid hex encoding length.",
-    };
-  }
-
-  const tags = Array.isArray(article.tags) ? article.tags : [];
-  const timestamp = article.createdAt ? new Date(article.createdAt).toISOString() : undefined;
-
-  const candidatePayloads: string[] = [];
-  if (timestamp) {
-    candidatePayloads.push(
-      JSON.stringify({
-        title: article.title,
-        tags,
-        timestamp,
-      })
-    );
-  }
-
-  if (article.content) {
-    candidatePayloads.push(
-      JSON.stringify({
-        title: article.title,
-        content: article.content,
-        tags,
-      })
-    );
-  }
-
-  candidatePayloads.push(
-    JSON.stringify({
-      title: article.title,
-      tags,
-    })
-  );
-  candidatePayloads.push(article.title);
-
-  for (const payload of candidatePayloads) {
-    const isMatch = await verifySignature(payload, signatureHex, publicKeyHex);
-    if (isMatch) {
-      return {
-        isValid: true,
-        status: "verified",
-        algorithm: "Ed25519 (RFC 8032 / SHA-512)",
-        publicKey: publicKeyHex,
-        signature: signatureHex,
-        matchedPayload: payload,
-        latencyMs: Math.round((performance.now() - start) * 100) / 100,
-      };
-    }
-  }
+  const result = await verifyPublication({
+    title: article.title,
+    tags: Array.isArray(article.tags) ? article.tags : [],
+    timestamp,
+    content: article.content,
+    publicKey: article.publisher?.pubkey || article.publisher?.publicKey,
+    signature: article.signature || article.publisher?.signature,
+    sigVersion: article.publisher?.sigVersion,
+  });
 
   return {
-    isValid: false,
-    status: "invalid",
-    algorithm: "Ed25519 (RFC 8032 / SHA-512)",
-    publicKey: publicKeyHex,
-    signature: signatureHex,
+    isValid: result.isValid,
+    status: result.status,
+    algorithm: result.algorithm,
+    publicKey: result.publicKey,
+    signature: result.signature || "unsigned",
+    version: result.version,
     latencyMs: Math.round((performance.now() - start) * 100) / 100,
-    error: "Signature does not match canonical article content.",
+    error: result.error,
   };
 }
 

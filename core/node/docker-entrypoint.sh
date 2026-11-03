@@ -10,9 +10,13 @@ TOR_DIR="${DATA_DIR}/tor"
 ONION_SERVICE_DIR="${TOR_DIR}/onion_service"
 IPFS_DIR="${DATA_DIR}/ipfs"
 DB_DIR="${DATA_DIR}/db"
+IDENTITY_DIR="${DATA_DIR}/identity"
+KEYS_DIR="${DATA_DIR}/keys"
+WEBHOOKS_DIR="${DATA_DIR}/webhooks"
+CACHE_DIR="${DATA_DIR}/content-cache"
 
 # Create directories if they do not exist
-mkdir -p "${ONION_SERVICE_DIR}" "${IPFS_DIR}" "${DB_DIR}"
+mkdir -p "${ONION_SERVICE_DIR}" "${IPFS_DIR}" "${DB_DIR}" "${IDENTITY_DIR}" "${KEYS_DIR}" "${WEBHOOKS_DIR}" "${CACHE_DIR}"
 
 # Tor requires strict 700 permissions on HiddenServiceDir
 chmod 700 "${TOR_DIR}" "${ONION_SERVICE_DIR}"
@@ -23,7 +27,7 @@ cat << 'EOF' > "${TORRC_FILE}"
 DataDirectory /var/lib/tor
 HiddenServiceDir /data/tor/onion_service/
 HiddenServicePort 80 127.0.0.1:4000
-SocksPort 0.0.0.0:9050
+SocksPort 127.0.0.1:9050
 Log notice file /var/lib/tor/tor.log
 EOF
 
@@ -56,7 +60,7 @@ else
 fi
 
 # Ensure pressprotocol user owns app & data dirs without overwriting Tor keys ownership
-chown -R 10001:10001 "${IPFS_DIR}" "${DB_DIR}" /app/dist 2>/dev/null || true
+chown -R 10001:10001 "${IPFS_DIR}" "${DB_DIR}" "${IDENTITY_DIR}" "${KEYS_DIR}" "${WEBHOOKS_DIR}" "${CACHE_DIR}" /app/dist 2>/dev/null || true
 chown 10001:10001 "${DATA_DIR}" 2>/dev/null || true
 
 # Preserve Tor strict 700 ownership on private hidden service keys

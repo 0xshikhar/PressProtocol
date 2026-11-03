@@ -62,7 +62,7 @@ async function runAllTests() {
     assert.ok(key.startsWith('pp_live_'), 'Key starts with pp_live_ prefix');
     assert.strictEqual(record.name, 'ICIJ Newsroom Integration');
     assert.strictEqual(record.isActive, true);
-    assert.strictEqual(record.keyHash, crypto.createHash('sha256').update(key).digest('hex'), 'Hash matches raw key');
+    assert.strictEqual(record.keyHash, apiKeyService.hashKey(key), 'Hash matches raw key');
     assert.ok(!JSON.stringify(record).includes(key), 'Raw key is never stored in record');
   });
 

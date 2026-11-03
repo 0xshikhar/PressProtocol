@@ -38,7 +38,7 @@ export class PinataService {
     title: string,
     content: string,
     tags: string[],
-    publisher?: { pubkey: string; signature: string },
+    publisher?: { pubkey: string; signature: string; sigVersion?: 1 | 2 },
     timestamp?: string
   ): Promise<{ cid: string; ipfsUrl: string; gatewayUrl: string }> {
     const payload: ContentData = {

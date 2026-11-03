@@ -1,6 +1,10 @@
 # Multi-Architecture Sovereign Community Node Dockerfile
 # Platforms: linux/amd64, linux/arm64 (Raspberry Pi 4/5, Apple Silicon, VPS)
 # Target: PressProtocol Complete Sovereign Infrastructure (Wave 4)
+#
+# Build context: REPOSITORY ROOT (the node depends on the workspace @pressprotocol/sdk)
+#   fly deploy --config deploy/fly.toml        (context is the repo root)
+#   docker build -f core/node/Dockerfile .
 
 FROM node:22-alpine AS builder
 
@@ -9,22 +13,29 @@ WORKDIR /app
 # Install build essentials & core tools
 RUN apk add --no-cache curl wget bash python3 make g++
 
-# Enable pnpm via Corepack pinned to v9
-RUN corepack enable && corepack prepare pnpm@9 --activate
+# Enable pnpm via Corepack
+RUN corepack enable && corepack prepare pnpm@10.17.1 --activate
 
-# Copy manifest files
-COPY package.json tsconfig.json ./
+# Copy workspace manifests for a filtered install
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+COPY packages/sdk/package.json packages/sdk/package.json
+COPY core/node/package.json core/node/package.json
+COPY core/node/tsconfig.json core/node/tsconfig.json
+COPY core/node/prisma core/node/prisma
 
-# Install dependencies with pnpm
-RUN pnpm install --no-frozen-lockfile
+# Install only the node + sdk dependency subgraph
+RUN pnpm install --frozen-lockfile --filter anonpress-backend --filter @pressprotocol/sdk
 
-# Copy source and prisma definitions
-COPY src ./src
-COPY prisma ./prisma
+# Copy sources and build SDK first, then node (prisma generate + tsc)
+COPY packages/sdk ./packages/sdk
+COPY core/node/src ./core/node/src
+RUN pnpm --dir packages/sdk run build && pnpm --dir core/node run build
 
-# Generate Prisma client and compile TypeScript
-RUN npx prisma generate --no-engine 2>/dev/null || true
-RUN pnpm run build
+# Produce an isolated production bundle (vendors the workspace SDK + prod deps)
+RUN pnpm deploy --filter anonpress-backend --prod --legacy /app/deploy
+
+# Generate the Prisma client inside the deployed bundle (@prisma/client is a prod dep)
+RUN cd /app/deploy && npx -y prisma@6 generate
 
 # --- Production Image ---
 FROM node:22-alpine AS runner
@@ -43,27 +54,21 @@ RUN apk add --no-cache tor su-exec bash curl wget ca-certificates
 RUN addgroup -g 10001 -S pressprotocol && \
     adduser -u 10001 -S pressprotocol -G pressprotocol
 
-# Enable pnpm in production runner pinned to v9
-RUN corepack enable && corepack prepare pnpm@9 --activate
-
-# Copy production package descriptors and install prod-only dependencies
-COPY package.json tsconfig.json ./
-RUN pnpm install --prod --no-frozen-lockfile
-
-# Copy built application and prisma definitions from builder stage
-COPY --from=builder /app/dist ./dist
-COPY prisma ./prisma
-RUN npx prisma generate --no-engine || true
+# Copy the isolated production bundle (node_modules + dist + prisma schema)
+COPY --from=builder /app/deploy/node_modules ./node_modules
+COPY --from=builder /app/deploy/dist ./dist
+COPY --from=builder /app/deploy/prisma ./prisma
+COPY --from=builder /app/deploy/package.json ./package.json
 
 # Copy entrypoint script
-COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+COPY core/node/docker-entrypoint.sh /app/docker-entrypoint.sh
 RUN chmod +x /app/docker-entrypoint.sh
 
 # Create mount directories
-RUN mkdir -p /data/ipfs /data/tor/onion_service /data/db && \
+RUN mkdir -p /data/ipfs /data/tor/onion_service /data/db /data/identity /data/content-cache && \
     chown -R 10001:10001 /data /app
 
-# Volume for all persistent sovereign data (IPFS blockstore, Tor keys, embedded DB)
+# Volume for all persistent sovereign data (IPFS blockstore, Tor keys, embedded DB, node identity)
 VOLUME ["/data"]
 
 # Expose ports:

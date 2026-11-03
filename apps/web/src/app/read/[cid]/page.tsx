@@ -4,8 +4,8 @@ import { siteConfig } from "@/config/site";
 import { ReadArticleClient } from "./ReadArticleClient";
 
 interface PageProps {
-  params: { cid: string };
-  searchParams: { quote?: string; q?: string; v?: string; [key: string]: string | string[] | undefined };
+  params: Promise<{ cid: string }>;
+  searchParams: Promise<{ quote?: string; q?: string; v?: string; [key: string]: string | string[] | undefined }>;
 }
 
 /**
@@ -20,12 +20,13 @@ export async function generateMetadata({
   params,
   searchParams,
 }: PageProps): Promise<Metadata> {
-  const { cid } = params;
+  const { cid } = await params;
+  const query = await searchParams;
   const rawQuote =
-    typeof searchParams.q === "string"
-      ? searchParams.q
-      : typeof searchParams.quote === "string"
-      ? searchParams.quote
+    typeof query.q === "string"
+      ? query.q
+      : typeof query.quote === "string"
+      ? query.quote
       : "";
   const quote = rawQuote.replace(/\+/g, " ").trim();
 
@@ -109,6 +110,7 @@ export async function generateMetadata({
  * @param props - Page properties containing the dynamic route CID parameter.
  * @returns React Server Component rendering the interactive client reader.
  */
-export default function Page({ params }: PageProps) {
-  return <ReadArticleClient cid={params.cid} />;
+export default async function Page({ params }: PageProps) {
+  const { cid } = await params;
+  return <ReadArticleClient cid={cid} />;
 }

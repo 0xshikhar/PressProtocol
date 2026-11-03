@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import DOMPurify from "dompurify";
+import { sanitizeArticleHtml } from "@/lib/sanitize-html";
 import { usePrivy } from "@privy-io/react-auth";
 import { EnhancedEditor } from "@/components/editor/EnhancedEditor";
 import { Button } from "@/components/ui/button";
@@ -42,6 +42,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { calculateDeterministicCIDv1, exportPressProof, downloadPressProofFile } from "@pressprotocol/proof";
+import { signArticleV2 } from "@pressprotocol/sdk";
 import { CryptographicPreFlightHUD } from "@/components/editor/CryptographicPreFlightHUD";
 import { ZenModeOverlay } from "@/components/editor/ZenModeOverlay";
 import { DraftVaultModal } from "@/components/editor/DraftVaultModal";
@@ -62,7 +63,6 @@ import {
   getOrCreateBurnerWallet,
   burnCurrentWallet,
   saveBurnerArticle,
-  signWithBurner,
   type BurnerWallet,
 } from "@/lib/burner-wallet";
 import {
@@ -268,12 +268,10 @@ export default function WritePage() {
 
       if (identityMode === "anonymous" && burnerWallet) {
         pubKey = burnerWallet.publicKey;
-        const canonicalPayload = JSON.stringify({
-          title: title.trim(),
-          tags,
-          timestamp,
-        });
-        signature = await signWithBurner(canonicalPayload, burnerWallet.privateKey);
+        signature = await signArticleV2(
+          { title: title.trim(), tags, timestamp, content },
+          burnerWallet.privateKey
+        );
       }
 
       const proof = exportPressProof({
@@ -285,6 +283,7 @@ export default function WritePage() {
         publisher: {
           publicKey: pubKey,
           signature,
+          ...(signature !== "unsigned" ? { sigVersion: 2 as const } : {}),
           walletAddress: identityMode === "verified" ? user?.wallet?.address : undefined,
           username: identityMode === "anonymous" ? burnerWallet?.pseudonym : user?.email?.address,
         },
@@ -353,12 +352,10 @@ export default function WritePage() {
       const publishedTimestamp = new Date().toISOString();
 
       if (isAnonymousPublish && burnerWallet?.privateKey) {
-        const canonicalPayload = JSON.stringify({
-          title: title.trim(),
-          tags,
-          timestamp: publishedTimestamp,
-        });
-        clientSignature = await signWithBurner(canonicalPayload, burnerWallet.privateKey);
+        clientSignature = await signArticleV2(
+          { title: title.trim(), tags, timestamp: publishedTimestamp, content },
+          burnerWallet.privateKey
+        );
         clientPubKey = burnerWallet.publicKey;
       }
 
@@ -406,12 +403,10 @@ export default function WritePage() {
         let sig = "unsigned";
 
         if (burnerWallet?.privateKey) {
-          const canonical = JSON.stringify({
-            title: title.trim(),
-            tags,
-            timestamp,
-          });
-          sig = await signWithBurner(canonical, burnerWallet.privateKey);
+          sig = await signArticleV2(
+            { title: title.trim(), tags, timestamp, content },
+            burnerWallet.privateKey
+          );
         }
 
         const proof = exportPressProof({
@@ -423,6 +418,7 @@ export default function WritePage() {
           publisher: {
             publicKey: pubKey,
             signature: sig,
+            ...(sig !== "unsigned" ? { sigVersion: 2 as const } : {}),
             walletAddress: identityMode === "verified" ? user?.wallet?.address : undefined,
             username: identityMode === "anonymous" ? burnerWallet?.pseudonym : user?.email?.address,
           },
@@ -572,7 +568,7 @@ export default function WritePage() {
               <div
                 className="prose prose-lg dark:prose-invert max-w-none pt-4 font-serif leading-relaxed text-primary dispatch-prose"
                 dangerouslySetInnerHTML={{
-                  __html: typeof window !== "undefined" ? DOMPurify.sanitize(content) : content,
+                  __html: sanitizeArticleHtml(content),
                 }}
               />
             ) : (

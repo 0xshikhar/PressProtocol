@@ -18,6 +18,7 @@ delete_option('anonpress_api_url');
 delete_option('anonpress_wallet_address');
 delete_option('anonpress_public_key');
 delete_option('anonpress_private_key');
+delete_option('pressprotocol_signing_key');
 
 // Delete plugin tables
 $table_name = $wpdb->prefix . 'anonpress_publications';

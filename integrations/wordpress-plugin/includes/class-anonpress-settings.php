@@ -15,7 +15,6 @@ class AnonPress_Settings {
             'sanitize_callback' => array(__CLASS__, 'sanitize_wallet_address'),
         ));
         register_setting('anonpress_settings', 'anonpress_public_key');
-        register_setting('anonpress_settings', 'anonpress_private_key');
         
         add_settings_section(
             'anonpress_main_section',

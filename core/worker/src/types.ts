@@ -7,6 +7,11 @@ export interface Env {
   CORS_ORIGIN?: string;
   PUBLIC_APP_URL?: string;
   TOR_ONION_GATEWAY?: string;
+  PINATA_GATEWAY_URL?: string;
+  PINATA_GATEWAY_TOKEN?: string;
+  EDGE_SIGNING_KEY?: string;
+  PUBLISH_LIMITER?: RateLimit;
+  READ_LIMITER?: RateLimit;
   JWT_SECRET?: string;
   ENVIRONMENT?: string;
 }
@@ -19,6 +24,7 @@ export interface ContentData {
   publisher?: {
     pubkey: string;
     signature: string;
+    sigVersion?: 1 | 2;
   };
 }
 
@@ -46,6 +52,7 @@ export interface PublishResponseData {
     signature: string;
     walletAddress?: string;
   };
+  signatureStatus?: string;
   mirrors: {
     ipfs: string;
     tor: string;

@@ -1,10 +1,9 @@
 import {
   generateKeypair,
   getPublicKey,
-  signPayload,
-  createCanonicalPayload,
   verifyArticle,
 } from "./crypto.js";
+import { signArticleV2 } from "./protocol.js";
 import type {
   ClientConfig,
   PublishOptions,
@@ -81,8 +80,10 @@ export class PressProtocolClient {
     }
 
     // 2. Construct canonical payload and sign client-side
-    const canonicalPayload = createCanonicalPayload(options.title, tags, timestamp);
-    const signature = await signPayload(canonicalPayload, privKey);
+    const signature = await signArticleV2(
+      { title: options.title, tags, timestamp, content: options.content },
+      privKey
+    );
 
     // 3. Post to PressProtocol Node daemon
     const controller = new AbortController();
@@ -227,7 +228,7 @@ export class PressProtocolClient {
         content,
         tags,
         createdAt,
-        publisher: { publicKey: pubkey, pubkey, signature },
+        publisher: { publicKey: pubkey, pubkey, signature, sigVersion: articleRaw.publisher?.sigVersion },
         signature,
       });
 

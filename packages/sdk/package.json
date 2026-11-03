@@ -6,6 +6,19 @@
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./protocol": {
+      "types": "./dist/protocol.d.ts",
+      "import": "./dist/protocol.js",
+      "default": "./dist/protocol.js"
+    },
+    "./package.json": "./package.json"
+  },
   "bin": {
     "pressprotocol": "dist/bin/cli.js"
   },
@@ -28,7 +41,6 @@
   "bugs": {
     "url": "https://github.com/0xshikhar/PressProtocol/issues"
   },
-
   "keywords": [
     "pressprotocol",
     "sdk",
@@ -53,4 +65,3 @@
     "typescript": "^5.4.5"
   }
 }
-

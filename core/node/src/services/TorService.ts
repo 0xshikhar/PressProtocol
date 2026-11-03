@@ -33,6 +33,7 @@ export class TorService {
   private controlPassword?: string;
   private isDevelopment: boolean;
   private onionServicesPath: string;
+  private cachedOnionAddress: string | null = null;
 
   constructor() {
     this.proxyHost = env.TOR_PROXY_HOST;
@@ -41,18 +42,15 @@ export class TorService {
     this.controlPassword = env.TOR_CONTROL_PASSWORD;
     this.isDevelopment = env.NODE_ENV === 'development';
     this.onionServicesPath = '/var/lib/tor/onion_services';
+    void this.refreshCachedOnionAddress();
+    setInterval(() => {
+      if (!this.cachedOnionAddress) {
+        void this.refreshCachedOnionAddress();
+      }
+    }, 10_000).unref();
   }
 
-  /**
-   * Resolve self .onion address from container volume, env, or onionize
-   */
-  async getSelfOnionAddress(): Promise<string | null> {
-    // 1. Explicit env override
-    if (env.TOR_ONION_ADDRESS) {
-      return env.TOR_ONION_ADDRESS.trim();
-    }
-
-    // 2. Candidate paths in autonomous container or onionize volume
+  private async refreshCachedOnionAddress(): Promise<void> {
     const candidatePaths = [
       `${env.DATA_DIR}/tor_hostname`,
       `/data/tor_hostname`,
@@ -74,19 +72,33 @@ export class TorService {
           const content = await readFile(p, 'utf-8');
           const address = content.trim();
           if (address && address.endsWith('.onion')) {
-            return address;
+            this.cachedOnionAddress = address;
+            return;
           }
         } catch {
           // continue checking next path
         }
       }
     }
+  }
 
-    // 3. In dev / test / fallback: Return deterministic fallback
+  /**
+   * Resolve self .onion address from container volume, env, or onionize
+   */
+  async getSelfOnionAddress(): Promise<string | null> {
+    // 1. Explicit env override
+    if (env.TOR_ONION_ADDRESS) {
+      return env.TOR_ONION_ADDRESS.trim();
+    }
+
+    // 2. Cached address discovered at startup or background poll
+    if (this.cachedOnionAddress) {
+      return this.cachedOnionAddress;
+    }
+
+    // 3. In dev / test / fallback: Return canonical Tor v3 address
     if (env.NODE_ENV === 'test' || env.NODE_ENV === 'development') {
-      const fallbackHash = 'pressprotocol7sovereign4node6federation3mesh7relay5v3';
-      const padded = (fallbackHash + '234567abcdefghijklmnopqrstuvwxyz').slice(0, 56);
-      return `${padded}.onion`;
+      return '6wst2skhjdkaltwvy37clw2mzk75lteq66qu5qzg3ujhresdhloy63yd.onion';
     }
 
     return null;
@@ -155,7 +167,7 @@ export class TorService {
    * Get onion URL for content via Tor hidden service
    * Returns the actual .onion address from embedded Tor daemon or onionize
    */
-  async createOnionService(contentCid: string, gatewayUrl: string): Promise<OnionServiceResult> {
+  async createOnionService(contentCid: string, gatewayUrl?: string | null): Promise<OnionServiceResult> {
     try {
       console.log('🔍 [TOR] Creating onion service reference for content...');
       console.log(`   CID: ${contentCid}`);
@@ -235,24 +247,11 @@ export class TorService {
   }
 
   /**
-   * Measure latency to onion service
-   * Returns typical Tor latency (~450ms)
+   * Latency to the onion service is not measured yet (requires a SOCKS round-trip through Tor),
+   * so no value is reported rather than a fabricated one.
    */
-  async measureOnionLatency(serviceName: string = 'self'): Promise<number | null> {
-    try {
-      const isAvailable = await this.checkOnionAvailability(serviceName);
-      
-      if (!isAvailable) {
-        return null;
-      }
-
-      // Return typical Tor latency
-      // In production, could measure actual latency via SOCKS proxy
-      return 450;
-    } catch (error) {
-      console.error('Onion latency measurement failed:', error);
-      return null;
-    }
+  async measureOnionLatency(_serviceName: string = 'self'): Promise<number | null> {
+    return null;
   }
 
   /**

@@ -1,6 +1,9 @@
 import { FastifyInstance } from 'fastify';
+import { timingSafeEqual } from 'node:crypto';
 import { z } from 'zod';
 import { env } from '../config/env.js';
+import { optionalScope, rateLimit } from '../lib/auth.js';
+import { validateSafeUrl } from '../lib/ssrf.js';
 import { 
   sovereignMirrorService, 
   MediumIngestInput, 
@@ -17,7 +20,6 @@ const mediumIngestSchema = z.object({
   content: z.string().min(1),
   author: z.string().optional(),
   tags: z.array(z.string()).optional(),
-  privateKey: z.string().optional(),
 });
 
 const substackIngestSchema = z.object({
@@ -28,7 +30,6 @@ const substackIngestSchema = z.object({
   author: z.string().optional(),
   tags: z.array(z.string()).optional(),
   audioEnclosureUrl: z.string().optional(),
-  privateKey: z.string().optional(),
 });
 
 const genericCmsSchema = z.object({
@@ -72,7 +73,7 @@ export async function bridgeRoutes(fastify: FastifyInstance) {
   /**
    * POST /api/bridge/cleanse - Cleanses arbitrary HTML/Markdown of surveillance trackers
    */
-  fastify.post('/api/bridge/cleanse', async (request, reply) => {
+  fastify.post('/api/bridge/cleanse', { preHandler: rateLimit(60) }, async (request, reply) => {
     try {
       const body = cleanseSchema.parse(request.body);
       const result = sovereignMirrorService.cleanseSurveillanceTrackers(body.content);
@@ -91,9 +92,10 @@ export async function bridgeRoutes(fastify: FastifyInstance) {
   /**
    * POST /api/bridge/medium - Sovereign Mirroring for Medium Articles
    */
-  fastify.post('/api/bridge/medium', async (request, reply) => {
+  fastify.post('/api/bridge/medium', { preHandler: [optionalScope('publish:raw'), rateLimit(60)] }, async (request, reply) => {
     try {
       const body = mediumIngestSchema.parse(request.body) as MediumIngestInput;
+      if (body.url) validateSafeUrl(body.url);
       const result = await sovereignMirrorService.mirrorMediumArticle(body);
       return reply.send(result);
     } catch (err: any) {
@@ -107,9 +109,10 @@ export async function bridgeRoutes(fastify: FastifyInstance) {
   /**
    * POST /api/bridge/substack - Sovereign Mirroring for Substack Newsletters
    */
-  fastify.post('/api/bridge/substack', async (request, reply) => {
+  fastify.post('/api/bridge/substack', { preHandler: [optionalScope('publish:raw'), rateLimit(60)] }, async (request, reply) => {
     try {
       const body = substackIngestSchema.parse(request.body) as SubstackIngestInput;
+      if (body.url) validateSafeUrl(body.url);
       const result = await sovereignMirrorService.mirrorSubstackPost(body);
       return reply.send(result);
     } catch (err: any) {
@@ -123,14 +126,13 @@ export async function bridgeRoutes(fastify: FastifyInstance) {
   /**
    * POST /api/bridge/ghost - Ghost CMS Webhook Ingress with HMAC-SHA256 verification
    */
-  fastify.post('/api/bridge/ghost', async (request, reply) => {
+  fastify.post('/api/bridge/ghost', { preHandler: rateLimit(60) }, async (request, reply) => {
     try {
-      const secret = env.GHOST_WEBHOOK_SECRET || (request.headers['x-ghost-secret'] as string);
-      const signatureHeader = request.headers['x-ghost-signature'] as string | undefined;
-
-      // If secret configured, verify HMAC
+      // The shared secret comes only from the environment — a caller may never supply it.
+      const secret = env.GHOST_WEBHOOK_SECRET;
       if (secret) {
-        const rawBody = typeof request.body === 'string' ? request.body : JSON.stringify(request.body);
+        const signatureHeader = request.headers['x-ghost-signature'] as string | undefined;
+        const rawBody = request.rawBody ?? JSON.stringify(request.body ?? {});
         const verification = cmsBridgeService.verifyGhostSignature(rawBody, signatureHeader, secret);
         if (!verification.valid) {
           return reply.status(401).send({
@@ -154,14 +156,16 @@ export async function bridgeRoutes(fastify: FastifyInstance) {
   /**
    * POST /api/bridge/strapi - Strapi CMS Webhook Ingress
    */
-  fastify.post('/api/bridge/strapi', async (request, reply) => {
+  fastify.post('/api/bridge/strapi', { preHandler: rateLimit(60) }, async (request, reply) => {
     try {
       const secret = env.STRAPI_WEBHOOK_SECRET;
       if (secret) {
         const authHeader = request.headers['authorization'];
         const customHeader = request.headers['x-strapi-secret'];
         const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : customHeader;
-        if (token !== secret) {
+        const expected = Buffer.from(secret, 'utf-8');
+        const provided = Buffer.from(typeof token === 'string' ? token : '', 'utf-8');
+        if (provided.length !== expected.length || !timingSafeEqual(provided, expected)) {
           return reply.status(401).send({
             success: false,
             error: 'Unauthorized: Invalid Strapi webhook secret',
@@ -183,7 +187,7 @@ export async function bridgeRoutes(fastify: FastifyInstance) {
   /**
    * POST /api/bridge/cms - Generic CMS Ingress (Sanity, Contentful, etc.)
    */
-  fastify.post('/api/bridge/cms', async (request, reply) => {
+  fastify.post('/api/bridge/cms', { preHandler: [optionalScope('publish:raw'), rateLimit(60)] }, async (request, reply) => {
     try {
       const body = genericCmsSchema.parse(request.body) as GenericCmsPayload;
       const result = await cmsBridgeService.ingestGenericCms(body);

@@ -6,7 +6,7 @@ primary_region = "iad"
 
 [build]
   dockerfile = "core/node/Dockerfile"
-  ignorefile = "core/node/.dockerignore"
+  ignorefile = ".dockerignore"
 
 [mounts]
   source = "pressprotocol_data"
@@ -28,6 +28,12 @@ primary_region = "iad"
   timeout = "5s"
   path = "/api/node/health"
 
+# Secrets (set via `fly secrets set`, not in this file):
+#   ADMIN_API_KEY      - operator key for /api/v1/admin/* and operator routes
+#   PINATA_API_KEY + PINATA_SECRET_KEY - optional; omit for pure sovereign mode
+#   CORS_ORIGIN        - comma-separated allowed origins (e.g. https://pressprotocol.com)
+#   PUBLIC_NODE_URL    - this node's public HTTPS URL once provisioned
+#   PUBLIC_APP_URL     - reader app URL (default https://pressprotocol.com)
 [env]
   PORT = "4000"
   NODE_ENV = "production"
