@@ -1,14 +1,15 @@
 /**
  * At-rest protection for browser-held signing keys.
- * Secrets are sealed with AES-GCM under a non-extractable CryptoKey persisted in IndexedDB,
- * so raw key material never sits in localStorage and cannot be read back as bytes.
+ * Key material is encrypted with AES-GCM under a non-extractable CryptoKey and stored in IndexedDB,
+ * so localStorage never holds raw or wrapped key material.
  */
 
 const DB_NAME = "pressprotocol-keyvault";
 const STORE = "keys";
 const WRAP_KEY_ID = "burner-wrap-v1";
+const ENTRY_PREFIX = "entry:";
 
-export interface SealedSecret {
+export interface EncryptedVaultRecord {
   iv: string;
   ct: string;
 }
@@ -54,15 +55,35 @@ function getWrappingKey(): Promise<CryptoKey> {
   return wrapKeyPromise;
 }
 
-export async function sealSecret(plain: string): Promise<SealedSecret> {
+export async function encryptVaultValue(plain: string): Promise<EncryptedVaultRecord> {
   const key = await getWrappingKey();
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const ct = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(plain));
   return { iv: toB64(iv), ct: toB64(new Uint8Array(ct)) };
 }
 
-export async function openSecret(sealed: SealedSecret): Promise<string> {
+export async function decryptVaultValue(record: EncryptedVaultRecord): Promise<string> {
   const key = await getWrappingKey();
-  const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: fromB64(sealed.iv) }, key, fromB64(sealed.ct));
+  const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: fromB64(record.iv) }, key, fromB64(record.ct));
   return new TextDecoder().decode(pt);
+}
+
+export async function saveVaultEntry(id: string, plain: string): Promise<void> {
+  const encrypted = await encryptVaultValue(plain);
+  const db = await openDb();
+  await idbRequest(db, "readwrite", (s) => s.put(encrypted, `${ENTRY_PREFIX}${id}`));
+}
+
+export async function loadVaultEntry(id: string): Promise<string | null> {
+  const db = await openDb();
+  const encrypted = await idbRequest<EncryptedVaultRecord | undefined>(db, "readonly", (s) =>
+    s.get(`${ENTRY_PREFIX}${id}`)
+  );
+  if (!encrypted) return null;
+  return decryptVaultValue(encrypted);
+}
+
+export async function deleteVaultEntry(id: string): Promise<void> {
+  const db = await openDb();
+  await idbRequest(db, "readwrite", (s) => s.delete(`${ENTRY_PREFIX}${id}`));
 }

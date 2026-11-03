@@ -1,5 +1,12 @@
 import * as ed from "@noble/ed25519";
-import { isKeyVaultSupported, openSecret, sealSecret, type SealedSecret } from "./key-vault";
+import {
+  decryptVaultValue,
+  deleteVaultEntry,
+  isKeyVaultSupported,
+  loadVaultEntry,
+  saveVaultEntry,
+  type EncryptedVaultRecord,
+} from "./key-vault";
 
 export interface BurnerWallet {
   publicKey: string;
@@ -18,39 +25,38 @@ export interface BurnerArticle {
 const STORAGE_KEY = "pressprotocol_burner_identity";
 const ARTICLES_STORAGE_KEY = "pressprotocol_burner_articles";
 
-/** Shape persisted in localStorage: public fields in clear, private key sealed. */
-interface StoredBurnerWallet {
+/** Public metadata persisted in localStorage; signing key material lives encrypted in IndexedDB. */
+interface StoredBurnerMetadata {
   v: 2;
   publicKey: string;
   pseudonym: string;
   createdAt: number;
-  sealedPrivateKey: SealedSecret;
+  sealedPrivateKey?: EncryptedVaultRecord;
 }
 
 /**
- * Persists a burner wallet with its private key sealed at rest.
- * Falls back to legacy plaintext storage only when WebCrypto/IndexedDB are unavailable.
+ * Persists a burner wallet: signing key is encrypted in IndexedDB, and only public metadata
+ * (publicKey, pseudonym, createdAt) is written to localStorage.
  */
 export async function persistBurnerWallet(wallet: BurnerWallet): Promise<void> {
   if (typeof window === "undefined") return;
   if (!isKeyVaultSupported()) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(wallet));
+    console.warn("Secure key storage is unavailable; burner wallet will not be persisted.");
     return;
   }
-  const stored: StoredBurnerWallet = {
+  await saveVaultEntry(wallet.publicKey, wallet.privateKey);
+  const metadata: StoredBurnerMetadata = {
     v: 2,
     publicKey: wallet.publicKey,
     pseudonym: wallet.pseudonym,
     createdAt: wallet.createdAt,
-    sealedPrivateKey: await sealSecret(wallet.privateKey),
   };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(metadata));
 }
 
 /**
- * Retrieves the existing persistent burner wallet from localStorage,
- * or generates a fresh cryptographic Ed25519 keypair if none exists.
- * Legacy plaintext entries are transparently re-sealed.
+ * Retrieves the existing persistent burner wallet, or generates a fresh Ed25519 keypair if none exists.
+ * Legacy entries are transparently migrated into the IndexedDB vault.
  */
 export async function getOrCreateBurnerWallet(): Promise<BurnerWallet> {
   if (typeof window === "undefined") {
@@ -58,24 +64,42 @@ export async function getOrCreateBurnerWallet(): Promise<BurnerWallet> {
   }
 
   const existing = localStorage.getItem(STORAGE_KEY);
-  if (existing) {
+  if (existing && isKeyVaultSupported()) {
     try {
-      const parsed = JSON.parse(existing) as Partial<BurnerWallet & StoredBurnerWallet>;
-      if (parsed.v === 2 && parsed.publicKey && parsed.sealedPrivateKey) {
-        const privateKey = await openSecret(parsed.sealedPrivateKey);
-        return {
+      const parsed = JSON.parse(existing) as Partial<BurnerWallet & StoredBurnerMetadata>;
+      if (parsed.v === 2 && parsed.publicKey) {
+        let keyHex = await loadVaultEntry(parsed.publicKey);
+        if (!keyHex && parsed.sealedPrivateKey) {
+          keyHex = await decryptVaultValue(parsed.sealedPrivateKey);
+          await saveVaultEntry(parsed.publicKey, keyHex);
+          const cleanMeta: StoredBurnerMetadata = {
+            v: 2,
+            publicKey: parsed.publicKey,
+            pseudonym: parsed.pseudonym || `Anon-${parsed.publicKey.slice(0, 4)}...${parsed.publicKey.slice(-4)}`,
+            createdAt: parsed.createdAt || Date.now(),
+          };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(cleanMeta));
+        }
+        if (keyHex) {
+          return {
+            publicKey: parsed.publicKey,
+            privateKey: keyHex,
+            pseudonym: parsed.pseudonym || `Anon-${parsed.publicKey.slice(0, 4)}...${parsed.publicKey.slice(-4)}`,
+            createdAt: parsed.createdAt || Date.now(),
+          };
+        }
+      }
+      if (parsed.publicKey && parsed.privateKey) {
+        const legacy: BurnerWallet = {
           publicKey: parsed.publicKey,
-          privateKey,
+          privateKey: parsed.privateKey,
           pseudonym: parsed.pseudonym || `Anon-${parsed.publicKey.slice(0, 4)}...${parsed.publicKey.slice(-4)}`,
           createdAt: parsed.createdAt || Date.now(),
         };
-      }
-      if (parsed.publicKey && parsed.privateKey) {
-        const legacy = parsed as BurnerWallet;
         await persistBurnerWallet(legacy);
         return legacy;
       }
-    } catch (e) {
+    } catch {
       console.warn("Burner wallet in storage could not be opened, generating fresh identity...");
     }
   }
@@ -111,6 +135,17 @@ export async function createFreshBurnerWallet(): Promise<BurnerWallet> {
  */
 export async function burnCurrentWallet(wipeHistory: boolean = false): Promise<BurnerWallet> {
   if (typeof window !== "undefined") {
+    try {
+      const existing = localStorage.getItem(STORAGE_KEY);
+      if (existing && isKeyVaultSupported()) {
+        const parsed = JSON.parse(existing) as { publicKey?: string };
+        if (parsed?.publicKey) {
+          await deleteVaultEntry(parsed.publicKey);
+        }
+      }
+    } catch {
+      // Ignore cleanup errors
+    }
     localStorage.removeItem(STORAGE_KEY);
     if (wipeHistory) {
       localStorage.removeItem(ARTICLES_STORAGE_KEY);
@@ -152,8 +187,14 @@ export function saveBurnerArticle(article: BurnerArticle): void {
   if (typeof window === "undefined") return;
 
   try {
+    const sanitized: BurnerArticle = {
+      cid: String(article.cid),
+      title: String(article.title),
+      publishedAt: Number(article.publishedAt),
+      pseudonym: String(article.pseudonym),
+    };
     const existing = getBurnerArticles();
-    const updated = [article, ...existing.filter((a) => a.cid !== article.cid)];
+    const updated = [sanitized, ...existing.filter((a) => a.cid !== sanitized.cid)];
     localStorage.setItem(ARTICLES_STORAGE_KEY, JSON.stringify(updated));
   } catch (err) {
     console.error("Failed to save burner article history:", err);

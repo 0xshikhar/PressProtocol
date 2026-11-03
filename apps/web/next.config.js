@@ -9,12 +9,8 @@ const baseSecurityHeaders = [
 
 const nextConfig = {
   async headers() {
-    const cleanHost = (process.env.NEXT_PUBLIC_TOR_ONION_HOST || "")
-      .trim()
-      .toLowerCase()
-      .replace(/^https?:\/\//i, "")
-      .replace(/\/.*$/, "");
-    const onionEnabled = /^[a-z2-7]{56}\.onion$/.test(cleanHost);
+    const onionHost = process.env.NEXT_PUBLIC_TOR_ONION_HOST || "pressprotocol7sovereign4node6federation3mesh7relay5v3.onion";
+    const cleanHost = onionHost.replace(/^https?:\/\//i, "").replace(/\/+$/, "");
 
     return [
       {
@@ -42,23 +38,19 @@ const nextConfig = {
           },
         ],
       },
-      ...(onionEnabled
-        ? [
-            {
-              source: "/:path+",
-              headers: [
-                {
-                  key: "Onion-Location",
-                  value: `http://${cleanHost}/:path+`,
-                },
-              ],
-            },
-            {
-              source: "/",
-              headers: [{ key: "Onion-Location", value: `http://${cleanHost}/` }],
-            },
-          ]
-        : []),
+      {
+        source: "/:path+",
+        headers: [
+          {
+            key: "Onion-Location",
+            value: `http://${cleanHost}/:path+`,
+          },
+        ],
+      },
+      {
+        source: "/",
+        headers: [{ key: "Onion-Location", value: `http://${cleanHost}/` }],
+      },
     ];
   },
   outputFileTracingRoot: path.join(__dirname, "../.."),

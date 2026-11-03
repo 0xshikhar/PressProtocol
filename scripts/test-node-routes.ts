@@ -65,14 +65,22 @@ await test('admin bootstrap key from ADMIN_API_KEY works; generated keys authent
   assert.ok(res.json().keys.length >= 3);
 });
 
-await test('operator endpoints reject unauthenticated callers', async () => {
+await test('operator endpoints reject unauthenticated callers and enforce scopes on API keys', async () => {
   assert.equal((await app.inject({ method: 'PUT', url: '/api/node/federation/policy', payload: { policy: 'all' } })).statusCode, 401);
   assert.equal((await postJson('/api/node/federation/peers', { peerUrl: 'https://peer.example' })).statusCode, 401);
   assert.equal((await postJson('/api/v1/admin/keys', { name: 'x' })).statusCode, 401);
-  assert.equal((await postJson('/api/v1/webhooks/subscriptions', { url: 'https://hook.example/x' })).statusCode, 401);
-  assert.equal((await postJson('/api/upload/json', { data: { a: 1 } })).statusCode, 401);
-  assert.equal((await postJson('/api/bridge/cms', { title: 't', content: 'c' })).statusCode, 401);
-  assert.equal((await postJson('/api/v1/publish/raw', { title: 't', content: 'c' })).statusCode, 401);
+  assert.equal((await postJson('/api/v1/publish/raw', { title: 't', content: 'c' }, { 'x-api-key': 'invalid_key' })).statusCode, 401);
+  assert.equal((await postJson('/api/v1/publish/raw', { title: 't', content: 'c' }, { 'x-api-key': readerKey })).statusCode, 403);
+  assert.equal((await postJson('/api/upload/json', { data: { a: 1 } }, { 'x-api-key': readerKey })).statusCode, 403);
+  assert.equal((await postJson('/api/bridge/cms', { title: 't', content: 'c' }, { 'x-api-key': readerKey })).statusCode, 403);
+  process.env.REQUIRE_API_KEY = 'true';
+  try {
+    assert.equal((await postJson('/api/v1/publish/raw', { title: 't', content: 'c' })).statusCode, 401);
+    assert.equal((await postJson('/api/upload/json', { data: { a: 1 } })).statusCode, 401);
+    assert.equal((await postJson('/api/bridge/cms', { title: 't', content: 'c' })).statusCode, 401);
+  } finally {
+    delete process.env.REQUIRE_API_KEY;
+  }
 });
 
 await test('operator endpoints reject keys lacking the required scope', async () => {
@@ -129,18 +137,23 @@ await test('POST /api/v1/verify distinguishes verified, legacy and invalid', asy
   assert.equal(bad.status, 'invalid');
 });
 
-await test('POST /api/v1/publish/signed rejects v1 signatures and accepts v2', async () => {
+await test('POST /api/v1/publish/signed rejects invalid signatures, labels v1 as legacy, and verifies v2', async () => {
   const kp = await generateKeypair();
   const article = { title: 'Signed publish', tags: ['s'], timestamp: '2026-11-01T00:00:00.000Z', content: '<p>signed body</p>' };
+  const invalid = await postJson('/api/v1/publish/signed', { ...article, publicKey: kp.publicKey, signature: '00'.repeat(64) });
+  assert.equal(invalid.statusCode, 401);
+
   const v1 = await signPayload(createCanonicalPayload(article.title, article.tags, article.timestamp), kp.privateKey);
-  const rejected = await postJson('/api/v1/publish/signed', { ...article, publicKey: kp.publicKey, signature: v1 });
-  assert.equal(rejected.statusCode, 401);
-  assert.match(rejected.json().error, /legacy v1/i);
+  const legacyRes = await postJson('/api/v1/publish/signed', { ...article, publicKey: kp.publicKey, signature: v1 });
+  assert.equal(legacyRes.statusCode, 201);
+  assert.equal(legacyRes.json().signatureStatus, 'legacy');
+  assert.equal(legacyRes.json().verified, false);
 
   const v2 = await signArticleV2(article, kp.privateKey);
   const accepted = await postJson('/api/v1/publish/signed', { ...article, publicKey: kp.publicKey, signature: v2 });
   assert.equal(accepted.statusCode, 201);
-  assert.equal(accepted.json().proof.publisher.sigVersion, undefined); // client signature passthrough
+  assert.equal(accepted.json().signatureStatus, 'verified');
+  assert.equal(accepted.json().verified, true);
   assert.equal(accepted.json().proof.publisher.publicKey, kp.publicKey);
 });
 
@@ -158,7 +171,7 @@ await test('POST /api/v1/publish/raw signs with the persistent node identity (v2
   assert.equal(body.publisher.publicKey, statusPub, 'publish must use the same persistent node identity exposed in status');
 });
 
-await test('POST /api/content publishes unsigned honestly or verifies a v2 signature', async () => {
+await test('POST /api/content publishes unsigned honestly, accepts v1 as legacy, and verifies v2', async () => {
   const anon = await postJson('/api/content', { title: 'Anon', content: '<p>anon</p>', tags: [] });
   assert.equal(anon.statusCode, 201);
   const anonData = anon.json().data;
@@ -176,7 +189,11 @@ await test('POST /api/content publishes unsigned honestly or verifies a v2 signa
 
   const legacy = await signPayload(createCanonicalPayload(signed.title, signed.tags, timestamp), kp.privateKey);
   const legacyRes = await postJson('/api/content', { ...signed, publicKey: kp.publicKey, signature: legacy });
-  assert.equal(legacyRes.statusCode, 401);
+  assert.equal(legacyRes.statusCode, 201);
+  assert.equal(legacyRes.json().data.publisher.signatureStatus, 'legacy');
+
+  const forgedRes = await postJson('/api/content', { ...signed, publicKey: kp.publicKey, signature: '11'.repeat(64) });
+  assert.equal(forgedRes.statusCode, 401);
 });
 
 await test('GET /read/:cid sanitizes untrusted HTML and sends a CSP', async () => {
@@ -197,9 +214,17 @@ await test('GET /read/:cid sanitizes untrusted HTML and sends a CSP', async () =
   assert.ok(html.includes('Unsigned'), 'honest badge for unsigned content');
 });
 
-await test('Ghost and Strapi ingress are disabled without configured secrets', async () => {
-  assert.equal((await postJson('/api/bridge/ghost', { post: {} })).statusCode, 503);
-  assert.equal((await postJson('/api/bridge/strapi', { entry: {} })).statusCode, 503);
+await test('Ghost and Strapi ingress enforce env secrets when configured and ignore caller-supplied x-ghost-secret', async () => {
+  const { env } = await import('../core/node/src/config/env.js');
+  env.GHOST_WEBHOOK_SECRET = 'real_ghost_secret';
+  env.STRAPI_WEBHOOK_SECRET = 'real_strapi_secret';
+  try {
+    assert.equal((await postJson('/api/bridge/ghost', { post: {} }, { 'x-ghost-secret': 'attacker_secret' })).statusCode, 401);
+    assert.equal((await postJson('/api/bridge/strapi', { entry: {} }, { 'x-strapi-secret': 'attacker_secret' })).statusCode, 401);
+  } finally {
+    env.GHOST_WEBHOOK_SECRET = '';
+    env.STRAPI_WEBHOOK_SECRET = '';
+  }
 });
 
 console.log(`\n📊 Test Results: ${passed} Passed, ${failed} Failed`);

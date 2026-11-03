@@ -14,6 +14,7 @@ if (typeof (Promise as any).withResolvers === 'undefined') {
 import Fastify, { FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
 import multipart from '@fastify/multipart';
+import fastifyRateLimit from '@fastify/rate-limit';
 import { pathToFileURL } from 'node:url';
 import { env } from './config/env.js';
 import { prisma } from './lib/prisma.js';
@@ -74,6 +75,12 @@ export async function buildServer(options?: { logger?: boolean }): Promise<Fasti
   });
 
   // Register plugins
+  await fastify.register(fastifyRateLimit, {
+    global: true,
+    max: 600,
+    timeWindow: '1 minute',
+  });
+
   await fastify.register(cors, {
     origin: env.CORS_ORIGIN.split(',').map(origin => origin.trim()),
     credentials: true,
@@ -151,7 +158,7 @@ export async function buildServer(options?: { logger?: boolean }): Promise<Fasti
       version: '1.0.0-sovereign',
       specification: 'RFC-PP-009-ENTERPRISE-GATEWAY-AND-API',
       description: 'Universal decentralized publishing substrate, P2P federation, OpenAPI 3.1 gateway, and multi-tenant publishing engine',
-      onionAddress: onionAddress || null,
+      onionAddress: onionAddress || 'Pending daemon startup',
       endpoints: {
         nodeStatus: '/api/node/status',
         nodeHealth: '/api/node/health',

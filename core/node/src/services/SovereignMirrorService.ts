@@ -258,7 +258,7 @@ export class SovereignMirrorService {
       wordCount,
       tags,
       proof,
-      ipfsUrl: storageResult.pinned ? `ipfs://${finalCID}` : null,
+      ipfsUrl: `https://ipfs.io/ipfs/${finalCID}`,
       torUrl: onionAddress ? `http://${onionAddress}/read/${finalCID}` : undefined,
     };
   }
@@ -325,7 +325,7 @@ export class SovereignMirrorService {
       wordCount,
       tags,
       proof,
-      ipfsUrl: storageResult.pinned ? `ipfs://${finalCID}` : null,
+      ipfsUrl: `https://ipfs.io/ipfs/${finalCID}`,
       torUrl: onionAddress ? `http://${onionAddress}/read/${finalCID}` : undefined,
     };
   }

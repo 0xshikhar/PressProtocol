@@ -26,6 +26,7 @@ import {
 } from '../core/node/src/lib/webhook-crypto.js';
 
 const TEST_DATA_DIR = mkdtempSync(join(tmpdir(), 'pp-webhook-test-'));
+process.env.ALLOW_PRIVATE_NETWORK_FETCH = 'true';
 import { WebhookSubscriptionService } from '../core/node/src/services/WebhookSubscriptionService.js';
 import {
   signWebhookPayload as sdkSign,

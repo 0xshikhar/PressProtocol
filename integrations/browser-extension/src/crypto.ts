@@ -3,7 +3,12 @@
  * Provides sovereign Ed25519 keypair generation, storage, and deterministic RFC 8785 payload signing.
  */
 import * as ed from "@noble/ed25519";
-import { isKeyVaultSupported, openSecret, sealSecret, type SealedSecret } from "./key-vault";
+import {
+  decryptVaultValue,
+  encryptVaultValue,
+  isKeyVaultSupported,
+  type EncryptedVaultRecord,
+} from "./key-vault";
 
 export interface BurnerIdentity {
   publicKey: string;
@@ -39,19 +44,21 @@ interface StoredBurnerIdentity {
   publicKey: string;
   pseudonym: string;
   createdAt: number;
-  sealedPrivateKey: SealedSecret;
+  sealedPrivateKey: EncryptedVaultRecord;
 }
 
 async function persistIdentity(identity: BurnerIdentity): Promise<void> {
-  const value = isKeyVaultSupported()
-    ? ({
-        v: 2,
-        publicKey: identity.publicKey,
-        pseudonym: identity.pseudonym,
-        createdAt: identity.createdAt,
-        sealedPrivateKey: await sealSecret(identity.privateKey),
-      } satisfies StoredBurnerIdentity)
-    : identity;
+  if (!isKeyVaultSupported()) {
+    console.warn("Secure key vault is unavailable in this environment; burner identity will not be persisted.");
+    return;
+  }
+  const value: StoredBurnerIdentity = {
+    v: 2,
+    publicKey: identity.publicKey,
+    pseudonym: identity.pseudonym,
+    createdAt: identity.createdAt,
+    sealedPrivateKey: await encryptVaultValue(identity.privateKey),
+  };
   await new Promise<void>((resolve) => {
     chrome.storage.local.set({ [STORAGE_KEY]: value }, () => resolve());
   });
@@ -69,7 +76,7 @@ export async function getOrCreateBurnerIdentity(): Promise<BurnerIdentity> {
     if (stored?.v === 2 && stored.publicKey && stored.sealedPrivateKey) {
       return {
         publicKey: stored.publicKey,
-        privateKey: await openSecret(stored.sealedPrivateKey),
+        privateKey: await decryptVaultValue(stored.sealedPrivateKey),
         pseudonym: stored.pseudonym || `Anon-${stored.publicKey.slice(0, 4)}...${stored.publicKey.slice(-4)}`,
         createdAt: stored.createdAt || Date.now(),
       };

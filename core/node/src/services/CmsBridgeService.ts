@@ -170,7 +170,7 @@ export class CmsBridgeService {
           slug: current.slug,
         },
       },
-      ipfsUrl: storageResult.pinned ? `ipfs://${finalCID}` : null,
+      ipfsUrl: `https://ipfs.io/ipfs/${finalCID}`,
       torUrl: onionAddress ? `http://${onionAddress}/read/${finalCID}` : undefined,
     };
   }
@@ -241,7 +241,7 @@ export class CmsBridgeService {
           model: payload.model,
         },
       },
-      ipfsUrl: storageResult.pinned ? `ipfs://${finalCID}` : null,
+      ipfsUrl: `https://ipfs.io/ipfs/${finalCID}`,
       torUrl: onionAddress ? `http://${onionAddress}/read/${finalCID}` : undefined,
     };
   }
@@ -298,7 +298,7 @@ export class CmsBridgeService {
           author: payload.author,
         },
       },
-      ipfsUrl: storageResult.pinned ? `ipfs://${finalCID}` : null,
+      ipfsUrl: `https://ipfs.io/ipfs/${finalCID}`,
       torUrl: onionAddress ? `http://${onionAddress}/read/${finalCID}` : undefined,
     };
   }

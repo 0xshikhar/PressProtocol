@@ -1,6 +1,6 @@
 /**
  * At-rest protection for the extension's signing key.
- * The private key is sealed with AES-GCM under a non-extractable CryptoKey kept in the
+ * Key material is encrypted with AES-GCM under a non-extractable CryptoKey kept in the
  * extension origin's IndexedDB (shared by popup and service worker), so chrome.storage
  * never holds raw key material.
  */
@@ -9,7 +9,7 @@ const DB_NAME = "pressprotocol-keyvault";
 const STORE = "keys";
 const WRAP_KEY_ID = "burner-wrap-v1";
 
-export interface SealedSecret {
+export interface EncryptedVaultRecord {
   iv: string;
   ct: string;
 }
@@ -55,15 +55,15 @@ function getWrappingKey(): Promise<CryptoKey> {
   return wrapKeyPromise;
 }
 
-export async function sealSecret(plain: string): Promise<SealedSecret> {
+export async function encryptVaultValue(plain: string): Promise<EncryptedVaultRecord> {
   const key = await getWrappingKey();
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const ct = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(plain));
   return { iv: toB64(iv), ct: toB64(new Uint8Array(ct)) };
 }
 
-export async function openSecret(sealed: SealedSecret): Promise<string> {
+export async function decryptVaultValue(record: EncryptedVaultRecord): Promise<string> {
   const key = await getWrappingKey();
-  const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: fromB64(sealed.iv) }, key, fromB64(sealed.ct));
+  const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: fromB64(record.iv) }, key, fromB64(record.ct));
   return new TextDecoder().decode(pt);
 }

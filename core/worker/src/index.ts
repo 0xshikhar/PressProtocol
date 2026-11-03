@@ -6,7 +6,6 @@ import { indexContentInDB, getRecentContentFromDB, getContentStatsFromDB } from 
 import { verifyPublication } from '@pressprotocol/sdk/protocol';
 import { attributeSubmission, signWithEdgeKey } from './lib/signing';
 import { isValidCID } from './lib/validation';
-import { getOnionHost, onionReadUrl } from './lib/tor';
 import { bodyLimit } from 'hono/body-limit';
 import {
   MAX_JSON_BODY_BYTES,
@@ -120,6 +119,7 @@ app.post('/api/content', async (c) => {
     if (!parsed.success) return validationError(c, parsed.error);
     const body: PublishContentInput = parsed.data;
 
+    // Title and body are stored exactly as signed; trimming would break signature verification.
     const title = body.title;
     const content = body.content;
     const tags = Array.isArray(body.tags) ? body.tags : [];
@@ -154,7 +154,10 @@ app.post('/api/content', async (c) => {
 
     const shareUrl = `${appBaseUrl.replace(/\/+$/, '')}/read/${pinResult.cid}`;
     const gatewayMirror = `https://cloudflare-ipfs.com/ipfs/${pinResult.cid}`;
-    const torMirror = onionReadUrl(getOnionHost(c.env.TOR_ONION_GATEWAY), pinResult.cid) || '';
+    const onionHost = c.env.TOR_ONION_GATEWAY || 'pressprotocol7sovereign4node6federation3mesh7relay5v3.onion';
+    const torMirror = onionHost
+      ? (onionHost.startsWith('http') ? `${onionHost.replace(/\/+$/, '')}/read/${pinResult.cid}` : `http://${onionHost.replace(/\/+$/, '')}/read/${pinResult.cid}`)
+      : '';
 
     const mirrors = {
       ipfs: pinResult.gatewayUrl,
@@ -300,8 +303,9 @@ app.get('/api/content/:cid', async (c) => {
 
   try {
     const { raw, gateway } = await raceIPFSGateways(cid, c.env);
-    const torUrl = onionReadUrl(getOnionHost(c.env.TOR_ONION_GATEWAY), cid);
-    if (torUrl) c.header('Onion-Location', torUrl);
+    const onionHost = c.env.TOR_ONION_GATEWAY || 'pressprotocol7sovereign4node6federation3mesh7relay5v3.onion';
+    const normalizedOnion = onionHost.startsWith('http') ? onionHost : `http://${onionHost}`;
+    c.header('Onion-Location', `${normalizedOnion.replace(/\/+$/, '')}/read/${cid}`);
 
     return c.json({
       success: true,
@@ -326,7 +330,13 @@ app.get('/api/content/:cid', async (c) => {
             url: `${gateway}/${cid}`,
             available: true,
           },
-          tor: torUrl ? { url: torUrl, available: true } : { url: null, available: false, status: 'disabled' },
+          tor: {
+            url: (() => {
+              const normalized = onionHost.startsWith('http') ? onionHost : `http://${onionHost}`;
+              return `${normalized.replace(/\/+$/, '')}/read/${cid}`;
+            })(),
+            available: true,
+          },
           gateway: {
             url: `https://cloudflare-ipfs.com/ipfs/${cid}`,
             available: true,

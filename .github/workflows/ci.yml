@@ -114,13 +114,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Go
-        uses: actions/setup-go@4a3601fe6c8cf1a449761d4dca4017ab3ff4f055 # v6.2.0
+        uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b # v5.4.0
 
       - name: Setup Rust
-        uses: dtolnay/rust-toolchain@21b3a05be5534fe582a0a97b96cd6d98d8d5a9f0 # stable
+        uses: dtolnay/rust-toolchain@7e38f4b43b4db5c8dd498af069a4f6196df1d067 # stable
 
       - name: Setup Python
-        uses: actions/setup-python@fd734b7c0c22f6b5cf4f24e5acbc06a4eaae51cd # v6.2.0
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
         with:
           python-version: '3.12'
 

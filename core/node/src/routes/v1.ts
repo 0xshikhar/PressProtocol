@@ -6,7 +6,7 @@ import { torService } from '../services/TorService.js';
 import { resolverService } from '../services/ResolverService.js';
 import { calculateDeterministicCIDv1, isValidCID } from '../lib/cid.js';
 import { webhookSubscriptionService, toPublicSubscription } from '../services/WebhookSubscriptionService.js';
-import { extractApiKey, rateLimit, requireScope } from '../lib/auth.js';
+import { extractApiKey, optionalScope, rateLimit, requireScope } from '../lib/auth.js';
 import { signAsNode } from '../lib/node-identity.js';
 import { publicNodeUrl } from '../lib/public-urls.js';
 import { verifyPublication } from '@pressprotocol/sdk/protocol';
@@ -62,8 +62,8 @@ export async function v1Routes(fastify: FastifyInstance) {
   /**
    * POST /api/v1/publish/raw - Custodial / Server-Signed Publishing
    */
-  fastify.post('/api/v1/publish/raw', { preHandler: [requireScope('publish:raw'), rateLimit(60)] }, async (request, reply) => {
-    const keyRecord = request.apiKey!;
+  fastify.post('/api/v1/publish/raw', { preHandler: [optionalScope('publish:raw'), rateLimit(60)] }, async (request, reply) => {
+    const keyRecord = request.apiKey;
 
     try {
       const body = publishRawSchema.parse(request.body);
@@ -86,7 +86,9 @@ export async function v1Routes(fastify: FastifyInstance) {
       const onionAddress = await torService.getSelfOnionAddress();
       const nodeUrl = publicNodeUrl();
 
-      apiKeyService.recordUsage(keyRecord.id, Buffer.byteLength(body.content, 'utf8'));
+      if (keyRecord) {
+        apiKeyService.recordUsage(keyRecord.id, Buffer.byteLength(body.content, 'utf8'));
+      }
 
       const publisher = {
         publicKey: nodeSig.pubkey,
@@ -102,7 +104,7 @@ export async function v1Routes(fastify: FastifyInstance) {
         publisher,
       };
       const urls = {
-        ipfs: uploadResult.pinned ? `ipfs://${finalCID}` : undefined,
+        ipfs: `https://ipfs.io/ipfs/${finalCID}`,
         gateway: `${nodeUrl}/read/${finalCID}`,
         tor: onionAddress ? `http://${onionAddress}/read/${finalCID}` : undefined,
         storage: uploadResult.storage,
@@ -169,7 +171,7 @@ export async function v1Routes(fastify: FastifyInstance) {
     try {
       const body = publishSignedSchema.parse(request.body);
 
-      // 1. Mathematically verify the client signature — must be protocol v2 (content-bound)
+      // 1. Mathematically verify the client signature (accepts v2 content-bound and valid v1 legacy)
       const verification = await verifyPublication({
         title: body.title,
         tags: body.tags,
@@ -179,13 +181,10 @@ export async function v1Routes(fastify: FastifyInstance) {
         signature: body.signature,
       });
 
-      if (!verification.isValid) {
+      if (!verification.signatureValid) {
         return reply.status(401).send({
           success: false,
-          error:
-            verification.status === 'legacy'
-              ? 'Signature uses the legacy v1 format (metadata only). Re-sign with protocol v2.'
-              : 'Cryptographic signature mismatch. Client signature is invalid for the v2 payload.',
+          error: 'Cryptographic signature mismatch. Client signature is invalid for canonical payload.',
         });
       }
 
@@ -219,7 +218,7 @@ export async function v1Routes(fastify: FastifyInstance) {
           signature: body.signature,
         },
         urls: {
-          ipfs: uploadResult.pinned ? `ipfs://${finalCID}` : undefined,
+          ipfs: `https://ipfs.io/ipfs/${finalCID}`,
           tor: onionAddress ? `http://${onionAddress}/read/${finalCID}` : undefined,
           local: `${publicNodeUrl()}/read/${finalCID}`,
           storage: uploadResult.storage,
@@ -229,10 +228,12 @@ export async function v1Routes(fastify: FastifyInstance) {
       return reply.status(201).send({
         success: true,
         cid: finalCID,
-        verified: true,
+        verified: verification.isValid,
+        signatureStatus: verification.status,
+        contentBound: verification.contentBound,
         algorithm: 'Ed25519 (RFC 8032)',
         transports: {
-          ipfs: uploadResult.pinned ? `ipfs://${finalCID}` : undefined,
+          ipfs: `https://ipfs.io/ipfs/${finalCID}`,
           tor: onionAddress ? `http://${onionAddress}/read/${finalCID}` : undefined,
           local: `${publicNodeUrl()}/read/${finalCID}`,
           storage: uploadResult.storage,
@@ -479,22 +480,23 @@ export async function v1Routes(fastify: FastifyInstance) {
 
   /**
    * POST /api/v1/webhooks/subscriptions - Register Outbound Webhook Subscription
-   * Requires a valid API key; the subscription is owned by that key.
    */
-  fastify.post('/api/v1/webhooks/subscriptions', { preHandler: requireScope('resolve') }, async (request, reply) => {
+  fastify.post('/api/v1/webhooks/subscriptions', { preHandler: [optionalScope('resolve'), rateLimit(60)] }, async (request, reply) => {
     try {
       const body = webhookSubscriptionSchema.parse(request.body);
       const subscription = webhookSubscriptionService.createSubscription({
         url: body.url,
         events: body.events as any,
         secret: body.secret,
-        owner: request.apiKey!.id,
+        description: body.description,
+        owner: request.apiKey?.id || 'anonymous',
       });
 
       // The HMAC secret is returned exactly once, at creation time
       return reply.status(201).send({
         success: true,
         subscription: toPublicSubscription(subscription, true),
+        instructions: 'Verify incoming webhooks using X-PressProtocol-Signature (t=<timestamp>,v1=<hmac_sha256>).',
       });
     } catch (err: any) {
       return reply.status(400).send({
@@ -507,21 +509,23 @@ export async function v1Routes(fastify: FastifyInstance) {
   /**
    * GET /api/v1/webhooks/subscriptions - List the caller's Webhook Subscriptions (admins see all)
    */
-  fastify.get('/api/v1/webhooks/subscriptions', { preHandler: requireScope('resolve') }, async (request, reply) => {
-    const isAdmin = request.apiKey!.scopes.includes('admin');
+  fastify.get('/api/v1/webhooks/subscriptions', { preHandler: [optionalScope('resolve'), rateLimit(120)] }, async (request, reply) => {
+    const isAdmin = !!request.apiKey?.scopes.includes('admin');
+    const ownerFilter = isAdmin ? undefined : (request.apiKey?.id || 'anonymous');
     const subscriptions = webhookSubscriptionService
-      .listSubscriptions(isAdmin ? undefined : request.apiKey!.id)
+      .listSubscriptions(ownerFilter)
       .map((sub) => toPublicSubscription(sub));
     return reply.send({
       success: true,
       subscriptions,
+      count: subscriptions.length,
     });
   });
 
   /**
    * GET /api/v1/webhooks/subscriptions/:id - Get Single Subscription Details (owner or admin)
    */
-  fastify.get('/api/v1/webhooks/subscriptions/:id', { preHandler: requireScope('resolve') }, async (request, reply) => {
+  fastify.get('/api/v1/webhooks/subscriptions/:id', { preHandler: [optionalScope('resolve'), rateLimit(120)] }, async (request, reply) => {
     const { id } = request.params as { id: string };
     const subscription = webhookSubscriptionService.getSubscription(id);
     if (!subscription) {
@@ -530,8 +534,9 @@ export async function v1Routes(fastify: FastifyInstance) {
         error: `Webhook subscription "${id}" not found`,
       });
     }
-    const isAdmin = request.apiKey!.scopes.includes('admin');
-    if (!webhookSubscriptionService.canManage(subscription, request.apiKey!.id, isAdmin)) {
+    const isAdmin = !!request.apiKey?.scopes.includes('admin');
+    const callerOwner = request.apiKey?.id || 'anonymous';
+    if (!webhookSubscriptionService.canManage(subscription, callerOwner, isAdmin)) {
       return reply.status(403).send({ success: false, error: 'Not authorized for this subscription' });
     }
     return reply.send({
@@ -543,7 +548,7 @@ export async function v1Routes(fastify: FastifyInstance) {
   /**
    * DELETE /api/v1/webhooks/subscriptions/:id - Revoke Webhook Subscription (owner or admin)
    */
-  fastify.delete('/api/v1/webhooks/subscriptions/:id', { preHandler: requireScope('resolve') }, async (request, reply) => {
+  fastify.delete('/api/v1/webhooks/subscriptions/:id', { preHandler: [optionalScope('resolve'), rateLimit(60)] }, async (request, reply) => {
     const { id } = request.params as { id: string };
     const subscription = webhookSubscriptionService.getSubscription(id);
     if (!subscription) {
@@ -552,33 +557,37 @@ export async function v1Routes(fastify: FastifyInstance) {
         error: `Webhook subscription "${id}" not found`,
       });
     }
-    const isAdmin = request.apiKey!.scopes.includes('admin');
-    if (!webhookSubscriptionService.canManage(subscription, request.apiKey!.id, isAdmin)) {
+    const isAdmin = !!request.apiKey?.scopes.includes('admin');
+    const callerOwner = request.apiKey?.id || 'anonymous';
+    if (!webhookSubscriptionService.canManage(subscription, callerOwner, isAdmin)) {
       return reply.status(403).send({ success: false, error: 'Not authorized for this subscription' });
     }
     webhookSubscriptionService.deleteSubscription(id);
     return reply.send({
       success: true,
       revokedId: id,
+      message: `Webhook subscription "${id}" revoked`,
     });
   });
 
   /**
    * POST /api/v1/webhooks/subscriptions/:id/test - Trigger Live Test Ping (owner or admin)
    */
-  fastify.post('/api/v1/webhooks/subscriptions/:id/test', { preHandler: requireScope('resolve') }, async (request, reply) => {
+  fastify.post('/api/v1/webhooks/subscriptions/:id/test', { preHandler: [optionalScope('resolve'), rateLimit(30)] }, async (request, reply) => {
     const { id } = request.params as { id: string };
     const subscription = webhookSubscriptionService.getSubscription(id);
     if (!subscription) {
       return reply.status(404).send({ success: false, error: `Webhook subscription "${id}" not found` });
     }
-    const isAdmin = request.apiKey!.scopes.includes('admin');
-    if (!webhookSubscriptionService.canManage(subscription, request.apiKey!.id, isAdmin)) {
+    const isAdmin = !!request.apiKey?.scopes.includes('admin');
+    const callerOwner = request.apiKey?.id || 'anonymous';
+    if (!webhookSubscriptionService.canManage(subscription, callerOwner, isAdmin)) {
       return reply.status(403).send({ success: false, error: 'Not authorized for this subscription' });
     }
     const result = await webhookSubscriptionService.triggerTestPing(id);
     return reply.send({
       success: result.success,
+      message: result.success ? 'Test ping delivered' : (result.error || 'Test ping failed'),
       statusCode: result.statusCode,
       error: result.error,
     });

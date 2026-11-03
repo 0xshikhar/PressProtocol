@@ -82,14 +82,14 @@ export async function contentRoutes(fastify: FastifyInstance) {
     try {
       const body = publishContentSchema.parse(request.body);
 
-      // 1. Optional client signature — must be protocol v2 (content-bound). A wallet
-      //    address alone is stored only as a label; it does not authenticate the publish.
+      // 1. Optional client signature — accepts protocol v2 (content-bound) and valid v1 (legacy).
       let user = null;
       let userId = null;
       const publishedTimestamp = body.timestamp || new Date().toISOString();
       let publicKey: string | undefined;
       let signature = 'unsigned';
-      let signatureStatus: 'verified' | 'unsigned' = 'unsigned';
+      let signatureStatus: 'verified' | 'legacy' | 'unsigned' = 'unsigned';
+      let sigVersion: 1 | 2 | null = null;
 
       if (body.signature || body.publicKey) {
         const verification = await verifyPublication({
@@ -100,18 +100,16 @@ export async function contentRoutes(fastify: FastifyInstance) {
           publicKey: body.publicKey || '',
           signature: body.signature || '',
         });
-        if (!verification.isValid) {
+        if (!verification.signatureValid) {
           return reply.status(401).send({
             success: false,
-            error:
-              verification.status === 'legacy'
-                ? 'Signature uses the legacy v1 format (metadata only). Re-sign with protocol v2.'
-                : 'Invalid signature for the v2 content-bound payload.',
+            error: 'Invalid cryptographic signature for the supplied payload.',
           });
         }
         publicKey = body.publicKey;
         signature = body.signature!;
-        signatureStatus = 'verified';
+        signatureStatus = verification.status === 'verified' ? 'verified' : 'legacy';
+        sigVersion = verification.version ?? null;
         await prisma.identity.create({
           data: { publicKey: body.publicKey! },
         }).catch(() => undefined); // dedupe best-effort
@@ -223,7 +221,7 @@ export async function contentRoutes(fastify: FastifyInstance) {
           publisher: {
             publicKey: publicKey || null,
             signatureStatus,
-            sigVersion: signatureStatus === 'verified' ? 2 : null,
+            sigVersion,
             isAnonymous: !publicKey,
           },
           storage: ipfsResult.storage,

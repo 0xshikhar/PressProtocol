@@ -11,10 +11,8 @@ export interface PinataUploadResult {
 
 export interface UploadContentResult {
   cid: string;
-  /** Canonical ipfs:// URI — only set when the content was actually pinned to IPFS. */
-  ipfsUrl: string | null;
-  /** HTTP gateway URL — only set when the content was actually pinned to IPFS. */
-  gatewayUrl: string | null;
+  ipfsUrl: string;
+  gatewayUrl: string;
   /** Where the content actually ended up: the public IPFS swarm or the local sovereign store. */
   storage: 'ipfs' | 'local';
   pinned: boolean;
@@ -114,8 +112,8 @@ export class StorageService {
 
         return {
           cid: deterministicCid,
-          ipfsUrl: null,
-          gatewayUrl: null,
+          ipfsUrl: `ipfs://${deterministicCid}`,
+          gatewayUrl: `${this.gatewayUrl}/${deterministicCid}`,
           storage: 'local',
           pinned: false,
         };
@@ -149,8 +147,8 @@ export class StorageService {
 
         return {
           cid: deterministicCid,
-          ipfsUrl: null,
-          gatewayUrl: null,
+          ipfsUrl: `ipfs://${deterministicCid}`,
+          gatewayUrl: `${this.gatewayUrl}/${deterministicCid}`,
           storage: 'local',
           pinned: false,
         };
@@ -288,7 +286,13 @@ export class StorageService {
         } catch (cacheErr) {
           console.warn('Could not write to local disk cache:', cacheErr);
         }
-        return { cid: deterministicCid, ipfsUrl: null, gatewayUrl: null, storage: 'local', pinned: false };
+        return {
+          cid: deterministicCid,
+          ipfsUrl: `ipfs://${deterministicCid}`,
+          gatewayUrl: `${this.gatewayUrl}/${deterministicCid}`,
+          storage: 'local',
+          pinned: false,
+        };
       }
 
       const formData = new FormData();

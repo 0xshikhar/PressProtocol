@@ -11,10 +11,14 @@ declare module 'fastify' {
 export function extractApiKey(request: FastifyRequest): string | undefined {
   const authHeader = request.headers['authorization'];
   if (authHeader && authHeader.startsWith('Bearer ')) {
-    return authHeader.substring(7).trim();
+    const token = authHeader.substring(7).trim();
+    if (token) return token;
   }
   const customHeader = request.headers['x-api-key'];
-  return typeof customHeader === 'string' ? customHeader.trim() : undefined;
+  if (typeof customHeader === 'string' && customHeader.trim()) {
+    return customHeader.trim();
+  }
+  return undefined;
 }
 
 /**
@@ -35,11 +39,32 @@ export function requireScope(scope: string): preHandlerAsyncHookHandler {
   };
 }
 
+/**
+ * preHandler that validates the API key and `scope` when an API key is provided
+ * (or when REQUIRE_API_KEY=true), while allowing unauthenticated requests in
+ * open community-node mode so existing SDK/web callers continue to work.
+ */
+export function optionalScope(scope: string): preHandlerAsyncHookHandler {
+  return async (request: FastifyRequest, reply: FastifyReply) => {
+    const rawKey = extractApiKey(request);
+    if (!rawKey) {
+      if (process.env.REQUIRE_API_KEY === 'true') {
+        return reply.status(401).send({ success: false, error: 'API key required' });
+      }
+      return;
+    }
+    const auth = apiKeyService.validateKey(rawKey, scope);
+    if (!auth.valid || !auth.record) {
+      return reply.status(auth.record ? 403 : 401).send({ success: false, error: auth.error || 'Invalid API key' });
+    }
+    request.apiKey = auth.record;
+  };
+}
+
 /** preHandler applying the token-bucket limiter per API key (when present) or client IP. */
 export function rateLimit(limitPerMin: number): preHandlerAsyncHookHandler {
   return async (request: FastifyRequest, reply: FastifyReply) => {
-    const rawKey = extractApiKey(request);
-    const record = rawKey ? apiKeyService.validateKey(rawKey).record : undefined;
+    const record = request.apiKey ?? (extractApiKey(request) ? apiKeyService.validateKey(extractApiKey(request)!).record : undefined);
     const result = apiKeyService.checkRateLimit(record ? `key:${record.id}` : `ip:${request.ip}`, record?.rateLimitPerMin || limitPerMin);
     reply.header('X-RateLimit-Limit', result.limit);
     reply.header('X-RateLimit-Remaining', result.remaining);
