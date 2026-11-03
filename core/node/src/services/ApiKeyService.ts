@@ -117,7 +117,7 @@ export class ApiKeyService {
   }
 
   public hashKey(rawKey: string): string {
-    return crypto.createHash('sha256').update(rawKey).digest('hex');
+    return crypto.scryptSync(rawKey, 'pressprotocol-apikey-salt-v1', 32).toString('hex');
   }
 
   /**
