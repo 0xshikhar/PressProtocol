@@ -1,3 +1,7 @@
+## Commit and PR conventions
+- Do not add AI or tool attribution to commits or PR descriptions: no "Generated with" footers, no `Co-Authored-By` trailers for bots or assistants, and no mentions of AI tools.
+- Write commit messages and PR bodies as plain, human-authored text focused on what changed and why.
+
 <!-- BEGIN AWS Agent Toolkit rules -->
 # AWS Guidance for the new AWS experience
 
