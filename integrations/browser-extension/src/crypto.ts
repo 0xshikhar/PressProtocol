@@ -69,7 +69,7 @@ async function persistIdentity(identity: BurnerIdentity): Promise<void> {
  * Legacy plaintext identities are transparently re-sealed.
  */
 export async function getOrCreateBurnerIdentity(): Promise<BurnerIdentity> {
-  const result = await new Promise<Record<string, any>>((resolve) => chrome.storage.local.get([STORAGE_KEY], resolve));
+  const result = await new Promise<Record<string, any>>((resolve) => chrome.storage.local.get<Record<string, any>>([STORAGE_KEY], resolve));
   const stored = result[STORAGE_KEY] as Partial<BurnerIdentity & StoredBurnerIdentity> | undefined;
 
   try {
