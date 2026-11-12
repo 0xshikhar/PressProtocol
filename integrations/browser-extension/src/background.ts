@@ -28,7 +28,7 @@ async function getSettings(): Promise<ExtensionSettings> {
  */
 async function getScraps(): Promise<SovereignScrap[]> {
   return new Promise((resolve) => {
-    chrome.storage.local.get([SCRAPS_STORAGE_KEY], (res) => {
+    chrome.storage.local.get<{ [SCRAPS_STORAGE_KEY]?: SovereignScrap[] }>([SCRAPS_STORAGE_KEY], (res) => {
       resolve(res[SCRAPS_STORAGE_KEY] || []);
     });
   });
